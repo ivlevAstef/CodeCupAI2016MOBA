@@ -8,6 +8,7 @@
 
 
 #include "Extensions.h"
+#include <cmath>
 
 namespace Extensions
 {

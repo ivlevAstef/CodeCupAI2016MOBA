@@ -15,6 +15,9 @@
     <ClCompile Include="..\Sources\Common\Logger.cpp">
       <Filter>Sources\Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\MyStrategy.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\Common\Extensions.h">
@@ -29,5 +32,12 @@
     <ClInclude Include="..\Sources\Common\Singleton.h">
       <Filter>Sources\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\Sources\MyStrategy.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\local-runner\read.me" />
+    <None Include="..\..\..\local-runner\local-runner.properties" />
   </ItemGroup>
 </Project>

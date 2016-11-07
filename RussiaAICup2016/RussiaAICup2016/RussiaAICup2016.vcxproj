@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)..\..\cpp-cgdk;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -90,12 +90,16 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)Sources;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Sources;$(SolutionDir)..\..\cpp-cgdk;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>cd $(SolutionDir)..\..\local-runner\
+powershell start-process local-runner.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -150,12 +154,18 @@
   <ItemGroup>
     <ClCompile Include="..\Sources\Common\Extensions.cpp" />
     <ClCompile Include="..\Sources\Common\Logger.cpp" />
+    <ClCompile Include="..\Sources\MyStrategy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\Common\Extensions.h" />
     <ClInclude Include="..\Sources\Common\Logger.h" />
     <ClInclude Include="..\Sources\Common\Singleton.h" />
     <ClInclude Include="..\Sources\Common\Vector2D.h" />
+    <ClInclude Include="..\Sources\MyStrategy.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\local-runner\local-runner.properties" />
+    <None Include="..\..\..\local-runner\read.me" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

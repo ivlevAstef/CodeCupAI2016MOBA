@@ -9,19 +9,21 @@
 #pragma once
 
 
-namespace Extensions
+namespace AICup
 {
-  double constPI();
+  namespace Extensions
+  {
+    double constPI();
 
-  template <typename T> int sign(T val) {
-    return (T(0) < val) - (val < T(0));
-  }
+    template <typename T> int sign(T val) {
+      return (T(0) < val) - (val < T(0));
+    }
 
-#define MAX(a,b) (((a) > (b)) ? (a) : (b))
-#define MIN(a,b) (((a) < (b)) ? (a) : (b))
+    #define MAX(a,b) (((a) > (b)) ? (a) : (b))
+    #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
-#define SIA_PI constPI()
+    #define SIA_PI constPI()
+
+  };
 
 };
-
-#endif
