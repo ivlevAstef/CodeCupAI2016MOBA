@@ -8,6 +8,7 @@
 #pragma once
 
 #include "model\World.h"
+#include "C_Vector2D.h"
 #include "C_Singleton.h"
 
 namespace AICup
@@ -20,6 +21,9 @@ namespace AICup
 
     std::vector<model::Tree>& trees();
     std::vector<model::Wizard>& wizards();
+
+    Position linePosition(model::LineType line);
+
 
   private:
     void updateSupposedData();

@@ -24,9 +24,10 @@ namespace AICup
     double turn;
   };
 
-  /// строит путь состоящий из набора точек, по которым можно пройти чтобы попасть из точки в точку
+  /// строит путь состоящий из набора точек, по которым можно пройти по прямым чтобы попасть из точки в точку
   std::vector<Position> path(Position from, Position to);
 
-  std::vector<Position> move(Position from, Position to);
+  /// Говорит куда и как надо двигаться, чтобы попасть из текущего состояния в некоторую точку
+  MoveAction move(MovableUnit unit, Position to);
 
 };

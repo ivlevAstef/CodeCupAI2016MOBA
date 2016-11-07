@@ -51,7 +51,7 @@ namespace AICup
       x = array[0];
       y = array[1];
     }
-    void set(const Vector<Type>& v) {
+    void set(const Vector2D<Type>& v) {
       x = v.x;
       y = v.y;
     }
@@ -124,6 +124,17 @@ namespace AICup
 
     inline Type length2() const {
       return x * x + y * y;
+    }
+
+    inline double normalize() {
+      auto len = length();
+      x /= len;
+      y /= len;
+    }
+
+    inline Vector2D<Type> normal() {
+      auto len = length();
+      return Vector2D<Type>(x / len, y / len);
     }
 
     inline Vector2D<Type> perpendicular() const {

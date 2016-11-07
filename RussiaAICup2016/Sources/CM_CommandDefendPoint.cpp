@@ -5,7 +5,7 @@
 //
 
 
-#include "CommandDefendPoint.h"
+#include "CM_CommandDefendPoint.h"
 
 using namespace AICup;
 

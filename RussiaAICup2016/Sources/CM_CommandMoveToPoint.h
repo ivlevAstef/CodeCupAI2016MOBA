@@ -13,7 +13,7 @@ namespace AICup
 {
   class CommandMoveToPoint: public Command {
   public:
-    CommandMoveToPoint(double x, double y)
+    CommandMoveToPoint(double x, double y);
 
     bool execute();
 

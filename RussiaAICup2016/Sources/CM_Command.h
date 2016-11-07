@@ -8,10 +8,13 @@
 
 #include <vector>
 #include <memory>
-#include "CM_CommandFabric.h"
 
 namespace AICup
 {
+  class Command;
+  class CommandFabric;
+  typedef std::shared_ptr<Command> CommandPtr;
+
   class Command {
   public:
     /// исполнить команду, возвращает false если команду исполнить невозможно
@@ -20,7 +23,5 @@ namespace AICup
     /// команды которые можно исполнить, чтобы стало возможным исполнить текущую команду
     virtual const std::vector<CommandPtr>& neededCommands(const CommandFabric& fabric) = 0;
   };
-
-  typedef std::shared_ptr<Command> CommandPtr;
 }
 

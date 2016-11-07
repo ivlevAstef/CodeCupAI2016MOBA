@@ -7,33 +7,108 @@
     <Filter Include="Sources\Common">
       <UniqueIdentifier>{5d0d7a16-d806-4c6f-adde-753498eb35e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Environment">
+      <UniqueIdentifier>{66b203dc-f43a-465c-8f5a-c00cbfff17dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Command">
+      <UniqueIdentifier>{4200eb28-3d4d-450e-9a24-6116f5bbc000}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Command\Commands">
+      <UniqueIdentifier>{2c5c1f33-d97c-4da6-bc54-851845ece8e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Command\Base">
+      <UniqueIdentifier>{524f0aa1-5927-4d5a-be50-5a7993f194b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Sources\Common\Extensions.cpp">
-      <Filter>Sources\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Sources\Common\Logger.cpp">
-      <Filter>Sources\Common</Filter>
-    </ClCompile>
     <ClCompile Include="..\Sources\MyStrategy.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\C_Extensions.cpp">
+      <Filter>Sources\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\C_Logger.cpp">
+      <Filter>Sources\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\E_World.cpp">
+      <Filter>Sources\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandMoveToPoint.cpp">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAttackEnemy.cpp">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandDefendPoint.cpp">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandSequence.cpp">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandFabric.cpp">
+      <Filter>Sources\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandMoveToLine.cpp">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandManager.cpp">
+      <Filter>Sources\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_Move.cpp">
+      <Filter>Sources\Command\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\E_Graph.cpp">
+      <Filter>Sources\Environment</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Sources\Common\Extensions.h">
-      <Filter>Sources\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\Common\Vector2D.h">
-      <Filter>Sources\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\Common\Logger.h">
-      <Filter>Sources\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\Common\Singleton.h">
-      <Filter>Sources\Common</Filter>
-    </ClInclude>
     <ClInclude Include="..\Sources\MyStrategy.h">
       <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\C_Extensions.h">
+      <Filter>Sources\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\C_Logger.h">
+      <Filter>Sources\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\C_Singleton.h">
+      <Filter>Sources\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\C_Vector2D.h">
+      <Filter>Sources\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\E_World.h">
+      <Filter>Sources\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_Command.h">
+      <Filter>Sources\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandManager.h">
+      <Filter>Sources\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandFabric.h">
+      <Filter>Sources\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandMoveToPoint.h">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAttackEnemy.h">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandDefendPoint.h">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandSequence.h">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandMoveToLine.h">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_Move.h">
+      <Filter>Sources\Command\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\E_Graph.h">
+      <Filter>Sources\Environment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

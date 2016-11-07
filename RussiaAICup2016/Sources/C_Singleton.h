@@ -21,10 +21,11 @@ namespace AICup
       return *ref();
     }
 
-  private:
+  protected:
     Singleton() {
-      assert(true);
     }
+
+  private:
 
     Singleton(const Singleton<Parent>&) {
       assert(true);
@@ -36,7 +37,7 @@ namespace AICup
 
   private:
     static Parent* ref() {
-      static Parent* sSingleton = Parent();
+      static Parent* sSingleton = new Parent();
       return sSingleton;
     }
   };

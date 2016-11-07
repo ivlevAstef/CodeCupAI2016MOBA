@@ -6,7 +6,7 @@
 //Copyright (c) SIA 2015. All Right Reserved.
 //
 
-#include "Logger.h"
+#include "C_Logger.h"
 
 #include <stdarg.h>  // For va_start, etc.
 

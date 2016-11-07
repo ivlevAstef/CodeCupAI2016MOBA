@@ -30,6 +30,6 @@ CommandPtr CommandFabric::defend(double x, double y) {
   return std::make_shared<CommandDefendPoint>(x, y);
 }
 
-CommandPtr CommandFabric::sequence(std::initializer_list<Command&> commands) {
+CommandPtr CommandFabric::sequence(std::initializer_list<CommandPtr> commands) {
   return std::make_shared<CommandSequence>(commands);
 }
