@@ -141,6 +141,6 @@ namespace AICup
     return (*this - v).length2() < 1.0e-9;
   }
 
-  typedef Vector2D<int> Position;
+  typedef Vector2D<double> Position;
   typedef Vector2D<double> Vector;
 };

@@ -17,17 +17,15 @@ namespace AICup
   class Singleton
   {
   public:
-    Singleton() {
-      assert(nullptr == ref());
-      ref(static_cast<Parent*>(this));
-    }
-
     static Parent& instance() {
-      assert(nullptr != ref());
       return *ref();
     }
 
   private:
+    Singleton() {
+      assert(true);
+    }
+
     Singleton(const Singleton<Parent>&) {
       assert(true);
     }
@@ -37,11 +35,8 @@ namespace AICup
     }
 
   private:
-    static Parent* ref(Parent* pThis = nullptr) {
-      static Parent* sSingleton = nullptr;
-      if (nullptr != pThis) {
-        sSingleton = pThis;
-      }
+    static Parent* ref() {
+      static Parent* sSingleton = Parent();
       return sSingleton;
     }
   };
