@@ -168,6 +168,7 @@ powershell start-process local-runner.bat</Command>
     <ClCompile Include="..\Sources\CM_Move.cpp" />
     <ClCompile Include="..\Sources\C_Extensions.cpp" />
     <ClCompile Include="..\Sources\C_Logger.cpp" />
+    <ClCompile Include="..\Sources\E_Game.cpp" />
     <ClCompile Include="..\Sources\E_Graph.cpp" />
     <ClCompile Include="..\Sources\E_World.cpp" />
     <ClCompile Include="..\Sources\MyStrategy.cpp" />
@@ -189,6 +190,7 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\C_Logger.h" />
     <ClInclude Include="..\Sources\C_Singleton.h" />
     <ClInclude Include="..\Sources\C_Vector2D.h" />
+    <ClInclude Include="..\Sources\E_Game.h" />
     <ClInclude Include="..\Sources\E_Graph.h" />
     <ClInclude Include="..\Sources\E_World.h" />
     <ClInclude Include="..\Sources\MyStrategy.h" />

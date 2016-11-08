@@ -13,7 +13,7 @@
 namespace AICup
 {
   class CommandFabric {
-
+  public:
 #pragma mark - перемещение
     /// переместиться в точку
     CommandPtr moveToPoint(double x, double y);

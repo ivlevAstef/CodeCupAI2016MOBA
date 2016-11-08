@@ -13,7 +13,7 @@ CommandDefendPoint::CommandDefendPoint(double x, double y) {
 
 }
 
-bool AICup::CommandDefendPoint::execute() {
+bool AICup::CommandDefendPoint::execute(const model::Wizard& self, model::Move& move) {
   return false;
 }
 

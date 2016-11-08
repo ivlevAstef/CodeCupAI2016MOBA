@@ -13,7 +13,7 @@ CommandFollow::CommandFollow(long long unitId) {
 
 }
 
-bool AICup::CommandFollow::execute() {
+bool AICup::CommandFollow::execute(const model::Wizard& self, model::Move& move) {
   return false;
 }
 

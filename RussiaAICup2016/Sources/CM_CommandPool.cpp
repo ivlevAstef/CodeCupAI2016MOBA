@@ -13,7 +13,7 @@ CommandPool::CommandPool(long long neutralUnitId) {
 
 }
 
-bool AICup::CommandPool::execute() {
+bool AICup::CommandPool::execute(const model::Wizard& self, model::Move& move) {
   return false;
 }
 

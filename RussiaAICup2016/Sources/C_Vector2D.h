@@ -126,7 +126,7 @@ namespace AICup
       return x * x + y * y;
     }
 
-    inline double normalize() {
+    inline void normalize() {
       auto len = length();
       x /= len;
       y /= len;
@@ -139,6 +139,28 @@ namespace AICup
 
     inline Vector2D<Type> perpendicular() const {
       return Vector2D<Type>(-y, x);
+    }
+
+    Vector2D<Type>& rotate(double angle) {
+      Type xNew = x * cos(angle) - y * sin(angle);
+      Type yNew = y * cos(angle) + x * sin(angle);
+      x = xNew;
+      y = yNew;
+      return *this;
+    }
+
+    Vector2D<Type> rotated(double angle) const {
+      Type xNew = x * cos(angle) - y * sin(angle);
+      Type yNew = y * cos(angle) + x * sin(angle);
+      return Vector2D<Type>(xNew, yNew);
+    }
+
+    double angle() const {
+      if (-1.0e-3 < y && y < 1.0e-3) {
+        return x > 0 ? 0 : 3.14159265358979323846;
+      }
+
+      return atan2(y, x);
     }
 
 

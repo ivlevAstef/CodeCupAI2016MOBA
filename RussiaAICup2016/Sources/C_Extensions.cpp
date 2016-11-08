@@ -33,3 +33,17 @@ double Extensions::distance(const Position& p, const Position& p1, const Positio
 
   return abs(v.normal().cross(w));
 }
+
+double Extensions::angleDiff(double angle1, double angle2) {
+  double angle = angle1 - angle2;
+
+  while (angle > SIA_PI) {
+    angle -= 2.0 * SIA_PI;
+  }
+
+  while (angle < -SIA_PI) {
+    angle += 2.0 * SIA_PI;
+  }
+
+  return angle;
+}

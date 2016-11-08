@@ -13,7 +13,7 @@ CommandMoveToLine::CommandMoveToLine(model::LineType line) {
 
 }
 
-bool AICup::CommandMoveToLine::execute() {
+bool AICup::CommandMoveToLine::execute(const model::Wizard& self, model::Move& move) {
   return false;
 }
 

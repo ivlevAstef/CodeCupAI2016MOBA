@@ -13,7 +13,7 @@ CommandObserveMap::CommandObserveMap() {
 
 }
 
-bool AICup::CommandObserveMap::execute() {
+bool AICup::CommandObserveMap::execute(const model::Wizard& self, model::Move& move) {
   return false;
 }
 

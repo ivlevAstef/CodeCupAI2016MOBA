@@ -23,10 +23,12 @@ namespace AICup
 {
   class CommandManager: public Singleton<CommandManager> {
   public:
+    CommandManager();
+
     void update(const model::Wizard& self, model::Move& move);
 
 #ifdef ENABLE_VISUALIZATOR
-    void visualization(const Visualizator& visualizator);
+    void visualization(const Visualizator& visualizator) const;
 #endif // ENABLE_VISUALIZATOR
 
 

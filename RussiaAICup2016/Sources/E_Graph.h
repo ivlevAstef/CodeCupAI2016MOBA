@@ -85,12 +85,12 @@ namespace AICup
   public:
     Graph();
 
-    std::vector<Position> path(const Position& from, const Position& to);
+    std::vector<Position> path(const Position& from, const Position& to, double& length);
 
     void update(); /// использует World
 
 #ifdef ENABLE_VISUALIZATOR
-    void visualization(const Visualizator& visualizator);
+    void visualization(const Visualizator& visualizator) const;
 #endif // ENABLE_VISUALIZATOR
 
   private:
@@ -99,10 +99,11 @@ namespace AICup
     void initDefaultJoinMemory();
 
     const size_t addPoint(const Position& pos);
+    void adaptPoints(const size_t p1Index, const size_t p2Index);
 
     void updatePointsByMemory();
 
-    std::vector<size_t> dijkstraPath(const size_t& fromPIndex, const size_t& toPIndex);
+    std::vector<size_t> dijkstraPath(const size_t& fromPIndex, const size_t& toPIndex, double& length);
 
   private:
     std::vector<Join> joinMemory;

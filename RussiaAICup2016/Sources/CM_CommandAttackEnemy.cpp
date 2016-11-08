@@ -13,7 +13,7 @@ CommandAttackEnemy::CommandAttackEnemy(long long enemyId) {
 
 }
 
-bool AICup::CommandAttackEnemy::execute() {
+bool AICup::CommandAttackEnemy::execute(const model::Wizard& self, model::Move& move) {
   return false;
 }
 

@@ -8,6 +8,7 @@
 #include "E_World.h"
 #include "C_Vector2D.h"
 #include "C_Extensions.h"
+#include <unordered_set>
 
 using namespace AICup;
 
@@ -20,7 +21,7 @@ Graph::Graph() {
 void Graph::update() {
 }
 
-std::vector<Position> Graph::path(const Position& from, const Position& to) {
+std::vector<Position> Graph::path(const Position& from, const Position& to, double& length) {
   assert(joinsForPoints.size() == pointMemory.size());
   /// save graph
   const auto pointMemorySave = pointMemory;
@@ -30,9 +31,10 @@ std::vector<Position> Graph::path(const Position& from, const Position& to) {
   // update graph
   const auto& pointFrom = addPoint(from);
   const auto& pointTo = addPoint(to);
+  adaptPoints(pointFrom, pointTo);
 
   // calc path
-  const auto& reversedPrivatePath = dijkstraPath(pointFrom, pointTo);
+  const auto& reversedPrivatePath = dijkstraPath(pointFrom, pointTo, length);
 
   /// Create result
   std::vector<Position> result;
@@ -53,51 +55,87 @@ std::vector<Position> Graph::path(const Position& from, const Position& to) {
 }
 
 const size_t Graph::addPoint(const Position& pos) {
-  /// find nearest join
-  const Join* nearJoin = nullptr;
-  double minLength = DBL_MAX;
-  for (const auto& join : joinMemory) {
+  const auto& pointIndex = pointMemory.size();
+  pointMemory.push_back({pos.x, pos.y});
+  joinsForPoints.push_back({ });
+
+
+  /// calculate all length
+  std::vector<double> lengths;
+  lengths.resize(joinMemory.size());
+  for (size_t joinIndex = 0; joinIndex < joinMemory.size(); joinIndex++) {
+    const auto& join = joinMemory[joinIndex];
+
     const auto& pos1 = pointMemory[join.p1Index];
     const auto& pos2 = pointMemory[join.p2Index];
 
 
-    auto length = Extensions::distance(pos, pos1, pos2);
+    lengths[joinIndex] = Extensions::distance(pos, pos1, pos2);
+  }
 
+  /// find nearest join
+
+  size_t nearJoinIndex = UINT16_MAX;
+  double minLength = DBL_MAX;
+  for (size_t lenIndex = 0; lenIndex < lengths.size(); lenIndex++) {
+    double length = lengths[lenIndex];
     if (minLength > length) {
       minLength = length;
-      nearJoin = &join;
+      nearJoinIndex = lenIndex;
     }
   }
 
-  assert(nullptr != nearJoin);
+  assert(UINT16_MAX != nearJoinIndex);
+
+  auto insertIndex = [this, &pointIndex] (size_t index) {
+    joinMemory.push_back(CreateJoin(index, pointIndex));
+    joinsForPoints[pointIndex].push_back(joinMemory.size() - 1);
+    joinsForPoints[index].push_back(joinMemory.size() - 1);
+  };
 
   /// added point for join
-  const auto& pointIndex = pointMemory.size();
-  pointMemory.push_back({pos.x, pos.y});
+  insertIndex(joinMemory[nearJoinIndex].p1Index);
+  insertIndex(joinMemory[nearJoinIndex].p2Index);
 
-  joinMemory.push_back(CreateJoin(nearJoin->p1Index, pointIndex));
-  joinMemory.push_back(CreateJoin(nearJoin->p2Index, pointIndex));
+  return pointIndex;
+}
 
-  joinsForPoints.push_back({joinMemory.size() - 2, joinMemory.size() - 1});
-  joinsForPoints[nearJoin->p1Index].push_back(joinMemory.size() - 2);
-  joinsForPoints[nearJoin->p2Index].push_back(joinMemory.size() - 1);
+void Graph::adaptPoints(const size_t p1Index, const size_t p2Index) {
+  std::unordered_set<size_t> pIndexes;
 
-  return joinsForPoints.size() - 1;
+  for (const auto& joinIndex : joinsForPoints[p1Index]) {
+    const auto& join = joinMemory[joinIndex];
+    pIndexes.insert((p1Index == join.p1Index) ? join.p2Index : join.p1Index);
+  }
+
+  size_t intersectCount = 0;
+  for (const auto& joinIndex : joinsForPoints[p2Index]) {
+    const auto& join = joinMemory[joinIndex];
+    const auto& result = pIndexes.insert((p2Index == join.p1Index) ? join.p2Index : join.p1Index);
+    intersectCount += result.second ? 1 : 0;
+  }
+
+  if (intersectCount > 2) {
+    joinMemory.push_back(CreateJoin(p1Index, p2Index));
+    joinsForPoints[p1Index].push_back(joinMemory.size() - 1);
+    joinsForPoints[p2Index].push_back(joinMemory.size() - 1);
+  }
 }
 
 struct DijkstraData {
   double weight;
   bool passed;
+  size_t from;
 };
 
-std::vector<size_t> Graph::dijkstraPath(const size_t& fromPIndex, const size_t& toPIndex) {
+std::vector<size_t> Graph::dijkstraPath(const size_t& fromPIndex, const size_t& toPIndex, double& length) {
   assert(pointMemory.size() == joinsForPoints.size());
 
   const auto& COUNT = pointMemory.size();
 
   /// Initialize
   std::vector<DijkstraData> data;
-  data.resize(COUNT, {DBL_MAX, false});
+  data.resize(COUNT, {DBL_MAX, false, INT_MAX});
 
   size_t currentIndex = fromPIndex;
   data[currentIndex].weight = 0;
@@ -110,7 +148,11 @@ std::vector<size_t> Graph::dijkstraPath(const size_t& fromPIndex, const size_t& 
       const auto& join = joinMemory[joinIndex];
       const auto index = (currentIndex == join.p1Index) ? join.p2Index : join.p1Index;
 
-      data[index].weight = MIN(data[index].weight, currentWeight + join.weight);
+      const auto weight = currentWeight + join.weight;
+      if (data[index].weight > weight) {
+        data[index].weight = weight;
+        data[index].from = currentIndex;
+      }
     }
     data[currentIndex].passed = true;
 
@@ -128,23 +170,12 @@ std::vector<size_t> Graph::dijkstraPath(const size_t& fromPIndex, const size_t& 
   std::vector<size_t> result;
 
   currentIndex = toPIndex;
+  length = 0;
   do {
     result.push_back(currentIndex);
-    const auto& currentWeight = data[currentIndex].weight;
-
-    for (const auto& joinIndex : joinsForPoints[currentIndex]) {
-      const auto& join = joinMemory[joinIndex];
-      const auto index = (currentIndex == join.p1Index) ? join.p2Index : join.p1Index;
-
-      if (abs(currentWeight - data[index].weight - join.weight) < 1.0e-3) {
-        currentIndex = index;
-        goto DIJKSTRA_REVERSE_PATH_GOTO;
-      }
-    }
-
-    break; // exit
-    DIJKSTRA_REVERSE_PATH_GOTO:;
-  } while (true);
+    length += data[currentIndex].weight;
+    currentIndex = data[currentIndex].from;
+  } while (currentIndex != INT_MAX);
 
   /// if found path
   if (result[result.size() - 1] == fromPIndex) {
@@ -312,7 +343,7 @@ void Graph::updatePointsByMemory() {
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void Graph::visualization(const Visualizator& visualizator) {
+void Graph::visualization(const Visualizator& visualizator) const {
   for (const auto& join : joinMemory) {
     const auto& p1 = pointMemory[join.p1Index];
     const auto& p2 = pointMemory[join.p2Index];

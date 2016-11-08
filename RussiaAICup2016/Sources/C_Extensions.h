@@ -21,6 +21,7 @@ namespace AICup
     }
 
     double distance(const Position& p, const Position& p1, const Position& p2);
+    double angleDiff(double angle1, double angle2);
 
     #define MAX(a,b) (((a) > (b)) ? (a) : (b))
     #define MIN(a,b) (((a) < (b)) ? (a) : (b))
