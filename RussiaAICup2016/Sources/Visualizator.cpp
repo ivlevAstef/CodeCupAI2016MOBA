@@ -32,14 +32,9 @@ using namespace AICup;
 std::string Visualizator::DEFAULT_HOST = "127.0.0.1";
 std::string Visualizator::DEFAULT_PORT = "13579";
 
-void Visualizator::setWindowCenter(double x, double y, double maxWidth, double maxHeight) {
-  windowCenterX = floor(x / 800) * 800 + 400;
-  windowCenterX = max(windowCenterX, windowWidth);
-  windowCenterX = min(windowCenterX, maxWidth - windowWidth);
-
-  windowCenterY = floor(y / 800) * 800 + 400;
-  windowCenterY = max(windowCenterY, windowHeight);
-  windowCenterY = min(windowCenterY, maxHeight - windowHeight);
+void Visualizator::setWindowCenter(double x, double y) {
+  windowCenterX = x;
+  windowCenterY = y;
 }
 
 void Visualizator::init() {
@@ -48,11 +43,12 @@ void Visualizator::init() {
 
   windowCenterX = 0;
   windowCenterY = 0;
-  windowWidth = 800 * 4;
-  windowHeight = 800 * 3;
+  windowWidth = 800;
+  windowHeight = 600;
 }
 
 Visualizator::Visualizator() : openSocket(INVALID_SOCKET) {
+  init();
   /* Obtain address(es) matching host/port */
   addrinfo hints;
   memset(&hints, 0, sizeof(addrinfo));

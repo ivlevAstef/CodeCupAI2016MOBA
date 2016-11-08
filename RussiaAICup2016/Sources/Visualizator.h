@@ -32,7 +32,7 @@ namespace AICup
   public:
     Visualizator();
 
-    void setWindowCenter(double x, double y, double maxWidth, double maxHeight);
+    void setWindowCenter(double x, double y);
 
     void beginPre() const;
     void endPre() const;

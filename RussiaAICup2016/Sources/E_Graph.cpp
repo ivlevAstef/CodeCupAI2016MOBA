@@ -33,8 +33,12 @@ std::vector<Position> Graph::path(const Position& from, const Position& to) {
 
   /// restore graph
   pointMemory.resize(pointMemorySaveSize);
-  joinMemory.resize(joinMemorySaveSize);
+  while (joinMemory.size() > joinMemorySaveSize) {
+    joinMemory.pop_back();
+  }
   points.resize(pointsSaveSize);
+
+  return std::vector<Position>();
 }
 
 const Graph::PointWithJoins* Graph::addPoint(const Position& pos) {
@@ -73,6 +77,8 @@ std::vector<const Graph::PointWithJoins*> Graph::path(const PointWithJoins* from
   std::vector<const Graph::PointWithJoins*> result;
 
   result.push_back(from);
+
+  return std::vector<const Graph::PointWithJoins*>();
 }
 
 void Graph::initDefaultGraph() {

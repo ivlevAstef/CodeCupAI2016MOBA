@@ -10,10 +10,6 @@
 
 #include <stdarg.h>  // For va_start, etc.
 
-#if defined(_WIN32)
-#include <Windows.h>
-#endif
-
 #pragma warning( push )
 #pragma warning( disable : 4996 )
 
@@ -56,11 +52,7 @@ void Logger::log(const char* logLevel, const char* file, int line, const char* m
   logBuffer[logIndex] = 0;
 
   ///print
-#if defined(_WIN32)
-  OutputDebugStringA(logBuffer);
-#else
-  std::cerr << logBuffer;
-#endif
+  fprintf(stderr, logBuffer);
 }
 
 
