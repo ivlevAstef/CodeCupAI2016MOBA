@@ -14,7 +14,7 @@ using namespace AICup;
 std::vector<Position> _path;
 
 void CommandManager::update(const model::Wizard& self, model::Move& move) {
-  _path = path(Position(self.getX(), self.getY()), Position(1200, 200));
+  _path = path(Position(self.getX(), self.getY()), Position(1200, 300));
 }
 
 #ifdef ENABLE_VISUALIZATOR

@@ -11,6 +11,10 @@
 #include "model/LineType.h"
 #include <vector>
 
+#ifdef ENABLE_VISUALIZATOR
+#include "Visualizator.h"
+#endif
+
 namespace AICup
 {
   class Graph: public Singleton<Graph> {
@@ -27,7 +31,15 @@ namespace AICup
 
     enum PointType {
       ACADEMY_BASE = 0,
+      ACADEMY_BASE_TOP,
+      ACADEMY_BASE_MIDDLE,
+      ACADEMY_BASE_BOTTOM,
+
       DEFIANT_BASE,
+      DEFIANT_BASE_TOP,
+      DEFIANT_BASE_MIDDLE,
+      DEFIANT_BASE_BOTTOM,
+
       ACADEMY_TOP_FIRST_TOWER,
       ACADEMY_TOP_SECOND_TOWER,
       DEFIANT_TOP_FIRST_TOWER,
@@ -51,6 +63,22 @@ namespace AICup
       BOTTOM_CENTER,
       MIDDLE_CENTER,
 
+      /// additional
+
+
+      CENTER_BONUS_TOP,
+      CENTER_ACADEMY,
+      CENTER_BONUS_BOTTOM,
+      CENTER_DEFIANT,
+
+      ACADEMY_TOP_CENTER,
+      BONUS_TOP_CENTER,
+      DEFIANT_TOP_CENTER,
+
+      ACADEMY_BOTTOM_CENTER,
+      BONUS_BOTTOM_CENTER,
+      DEFIANT_BOTTOM_CENTER,
+
       _POINT_COUNT_
     };
 
@@ -60,6 +88,10 @@ namespace AICup
     std::vector<Position> path(const Position& from, const Position& to);
 
     void update(); /// использует World
+
+#ifdef ENABLE_VISUALIZATOR
+    void visualization(const Visualizator& visualizator);
+#endif // ENABLE_VISUALIZATOR
 
   private:
     void initDefaultGraph();

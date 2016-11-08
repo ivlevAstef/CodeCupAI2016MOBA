@@ -32,6 +32,7 @@ void MyStrategy::move(const model::Wizard& self, const model::World& world, cons
 
   visualizator.beginPost();
 
+  AICup::Graph::instance().visualization(visualizator);
   AICup::CommandManager::instance().visualization(visualizator);
 
   visualizator.endPost();
