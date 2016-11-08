@@ -1,7 +1,7 @@
 //
-//File: CM_CommandSequence.h
+//File: CM_CommandObserveMap.h
 //Author: Ivlev Alexander. Stef
-//Created: 07/11/2016
+//Created: 08/11/2016
 //
 
 
@@ -11,9 +11,9 @@
 
 namespace AICup
 {
-  class CommandSequence: public Command {
+  class CommandObserveMap: public Command {
   public:
-    CommandSequence(std::initializer_list<CommandPtr> commands);
+    CommandObserveMap();
 
     bool execute();
 

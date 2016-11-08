@@ -8,9 +8,12 @@
 
 #include "CM_CommandMoveToPoint.h"
 #include "CM_CommandMoveToLine.h"
+#include "CM_CommandFollow.h"
+#include "CM_CommandObserveMap.h"
+
 #include "CM_CommandAttackEnemy.h"
+#include "CM_CommandPool.h"
 #include "CM_CommandDefendPoint.h"
-#include "CM_CommandSequence.h"
 
 using namespace AICup;
 
@@ -22,14 +25,24 @@ CommandPtr CommandFabric::moveToLine(model::LineType line) {
   return std::make_shared<CommandMoveToLine>(line);
 }
 
+CommandPtr CommandFabric::follow(long long unitId) {
+  return std::make_shared<CommandFollow>(unitId);
+}
+
+CommandPtr CommandFabric::observeMap() {
+  return std::make_shared<CommandObserveMap>();
+}
+
 CommandPtr CommandFabric::attack(long long enemyId) {
   return std::make_shared<CommandAttackEnemy>(enemyId);
+}
+
+CommandPtr CommandFabric::pool(long long neutralUnitId) {
+  return std::make_shared<CommandPool>(neutralUnitId);
 }
 
 CommandPtr CommandFabric::defend(double x, double y) {
   return std::make_shared<CommandDefendPoint>(x, y);
 }
 
-CommandPtr CommandFabric::sequence(std::initializer_list<CommandPtr> commands) {
-  return std::make_shared<CommandSequence>(commands);
-}
+
