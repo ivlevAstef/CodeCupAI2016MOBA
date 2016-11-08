@@ -115,7 +115,7 @@ namespace AICup
     }
 
     inline Type cross(const Vector2D<Type>& v) const {
-      return x * v.Y - y * v.x;
+      return x * v.y - y * v.x;
     }
 
     inline double length() const {

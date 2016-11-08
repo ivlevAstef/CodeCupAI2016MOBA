@@ -7,7 +7,6 @@
 
 #pragma once
 
-
 #include "Strategy.h"
 
 class MyStrategy: public Strategy {

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "C_Singleton.h"
+#include "C_Vector2D.h"
 #include "model/LineType.h"
 #include <vector>
 

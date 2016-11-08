@@ -8,6 +8,11 @@
 #include "E_World.h"
 #include "E_Graph.h"
 
+#ifdef ENABLE_VISUALIZATOR
+#include "Visualizator.h"
+#endif
+
+
 using namespace model;
 
 void MyStrategy::move(const Wizard& self, const World& world, const Game& game, Move& move) {
@@ -16,4 +21,8 @@ void MyStrategy::move(const Wizard& self, const World& world, const Game& game, 
 
   move.setSpeed(-game.getWizardBackwardSpeed());
   move.setAction(ACTION_STAFF);
+
+#ifdef ENABLE_VISUALIZATOR
+  auto& visualizator = AICup::Visualizator::instance();
+#endif
 }
