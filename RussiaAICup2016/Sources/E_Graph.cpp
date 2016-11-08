@@ -7,12 +7,11 @@
 #include "E_Graph.h"
 #include "E_World.h"
 #include "C_Vector2D.h"
+#include "C_Extensions.h"
 
 using namespace AICup;
 
-Graph::Join::Join(const Point* p1, const Point* p2): p1(p1), p2(p2),
-  weight((Position(p1->x, p1->y) - Position(p2->x, p2->y)).length()) {
-}
+#define CreateJoin(I1, I2) Join{I1, I2, (pointMemory[I1] - pointMemory[I2]).length()}
 
 Graph::Graph() {
   initDefaultGraph();
@@ -22,36 +21,47 @@ void Graph::update() {
 }
 
 std::vector<Position> Graph::path(const Position& from, const Position& to) {
+  assert(joinsForPoints.size() == pointMemory.size());
   /// save graph
-  const size_t pointMemorySaveSize = pointMemory.size();
-  const size_t joinMemorySaveSize = joinMemory.size();
-  const size_t pointsSaveSize = points.size();
+  const auto pointMemorySave = pointMemory;
+  const auto joinMemorySave = joinMemory;
+  const auto joinsForPointsSave = joinsForPoints;
 
+  // update graph
+  const auto& pointFrom = addPoint(from);
+  const auto& pointTo = addPoint(to);
 
-  auto point1 = addPoint(from);
-  auto point2 = addPoint(to);
+  // calc path
+  const auto& reversedPrivatePath = dijkstraPath(pointFrom, pointTo);
+
+  /// Create result
+  std::vector<Position> result;
+  result.reserve(reversedPrivatePath.size());
+
+  for (size_t index = 0; index < reversedPrivatePath.size(); index++) {
+    const auto& pIndex = reversedPrivatePath[reversedPrivatePath.size() - index - 1];
+    const auto& point = pointMemory[pIndex];
+    result.push_back(point);
+  }
 
   /// restore graph
-  pointMemory.resize(pointMemorySaveSize);
-  while (joinMemory.size() > joinMemorySaveSize) {
-    joinMemory.pop_back();
-  }
-  points.resize(pointsSaveSize);
+  pointMemory = pointMemorySave;
+  joinMemory = joinMemorySave;
+  joinsForPoints = joinsForPointsSave;
 
-  return std::vector<Position>();
+  return result;
 }
 
-const Graph::PointWithJoins* Graph::addPoint(const Position& pos) {
-
+const size_t Graph::addPoint(const Position& pos) {
+  /// find nearest join
   const Join* nearJoin = nullptr;
   double minLength = DBL_MAX;
   for (const auto& join : joinMemory) {
-    auto pos1 = Position(join.p1->x, join.p1->y);
-    auto pos2 = Position(join.p2->x, join.p2->y);
+    const auto& pos1 = pointMemory[join.p1Index];
+    const auto& pos2 = pointMemory[join.p2Index];
 
-    auto vec1 = pos2 - pos1;
-    auto vec2 = pos - pos1;
-    auto length = abs(vec1.normal().cross(vec2));
+
+    auto length = Extensions::distance(pos, pos1, pos2);
 
     if (minLength > length) {
       minLength = length;
@@ -61,24 +71,87 @@ const Graph::PointWithJoins* Graph::addPoint(const Position& pos) {
 
   assert(nullptr != nearJoin);
 
+  /// added point for join
+  const auto& pointIndex = pointMemory.size();
   pointMemory.push_back({pos.x, pos.y});
-  auto pointPtr = &pointMemory[pointMemory.size()-1];
 
-  const Point* pointsPtr = pointMemory.data();
-  joinMemory.push_back(Join(nearJoin->p2, pointPtr));
-  joinMemory.push_back(Join(pointPtr, nearJoin->p2));
+  joinMemory.push_back(CreateJoin(nearJoin->p1Index, pointIndex));
+  joinMemory.push_back(CreateJoin(nearJoin->p2Index, pointIndex));
 
-  points.push_back({pointPtr, {&joinMemory[joinMemory.size() - 1], &joinMemory[joinMemory.size() - 2]}});
+  joinsForPoints.push_back({joinMemory.size() - 2, joinMemory.size() - 1});
+  joinsForPoints[nearJoin->p1Index].push_back(joinMemory.size() - 2);
+  joinsForPoints[nearJoin->p2Index].push_back(joinMemory.size() - 1);
 
-  return &points[points.size() - 1];
+  return joinsForPoints.size() - 1;
 }
 
-std::vector<const Graph::PointWithJoins*> Graph::path(const PointWithJoins* from, const PointWithJoins* to) {
-  std::vector<const Graph::PointWithJoins*> result;
+struct DijkstraData {
+  double weight;
+  bool passed;
+};
 
-  result.push_back(from);
+std::vector<size_t> Graph::dijkstraPath(const size_t& fromPIndex, const size_t& toPIndex) {
+  assert(pointMemory.size() == joinsForPoints.size());
 
-  return std::vector<const Graph::PointWithJoins*>();
+  const auto& COUNT = pointMemory.size();
+
+  /// Initialize
+  std::vector<DijkstraData> data;
+  data.resize(COUNT, {DBL_MAX, false});
+
+  size_t currentIndex = fromPIndex;
+  data[currentIndex].weight = 0;
+
+  /// Step
+
+  do {
+    const auto& currentWeight = data[currentIndex].weight;
+    for (const auto& joinIndex : joinsForPoints[currentIndex]) {
+      const auto& join = joinMemory[joinIndex];
+      const auto index = (currentIndex == join.p1Index) ? join.p2Index : join.p1Index;
+
+      data[index].weight = MIN(data[index].weight, currentWeight + join.weight);
+    }
+    data[currentIndex].passed = true;
+
+    auto minWeight = DBL_MAX;
+    currentIndex = UINT16_MAX;
+    for (size_t index = 0; index < COUNT; index++) {
+      if (!data[index].passed && data[index].weight < minWeight) {
+        minWeight = data[index].weight;
+        currentIndex = index;
+      }
+    }
+  } while (currentIndex != UINT16_MAX);
+
+  /// reverse path
+  std::vector<size_t> result;
+
+  currentIndex = toPIndex;
+  do {
+    result.push_back(currentIndex);
+    const auto& currentWeight = data[currentIndex].weight;
+
+    for (const auto& joinIndex : joinsForPoints[currentIndex]) {
+      const auto& join = joinMemory[joinIndex];
+      const auto index = (currentIndex == join.p1Index) ? join.p2Index : join.p1Index;
+
+      if (abs(currentWeight - data[index].weight - join.weight) < 1.0e-3) {
+        currentIndex = index;
+        goto DIJKSTRA_REVERSE_PATH_GOTO;
+      }
+    }
+
+    break; // exit
+    DIJKSTRA_REVERSE_PATH_GOTO:;
+  } while (true);
+
+  /// if found path
+  if (result[result.size() - 1] == fromPIndex) {
+    return result; // reversed
+  }
+
+  return std::vector<size_t>();
 }
 
 void Graph::initDefaultGraph() {
@@ -133,55 +206,45 @@ void Graph::initDefaultPointMemory() {
 }
 
 void Graph::initDefaultJoinMemory() {
-  const Point* points = pointMemory.data();
+  joinMemory.push_back(CreateJoin(ACADEMY_BASE, ACADEMY_TOP_SECOND_TOWER));
+  joinMemory.push_back(CreateJoin(ACADEMY_TOP_SECOND_TOWER, ACADEMY_TOP_FIRST_TOWER));
+  joinMemory.push_back(CreateJoin(ACADEMY_TOP_FIRST_TOWER, TOP_CENTER));
 
+  joinMemory.push_back(CreateJoin(ACADEMY_BASE, ACADEMY_BOTTOM_SECOND_TOWER));
+  joinMemory.push_back(CreateJoin( ACADEMY_BOTTOM_SECOND_TOWER, ACADEMY_BOTTOM_FIRST_TOWER));
+  joinMemory.push_back(CreateJoin(ACADEMY_BOTTOM_FIRST_TOWER, BOTTOM_CENTER));
 
-  joinMemory.push_back(Join(points + ACADEMY_BASE, points + ACADEMY_TOP_SECOND_TOWER));
-  joinMemory.push_back(Join(points + ACADEMY_TOP_SECOND_TOWER, points + ACADEMY_TOP_FIRST_TOWER));
-  joinMemory.push_back(Join(points + ACADEMY_TOP_FIRST_TOWER, points + TOP_CENTER));
+  joinMemory.push_back(CreateJoin(ACADEMY_BASE, ACADEMY_MIDDLE_SECOND_TOWER));
+  joinMemory.push_back(CreateJoin(ACADEMY_MIDDLE_SECOND_TOWER, ACADEMY_MIDDLE_FIRST_TOWER));
+  joinMemory.push_back(CreateJoin(ACADEMY_MIDDLE_FIRST_TOWER, MIDDLE_CENTER));
 
-  joinMemory.push_back(Join(points + ACADEMY_BASE, points + ACADEMY_BOTTOM_SECOND_TOWER));
-  joinMemory.push_back(Join(points + ACADEMY_BOTTOM_SECOND_TOWER, points + ACADEMY_BOTTOM_FIRST_TOWER));
-  joinMemory.push_back(Join(points + ACADEMY_BOTTOM_FIRST_TOWER, points + BOTTOM_CENTER));
+  joinMemory.push_back(CreateJoin(DEFIANT_BASE, DEFIANT_TOP_SECOND_TOWER));
+  joinMemory.push_back(CreateJoin(DEFIANT_TOP_SECOND_TOWER, DEFIANT_TOP_FIRST_TOWER));
+  joinMemory.push_back(CreateJoin(DEFIANT_TOP_FIRST_TOWER, TOP_CENTER));
 
-  joinMemory.push_back(Join(points + ACADEMY_BASE, points + ACADEMY_MIDDLE_SECOND_TOWER));
-  joinMemory.push_back(Join(points + ACADEMY_MIDDLE_SECOND_TOWER, points + ACADEMY_MIDDLE_FIRST_TOWER));
-  joinMemory.push_back(Join(points + ACADEMY_MIDDLE_FIRST_TOWER, points + MIDDLE_CENTER));
+  joinMemory.push_back(CreateJoin(DEFIANT_BASE, DEFIANT_BOTTOM_SECOND_TOWER));
+  joinMemory.push_back(CreateJoin(DEFIANT_BOTTOM_SECOND_TOWER, DEFIANT_BOTTOM_FIRST_TOWER));
+  joinMemory.push_back(CreateJoin(DEFIANT_BOTTOM_FIRST_TOWER, BOTTOM_CENTER));
 
-  joinMemory.push_back(Join(points + DEFIANT_BASE, points + DEFIANT_TOP_SECOND_TOWER));
-  joinMemory.push_back(Join(points + DEFIANT_TOP_SECOND_TOWER, points + DEFIANT_TOP_FIRST_TOWER));
-  joinMemory.push_back(Join(points + DEFIANT_TOP_FIRST_TOWER, points + TOP_CENTER));
+  joinMemory.push_back(CreateJoin(DEFIANT_BASE, DEFIANT_MIDDLE_SECOND_TOWER));
+  joinMemory.push_back(CreateJoin(DEFIANT_MIDDLE_SECOND_TOWER, DEFIANT_MIDDLE_FIRST_TOWER));
+  joinMemory.push_back(CreateJoin(DEFIANT_MIDDLE_FIRST_TOWER, MIDDLE_CENTER));
 
-  joinMemory.push_back(Join(points + DEFIANT_BASE, points + DEFIANT_BOTTOM_SECOND_TOWER));
-  joinMemory.push_back(Join(points + DEFIANT_BOTTOM_SECOND_TOWER, points + DEFIANT_BOTTOM_FIRST_TOWER));
-  joinMemory.push_back(Join(points + DEFIANT_BOTTOM_FIRST_TOWER, points + BOTTOM_CENTER));
+  joinMemory.push_back(CreateJoin(TOP_CENTER, BONUS_TOP));
+  joinMemory.push_back(CreateJoin(MIDDLE_CENTER, BONUS_TOP));
 
-  joinMemory.push_back(Join(points + DEFIANT_BASE, points + DEFIANT_MIDDLE_SECOND_TOWER));
-  joinMemory.push_back(Join(points + DEFIANT_MIDDLE_SECOND_TOWER, points + DEFIANT_MIDDLE_FIRST_TOWER));
-  joinMemory.push_back(Join(points + DEFIANT_MIDDLE_FIRST_TOWER, points + MIDDLE_CENTER));
-
-  joinMemory.push_back(Join(points + TOP_CENTER, points + BONUS_TOP));
-  joinMemory.push_back(Join(points + MIDDLE_CENTER, points + BONUS_TOP));
-
-  joinMemory.push_back(Join(points + BOTTOM_CENTER, points + BONUS_BOTTOM));
-  joinMemory.push_back(Join(points + MIDDLE_CENTER, points + BONUS_BOTTOM));
+  joinMemory.push_back(CreateJoin(BOTTOM_CENTER, BONUS_BOTTOM));
+  joinMemory.push_back(CreateJoin(MIDDLE_CENTER, BONUS_BOTTOM));
 }
 
 void Graph::updatePointsByMemory() {
-  points.clear();
-  points.resize(pointMemory.size());
+  joinsForPoints.clear();
+  joinsForPoints.resize(pointMemory.size());
 
-  const Point* pointsMemoryPtr = pointMemory.data();
+  for (size_t index = 0; index < joinMemory.size(); index++) {
+    const auto& join = joinMemory[index];
 
-  for (size_t index = 0; index < points.size(); ++index) {
-    points[index].point = pointsMemoryPtr + index;
-  }
-
-  for (const auto& join : joinMemory) {
-    size_t p1Index = (join.p1 - pointsMemoryPtr) / sizeof(Point);
-    size_t p2Index = (join.p2 - pointsMemoryPtr) / sizeof(Point);
-
-    points[p1Index].joins.push_back(&join);
-    points[p2Index].joins.push_back(&join);
+    joinsForPoints[join.p1Index].push_back(index);
+    joinsForPoints[join.p2Index].push_back(index);
   }
 }

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "C_Vector2D.h"
 
 namespace AICup
 {
@@ -18,6 +19,8 @@ namespace AICup
     template <typename T> int sign(T val) {
       return (T(0) < val) - (val < T(0));
     }
+
+    double distance(const Position& p, const Position& p1, const Position& p2);
 
     #define MAX(a,b) (((a) > (b)) ? (a) : (b))
     #define MIN(a,b) (((a) < (b)) ? (a) : (b))

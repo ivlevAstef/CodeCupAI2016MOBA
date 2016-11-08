@@ -25,9 +25,13 @@ namespace AICup
   };
 
   /// строит путь состоящий из набора точек, по которым можно пройти по прямым чтобы попасть из точки в точку
-  std::vector<Position> path(Position from, Position to);
+  std::vector<Position> path(const Position from, const Position to);
+
 
   /// Говорит куда и как надо двигаться, чтобы попасть из текущего состояния в некоторую точку
-  MoveAction move(MovableUnit unit, Position to);
+  MoveAction move(const MovableUnit unit, const Position& pos);
+
+  /// Говорит куда и как надо двигаться, чтобы попасть из текущего состояния в некоторую точку, используя путь
+  MoveAction move(const MovableUnit unit, const std::vector<Position>& path);
 
 };

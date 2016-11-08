@@ -8,10 +8,7 @@
 #include "E_World.h"
 #include "E_Graph.h"
 #include "C_Logger.h"
-
-#ifdef ENABLE_VISUALIZATOR
-#include "Visualizator.h"
-#endif
+#include "CM_CommandManager.h"
 
 
 using namespace model;
@@ -25,16 +22,17 @@ void MyStrategy::move(const model::Wizard& self, const model::World& world, cons
   AICup::World::instance().update(world);
   AICup::Graph::instance().update();
 
+  AICup::CommandManager::instance().update(self, move);
+
   move.setSpeed(-game.getWizardBackwardSpeed());
   move.setAction(ACTION_STAFF);
 
 #ifdef ENABLE_VISUALIZATOR
   auto& visualizator = Visualizator::instance();
-  visualizator.setWindowCenter(self.getX(), self.getY());
 
   visualizator.beginPost();
 
-  visualizator.fillCircle(self.getX(), self.getY(), self.getRadius() * 2, 0xff0000);
+  AICup::CommandManager::instance().visualization(visualizator);
 
   visualizator.endPost();
 

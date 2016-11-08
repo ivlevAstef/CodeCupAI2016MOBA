@@ -23,16 +23,8 @@ namespace AICup
     char* buf;
     std::vector<char> bufMemory;
 
-    /// for optimization draw
-    double windowCenterX;
-    double windowCenterY;
-    double windowWidth;
-    double windowHeight;
-
   public:
     Visualizator();
-
-    void setWindowCenter(double x, double y);
 
     void beginPre() const;
     void endPre() const;
@@ -51,8 +43,6 @@ namespace AICup
 
   private:
     void init();
-
-    bool checkPoint(double x, double y) const;
 
     void sendCommand(const char* str) const;
     void writeWithColor(char* buf, int32_t color) const;

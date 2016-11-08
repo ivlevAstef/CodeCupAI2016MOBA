@@ -15,23 +15,15 @@ namespace AICup
 {
   class Graph: public Singleton<Graph> {
   private:
-    struct Point {
-      double x;
-      double y;
-    };
+    typedef Position Point;
 
     struct Join {
-      const Point* p1;
-      const Point* p2;
-      const double weight;
-
-      Join(const Point* p1, const Point* p2);
+      size_t p1Index;
+      size_t p2Index;
+      double weight;
     };
 
-    struct PointWithJoins {
-      const Point* point;
-      std::vector<const Join*> joins;
-    };
+    typedef std::vector<size_t> JoinsForPoint;
 
     enum PointType {
       ACADEMY_BASE = 0,
@@ -74,16 +66,16 @@ namespace AICup
     void initDefaultPointMemory();
     void initDefaultJoinMemory();
 
-    const PointWithJoins* addPoint(const Position& pos);
+    const size_t addPoint(const Position& pos);
 
     void updatePointsByMemory();
 
-    std::vector<const PointWithJoins*> path(const PointWithJoins* from, const PointWithJoins* to);
+    std::vector<size_t> dijkstraPath(const size_t& fromPIndex, const size_t& toPIndex);
 
   private:
     std::vector<Join> joinMemory;
     std::vector<Point> pointMemory;
 
-    std::vector<PointWithJoins> points;
+    std::vector<JoinsForPoint> joinsForPoints;
   };
 }

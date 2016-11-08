@@ -32,19 +32,9 @@ using namespace AICup;
 std::string Visualizator::DEFAULT_HOST = "127.0.0.1";
 std::string Visualizator::DEFAULT_PORT = "13579";
 
-void Visualizator::setWindowCenter(double x, double y) {
-  windowCenterX = x;
-  windowCenterY = y;
-}
-
 void Visualizator::init() {
   bufMemory.resize(BUF_SIZE);
   buf = bufMemory.data();
-
-  windowCenterX = 0;
-  windowCenterY = 0;
-  windowWidth = 800;
-  windowHeight = 600;
 }
 
 Visualizator::Visualizator() : openSocket(INVALID_SOCKET) {
@@ -130,64 +120,59 @@ void Visualizator::writeWithColor(char* buf, int32_t color) const {
 }
 
 void Visualizator::circle(double x, double y, double r, int32_t color) const {
-  if (INVALID_SOCKET != openSocket && checkPoint(x, y)) {
+  if (INVALID_SOCKET != openSocket) {
     sprintf(buf, "circle %.3f %.3f %.3f", x, y, r);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::fillCircle(double x, double y, double r, int32_t color) const {
-  if (INVALID_SOCKET != openSocket && checkPoint(x, y)) {
+  if (INVALID_SOCKET != openSocket) {
     sprintf(buf, "fill_circle %.3f %.3f %.3f", x, y, r);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::rect(double x1, double y1, double x2, double y2, int32_t color) const {
-  if (INVALID_SOCKET != openSocket && (checkPoint(x1, y1) || checkPoint(x2, y2))) {
+  if (INVALID_SOCKET != openSocket) {
     sprintf(buf, "rect %.3f %.3f %.3f %.3f", x1, y1, x2, y2);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::fillRect(double x1, double y1, double x2, double y2, int32_t color) const {
-  if (INVALID_SOCKET != openSocket && (checkPoint(x1, y1) || checkPoint(x2, y2))) {
+  if (INVALID_SOCKET != openSocket) {
     sprintf(buf, "fill_rect %.3f %.3f %.3f %.3f", x1, y1, x2, y2);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::line(double x1, double y1, double x2, double y2, int32_t color) const {
-  if (INVALID_SOCKET != openSocket && (checkPoint(x1, y1) || checkPoint(x2, y2))) {
+  if (INVALID_SOCKET != openSocket) {
     sprintf(buf, "line %.3f %.3f %.3f %.3f", x1, y1, x2, y2);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::text(double x, double y, const char* text, int32_t color) const {
-  if (INVALID_SOCKET != openSocket && checkPoint(x, y)) {
+  if (INVALID_SOCKET != openSocket) {
     sprintf(buf, "text %.3f %.3f %s", x, y, text);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::text(double x, double y, double value, int32_t color) const {
-  if (INVALID_SOCKET != openSocket && checkPoint(x, y)) {
+  if (INVALID_SOCKET != openSocket) {
     sprintf(buf, "text %.3f %.3f %.2f", x, y, value);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::text(double x, double y, int64_t value, int32_t color) const {
-  if (INVALID_SOCKET != openSocket && checkPoint(x, y)) {
+  if (INVALID_SOCKET != openSocket) {
     sprintf(buf, "text %.3f %.3f %I64d", x, y, value);
     writeWithColor(buf, color);
   }
-}
-
-bool Visualizator::checkPoint(double x, double y) const {
-  return windowCenterX - windowWidth < x && x < windowCenterX + windowWidth &&
-    windowCenterY - windowHeight < y && y < windowCenterY + windowHeight;
 }
 
 #endif

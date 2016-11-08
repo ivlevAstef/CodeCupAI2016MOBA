@@ -132,7 +132,7 @@ namespace AICup
       y /= len;
     }
 
-    inline Vector2D<Type> normal() {
+    inline Vector2D<Type> normal() const {
       auto len = length();
       return Vector2D<Type>(x / len, y / len);
     }
