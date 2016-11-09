@@ -8,6 +8,7 @@
 #pragma once
 
 #include "C_Vector2D.h"
+#include "model\CircularUnit.h"
 #include <vector>
 
 namespace AICup
@@ -18,12 +19,6 @@ namespace AICup
     double turn;
   };
 
-  struct MovableUnit {
-    double x;
-    double y;
-    double angle;
-  };
-
   namespace Move
   {
     /// строит путь состоящий из набора точек, по которым можно пройти по прямым чтобы попасть из точки в точку
@@ -31,10 +26,10 @@ namespace AICup
 
 
     /// Говорит куда и как надо двигаться, чтобы попасть из текущего состояния в некоторую точку
-    MoveAction move(const MovableUnit unit, const Position& pos, bool rotate = true);
+    MoveAction move(const model::CircularUnit& unit, const Position& pos, bool rotate = true);
 
     /// Говорит куда и как надо двигаться, чтобы попасть из текущего состояния в некоторую точку, используя путь
-    MoveAction move(const MovableUnit unit, const std::vector<Position>& path, bool rotate = true);
+    MoveAction move(const model::CircularUnit& unit, const std::vector<Position>& path, bool rotate = true);
 
   };
 

@@ -15,26 +15,26 @@ std::vector<Position> Move::path(const Position from, const Position to, double&
   return Graph::instance().path(from, to, length);
 }
 
-MoveAction Move::move(const MovableUnit unit, const Position& to, bool rotate) {
-  const auto dx = unit.x - to.x;
-  const auto dy = unit.y - to.y;
-  auto vec = Vector(dx, dy);
-  auto rotatedVec = vec.rotated(unit.angle);
-  rotatedVec = rotatedVec.normal() * Game::instance().model().getWizardForwardSpeed();
+MoveAction Move::move(const model::CircularUnit& unit, const Position& to, bool rotate) {
+  const auto dx = to.x - unit.getX();
+  const auto dy = to.y - unit.getY();
+  auto speedVec = Vector(dx, -dy).normalize().rotated(unit.getAngle());
+  speedVec.y *= -1;
+  speedVec *= Game::instance().model().getWizardForwardSpeed();
 
   if (rotate) {
-    const auto vecAngle = vec.angle();
-    const auto diff = -Extensions::angleDiff(vecAngle, unit.angle);
-    return MoveAction{rotatedVec.x, rotatedVec.y, diff*0.1};
+    const auto vecAngle = Vector(dx, dy).angle();
+    const auto diff = Extensions::angleDiff(vecAngle, unit.getAngle());
+    return MoveAction{speedVec.x, speedVec.y, diff};
   }
 
-  return MoveAction{rotatedVec.x, rotatedVec.y, 0};
+  return MoveAction{speedVec.x, speedVec.y, 0};
 }
 
-MoveAction Move::move(const MovableUnit unit, const std::vector<Position>& path, bool rotate) {
+MoveAction Move::move(const model::CircularUnit& unit, const std::vector<Position>& path, bool rotate) {
   assert(path.size() >= 2);
 
-  if ((path[1] - path[0]).length2() < 1 && path.size() >= 3) {
+  if ((path[1] - path[0]).length() < unit.getRadius()*0.25 && path.size() >= 3) {
     return move(unit, path[2], rotate);
   }
 

@@ -126,10 +126,11 @@ namespace AICup
       return x * x + y * y;
     }
 
-    inline void normalize() {
+    inline Vector2D<Type>& normalize() {
       auto len = length();
       x /= len;
       y /= len;
+      return *this;
     }
 
     inline Vector2D<Type> normal() const {

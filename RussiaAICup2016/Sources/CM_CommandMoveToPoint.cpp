@@ -14,13 +14,7 @@ CommandMoveToPoint::CommandMoveToPoint(double x, double y): point(x, y) {
 }
 
 bool CommandMoveToPoint::execute(const model::Wizard& self, model::Move& move) {
-  double newPathLength = 0;
-  const auto newPath = Move::path(Position(self.getX(), self.getY()), point, newPathLength);
-
-  if (abs(newPathLength - pathLength) > 50) {
-    pathLength = newPathLength;
-    path = newPath;
-  }
+  path = Move::path(Position(self.getX(), self.getY()), point, pathLength);
 
   if (path.size() < 2) {
     return false;
@@ -28,7 +22,7 @@ bool CommandMoveToPoint::execute(const model::Wizard& self, model::Move& move) {
 
 
 
-  const auto action = Move::move(MovableUnit{self.getX(), self.getY(), self.getAngle()}, path);
+  const auto action = Move::move(self, path);
 
   move.setSpeed(action.speed);
   move.setStrafeSpeed(action.strafeSpeed);
