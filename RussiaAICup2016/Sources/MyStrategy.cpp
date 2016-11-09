@@ -20,8 +20,8 @@ MyStrategy::MyStrategy() {
 }
 
 void MyStrategy::move(const model::Wizard& self, const model::World& world, const model::Game& game, model::Move& move) {
-  AICup::World::instance().update(world);
   AICup::Game::instance().update(game);
+  AICup::World::instance().update(world);
   AICup::Graph::instance().update();
 
   AICup::CommandManager::instance().update(self, move);
@@ -31,6 +31,7 @@ void MyStrategy::move(const model::Wizard& self, const model::World& world, cons
 
   visualizator.beginPost();
 
+  AICup::World::instance().visualization(visualizator);
   AICup::Graph::instance().visualization(visualizator);
   AICup::CommandManager::instance().visualization(visualizator);
 

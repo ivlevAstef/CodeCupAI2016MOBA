@@ -21,6 +21,11 @@ Graph::Graph() {
 void Graph::update() {
 }
 
+const Position& Graph::position(PointType type) const {
+  assert(0 <= type && type < pointMemory.size());
+  return pointMemory[type];
+}
+
 std::vector<Position> Graph::path(const Position& from, const Position& to, double& length) {
   assert(joinsForPoints.size() == pointMemory.size());
   /// save graph
@@ -214,25 +219,25 @@ void Graph::initDefaultPointMemory() {
   pointMemory[ACADEMY_BASE_MIDDLE] = {left + width*0.12, bottom - height*0.12};
   pointMemory[ACADEMY_BASE_BOTTOM] = {left + width*0.15, bottom};
 
-  pointMemory[DEFIANT_BASE] = {right, top};
-  pointMemory[DEFIANT_BASE_TOP] = {right - width*0.15, top};
-  pointMemory[DEFIANT_BASE_MIDDLE] = {right - width*0.12, top + height*0.12};
-  pointMemory[DEFIANT_BASE_BOTTOM] = {right, top + height*0.15};
+  pointMemory[RENEGADES_BASE] = {right, top};
+  pointMemory[RENEGADES_BASE_TOP] = {right - width*0.15, top};
+  pointMemory[RENEGADES_BASE_MIDDLE] = {right - width*0.12, top + height*0.12};
+  pointMemory[RENEGADES_BASE_BOTTOM] = {right, top + height*0.15};
 
   pointMemory[ACADEMY_TOP_FIRST_TOWER] = {left, top + pHeight * 0.44};
   pointMemory[ACADEMY_TOP_SECOND_TOWER] = {left, bottom - pHeight * 0.3};
-  pointMemory[DEFIANT_TOP_FIRST_TOWER] = {left + pWidth * 0.44, top};
-  pointMemory[DEFIANT_TOP_SECOND_TOWER] = {right - pWidth * 0.3, top};
+  pointMemory[RENEGADES_TOP_FIRST_TOWER] = {left + pWidth * 0.44, top};
+  pointMemory[RENEGADES_TOP_SECOND_TOWER] = {right - pWidth * 0.3, top};
 
   pointMemory[ACADEMY_BOTTOM_FIRST_TOWER] = {right - pWidth * 0.44, bottom};
   pointMemory[ACADEMY_BOTTOM_SECOND_TOWER] = {left + pWidth * 0.3, bottom};
-  pointMemory[DEFIANT_BOTTOM_FIRST_TOWER] = {right, bottom - pHeight * 0.44};
-  pointMemory[DEFIANT_BOTTOM_SECOND_TOWER] = {right, top + pHeight * 0.3};
+  pointMemory[RENEGADES_BOTTOM_FIRST_TOWER] = {right, bottom - pHeight * 0.44};
+  pointMemory[RENEGADES_BOTTOM_SECOND_TOWER] = {right, top + pHeight * 0.3};
 
   pointMemory[ACADEMY_MIDDLE_FIRST_TOWER] = {left + pWidth * 0.42, bottom - pHeight * 0.42};
   pointMemory[ACADEMY_MIDDLE_SECOND_TOWER] = {left + pWidth * 0.23, bottom - pHeight * 0.23};
-  pointMemory[DEFIANT_MIDDLE_FIRST_TOWER] = {right - pWidth * 0.42, top + pHeight * 0.42};
-  pointMemory[DEFIANT_MIDDLE_SECOND_TOWER] = {right - pWidth * 0.23, top + pHeight * 0.23};
+  pointMemory[RENEGADES_MIDDLE_FIRST_TOWER] = {right - pWidth * 0.42, top + pHeight * 0.42};
+  pointMemory[RENEGADES_MIDDLE_SECOND_TOWER] = {right - pWidth * 0.23, top + pHeight * 0.23};
 
 
   pointMemory[BONUS_TOP] = {width * 0.3, height * 0.3};
@@ -246,20 +251,19 @@ void Graph::initDefaultPointMemory() {
   pointMemory[CENTER_BONUS_TOP] = {width*0.5 - width*0.1, height*0.5 - height*0.1};
   pointMemory[CENTER_ACADEMY] = {width*0.5 - width*0.05, height*0.5 + height*0.05};
   pointMemory[CENTER_BONUS_BOTTOM] = {width*0.5 + width*0.1, height*0.5 + height*0.1};
-  pointMemory[CENTER_DEFIANT] = {width*0.5 + width*0.05, height*0.5 - height*0.05};
+  pointMemory[CENTER_RENEGADES] = {width*0.5 + width*0.05, height*0.5 - height*0.05};
 
   pointMemory[ACADEMY_TOP_CENTER] = {left, top + height * 0.12};
   pointMemory[BONUS_TOP_CENTER] = {left + width*0.13, top + height * 0.13};
-  pointMemory[DEFIANT_TOP_CENTER] = {left + width*0.12, top};
+  pointMemory[RENEGADES_TOP_CENTER] = {left + width*0.12, top};
 
   pointMemory[ACADEMY_BOTTOM_CENTER] = {right - width*0.12, bottom};
   pointMemory[BONUS_BOTTOM_CENTER] = {right - width*0.13, bottom - height*0.13};
-  pointMemory[DEFIANT_BOTTOM_CENTER] = {right, bottom - height*0.12};
+  pointMemory[RENEGADES_BOTTOM_CENTER] = {right, bottom - height*0.12};
 }
 
 void Graph::initDefaultJoinMemory() {
   joinMemory.push_back(CreateJoin(ACADEMY_BASE, ACADEMY_BASE_TOP));
-  joinMemory.push_back(CreateJoin(ACADEMY_BASE, ACADEMY_BASE_MIDDLE));
   joinMemory.push_back(CreateJoin(ACADEMY_BASE, ACADEMY_BASE_BOTTOM));
 
   joinMemory.push_back(CreateJoin(ACADEMY_BASE_TOP, ACADEMY_TOP_SECOND_TOWER));
@@ -286,32 +290,31 @@ void Graph::initDefaultJoinMemory() {
   joinMemory.push_back(CreateJoin(CENTER_ACADEMY, MIDDLE_CENTER));
 
 
-  joinMemory.push_back(CreateJoin(DEFIANT_BASE, DEFIANT_BASE_TOP));
-  joinMemory.push_back(CreateJoin(DEFIANT_BASE, DEFIANT_BASE_MIDDLE));
-  joinMemory.push_back(CreateJoin(DEFIANT_BASE, DEFIANT_BASE_BOTTOM));
+  joinMemory.push_back(CreateJoin(RENEGADES_BASE, RENEGADES_BASE_TOP));
+  joinMemory.push_back(CreateJoin(RENEGADES_BASE, RENEGADES_BASE_BOTTOM));
 
-  joinMemory.push_back(CreateJoin(DEFIANT_BASE_TOP, DEFIANT_TOP_SECOND_TOWER));
-  joinMemory.push_back(CreateJoin(DEFIANT_BASE_MIDDLE, DEFIANT_MIDDLE_SECOND_TOWER));
-  joinMemory.push_back(CreateJoin(DEFIANT_BASE_BOTTOM, DEFIANT_BOTTOM_SECOND_TOWER));
+  joinMemory.push_back(CreateJoin(RENEGADES_BASE_TOP, RENEGADES_TOP_SECOND_TOWER));
+  joinMemory.push_back(CreateJoin(RENEGADES_BASE_MIDDLE, RENEGADES_MIDDLE_SECOND_TOWER));
+  joinMemory.push_back(CreateJoin(RENEGADES_BASE_BOTTOM, RENEGADES_BOTTOM_SECOND_TOWER));
 
-  joinMemory.push_back(CreateJoin(DEFIANT_BASE_TOP, DEFIANT_BASE_MIDDLE));
-  joinMemory.push_back(CreateJoin(DEFIANT_BASE_BOTTOM, DEFIANT_BASE_MIDDLE));
+  joinMemory.push_back(CreateJoin(RENEGADES_BASE_TOP, RENEGADES_BASE_MIDDLE));
+  joinMemory.push_back(CreateJoin(RENEGADES_BASE_BOTTOM, RENEGADES_BASE_MIDDLE));
 
-  joinMemory.push_back(CreateJoin(DEFIANT_TOP_SECOND_TOWER, DEFIANT_TOP_FIRST_TOWER));
-  joinMemory.push_back(CreateJoin(DEFIANT_TOP_FIRST_TOWER, DEFIANT_TOP_CENTER));
-  joinMemory.push_back(CreateJoin(DEFIANT_TOP_CENTER, TOP_CENTER));
-  joinMemory.push_back(CreateJoin(DEFIANT_TOP_CENTER, BONUS_TOP_CENTER));
+  joinMemory.push_back(CreateJoin(RENEGADES_TOP_SECOND_TOWER, RENEGADES_TOP_FIRST_TOWER));
+  joinMemory.push_back(CreateJoin(RENEGADES_TOP_FIRST_TOWER, RENEGADES_TOP_CENTER));
+  joinMemory.push_back(CreateJoin(RENEGADES_TOP_CENTER, TOP_CENTER));
+  joinMemory.push_back(CreateJoin(RENEGADES_TOP_CENTER, BONUS_TOP_CENTER));
 
-  joinMemory.push_back(CreateJoin(DEFIANT_BOTTOM_SECOND_TOWER, DEFIANT_BOTTOM_FIRST_TOWER));
-  joinMemory.push_back(CreateJoin(DEFIANT_BOTTOM_FIRST_TOWER, DEFIANT_BOTTOM_CENTER));
-  joinMemory.push_back(CreateJoin(DEFIANT_BOTTOM_CENTER, BOTTOM_CENTER));
-  joinMemory.push_back(CreateJoin(DEFIANT_BOTTOM_CENTER, BONUS_BOTTOM_CENTER));
+  joinMemory.push_back(CreateJoin(RENEGADES_BOTTOM_SECOND_TOWER, RENEGADES_BOTTOM_FIRST_TOWER));
+  joinMemory.push_back(CreateJoin(RENEGADES_BOTTOM_FIRST_TOWER, RENEGADES_BOTTOM_CENTER));
+  joinMemory.push_back(CreateJoin(RENEGADES_BOTTOM_CENTER, BOTTOM_CENTER));
+  joinMemory.push_back(CreateJoin(RENEGADES_BOTTOM_CENTER, BONUS_BOTTOM_CENTER));
 
-  joinMemory.push_back(CreateJoin(DEFIANT_MIDDLE_SECOND_TOWER, DEFIANT_MIDDLE_FIRST_TOWER));
-  joinMemory.push_back(CreateJoin(DEFIANT_MIDDLE_FIRST_TOWER, CENTER_DEFIANT));
-  joinMemory.push_back(CreateJoin(CENTER_DEFIANT, CENTER_BONUS_TOP));
-  joinMemory.push_back(CreateJoin(CENTER_DEFIANT, CENTER_BONUS_BOTTOM));
-  joinMemory.push_back(CreateJoin(CENTER_DEFIANT, MIDDLE_CENTER));
+  joinMemory.push_back(CreateJoin(RENEGADES_MIDDLE_SECOND_TOWER, RENEGADES_MIDDLE_FIRST_TOWER));
+  joinMemory.push_back(CreateJoin(RENEGADES_MIDDLE_FIRST_TOWER, CENTER_RENEGADES));
+  joinMemory.push_back(CreateJoin(CENTER_RENEGADES, CENTER_BONUS_TOP));
+  joinMemory.push_back(CreateJoin(CENTER_RENEGADES, CENTER_BONUS_BOTTOM));
+  joinMemory.push_back(CreateJoin(CENTER_RENEGADES, MIDDLE_CENTER));
 
 
   joinMemory.push_back(CreateJoin(TOP_CENTER, CENTER_BONUS_TOP));
@@ -325,8 +328,8 @@ void Graph::initDefaultJoinMemory() {
   joinMemory.push_back(CreateJoin(CENTER_BONUS_BOTTOM, MIDDLE_CENTER));
 
 
-  joinMemory.push_back(CreateJoin(ACADEMY_TOP_CENTER, DEFIANT_TOP_CENTER));
-  joinMemory.push_back(CreateJoin(ACADEMY_BOTTOM_CENTER, DEFIANT_BOTTOM_CENTER));
+  joinMemory.push_back(CreateJoin(ACADEMY_TOP_CENTER, RENEGADES_TOP_CENTER));
+  joinMemory.push_back(CreateJoin(ACADEMY_BOTTOM_CENTER, RENEGADES_BOTTOM_CENTER));
 
 }
 

@@ -16,18 +16,18 @@ namespace AICup
   public:
     CommandMoveToPoint(double x, double y);
 
-    bool execute(const model::Wizard& self, model::Move& move);
+    bool check(const model::Wizard& self, model::Move& move);
 
-    const std::vector<CommandPtr>& neededCommands(const CommandFabric& fabric);
+    void execute(const model::Wizard& self, model::Move& move);
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;
 #endif // ENABLE_VISUALIZATOR
 
   private:
-    Position point;
+    const Position point;
+
     std::vector<Position> path;
     double pathLength;
-    std::vector<CommandPtr> needCommands;
   };
 }

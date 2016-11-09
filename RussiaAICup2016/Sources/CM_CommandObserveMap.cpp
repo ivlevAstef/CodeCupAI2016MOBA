@@ -13,10 +13,9 @@ CommandObserveMap::CommandObserveMap() {
 
 }
 
-bool AICup::CommandObserveMap::execute(const model::Wizard& self, model::Move& move) {
+bool CommandObserveMap::check(const model::Wizard& self, model::Move& move) {
   return false;
 }
 
-const std::vector<CommandPtr>& AICup::CommandObserveMap::neededCommands(const CommandFabric& fabric) {
-  return needCommands;
+void CommandObserveMap::execute(const model::Wizard& self, model::Move& move) {
 }

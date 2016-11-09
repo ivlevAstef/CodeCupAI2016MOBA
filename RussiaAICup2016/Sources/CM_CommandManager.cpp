@@ -10,12 +10,15 @@
 using namespace AICup;
 
 CommandManager::CommandManager() {
-  commands.push_back(fabric.moveToPoint(1200, 300));
+  //commands.push_back(fabric.moveToPoint(1200, 300));
+  commands.push_back(fabric.moveToLine(model::LINE_BOTTOM));
 }
 
 void CommandManager::update(const model::Wizard& self, model::Move& move) {
   for (const auto& command : commands) {
-    command->execute(self, move);
+    if (command->check(self, move)) {
+      command->execute(self, move);
+    }
   }
 }
 

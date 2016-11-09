@@ -9,6 +9,7 @@
 
 #include "CM_Command.h"
 #include "model\LineType.h"
+#include "C_Vector2D.h"
 
 namespace AICup
 {
@@ -16,11 +17,18 @@ namespace AICup
   public:
     CommandMoveToLine(model::LineType line);
 
-    bool execute(const model::Wizard& self, model::Move& move);
+    bool check(const model::Wizard& self, model::Move& move);
 
-    const std::vector<CommandPtr>& neededCommands(const CommandFabric& fabric);
+    void execute(const model::Wizard& self, model::Move& move);
+
+#ifdef ENABLE_VISUALIZATOR
+    void visualization(const Visualizator& visualizator) const override;
+#endif // ENABLE_VISUALIZATOR
 
   private:
-    std::vector<CommandPtr> needCommands;
+    const model::LineType line;
+
+    std::vector<Position> path;
+    double pathLength;
   };
 }

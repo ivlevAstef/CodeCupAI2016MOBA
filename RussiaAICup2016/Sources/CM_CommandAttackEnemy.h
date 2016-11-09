@@ -15,11 +15,10 @@ namespace AICup
   public:
     CommandAttackEnemy(long long enemyId);
 
-    bool execute(const model::Wizard& self, model::Move& move);
+    bool check(const model::Wizard& self, model::Move& move);
 
-    const std::vector<CommandPtr>& neededCommands(const CommandFabric& fabric);
+    void execute(const model::Wizard& self, model::Move& move);
 
   private:
-    std::vector<CommandPtr> needCommands;
   };
 }

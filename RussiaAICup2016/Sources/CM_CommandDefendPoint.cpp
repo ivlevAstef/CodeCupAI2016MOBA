@@ -13,10 +13,9 @@ CommandDefendPoint::CommandDefendPoint(double x, double y) {
 
 }
 
-bool AICup::CommandDefendPoint::execute(const model::Wizard& self, model::Move& move) {
+bool CommandDefendPoint::check(const model::Wizard& self, model::Move& move) {
   return false;
 }
 
-const std::vector<CommandPtr>& AICup::CommandDefendPoint::neededCommands(const CommandFabric& fabric) {
-  return needCommands;
+void CommandDefendPoint::execute(const model::Wizard& self, model::Move& move) {
 }

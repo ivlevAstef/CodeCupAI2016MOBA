@@ -13,10 +13,9 @@ CommandPool::CommandPool(long long neutralUnitId) {
 
 }
 
-bool AICup::CommandPool::execute(const model::Wizard& self, model::Move& move) {
+bool CommandPool::check(const model::Wizard& self, model::Move& move) {
   return false;
 }
 
-const std::vector<CommandPtr>& AICup::CommandPool::neededCommands(const CommandFabric& fabric) {
-  return needCommands;
+void CommandPool::execute(const model::Wizard& self, model::Move& move) {
 }

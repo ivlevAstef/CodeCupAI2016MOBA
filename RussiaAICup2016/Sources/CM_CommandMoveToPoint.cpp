@@ -13,26 +13,19 @@ using namespace AICup;
 CommandMoveToPoint::CommandMoveToPoint(double x, double y): point(x, y) {
 }
 
-bool CommandMoveToPoint::execute(const model::Wizard& self, model::Move& move) {
+bool CommandMoveToPoint::check(const model::Wizard& self, model::Move& move) {
   path = Move::path(Position(self.getX(), self.getY()), point, pathLength);
 
-  if (path.size() < 2) {
-    return false;
-  }
+  return path.size() >= 2 && pathLength > 1;
+}
 
 
-
+void CommandMoveToPoint::execute(const model::Wizard& self, model::Move& move) {
   const auto action = Move::move(self, path);
 
   move.setSpeed(action.speed);
   move.setStrafeSpeed(action.strafeSpeed);
   move.setTurn(action.turn);
-
-  return true;
-}
-
-const std::vector<CommandPtr>& CommandMoveToPoint::neededCommands(const CommandFabric& fabric) {
-  return needCommands;
 }
 
 #ifdef ENABLE_VISUALIZATOR

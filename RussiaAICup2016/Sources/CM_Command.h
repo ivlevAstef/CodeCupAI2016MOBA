@@ -18,20 +18,20 @@
 namespace AICup
 {
   class Command;
-  class CommandFabric;
   typedef std::shared_ptr<Command> CommandPtr;
 
   class Command {
   public:
-    /// исполнить команду, возвращает false если команду исполнить невозможно
-    virtual bool execute(const model::Wizard& self, model::Move& move) = 0;
 
-    /// команды которые можно исполнить, чтобы стало возможным исполнить текущую команду
-    virtual const std::vector<CommandPtr>& neededCommands(const CommandFabric& fabric) = 0;
+    /// проверяет возможность исполнения команды
+    virtual bool check(const model::Wizard& self, model::Move& move) = 0;
+
+    /// исполнить команду
+    virtual void execute(const model::Wizard& self, model::Move& move) = 0;
 
 
 #ifdef ENABLE_VISUALIZATOR
-    virtual void visualization(const Visualizator& visualizator) const { }
+    virtual void visualization(const Visualizator&) const { }
 #endif // ENABLE_VISUALIZATOR
   };
 }

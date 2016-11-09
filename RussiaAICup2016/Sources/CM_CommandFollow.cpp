@@ -13,10 +13,10 @@ CommandFollow::CommandFollow(long long unitId) {
 
 }
 
-bool AICup::CommandFollow::execute(const model::Wizard& self, model::Move& move) {
+
+bool CommandFollow::check(const model::Wizard& self, model::Move& move) {
   return false;
 }
 
-const std::vector<CommandPtr>& AICup::CommandFollow::neededCommands(const CommandFabric& fabric) {
-  return needCommands;
+void CommandFollow::execute(const model::Wizard& self, model::Move& move) {
 }

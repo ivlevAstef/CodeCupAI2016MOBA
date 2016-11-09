@@ -29,32 +29,33 @@ namespace AICup
 
     typedef std::vector<size_t> JoinsForPoint;
 
+  public:
     enum PointType {
       ACADEMY_BASE = 0,
       ACADEMY_BASE_TOP,
       ACADEMY_BASE_MIDDLE,
       ACADEMY_BASE_BOTTOM,
 
-      DEFIANT_BASE,
-      DEFIANT_BASE_TOP,
-      DEFIANT_BASE_MIDDLE,
-      DEFIANT_BASE_BOTTOM,
+      RENEGADES_BASE,
+      RENEGADES_BASE_TOP,
+      RENEGADES_BASE_MIDDLE,
+      RENEGADES_BASE_BOTTOM,
 
       ACADEMY_TOP_FIRST_TOWER,
       ACADEMY_TOP_SECOND_TOWER,
-      DEFIANT_TOP_FIRST_TOWER,
-      DEFIANT_TOP_SECOND_TOWER,
+      RENEGADES_TOP_FIRST_TOWER,
+      RENEGADES_TOP_SECOND_TOWER,
 
       ACADEMY_BOTTOM_FIRST_TOWER,
       ACADEMY_BOTTOM_SECOND_TOWER,
-      DEFIANT_BOTTOM_FIRST_TOWER,
-      DEFIANT_BOTTOM_SECOND_TOWER,
+      RENEGADES_BOTTOM_FIRST_TOWER,
+      RENEGADES_BOTTOM_SECOND_TOWER,
 
 
       ACADEMY_MIDDLE_FIRST_TOWER,
       ACADEMY_MIDDLE_SECOND_TOWER,
-      DEFIANT_MIDDLE_FIRST_TOWER,
-      DEFIANT_MIDDLE_SECOND_TOWER,
+      RENEGADES_MIDDLE_FIRST_TOWER,
+      RENEGADES_MIDDLE_SECOND_TOWER,
 
       BONUS_TOP,
       BONUS_BOTTOM,
@@ -69,15 +70,15 @@ namespace AICup
       CENTER_BONUS_TOP,
       CENTER_ACADEMY,
       CENTER_BONUS_BOTTOM,
-      CENTER_DEFIANT,
+      CENTER_RENEGADES,
 
       ACADEMY_TOP_CENTER,
       BONUS_TOP_CENTER,
-      DEFIANT_TOP_CENTER,
+      RENEGADES_TOP_CENTER,
 
       ACADEMY_BOTTOM_CENTER,
       BONUS_BOTTOM_CENTER,
-      DEFIANT_BOTTOM_CENTER,
+      RENEGADES_BOTTOM_CENTER,
 
       _POINT_COUNT_
     };
@@ -86,6 +87,8 @@ namespace AICup
     Graph();
 
     std::vector<Position> path(const Position& from, const Position& to, double& length);
+
+    const Position& position(PointType type) const;
 
     void update(); /// использует World
 
