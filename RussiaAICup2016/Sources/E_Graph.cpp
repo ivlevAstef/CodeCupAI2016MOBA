@@ -26,7 +26,7 @@ const Position& Graph::position(PointType type) const {
   return pointMemory[type];
 }
 
-std::vector<Position> Graph::path(const Position& from, const Position& to, double& length) {
+Path Graph::path(const Position& from, const Position& to, double& length) {
   assert(joinsForPoints.size() == pointMemory.size());
   /// save graph
   const auto pointMemorySave = pointMemory;
@@ -42,7 +42,7 @@ std::vector<Position> Graph::path(const Position& from, const Position& to, doub
   const auto& reversedPrivatePath = dijkstraPath(pointFrom, pointTo, length);
 
   /// Create result
-  std::vector<Position> result;
+  Path result;
   result.reserve(reversedPrivatePath.size());
 
   for (size_t index = 0; index < reversedPrivatePath.size(); index++) {

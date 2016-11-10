@@ -8,6 +8,7 @@
 
 #include "C_Singleton.h"
 #include "C_Vector2D.h"
+#include "E_Types.h"
 #include "model/LineType.h"
 #include <vector>
 
@@ -86,7 +87,7 @@ namespace AICup
   public:
     Graph();
 
-    std::vector<Position> path(const Position& from, const Position& to, double& length);
+    Path path(const Position& from, const Position& to, double& length);
 
     const Position& position(PointType type) const;
 

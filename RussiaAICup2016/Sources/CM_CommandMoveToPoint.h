@@ -28,7 +28,7 @@ namespace AICup
   private:
     const Position point;
 
-    std::vector<Position> path;
+    Path path;
     ObstaclesGroups obstaclesGroups;
 
     double pathLength;

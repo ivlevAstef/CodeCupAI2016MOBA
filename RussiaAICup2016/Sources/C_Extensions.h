@@ -26,7 +26,7 @@ namespace AICup
     #define MAX(a,b) (((a) > (b)) ? (a) : (b))
     #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
-    #define SIA_PI constPI()
+    #define AICUP_PI Extensions::constPI()
 
   };
 
