@@ -10,6 +10,7 @@
 #include "CM_Command.h"
 #include "model\LineType.h"
 #include "C_Vector2D.h"
+#include "CM_CommandMoveToPoint.h"
 
 namespace AICup
 {
@@ -28,7 +29,6 @@ namespace AICup
   private:
     const model::LineType line;
 
-    std::vector<Position> path;
-    double pathLength;
+    std::shared_ptr<CommandMoveToPoint> commandMoveToPoint;
   };
 }

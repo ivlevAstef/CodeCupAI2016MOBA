@@ -192,6 +192,7 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\C_Vector2D.h" />
     <ClInclude Include="..\Sources\E_Game.h" />
     <ClInclude Include="..\Sources\E_Graph.h" />
+    <ClInclude Include="..\Sources\E_Types.h" />
     <ClInclude Include="..\Sources\E_World.h" />
     <ClInclude Include="..\Sources\MyStrategy.h" />
     <ClInclude Include="..\Sources\Visualizator.h" />

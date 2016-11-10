@@ -7,6 +7,7 @@
 
 #include "CM_CommandMoveToPoint.h"
 #include "CM_Move.h"
+#include "E_World.h"
 
 using namespace AICup;
 
@@ -21,6 +22,8 @@ bool CommandMoveToPoint::check(const model::Wizard& self, model::Move& move) {
 
 
 void CommandMoveToPoint::execute(const model::Wizard& self, model::Move& move) {
+  obstaclesGroups = World::instance().obstaclesGroup(self);
+
   const auto action = Move::move(self, path);
 
   move.setSpeed(action.speed);
@@ -33,5 +36,16 @@ void CommandMoveToPoint::visualization(const Visualizator& visualizator) const {
   for (size_t index = 1; index < path.size(); index++) {
     visualizator.line(path[index - 1].x, path[index - 1].y, path[index].x, path[index].y, 0xff0000);
   }
+
+  for (const auto& group : obstaclesGroups) {
+    for (size_t index = 1; index < group.size(); index++) {
+      visualizator.line(group[index - 1].getX(), group[index - 1].getY(), group[index].getX(), group[index].getY(), 0xff00ff);
+    }
+
+    for (const auto& obstacle : group) {
+      visualizator.circle(obstacle.getX(), obstacle.getY(), obstacle.getRadius(), 0xff00ff);
+    }
+  }
+
 }
 #endif // ENABLE_VISUALIZATOR

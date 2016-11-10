@@ -175,11 +175,86 @@ const Position& World::linePosition(model::LineType line) const {
   return middleLinePosition;
 }
 
+Obstacles World::obstacles(const model::Wizard& unit) const {
+  Obstacles aroundObstacles;
+  aroundObstacles.reserve(24); // Приблизительно сколько объектов вокруг мага в среднем
+
+  for (const auto& tree : model().getTrees()) {
+    if (unit.getDistanceTo(tree) < unit.getVisionRange()) {
+      aroundObstacles.push_back(tree);
+    }
+  }
+
+  for (const auto& tree : model().getMinions()) {
+    if (unit.getDistanceTo(tree) < unit.getVisionRange()) {
+      aroundObstacles.push_back(tree);
+    }
+  }
+
+  for (const auto& tree : model().getBuildings()) {
+    if (unit.getDistanceTo(tree) < unit.getVisionRange()) {
+      aroundObstacles.push_back(tree);
+    }
+  }
+
+  for (const auto& tree : model().getWizards()) {
+    if (unit.getDistanceTo(tree) < unit.getVisionRange()) {
+      aroundObstacles.push_back(tree);
+    }
+  }
+
+  //after model().getProjectiles()
+
+  return aroundObstacles;
+}
+
+ObstaclesGroups World::obstaclesGroup(const model::Wizard& unit) const {
+  const auto aroundObstacles = obstacles(unit);
+
+  ObstaclesGroups result;
+
+  std::vector<size_t> groupsForMerge;
+  for (const auto& obstacle : aroundObstacles) {
+    groupsForMerge.clear();
+
+    for (size_t index = 0; index < result.size(); ++index) {
+      for (const auto& obstacleInGroup : result[index]) {
+        if (obstacle.getDistanceTo(obstacleInGroup) < obstacle.getRadius() + obstacleInGroup.getRadius() + unit.getRadius()*2) {
+          groupsForMerge.push_back(index);
+          break;
+        }
+      }
+    }
+
+    /// create new group
+    if (0 == groupsForMerge.size()) {
+      result.push_back({obstacle});
+    } else {
+      auto& firstGroup = result[groupsForMerge[0]];
+      /// merge
+      for (size_t index = 1; index < groupsForMerge.size(); ++index) {
+        const auto& iterGroup = result[groupsForMerge[index]];
+        firstGroup.insert(firstGroup.end(), iterGroup.begin(), iterGroup.end());
+      }
+
+      /// remove groups
+      for (size_t index = groupsForMerge.size() - 1; index > 0; index--) {
+        result.erase(result.begin() + groupsForMerge[index]);
+      }
+
+      /// add
+      firstGroup.push_back(obstacle);
+    }
+  }
+
+  return result;
+}
+
 
 #ifdef ENABLE_VISUALIZATOR
 void World::visualization(const Visualizator& visualizator) const {
-  visualizator.circle(topLinePosition.x, topLinePosition.y, 100, 0xff0000);
-  visualizator.circle(middleLinePosition.x, middleLinePosition.y, 100, 0xff0000);
-  visualizator.circle(bottomLinePosition.x, bottomLinePosition.y, 100, 0xff0000);
+  visualizator.circle(topLinePosition.x, topLinePosition.y, 200, 0xff0000);
+  visualizator.circle(middleLinePosition.x, middleLinePosition.y, 200, 0xff0000);
+  visualizator.circle(bottomLinePosition.x, bottomLinePosition.y, 200, 0xff0000);
 }
 #endif // ENABLE_VISUALIZATOR

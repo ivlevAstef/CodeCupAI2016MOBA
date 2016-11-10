@@ -146,6 +146,9 @@
     <ClInclude Include="..\Sources\E_Game.h">
       <Filter>Sources\Environment</Filter>
     </ClInclude>
+    <ClInclude Include="..\Sources\E_Types.h">
+      <Filter>Sources\Environment</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\local-runner\read.me" />

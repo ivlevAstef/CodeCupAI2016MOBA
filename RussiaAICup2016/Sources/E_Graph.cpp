@@ -244,8 +244,8 @@ void Graph::initDefaultPointMemory() {
   pointMemory[BONUS_BOTTOM] = {width * 0.7, height * 0.7};
 
 
-  pointMemory[TOP_CENTER] = {left, top};
-  pointMemory[BOTTOM_CENTER] = {right, bottom};
+  pointMemory[TOP_CENTER] = {left + width * 0.04, top + width * 0.04};
+  pointMemory[BOTTOM_CENTER] = {right - width * 0.04, bottom - width * 0.04};
   pointMemory[MIDDLE_CENTER] = {width * 0.5, height * 0.5};
 
   pointMemory[CENTER_BONUS_TOP] = {width*0.5 - width*0.1, height*0.5 - height*0.1};
@@ -328,8 +328,8 @@ void Graph::initDefaultJoinMemory() {
   joinMemory.push_back(CreateJoin(CENTER_BONUS_BOTTOM, MIDDLE_CENTER));
 
 
-  joinMemory.push_back(CreateJoin(ACADEMY_TOP_CENTER, RENEGADES_TOP_CENTER));
-  joinMemory.push_back(CreateJoin(ACADEMY_BOTTOM_CENTER, RENEGADES_BOTTOM_CENTER));
+  //joinMemory.push_back(CreateJoin(ACADEMY_TOP_CENTER, RENEGADES_TOP_CENTER));
+  //joinMemory.push_back(CreateJoin(ACADEMY_BOTTOM_CENTER, RENEGADES_BOTTOM_CENTER));
 
 }
 

@@ -10,7 +10,7 @@
 #include "model\World.h"
 #include "C_Vector2D.h"
 #include "C_Singleton.h"
-
+#include "E_Types.h"
 
 #ifdef ENABLE_VISUALIZATOR
 #include "Visualizator.h"
@@ -18,6 +18,7 @@
 
 namespace AICup
 {
+
   class World: public Singleton<World> {
   public:
     World();
@@ -28,6 +29,9 @@ namespace AICup
 
     std::vector<model::Tree>& trees();
     std::vector<model::Wizard>& wizards();
+
+    Obstacles obstacles(const model::Wizard& unit) const;
+    ObstaclesGroups obstaclesGroup(const model::Wizard& unit) const;
 
     const Position& linePosition(model::LineType line) const;
 

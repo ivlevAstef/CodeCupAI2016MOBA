@@ -9,6 +9,7 @@
 
 #include "CM_Command.h"
 #include "C_Vector2D.h"
+#include "E_Types.h"
 
 namespace AICup
 {
@@ -28,6 +29,8 @@ namespace AICup
     const Position point;
 
     std::vector<Position> path;
+    ObstaclesGroups obstaclesGroups;
+
     double pathLength;
   };
 }
