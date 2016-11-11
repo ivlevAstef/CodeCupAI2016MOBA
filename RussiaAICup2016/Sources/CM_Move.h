@@ -8,7 +8,7 @@
 #pragma once
 
 #include "C_Vector2D.h"
-#include "model\CircularUnit.h"
+#include "model\Wizard.h"
 #include "E_Types.h"
 #include <vector>
 
@@ -40,9 +40,11 @@ namespace AICup
 
     /// Говорит куда и как надо двигаться, чтобы попасть из текущего состояния в некоторую точку, используя путь
     MoveAction move(const model::CircularUnit& unit, const Path& path, MoveStyle style = MOVE_WITH_ROTATE);
+    MoveAction move(const model::Wizard& unit, const Path& path, MoveStyle style = MOVE_WITH_ROTATE);
 
     /// Говорит куда и как надо двигаться, чтобы попасть из текущего состояния в некоторую точку, используя путь и учитывая препятствия
     MoveAction move(const model::CircularUnit& unit, const Path& path, const ObstaclesGroups& obstacles, MoveStyle style = MOVE_WITH_ROTATE);
+    MoveAction move(const model::Wizard& unit, const Path& path, const ObstaclesGroups& obstacles, MoveStyle style = MOVE_WITH_ROTATE);
 
   };
 

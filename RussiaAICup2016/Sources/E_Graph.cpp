@@ -7,7 +7,7 @@
 #include "E_Graph.h"
 #include "E_World.h"
 #include "C_Vector2D.h"
-#include "C_Extensions.h"
+#include "C_Math.h"
 #include <unordered_set>
 
 using namespace AICup;
@@ -75,7 +75,7 @@ const size_t Graph::addPoint(const Position& pos) {
     const auto& pos2 = pointMemory[join.p2Index];
 
 
-    lengths[joinIndex] = Extensions::distance(pos, pos1, pos2);
+    lengths[joinIndex] = Math::distance(pos, pos1, pos2);
   }
 
   /// find nearest join

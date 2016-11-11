@@ -7,7 +7,7 @@
 #include "E_World.h"
 #include "E_Graph.h"
 #include "E_Game.h"
-#include "C_Extensions.h"
+#include "C_Math.h"
 
 using namespace AICup;
 
@@ -185,21 +185,21 @@ Obstacles World::obstacles(const model::Wizard& unit) const {
     }
   }
 
-  for (const auto& tree : model().getMinions()) {
-    if (unit.getDistanceTo(tree) < unit.getVisionRange()) {
-      aroundObstacles.push_back(tree);
+  for (const auto& minion : model().getMinions()) {
+    if (unit.getDistanceTo(minion) < unit.getVisionRange()) {
+      aroundObstacles.push_back(minion);
     }
   }
 
-  for (const auto& tree : model().getBuildings()) {
-    if (unit.getDistanceTo(tree) < unit.getVisionRange()) {
-      aroundObstacles.push_back(tree);
+  for (const auto& build : model().getBuildings()) {
+    if (unit.getDistanceTo(build) < unit.getVisionRange()) {
+      aroundObstacles.push_back(build);
     }
   }
 
-  for (const auto& tree : model().getWizards()) {
-    if (unit.getDistanceTo(tree) < unit.getVisionRange()) {
-      aroundObstacles.push_back(tree);
+  for (const auto& wizard : model().getWizards()) {
+    if (unit.getId() != wizard.getId() && unit.getDistanceTo(wizard) < unit.getVisionRange()) {
+      aroundObstacles.push_back(wizard);
     }
   }
 
