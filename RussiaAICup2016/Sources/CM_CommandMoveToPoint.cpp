@@ -24,7 +24,7 @@ bool CommandMoveToPoint::check(const model::Wizard& self, model::Move& move) {
 void CommandMoveToPoint::execute(const model::Wizard& self, model::Move& move) {
   obstaclesGroups = World::instance().obstaclesGroup(self);
 
-  const auto action = Move::move(self, path);
+  const auto action = Move::move(self, path, obstaclesGroups);
 
   move.setSpeed(action.speed);
   move.setStrafeSpeed(action.strafeSpeed);

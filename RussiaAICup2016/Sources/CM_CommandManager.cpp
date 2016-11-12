@@ -10,7 +10,7 @@
 using namespace AICup;
 
 CommandManager::CommandManager() {
-  commands.push_back(fabric.moveToPoint(1000, 200));
+  commands.push_back(fabric.moveToPoint(1200, 1200));
   //commands.push_back(fabric.moveToLine(model::LINE_BOTTOM));
 }
 

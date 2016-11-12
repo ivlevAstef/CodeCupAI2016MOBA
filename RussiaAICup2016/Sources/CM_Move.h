@@ -18,6 +18,7 @@ namespace AICup
     double speed;
     double strafeSpeed;
     double turn;
+    bool isClosed;
   };
 
   enum MoveStyle {

@@ -75,7 +75,7 @@ const size_t Graph::addPoint(const Position& pos) {
     const auto& pos2 = pointMemory[join.p2Index];
 
 
-    lengths[joinIndex] = Math::distance(pos, pos1, pos2);
+    lengths[joinIndex] = Math::distanceToSegment(pos, pos1, pos2);
   }
 
   /// find nearest join

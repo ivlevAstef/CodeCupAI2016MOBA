@@ -8,11 +8,6 @@ double Math::constPI() {
   return PI;
 }
 
-double Math::distance(const Position& point, const Position& p1, const Position& p2) {
-  const auto pPoint = intersectLineFromPoint(point, p1, p2);
-  return (point - pPoint).length();
-}
-
 double Math::angleDiff(double angle1, double angle2) {
   double angle = angle1 - angle2;
 
@@ -27,7 +22,22 @@ double Math::angleDiff(double angle1, double angle2) {
   return angle;
 }
 
-Position Math::perpendicularFromPointToLine(const Position& point, const Position& p1, const Position& p2) {
+double Math::distanceToLine(const Position& point, const Position& p1, const Position& p2) {
+  Vector delta = p2 - p1;
+  Vector distanceToP1 = point - p1;
+  return abs(delta.normal().cross(distanceToP1));
+}
+
+double Math::distanceToSegment(const Position& point, const Position& p1, const Position& p2) {
+  Vector delta = p2 - p1;
+  Vector distanceToP1 = point - p1;
+  double t = delta.normal().dot(distanceToP1);
+  t = MAX(0, MIN(t, delta.length()));
+
+  return (point - (p1 + delta.normal() * t)).length();
+}
+
+Position Math::point_distanceToLine(const Position& point, const Position& p1, const Position& p2) {
   Vector delta = p2 - p1;
   Vector distanceToP1 = point - p1;
   double t = delta.normal().dot(distanceToP1);
@@ -35,7 +45,7 @@ Position Math::perpendicularFromPointToLine(const Position& point, const Positio
   return p1 + delta.normal() * t;
 }
 
-Position Math::intersectLineFromPoint(const Position& point, const Position& p1, const Position& p2) {
+Position Math::point_distanceToSegment(const Position& point, const Position& p1, const Position& p2) {
   Vector delta = p2 - p1;
   Vector distanceToP1 = point - p1;
   double t = delta.normal().dot(distanceToP1);
@@ -44,8 +54,10 @@ Position Math::intersectLineFromPoint(const Position& point, const Position& p1,
   return p1 + delta.normal() * t;
 }
 
-std::vector<Position> Math::intersectLineWithCircle(const Position& point, double radius, const Position& p1, const Position& p2) {
-  const auto perpedicularPos = perpendicularFromPointToLine(point, p1, p2);
+
+
+std::vector<Position> Math::intersectSegmentWithCircle(const Position& point, const double radius, const Position& p1, const Position& p2) {
+  const auto perpedicularPos = point_distanceToLine(point, p1, p2);
   const auto perpendicularV = point - perpedicularPos;
 
   const auto radius2 = radius*radius;
@@ -85,4 +97,42 @@ std::vector<Position> Math::intersectLineWithCircle(const Position& point, doubl
   }
 
   return result;
+}
+
+Position Math::center(const Position& p1, const Position& p2) {
+  return p1 + (p2 - p1) * 0.5;
+}
+
+Position Math::center(const double x1, const double y1, const double x2, const double y2) {
+  return Position(x1 + (x2 - x1) * 0.5, y1 + (y2 - y1) * 0.5);
+}
+
+std::vector<Vector> Math::tangetsForTwoCircle(const Position& p1, const double radius1, const Position& p2, const double radius2) {
+  /// всегда считаем что первый радиус больше второго
+  if (radius1 < radius2) {
+    return tangetsForTwoCircle(p2, radius2, p1, radius1);
+  }
+
+  const double radius = radius1 + radius2;
+  const double radiusX2 = radius * radius;
+  const auto delta = p2 - p1;
+  const auto deltaLength = delta.length();
+
+  /// два круга находяться очень близко -> касательная = перпендикуляру к вектору
+  if (deltaLength < radius + 1.0e-3) {
+    const auto n = delta.perpendicular().normal();
+    return {n, -n};
+  }
+
+
+  const auto vLength = radiusX2 / deltaLength;
+  const auto v = delta.normal() * vLength;
+
+  const auto nLength = sqrt(radiusX2 - vLength * vLength);
+  const auto n = delta.perpendicular().normal() * nLength;
+
+  const auto tangent1 = (p1 - p2) + v + n;
+  const auto tangent2 = (p1 - p2) + v - n;
+
+  return{tangent1.normal(), tangent2.normal()};
 }
