@@ -8,6 +8,8 @@
 #include "E_Graph.h"
 #include "C_Math.h"
 #include "E_Game.h"
+#include <tuple>
+#include <algorithm>
 
 using namespace AICup;
 
@@ -72,163 +74,91 @@ const Obstacles* findNearestGroup(const Position& from, const double radius, con
 }
 
 
-const bool checkIsClosed(const model::CircularUnit& obstacle1, const model::CircularUnit& obstacle2, const double radius) {
-  return false; //TODO: подумать, надо учитывать, еще что угол должен быть взаде движения а не спереди
-  /*const double dx = obstacle2.getX() - obstacle1.getX();
-  const double dy = obstacle2.getY() - obstacle1.getY();
+/// устанавливает направление движения в сторону выхода если это не так (так как касательные могут иметь любой знак
+void setTangetsDirection(const Position& from, const Position& obstaclePos, std::vector<Vector>& tangets) {
+  assert(2 == tangets.size());
+  const auto delta = (obstaclePos - from).normal();
 
-  return sqrt(dx*dx + dy*dy) < obstacle1.getRadius() + obstacle2.getRadius() + 2 * radius;*/
+  /// не ноль, чтобы навсякий случай не развернуть 90 градусов
+  if (tangets[0].dot(delta) < -0.001) {
+    tangets[0].set(-tangets[0]);
+  }
+
+  if (tangets[1].dot(delta) < -0.001) {
+    tangets[1].set(-tangets[1]);
+  }
 }
 
+
+bool isIntersectVectorWithGroup(const Position& from, const Vector& vec, const Position& checkPos, const double radius, const Obstacles& group) {
+  const Position p2 = from + vec * 10000;
+  for (const auto& obstacle : group) {
+    const auto obstaclePos = Position(obstacle.getX(), obstacle.getY());
+    /// игнорируем самого себя
+    if ((obstaclePos - checkPos).length2() < 1) {
+      continue;
+    }
+
+    const double distance = Math::distanceToSegment(obstaclePos, from, p2);
+    if (distance < obstacle.getRadius() + radius) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+struct ObstacleData {
+  double deviation;
+  Position obstaclePos;
+  Vector tangent;
+};
 /// ищет края группы - точки в группе до которых вектор изменения от движения максимален. таких точки две - в разные стороны поворота
-/// после чего для экономии времени, сразуже находит тот вариант который имеет минимальное отклонение.
+/// после чего для экономии времени, сразуже находит тот вариант который имеет минимальное отклонение, и выдает касательную нужной длины
 /// проверяет также что юнит не находится в полном окружении - результат возращаеться как входящая переменная
-const model::CircularUnit* findGroupPartsAndSelect(const Position& from, const double radius, const Position& to, const Obstacles& group, /*inout*/ bool& isClosed) {
+Vector findGroupPartsAndReturnTangets(const Position& from, const double radius, const Position& to, const Obstacles& group) {
   assert(!group.empty());
 
   const auto delta = (to - from).normal();
 
-  static const size_t LeftMax = 0;
-  static const size_t LeftMin = 1;
-  static const size_t RightMax = 2;
-  static const size_t RightMin = 3;
-  double deviations[4] = {
-    -1, // left max
-     3, // left min
-    -1, // right max
-     3  // right min
-  };
-
-  const model::CircularUnit* obstacles[4] = {
-    nullptr, // left max
-    nullptr, // left min
-    nullptr, // right max
-    nullptr, // right min
-  };
+  /// deviations, obstacle, tangent
+  std::vector<ObstacleData> dataArr;
+  dataArr.reserve(group.size() * 2);
 
   for (const auto& obstacle : group) {
     const auto obstaclePos = Position(obstacle.getX(), obstacle.getY());
-    const auto obstacleVector = obstaclePos - from;
-    /// придеться считать касательную сразуже тут, так как симуляция не сильно помогает
-    const double simulationTangentaFirstStep = 1 - (obstacle.getRadius() + radius) / obstacleVector.length();
-    const double perLen = obstacle.getRadius() + radius + 1 / MAX(0.001, simulationTangentaFirstStep);
-    const auto obstacleDeltaPer = obstacleVector.normal().perpendicular() * perLen;
+    auto obstacleTangets = Math::tangetsForTwoCircle(from, radius, obstaclePos, obstacle.getRadius());
+    assert(2 == obstacleTangets.size());
+    setTangetsDirection(from, obstaclePos, obstacleTangets);
 
-    const auto obstacleDelta1 = (obstacleVector + obstacleDeltaPer).normal();
-    const auto obstacleDelta2 = (obstacleVector - obstacleDeltaPer).normal();
-
-    for (const auto& obstacleDelta : {obstacleDelta1, obstacleDelta2}) {
+    for (const auto& tanget : obstacleTangets) {
       /// отклонение от нормально движения, чем больше тем больше отклонение, интервал от 0 до 2
-      double deviation = 1 - delta.dot(obstacleDelta);
-
-      size_t tIndex = 0;
-      /// проверяем направление отклонения
-      if (delta.cross(obstacleDelta) < 0) {
-        tIndex = 0; // left
-      } else {
-        tIndex = 2; // right
-      }
-
-      /// max deviation
-      if (deviations[tIndex] < deviation) {
-        deviations[tIndex] = deviation;
-        obstacles[tIndex] = &obstacle;
-      }
-
-      /// min deviation
-      if (deviations[tIndex + 1] > deviation) {
-        deviations[tIndex + 1] = deviation;
-        obstacles[tIndex + 1] = &obstacle;
-      }
+      double deviation = 1 - delta.dot(tanget);
+      dataArr.push_back(ObstacleData{deviation, obstaclePos, tanget});
     }
   }
 
-  /// если слева нету, значит миниум права наилучший вариант
-  if (nullptr == obstacles[LeftMax]) {
-    return obstacles[RightMin];
-  }
+  std::sort(dataArr.begin(), dataArr.end(), [] (ObstacleData a, ObstacleData b) {
+    return a.deviation < b.deviation;
+  });
 
-  /// если справа нету, значит миниум слева наилучший вариант
-  if (nullptr == obstacles[RightMax]) {
-    return obstacles[LeftMin];
-  }
 
-  /// если есть оба, проверяем что они не замыкаю круг
-  isClosed = checkIsClosed(*obstacles[LeftMax], *obstacles[RightMax], radius);
+  /// идем от меньшего отклонения к большему, и проверяем что нет пересечений.
+  for (const ObstacleData& data : dataArr) {
+    const Position& obstaclePos = data.obstaclePos;
+    const Vector& tangent = data.tangent;
 
-  /// если есть оба смотрим какой из них минимален
-  if (deviations[LeftMax] < deviations[RightMax]) {
-    return obstacles[LeftMax];
-  } else {
-    return obstacles[RightMax];
-  }
-
-  /* вариант если возвращать оба
-  /// с левой стороны нет препятсвий - значит это ближайший правый
-  if (nullptr == obstacles[LeftMax]) {
-    obstacles[LeftMax] = obstacles[RightMin];
-  }
-
-  /// с правой стороны нет препятсвий - значит это ближайший левый
-  if (nullptr == obstacles[RightMax]) {
-    obstacles[RightMax] = obstacles[LeftMin];
-  }
-
-  return {obstacles[LeftMax], obstacles[RightMax]};
-  */
-}
-
-const model::CircularUnit* findNeighbor(const model::CircularUnit& obstacle, const Obstacles& group) {
-  const auto obstaclePos = Position(obstacle.getX(), obstacle.getY());
-
-  const model::CircularUnit* neighbor = nullptr;
-  double minDistance = DBL_MAX;
-  for (const auto& subObstacle : group) {
-    double distance = (obstaclePos - Position(subObstacle.getX(), subObstacle.getY())).length2();
-
-    if (obstacle.getId() != subObstacle.getId() && distance < minDistance) {
-      minDistance = distance;
-      neighbor = &subObstacle;
+    if (!isIntersectVectorWithGroup(from, tangent, obstaclePos, radius, group)) {
+      return tangent.normal() * (obstaclePos - from).length();
     }
+
   }
 
-  if (nullptr == neighbor) {
-    return &obstacle;
-  }
-
-  return neighbor;
+  /// нет возможности выйти из группы - окружен.
+  return Vector();
 }
 
-/// возращает вектор из v1,v2 который подходит чтобы обойти препятствие. сами v1,v2 это касательные к препятствию
-const Vector bestVector(const Position& from, const Position& obstaclePos, const Position& neighbor, const Vector& v1, const Vector& v2) {
-
-  Position delta;
-  /// если препятствие это единственный круг
-  if ((obstaclePos - neighbor).length2() < 1.0e-1) {
-    delta = (obstaclePos - from).normal();
-  } else {
-    delta = (obstaclePos - neighbor).normal();
-  }
-
-  /// это два косинуса, чем он больше, тем меньше отклонение
-  if (delta.dot(v1.normal()) < delta.dot(v2.normal())) {
-    return v2;
-  }
-  return v1;
-}
-
-/// устанавливает направление движения в сторону выхода если это не так (так как касательные могут иметь любой знак
-void setVectorDirection(const Position& from, const Position& obstaclePos, Vector& v1, Vector& v2) {
-  const auto delta = obstaclePos - from;
-
-  if (v1.dot(delta) < 0) {
-    v1.set(-v1);
-  }
-
-  if (v2.dot(delta) < 0) {
-    v2.set(-v2);
-  }
-}
 
 class MyCircularUnit: public model::CircularUnit {
 public:
@@ -239,7 +169,7 @@ public:
     unit.getSpeedX(), unit.getSpeedY(),
     unit.getAngle(),
     unit.getFaction(),
-    unit.getRadius()*1.1
+    unit.getRadius()
     )
   {
   }
@@ -266,7 +196,7 @@ MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const
   Position iterTo = to;
 
   ObstaclesGroups obstaclesGroups;
-  moveObstacles(obstacles, obstaclesGroups, 2);
+  moveObstacles(obstacles, obstaclesGroups, 0);
 
   while (obstaclesGroups.size() > 0) {
     const Obstacles* nearestGroup = findNearestGroup(from, unit.getRadius(), iterTo, obstaclesGroups);
@@ -274,29 +204,14 @@ MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const
       break;
     }
 
-    bool isClosed = false;
-    const auto obstacle = findGroupPartsAndSelect(from, unit.getRadius(), to, *nearestGroup, isClosed);
-    assert(nullptr != obstacle);
+    const auto tanget = findGroupPartsAndReturnTangets(from, unit.getRadius(), to, *nearestGroup);
     /// находимся в окружении
-    if (isClosed) {
+    if (tanget.length2() < 1.0e-9) {
       return MoveAction{0,0,0, true};
     }
 
-    const auto obstaclePos = Position(obstacle->getX(), obstacle->getY());
 
-    auto neighbor = findNeighbor(*obstacle, *nearestGroup);
-    assert(nullptr != neighbor);
-    const auto neighborPos = Position(neighbor->getX(), neighbor->getY());
-
-    const auto moveVectors = Math::tangetsForTwoCircle(from, unit.getRadius(), obstaclePos, obstacle->getRadius());
-    assert(2 == moveVectors.size());
-    auto mVector1 = moveVectors[0];
-    auto mVector2 = moveVectors[1];
-    setVectorDirection(from, obstaclePos, mVector1, mVector2);
-
-    const auto moveVector = bestVector(from, obstaclePos, neighborPos, mVector1, mVector2);
-
-    iterTo = from + moveVector.normal() * (from - obstaclePos).length();
+    iterTo = from + tanget;
 
     const size_t groupIndex = (nearestGroup - &obstaclesGroups[0]) / sizeof(Obstacles);
     obstaclesGroups.erase(obstaclesGroups.begin() + groupIndex);
