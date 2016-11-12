@@ -31,6 +31,9 @@
     <Filter Include="Sources\Visualizator">
       <UniqueIdentifier>{e8f6dca2-3e3b-4e3a-82c8-cd9045dcc10f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Command\Strategy">
+      <UniqueIdentifier>{8df97d1a-04b5-4462-9113-6db456c59991}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Sources\MyStrategy.cpp">
@@ -83,6 +86,12 @@
     </ClCompile>
     <ClCompile Include="..\Sources\C_Math.cpp">
       <Filter>Sources\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandStrategy.cpp">
+      <Filter>Sources\Command\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_TestMoveStrategy.cpp">
+      <Filter>Sources\Command\Strategy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +157,12 @@
     </ClInclude>
     <ClInclude Include="..\Sources\C_Math.h">
       <Filter>Sources\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandStrategy.h">
+      <Filter>Sources\Command\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_TestMoveStrategy.h">
+      <Filter>Sources\Command\Strategy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

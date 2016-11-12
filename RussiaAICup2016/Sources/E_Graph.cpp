@@ -28,6 +28,7 @@ const Position& Graph::position(PointType type) const {
 
 Path Graph::path(const Position& from, const Position& to, double& length) {
   assert(joinsForPoints.size() == pointMemory.size());
+
   /// save graph
   const auto pointMemorySave = pointMemory;
   const auto joinMemorySave = joinMemory;
@@ -56,10 +57,19 @@ Path Graph::path(const Position& from, const Position& to, double& length) {
   joinMemory = joinMemorySave;
   joinsForPoints = joinsForPointsSave;
 
+
   return result;
 }
 
 const size_t Graph::addPoint(const Position& pos) {
+  /// проверяем - а может быть такая точка уже есть?
+  for (size_t pointIndex = 0; pointIndex < pointMemory.size(); pointIndex++) {
+    const auto& point = pointMemory[pointIndex];
+    if ((point - pos).length2() < 0.1) {
+      return pointIndex;
+    }
+  }
+
   const auto& pointIndex = pointMemory.size();
   pointMemory.push_back({pos.x, pos.y});
   joinsForPoints.push_back({ });
@@ -105,6 +115,7 @@ const size_t Graph::addPoint(const Position& pos) {
   return pointIndex;
 }
 
+/// создает связь из текущей точки в конечную, если это возможно
 void Graph::adaptPoints(const size_t p1Index, const size_t p2Index) {
   std::unordered_set<size_t> pIndexes;
 
@@ -117,7 +128,7 @@ void Graph::adaptPoints(const size_t p1Index, const size_t p2Index) {
   for (const auto& joinIndex : joinsForPoints[p2Index]) {
     const auto& join = joinMemory[joinIndex];
     const auto& result = pIndexes.insert((p2Index == join.p1Index) ? join.p2Index : join.p1Index);
-    intersectCount += result.second ? 1 : 0;
+    intersectCount += result.second ? 0 : 1;
   }
 
   if (intersectCount > 2) {
@@ -317,7 +328,7 @@ void Graph::initDefaultJoinMemory() {
   joinMemory.push_back(CreateJoin(CENTER_RENEGADES, MIDDLE_CENTER));
 
 
-  joinMemory.push_back(CreateJoin(TOP_CENTER, CENTER_BONUS_TOP));
+  joinMemory.push_back(CreateJoin(TOP_CENTER, BONUS_TOP_CENTER));
   joinMemory.push_back(CreateJoin(BONUS_TOP_CENTER, BONUS_TOP));
   joinMemory.push_back(CreateJoin(BONUS_TOP, CENTER_BONUS_TOP));
   joinMemory.push_back(CreateJoin(CENTER_BONUS_TOP, MIDDLE_CENTER));

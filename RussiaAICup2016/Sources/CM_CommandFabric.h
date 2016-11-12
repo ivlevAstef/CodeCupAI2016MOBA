@@ -16,28 +16,28 @@ namespace AICup
   public:
 #pragma mark - перемещение
     /// переместиться в точку
-    CommandPtr moveToPoint(double x, double y);
+    CommandPtr moveToPoint(double x, double y) const;
 
     /// переместиться на линию
-    CommandPtr moveToLine(model::LineType line);
+    CommandPtr moveToLine(model::LineType line) const;
 
     /// следовать за юнитом
-    CommandPtr follow(long long unitId);
+    CommandPtr follow(long long unitId) const;
 
     /// обследование карты - посещение мест где был давно
-    CommandPtr observeMap();
+    CommandPtr observeMap() const;
 
 #pragma mark - атака
     /// атаковать врага
-    CommandPtr attack(long long enemyId);
+    CommandPtr attack(long long enemyId) const;
 
     /// пул нейтральных крипов
-    CommandPtr pool(long long neutralUnitId);
+    CommandPtr pool(long long neutralUnitId) const;
 
 
 #pragma mark - защита
     /// защищать позицию
-    CommandPtr defend(double x, double y);
+    CommandPtr defend(double x, double y) const;
 
   };
 }

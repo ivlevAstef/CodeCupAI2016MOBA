@@ -7,26 +7,24 @@
 
 #include "CM_CommandManager.h"
 
+#include "CM_TestMoveStrategy.h"
+
 using namespace AICup;
 
 CommandManager::CommandManager() {
-  commands.push_back(fabric.moveToPoint(1200, 1200));
-  //commands.push_back(fabric.moveToLine(model::LINE_BOTTOM));
+  currentStrategy = std::make_shared<TestMoveStrategy>(fabric);
 }
 
 void CommandManager::update(const model::Wizard& self, model::Move& move) {
-  for (const auto& command : commands) {
-    if (command->check(self, move)) {
-      command->execute(self, move);
-    }
+  if (nullptr != currentStrategy.get()) {
+    currentStrategy->update(self, move);
   }
 }
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandManager::visualization(const Visualizator& visualizator) const {
-  for (const auto& command : commands) {
-    command->visualization(visualizator);
+  if (nullptr != currentStrategy.get()) {
+    currentStrategy->visualization(visualizator);
   }
-
 }
 #endif // ENABLE_VISUALIZATOR

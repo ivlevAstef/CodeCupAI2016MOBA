@@ -159,44 +159,12 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
   return Vector();
 }
 
-
-class MyCircularUnit: public model::CircularUnit {
-public:
-  MyCircularUnit(const CircularUnit& unit, int ticks): model::CircularUnit(
-    unit.getId(),
-    unit.getX() + unit.getSpeedX() * ticks,
-    unit.getY() + unit.getSpeedY() * ticks,
-    unit.getSpeedX(), unit.getSpeedY(),
-    unit.getAngle(),
-    unit.getFaction(),
-    unit.getRadius()
-    )
-  {
-  }
-};
-
-void moveObstacles(const ObstaclesGroups& obstaclesGroups, ObstaclesGroups& result, int ticks = 0) {
-  result.reserve(obstaclesGroups.size());
-
-
-  for (const auto& group : obstaclesGroups) {
-    result.push_back({ });
-    Obstacles& resultGroup = result[result.size() - 1];
-    resultGroup.reserve(group.size());
-
-    for (const auto& obstacle : group) {
-      resultGroup.push_back(MyCircularUnit(obstacle, ticks));
-    }
-  }
-}
-
 MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const ObstaclesGroups& obstacles, MoveStyle style) {
   const auto from = Position(unit.getX(), unit.getY());
 
   Position iterTo = to;
 
-  ObstaclesGroups obstaclesGroups;
-  moveObstacles(obstacles, obstaclesGroups, 0);
+  ObstaclesGroups obstaclesGroups = obstacles;
 
   while (obstaclesGroups.size() > 0) {
     const Obstacles* nearestGroup = findNearestGroup(from, unit.getRadius(), iterTo, obstaclesGroups);

@@ -12,8 +12,8 @@
 
 #include "C_Singleton.h"
 
-#include "CM_Command.h"
 #include "CM_CommandFabric.h"
+#include "CM_CommandStrategy.h"
 
 #ifdef ENABLE_VISUALIZATOR
 #include "Visualizator.h"
@@ -33,8 +33,7 @@ namespace AICup
 
 
   private:
-    std::vector<CommandPtr> commands;
-
+    CommandStategyPtr currentStrategy;
     CommandFabric fabric;
   };
 }
