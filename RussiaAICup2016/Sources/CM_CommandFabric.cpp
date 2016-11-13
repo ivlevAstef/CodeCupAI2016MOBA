@@ -17,31 +17,31 @@
 
 using namespace AICup;
 
-CommandPtr CommandFabric::moveToPoint(double x, double y) const {
+CommandPtr CommandFabric::moveToPoint(const double x, const double y) const {
   return std::make_shared<CommandMoveToPoint>(x, y);
 }
 
-CommandPtr CommandFabric::moveToLine(model::LineType line) const {
+CommandPtr CommandFabric::moveToLine(const model::LaneType line) const {
   return std::make_shared<CommandMoveToLine>(line);
 }
 
-CommandPtr CommandFabric::follow(long long unitId) const {
-  return std::make_shared<CommandFollow>(unitId);
+CommandPtr CommandFabric::follow(const long long unitId, const double minDistance, const double maxDistance) const {
+  return std::make_shared<CommandFollow>(unitId, minDistance, maxDistance);
 }
 
 CommandPtr CommandFabric::observeMap() const {
   return std::make_shared<CommandObserveMap>();
 }
 
-CommandPtr CommandFabric::attack(long long enemyId) const {
+CommandPtr CommandFabric::attack(const long long enemyId) const {
   return std::make_shared<CommandAttackEnemy>(enemyId);
 }
 
-CommandPtr CommandFabric::pool(long long neutralUnitId) const {
+CommandPtr CommandFabric::pool(const long long neutralUnitId) const {
   return std::make_shared<CommandPool>(neutralUnitId);
 }
 
-CommandPtr CommandFabric::defend(double x, double y) const {
+CommandPtr CommandFabric::defend(const double x, const double y) const {
   return std::make_shared<CommandDefendPoint>(x, y);
 }
 

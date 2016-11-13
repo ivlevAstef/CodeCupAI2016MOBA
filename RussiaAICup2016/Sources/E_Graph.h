@@ -9,7 +9,7 @@
 #include "C_Singleton.h"
 #include "C_Vector2D.h"
 #include "E_Types.h"
-#include "model/LineType.h"
+#include "model/LaneType.h"
 #include <vector>
 
 #ifdef ENABLE_VISUALIZATOR

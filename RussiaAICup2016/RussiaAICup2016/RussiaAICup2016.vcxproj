@@ -167,6 +167,7 @@ powershell start-process local-runner.bat</Command>
     <ClCompile Include="..\Sources\CM_CommandPool.cpp" />
     <ClCompile Include="..\Sources\CM_CommandStrategy.cpp" />
     <ClCompile Include="..\Sources\CM_Move.cpp" />
+    <ClCompile Include="..\Sources\CM_TestFollow.cpp" />
     <ClCompile Include="..\Sources\CM_TestMoveStrategy.cpp" />
     <ClCompile Include="..\Sources\C_Logger.cpp" />
     <ClCompile Include="..\Sources\C_Math.cpp" />
@@ -189,6 +190,7 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\CM_CommandPool.h" />
     <ClInclude Include="..\Sources\CM_CommandStrategy.h" />
     <ClInclude Include="..\Sources\CM_Move.h" />
+    <ClInclude Include="..\Sources\CM_TestFollow.h" />
     <ClInclude Include="..\Sources\CM_TestMoveStrategy.h" />
     <ClInclude Include="..\Sources\C_Logger.h" />
     <ClInclude Include="..\Sources\C_Math.h" />

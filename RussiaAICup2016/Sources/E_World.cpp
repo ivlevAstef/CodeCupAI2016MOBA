@@ -161,13 +161,13 @@ void World::recalculateLinePositions() {
 
 }
 
-const Position& World::linePosition(model::LineType line) const {
+const Position& World::linePosition(model::LaneType line) const {
   switch (line) {
-    case model::LINE_TOP:
+    case model::LANE_TOP:
       return topLinePosition;
-    case model::LINE_MIDDLE:
+    case model::LANE_MIDDLE:
       return middleLinePosition;
-    case model::LINE_BOTTOM:
+    case model::LANE_BOTTOM:
       return bottomLinePosition;
     default:
       assert(false);
@@ -248,6 +248,28 @@ ObstaclesGroups World::obstaclesGroup(const model::Wizard& unit) const {
   }
 
   return result;
+}
+
+const model::LivingUnit* World::unit(long long id) const {
+  for (const auto& wizard : model().getWizards()) {
+    if (wizard.getId() == id) {
+      return &wizard;
+    }
+  }
+
+  for (const auto& minion : model().getMinions()) {
+    if (minion.getId() == id) {
+      return &minion;
+    }
+  }
+
+  for (const auto& build : model().getBuildings()) {
+    if (build.getId() == id) {
+      return &build;
+    }
+  }
+
+  return nullptr;
 }
 
 

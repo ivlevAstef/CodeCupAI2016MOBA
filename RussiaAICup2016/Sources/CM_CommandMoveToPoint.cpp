@@ -11,7 +11,8 @@
 
 using namespace AICup;
 
-CommandMoveToPoint::CommandMoveToPoint(double x, double y): point(x, y) {
+CommandMoveToPoint::CommandMoveToPoint(const double x, const double y, const double speedLimit, const MoveStyle style):
+  point(x, y), speedLimit(speedLimit), style(style) {
 }
 
 bool CommandMoveToPoint::check(const model::Wizard& self, model::Move& move) {
@@ -24,7 +25,7 @@ bool CommandMoveToPoint::check(const model::Wizard& self, model::Move& move) {
 void CommandMoveToPoint::execute(const model::Wizard& self, model::Move& move) {
   obstaclesGroups = World::instance().obstaclesGroup(self);
 
-  const auto action = Move::move(self, path, obstaclesGroups);
+  const auto action = Move::move(self, path, obstaclesGroups, speedLimit, style);
 
   move.setSpeed(action.speed);
   move.setStrafeSpeed(action.strafeSpeed);

@@ -8,15 +8,14 @@
 #pragma once
 
 #include "CM_Command.h"
-#include "model\LineType.h"
-#include "C_Vector2D.h"
+#include "model\LaneType.h"
 #include "CM_CommandMoveToPoint.h"
 
 namespace AICup
 {
   class CommandMoveToLine: public Command {
   public:
-    CommandMoveToLine(model::LineType line);
+    CommandMoveToLine(model::LaneType line);
 
     bool check(const model::Wizard& self, model::Move& move);
 
@@ -27,7 +26,7 @@ namespace AICup
 #endif // ENABLE_VISUALIZATOR
 
   private:
-    const model::LineType line;
+    const model::LaneType line;
 
     std::shared_ptr<CommandMoveToPoint> commandMoveToPoint;
   };

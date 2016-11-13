@@ -17,12 +17,17 @@ std::vector<Position> Move::path(const Position from, const Position to, double&
   return Graph::instance().path(from, to, length);
 }
 
-MoveAction Move::move(const model::CircularUnit& unit, const Position& to, MoveStyle style) {
+MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const double speedLimit, MoveStyle style) {
   const auto dx = to.x - unit.getX();
   const auto dy = to.y - unit.getY();
   auto speedVec = Vector(dx, -dy).normalize().rotated(unit.getAngle());
   speedVec.y *= -1;
-  speedVec *= Game::instance().model().getWizardForwardSpeed();
+  if (-1.0e-3 + SPEED_LIMIT_NOT_SET < speedLimit && speedLimit < SPEED_LIMIT_NOT_SET + 1.0e-3) {
+    speedVec *= Game::instance().model().getWizardForwardSpeed();
+  } else {
+    speedVec *= speedLimit;
+  }
+
 
   if (MOVE_WITH_ROTATE == style) {
     const auto vecAngle = Vector(dx, dy).angle();
@@ -159,7 +164,7 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
   return Vector();
 }
 
-MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const ObstaclesGroups& obstacles, MoveStyle style) {
+MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const ObstaclesGroups& obstacles, const double speedLimit, MoveStyle style) {
   const auto from = Position(unit.getX(), unit.getY());
 
   Position iterTo = to;
@@ -186,7 +191,7 @@ MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const
   };
 
 
-  return move(unit, iterTo, style);
+  return move(unit, iterTo, speedLimit, style);
 }
 
 Position simplePathToPosition(const Path& path) {
@@ -207,7 +212,7 @@ Position adaptivePathToPosition(const Path& path, const model::Wizard& unit) {
 
   const auto& lastPos = path[path.size() - 1];
   /// если последняя точка находиться в обзоре, то двигаемся к ней
-  if ((unitPos - lastPos).length2() < radius*radius) {
+  if ((unitPos - lastPos).length2() - 1/*а то иногда на границе может оказаться*/ <= radius*radius) {
     return lastPos;
   }
 
@@ -233,26 +238,26 @@ Position adaptivePathToPosition(const Path& path, const model::Wizard& unit) {
 }
 
 
-MoveAction Move::move(const model::CircularUnit& unit, const Path& path, MoveStyle style) {
+MoveAction Move::move(const model::CircularUnit& unit, const Path& path, const double speedLimit, MoveStyle style) {
   const auto pos = simplePathToPosition(path);
-  return move(unit, pos, style);
+  return move(unit, pos, speedLimit, style);
 }
 
-MoveAction Move::move(const model::Wizard& unit, const Path& path, MoveStyle style) {
+MoveAction Move::move(const model::Wizard& unit, const Path& path, const double speedLimit, MoveStyle style) {
   const auto pos = simplePathToPosition(path);
   /// так как адаптивный путь строиться так чтобы как можно быстрее дойти на поворотах,
   /// не стоит применять его без учета препятствий, ибо они скорей всего будут, и мы в них уткнемся
   /// const auto pos = adaptivePathToPosition(path, unit);
 
-  return move(unit, pos, style);
+  return move(unit, pos, speedLimit, style);
 }
 
-MoveAction Move::move(const model::CircularUnit& unit, const Path& path, const ObstaclesGroups& obstacles, MoveStyle style) {
+MoveAction Move::move(const model::CircularUnit& unit, const Path& path, const ObstaclesGroups& obstacles, const double speedLimit, MoveStyle style) {
   const auto pos = simplePathToPosition(path);
-  return move(unit, pos, obstacles, style);
+  return move(unit, pos, obstacles, speedLimit, style);
 }
 
-MoveAction Move::move(const model::Wizard& unit, const Path& path, const ObstaclesGroups& obstacles, MoveStyle style) {
+MoveAction Move::move(const model::Wizard& unit, const Path& path, const ObstaclesGroups& obstacles, const double speedLimit, MoveStyle style) {
   const auto pos = adaptivePathToPosition(path, unit);
-  return move(unit, pos, obstacles, style);
+  return move(unit, pos, obstacles, speedLimit, style);
 }

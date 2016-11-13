@@ -33,7 +33,9 @@ namespace AICup
     Obstacles obstacles(const model::Wizard& unit) const;
     ObstaclesGroups obstaclesGroup(const model::Wizard& unit) const;
 
-    const Position& linePosition(model::LineType line) const;
+    const model::LivingUnit* unit(long long id) const;
+
+    const Position& linePosition(model::LaneType line) const;
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const;

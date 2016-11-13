@@ -6,12 +6,11 @@
 
 
 #include "CM_CommandMoveToLine.h"
-#include "CM_Move.h"
 #include "E_World.h"
 
 using namespace AICup;
 
-CommandMoveToLine::CommandMoveToLine(model::LineType line): line(line) {
+CommandMoveToLine::CommandMoveToLine(model::LaneType line): line(line) {
 
 }
 
