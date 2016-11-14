@@ -16,7 +16,10 @@ using namespace model;
 using namespace AICup;
 
 MyStrategy::MyStrategy() {
+#ifdef ENABLE_VISUALIZATOR
   Visualizator::instance();
+
+#endif
 }
 
 void MyStrategy::move(const model::Wizard& self, const model::World& world, const model::Game& game, model::Move& move) {

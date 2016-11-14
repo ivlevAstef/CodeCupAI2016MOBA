@@ -18,6 +18,9 @@ void TestFollow::update(const model::Wizard& self, model::Move& move) {
   }
 }
 
+#ifdef ENABLE_VISUALIZATOR
 void TestFollow::visualization(const Visualizator& visualizator) const {
   moveCommand->visualization(visualizator);
 }
+
+#endif

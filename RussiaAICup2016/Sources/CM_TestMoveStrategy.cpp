@@ -26,7 +26,11 @@ void TestMoveStrategy::update(const model::Wizard& self, model::Move& move) {
   command->execute(self, move);
 }
 
+#ifdef ENABLE_VISUALIZATOR
+
 void TestMoveStrategy::visualization(const Visualizator& visualizator) const {
   const auto& command = moveCommands[currentMoveCommandIndex];
   command->visualization(visualizator);
 }
+
+#endif

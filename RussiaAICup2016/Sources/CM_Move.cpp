@@ -47,7 +47,7 @@ MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const
 
 /// находит ближайшую группу, с которой пересекаеться вектор движения юнита.
 const Obstacles* findNearestGroup(const Position& from, const double radius, const Position& to, const ObstaclesGroups& obstacles) {
-  double minDistance = DBL_MAX;
+  double minDistance = 100000;
   const Obstacles* nearestGroup = nullptr;
 
   for (const auto& group : obstacles) {

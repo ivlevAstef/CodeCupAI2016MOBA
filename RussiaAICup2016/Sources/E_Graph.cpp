@@ -90,8 +90,8 @@ const size_t Graph::addPoint(const Position& pos) {
 
   /// find nearest join
 
-  size_t nearJoinIndex = UINT16_MAX;
-  double minLength = DBL_MAX;
+  size_t nearJoinIndex = 100000;
+  double minLength = 100000;
   for (size_t lenIndex = 0; lenIndex < lengths.size(); lenIndex++) {
     double length = lengths[lenIndex];
     if (minLength > length) {
@@ -150,11 +150,14 @@ std::vector<size_t> Graph::dijkstraPath(const size_t& fromPIndex, const size_t& 
   const auto& COUNT = pointMemory.size();
 
   /// Initialize
+  const auto INCORRECT_INDEX = 100000;
+
   std::vector<DijkstraData> data;
-  data.resize(COUNT, {DBL_MAX, false, INT_MAX});
+  data.resize(COUNT, {1000000, false, INCORRECT_INDEX});
 
   size_t currentIndex = fromPIndex;
   data[currentIndex].weight = 0;
+
 
   /// Step
 
@@ -172,15 +175,15 @@ std::vector<size_t> Graph::dijkstraPath(const size_t& fromPIndex, const size_t& 
     }
     data[currentIndex].passed = true;
 
-    auto minWeight = DBL_MAX;
-    currentIndex = UINT16_MAX;
+    auto minWeight = 100000;
+    currentIndex = INCORRECT_INDEX;
     for (size_t index = 0; index < COUNT; index++) {
       if (!data[index].passed && data[index].weight < minWeight) {
         minWeight = data[index].weight;
         currentIndex = index;
       }
     }
-  } while (currentIndex != UINT16_MAX);
+  } while (currentIndex != INCORRECT_INDEX);
 
   /// reverse path
   std::vector<size_t> result;
@@ -191,7 +194,7 @@ std::vector<size_t> Graph::dijkstraPath(const size_t& fromPIndex, const size_t& 
     result.push_back(currentIndex);
     length += data[currentIndex].weight;
     currentIndex = data[currentIndex].from;
-  } while (currentIndex != INT_MAX);
+  } while (currentIndex != INCORRECT_INDEX);
 
   /// if found path
   if (result[result.size() - 1] == fromPIndex) {

@@ -57,7 +57,7 @@ void World::init() {
 
 template<typename Type>
 static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real) {
-  static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
+  //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
 
 
   //TODO: need merge

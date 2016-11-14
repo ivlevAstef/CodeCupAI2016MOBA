@@ -4,8 +4,6 @@
 //Created: 09/11/2016
 //
 
-#pragma once
-
 #include "E_Game.h"
 
 using namespace AICup;

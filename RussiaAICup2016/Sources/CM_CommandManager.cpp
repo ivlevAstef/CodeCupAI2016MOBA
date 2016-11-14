@@ -13,7 +13,7 @@
 using namespace AICup;
 
 CommandManager::CommandManager() {
-  currentStrategy = std::make_shared<TestFollow>(fabric);
+  currentStrategy = std::make_shared<TestMoveStrategy>(fabric);
 }
 
 void CommandManager::update(const model::Wizard& self, model::Move& move) {
