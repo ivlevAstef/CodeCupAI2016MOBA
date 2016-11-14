@@ -96,6 +96,9 @@
     <ClCompile Include="..\Sources\CM_TestFollow.cpp">
       <Filter>Sources\Command\Strategy</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\CM_TestMoveAndAttackStrategy.cpp">
+      <Filter>Sources\Command\Strategy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -168,6 +171,9 @@
       <Filter>Sources\Command\Strategy</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\CM_TestFollow.h">
+      <Filter>Sources\Command\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_TestMoveAndAttackStrategy.h">
       <Filter>Sources\Command\Strategy</Filter>
     </ClInclude>
   </ItemGroup>

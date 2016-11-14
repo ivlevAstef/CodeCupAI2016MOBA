@@ -35,7 +35,7 @@ void CommandMoveToPoint::execute(const model::Wizard& self, model::Move& move) {
 #ifdef ENABLE_VISUALIZATOR
 void CommandMoveToPoint::visualization(const Visualizator& visualizator) const {
   for (size_t index = 1; index < path.size(); index++) {
-    visualizator.line(path[index - 1].x, path[index - 1].y, path[index].x, path[index].y, 0xff0000);
+    visualizator.line(path[index - 1].x, path[index - 1].y, path[index].x, path[index].y, 0x00ff00);
   }
 
   for (const auto& group : obstaclesGroups) {

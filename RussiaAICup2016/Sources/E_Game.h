@@ -7,6 +7,7 @@
 #pragma once
 
 #include "model\Game.h"
+#include "model\Faction.h"
 #include "C_Singleton.h"
 
 namespace AICup
@@ -16,6 +17,8 @@ namespace AICup
     void update(const model::Game& game);
 
     const model::Game& model() const;
+
+    model::Faction enemyFaction(const model::Faction faction) const;
 
   private:
     const model::Game* modelGame;

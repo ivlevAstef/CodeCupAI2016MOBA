@@ -272,6 +272,45 @@ const model::LivingUnit* World::unit(long long id) const {
   return nullptr;
 }
 
+std::vector<const model::LivingUnit*> World::around(const model::Wizard& unit, const model::Faction faction) const {
+  std::vector<const model::LivingUnit*> result;
+
+  const auto unitPos = Position(unit.getX(), unit.getY());
+  const auto radius2 = unit.getVisionRange() * unit.getVisionRange();
+
+  for (const auto& wizard : model().getWizards()) {
+    if (wizard.getFaction() == faction && wizard.getId() != unit.getId()) {
+      const auto wizardPos = Position(wizard.getX(), wizard.getY());
+      if ((wizardPos - unitPos).length2() < radius2) {
+        result.push_back(&wizard);
+      }
+    }
+  }
+
+  for (const auto& minion : model().getMinions()) {
+    if (minion.getFaction() == faction) {
+      const auto minionPos = Position(minion.getX(), minion.getY());
+      if ((minionPos - unitPos).length2() < radius2) {
+        result.push_back(&minion);
+      }
+    }
+  }
+
+  for (const auto& build : model().getBuildings()) {
+    if (build.getFaction() == faction) {
+      const auto buildPos = Position(build.getX(), build.getY());
+      if ((buildPos - unitPos).length2() < radius2) {
+        result.push_back(&build);
+      }
+    }
+  }
+
+  return result;
+}
+
+std::vector<const model::LivingUnit*> World::aroundEnemies(const model::Wizard& unit) const {
+  return around(unit, Game::instance().enemyFaction(unit.getFaction()));
+}
 
 #ifdef ENABLE_VISUALIZATOR
 void World::visualization(const Visualizator& visualizator) const {
