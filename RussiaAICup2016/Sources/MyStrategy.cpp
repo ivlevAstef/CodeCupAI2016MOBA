@@ -32,6 +32,8 @@ void MyStrategy::move(const model::Wizard& self, const model::World& world, cons
 #ifdef ENABLE_VISUALIZATOR
   auto& visualizator = Visualizator::instance();
 
+  visualizator.isReverse = (self.getFaction() == model::FACTION_RENEGADES);
+
   visualizator.beginPost();
 
   AICup::World::instance().visualization(visualizator);

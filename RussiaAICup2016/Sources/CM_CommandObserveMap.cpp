@@ -13,9 +13,14 @@ CommandObserveMap::CommandObserveMap() {
 
 }
 
-bool CommandObserveMap::check(const model::Wizard& self, model::Move& move) {
+bool CommandObserveMap::check(const model::Wizard& self) {
   return false;
 }
+
+int CommandObserveMap::priority(const model::Wizard& self) {
+  return 0;
+}
+
 
 void CommandObserveMap::execute(const model::Wizard& self, model::Move& move) {
 }

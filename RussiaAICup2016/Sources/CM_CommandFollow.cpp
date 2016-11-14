@@ -17,7 +17,7 @@ CommandFollow::CommandFollow(const long long unitId, const double minDistance, c
 }
 
 
-bool CommandFollow::check(const model::Wizard& self, model::Move& move) {
+bool CommandFollow::check(const model::Wizard& self) {
   const auto unit = World::instance().unit(unitId);
   if (nullptr == unit) {
     commandMoveToPoint = nullptr;
@@ -58,7 +58,11 @@ bool CommandFollow::check(const model::Wizard& self, model::Move& move) {
   }
 
 
-  return commandMoveToPoint->check(self, move);
+  return commandMoveToPoint->check(self);
+}
+
+int CommandFollow::priority(const model::Wizard& self) {
+  return 0;
 }
 
 void CommandFollow::execute(const model::Wizard& self, model::Move& move) {

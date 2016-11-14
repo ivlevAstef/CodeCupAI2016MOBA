@@ -13,9 +13,14 @@ CommandDefendPoint::CommandDefendPoint(double x, double y) {
 
 }
 
-bool CommandDefendPoint::check(const model::Wizard& self, model::Move& move) {
+bool CommandDefendPoint::check(const model::Wizard& self) {
   return false;
 }
+
+int CommandDefendPoint::priority(const model::Wizard& self) {
+  return 0;
+}
+
 
 void CommandDefendPoint::execute(const model::Wizard& self, model::Move& move) {
 }

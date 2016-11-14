@@ -1,5 +1,5 @@
 //
-//File: CM_TestFollow.h
+//File: CM_TestFollowStrategy.h
 //Author: Ivlev Alexander. Stef
 //Created: 13/11/2016
 //
@@ -10,9 +10,9 @@
 
 namespace AICup
 {
-  class TestFollow: public CommandStategy {
+  class TestFollowStrategy: public CommandStategy {
   public:
-    TestFollow(const CommandFabric& fabric);
+    TestFollowStrategy(const CommandFabric& fabric);
 
     void update(const model::Wizard& self, model::Move& move) override;
 

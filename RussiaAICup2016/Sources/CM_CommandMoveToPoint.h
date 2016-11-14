@@ -18,9 +18,11 @@ namespace AICup
   public:
     CommandMoveToPoint(const double x, const double y, const double speedLimit = SPEED_LIMIT_NOT_SET, const MoveStyle style = MOVE_WITH_ROTATE);
 
-    bool check(const model::Wizard& self, model::Move& move);
+    bool check(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move);
+    int priority(const model::Wizard& self) override;
+
+    void execute(const model::Wizard& self, model::Move& move) override;
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;

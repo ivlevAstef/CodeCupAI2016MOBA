@@ -15,9 +15,11 @@ namespace AICup
   public:
     CommandDefendPoint(double x, double y);
 
-    bool check(const model::Wizard& self, model::Move& move);
+    bool check(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move);
+    int priority(const model::Wizard& self) override;
+
+    void execute(const model::Wizard& self, model::Move& move) override;
 
   private:
   };

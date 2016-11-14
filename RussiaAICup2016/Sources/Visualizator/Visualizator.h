@@ -24,7 +24,11 @@ namespace AICup
     std::vector<char> bufMemory;
 
   public:
+    bool isReverse;
+  public:
     Visualizator();
+
+
 
     void beginPre() const;
     void endPre() const;
@@ -43,6 +47,8 @@ namespace AICup
 
   private:
     void init();
+
+    double rev(double v) const;
 
     void sendCommand(const char* str) const;
     void writeWithColor(char* buf, int32_t color) const;

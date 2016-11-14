@@ -14,12 +14,17 @@ CommandMoveToLine::CommandMoveToLine(model::LaneType line): line(line) {
 
 }
 
-bool CommandMoveToLine::check(const model::Wizard& self, model::Move& move) {
+bool CommandMoveToLine::check(const model::Wizard& self) {
   auto position = World::instance().linePosition(line);
   commandMoveToPoint = std::make_shared<CommandMoveToPoint>(position.x, position.y);
 
-  return commandMoveToPoint->check(self, move);
+  return commandMoveToPoint->check(self);
 }
+
+int CommandMoveToLine::priority(const model::Wizard& self) {
+  return 0;
+}
+
 
 void CommandMoveToLine::execute(const model::Wizard& self, model::Move& move) {
   assert(nullptr != commandMoveToPoint.get());

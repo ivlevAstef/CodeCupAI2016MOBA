@@ -18,7 +18,7 @@ TestMoveStrategy::TestMoveStrategy(const CommandFabric& fabric): CommandStategy(
 void TestMoveStrategy::update(const model::Wizard& self, model::Move& move) {
   auto& command = moveCommands[currentMoveCommandIndex];
 
-  while (!command->check(self, move)) {
+  while (!command->check(self)) {
     currentMoveCommandIndex = (currentMoveCommandIndex+1)% moveCommands.size();
     command = moveCommands[currentMoveCommandIndex];
   }

@@ -121,58 +121,62 @@ void Visualizator::writeWithColor(char* buf, int32_t color) const {
 
 void Visualizator::circle(double x, double y, double r, int32_t color) const {
   if (INVALID_SOCKET != openSocket) {
-    sprintf(buf, "circle %.3f %.3f %.3f", x, y, r);
+    sprintf(buf, "circle %.3f %.3f %.3f", rev(x), rev(y), r);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::fillCircle(double x, double y, double r, int32_t color) const {
   if (INVALID_SOCKET != openSocket) {
-    sprintf(buf, "fill_circle %.3f %.3f %.3f", x, y, r);
+    sprintf(buf, "fill_circle %.3f %.3f %.3f", rev(x), rev(y), r);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::rect(double x1, double y1, double x2, double y2, int32_t color) const {
   if (INVALID_SOCKET != openSocket) {
-    sprintf(buf, "rect %.3f %.3f %.3f %.3f", x1, y1, x2, y2);
+    sprintf(buf, "rect %.3f %.3f %.3f %.3f", rev(x1), rev(y1), rev(x2), rev(y2));
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::fillRect(double x1, double y1, double x2, double y2, int32_t color) const {
   if (INVALID_SOCKET != openSocket) {
-    sprintf(buf, "fill_rect %.3f %.3f %.3f %.3f", x1, y1, x2, y2);
+    sprintf(buf, "fill_rect %.3f %.3f %.3f %.3f", rev(x1), rev(y1), rev(x2), rev(y2));
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::line(double x1, double y1, double x2, double y2, int32_t color) const {
   if (INVALID_SOCKET != openSocket) {
-    sprintf(buf, "line %.3f %.3f %.3f %.3f", x1, y1, x2, y2);
+    sprintf(buf, "line %.3f %.3f %.3f %.3f", rev(x1), rev(y1), rev(x2), rev(y2));
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::text(double x, double y, const char* text, int32_t color) const {
   if (INVALID_SOCKET != openSocket) {
-    sprintf(buf, "text %.3f %.3f %s", x, y, text);
+    sprintf(buf, "text %.3f %.3f %s", rev(x), rev(y), text);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::text(double x, double y, double value, int32_t color) const {
   if (INVALID_SOCKET != openSocket) {
-    sprintf(buf, "text %.3f %.3f %.2f", x, y, value);
+    sprintf(buf, "text %.3f %.3f %.2f", rev(x), rev(y), value);
     writeWithColor(buf, color);
   }
 }
 
 void Visualizator::text(double x, double y, int64_t value, int32_t color) const {
   if (INVALID_SOCKET != openSocket) {
-    sprintf(buf, "text %.3f %.3f %I64d", x, y, value);
+    sprintf(buf, "text %.3f %.3f %I64d", rev(x), rev(y), value);
     writeWithColor(buf, color);
   }
+}
+
+double Visualizator::rev(double v) const {
+  return isReverse ? 4000 - v : v;
 }
 
 #endif

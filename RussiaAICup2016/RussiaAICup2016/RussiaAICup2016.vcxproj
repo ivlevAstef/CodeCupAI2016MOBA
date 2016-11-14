@@ -90,7 +90,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;ENABLE_VISUALIZATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)Sources;$(SolutionDir)..\..\cpp-cgdk;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Sources;$(SolutionDir)Sources\Visualizator;$(SolutionDir)Sources\Tests;$(SolutionDir)..\..\cpp-cgdk;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,17 +166,18 @@ powershell start-process local-runner.bat</Command>
     <ClCompile Include="..\Sources\CM_CommandObserveMap.cpp" />
     <ClCompile Include="..\Sources\CM_CommandPool.cpp" />
     <ClCompile Include="..\Sources\CM_CommandStrategy.cpp" />
+    <ClCompile Include="..\Sources\CM_FirstStrategy.cpp" />
     <ClCompile Include="..\Sources\CM_Move.cpp" />
-    <ClCompile Include="..\Sources\CM_TestFollow.cpp" />
-    <ClCompile Include="..\Sources\CM_TestMoveAndAttackStrategy.cpp" />
-    <ClCompile Include="..\Sources\CM_TestMoveStrategy.cpp" />
     <ClCompile Include="..\Sources\C_Logger.cpp" />
     <ClCompile Include="..\Sources\C_Math.cpp" />
     <ClCompile Include="..\Sources\E_Game.cpp" />
     <ClCompile Include="..\Sources\E_Graph.cpp" />
     <ClCompile Include="..\Sources\E_World.cpp" />
     <ClCompile Include="..\Sources\MyStrategy.cpp" />
-    <ClCompile Include="..\Sources\Visualizator.cpp" />
+    <ClCompile Include="..\Sources\Tests\CM_TestFollowStrategy.cpp" />
+    <ClCompile Include="..\Sources\Tests\CM_TestMoveAndAttackStrategy.cpp" />
+    <ClCompile Include="..\Sources\Tests\CM_TestMoveStrategy.cpp" />
+    <ClCompile Include="..\Sources\Visualizator\Visualizator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\CM_Command.h" />
@@ -190,10 +191,8 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\CM_CommandObserveMap.h" />
     <ClInclude Include="..\Sources\CM_CommandPool.h" />
     <ClInclude Include="..\Sources\CM_CommandStrategy.h" />
+    <ClInclude Include="..\Sources\CM_FirstStrategy.h" />
     <ClInclude Include="..\Sources\CM_Move.h" />
-    <ClInclude Include="..\Sources\CM_TestFollow.h" />
-    <ClInclude Include="..\Sources\CM_TestMoveAndAttackStrategy.h" />
-    <ClInclude Include="..\Sources\CM_TestMoveStrategy.h" />
     <ClInclude Include="..\Sources\C_Logger.h" />
     <ClInclude Include="..\Sources\C_Math.h" />
     <ClInclude Include="..\Sources\C_Singleton.h" />
@@ -203,7 +202,10 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\E_Types.h" />
     <ClInclude Include="..\Sources\E_World.h" />
     <ClInclude Include="..\Sources\MyStrategy.h" />
-    <ClInclude Include="..\Sources\Visualizator.h" />
+    <ClInclude Include="..\Sources\Tests\CM_TestFollowStrategy.h" />
+    <ClInclude Include="..\Sources\Tests\CM_TestMoveAndAttackStrategy.h" />
+    <ClInclude Include="..\Sources\Tests\CM_TestMoveStrategy.h" />
+    <ClInclude Include="..\Sources\Visualizator\Visualizator.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\local-runner\local-runner.properties" />

@@ -9,12 +9,13 @@
 
 #include "CM_TestMoveStrategy.h"
 #include "CM_TestMoveAndAttackStrategy.h"
-#include "CM_TestFollow.h"
+#include "CM_TestFollowStrategy.h"
+#include "CM_FirstStrategy.h"
 
 using namespace AICup;
 
 CommandManager::CommandManager() {
-  currentStrategy = std::make_shared<TestMoveAndAttackStrategy>(fabric);
+  currentStrategy = std::make_shared<FirstStrategy>(fabric);
 }
 
 void CommandManager::update(const model::Wizard& self, model::Move& move) {

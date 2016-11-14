@@ -16,9 +16,11 @@ namespace AICup
   public:
     CommandFollow(const long long unitId, const double minDistance = 0, const double maxDistance = 10000);
 
-    bool check(const model::Wizard& self, model::Move& move);
+    bool check(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move);
+    int priority(const model::Wizard& self) override;
+
+    void execute(const model::Wizard& self, model::Move& move) override;
 
 
 #ifdef ENABLE_VISUALIZATOR

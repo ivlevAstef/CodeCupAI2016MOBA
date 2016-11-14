@@ -19,7 +19,7 @@ void TestMoveAndAttackStrategy::update(const model::Wizard& self, model::Move& m
   attackCommand = nullptr;
   for (const auto& enemy : World::instance().aroundEnemies(self)) {
     attackCommand = fabric.attack(enemy->getId());
-    if (attackCommand->check(self, move)) {
+    if (attackCommand->check(self)) {
       attackCommand->execute(self, move);
       return;
     }
@@ -27,7 +27,7 @@ void TestMoveAndAttackStrategy::update(const model::Wizard& self, model::Move& m
 
   auto& command = moveCommands[currentMoveCommandIndex];
 
-  while (!command->check(self, move)) {
+  while (!command->check(self)) {
     currentMoveCommandIndex = (currentMoveCommandIndex + 1) % moveCommands.size();
     command = moveCommands[currentMoveCommandIndex];
   }

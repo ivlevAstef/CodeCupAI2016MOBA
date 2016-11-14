@@ -40,19 +40,10 @@ std::vector<model::Wizard>& AICup::World::wizards() {
 }
 
 void World::init() {
-  const auto faction = model().getMyPlayer().getFaction();
-
-  if (model::FACTION_ACADEMY == faction) {
-    topLinePosition = Graph::instance().position(Graph::ACADEMY_TOP_FIRST_TOWER);
-    middleLinePosition = Graph::instance().position(Graph::ACADEMY_MIDDLE_FIRST_TOWER);
-    bottomLinePosition = Graph::instance().position(Graph::ACADEMY_BOTTOM_FIRST_TOWER);
-  } else if (model::FACTION_RENEGADES == faction) {
-    topLinePosition = Graph::instance().position(Graph::RENEGADES_TOP_FIRST_TOWER);
-    middleLinePosition = Graph::instance().position(Graph::RENEGADES_MIDDLE_FIRST_TOWER);
-    bottomLinePosition = Graph::instance().position(Graph::RENEGADES_BOTTOM_FIRST_TOWER);
-  } else {
-    assert(false && "player not have faction??");
-  }
+  /// а мы всегда одна фракция... 
+  topLinePosition = Graph::instance().position(Graph::TOP_CENTER);
+  middleLinePosition = Graph::instance().position(Graph::CENTER_ACADEMY);
+  bottomLinePosition = Graph::instance().position(Graph::BOTTOM_CENTER);
 }
 
 template<typename Type>

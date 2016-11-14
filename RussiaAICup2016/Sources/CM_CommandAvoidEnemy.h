@@ -1,20 +1,19 @@
 //
-//File: CM_CommandAttackEnemy.h
+//File: CM_CommandAvoidEnemy.h
 //Author: Ivlev Alexander. Stef
-//Created: 07/11/2016
+//Created: 14/11/2016
 //
 
 
 #pragma once
 
 #include "CM_Command.h"
-#include "C_Vector2D.h"
 
 namespace AICup
 {
-  class CommandAttackEnemy: public Command {
+  class CommandAvoidEnemy: public Command {
   public:
-    CommandAttackEnemy(const long long enemyId);
+    CommandAvoidEnemy(const long long enemyId);
 
     bool check(const model::Wizard& self) override;
 
@@ -22,13 +21,7 @@ namespace AICup
 
     void execute(const model::Wizard& self, model::Move& move) override;
 
-#ifdef ENABLE_VISUALIZATOR
-    void visualization(const Visualizator& visualizator) const override;
-#endif // ENABLE_VISUALIZATOR
-
   private:
     const long long enemyId;
-
-    Position selfPos;
   };
 }

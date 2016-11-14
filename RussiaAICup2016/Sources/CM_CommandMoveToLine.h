@@ -17,9 +17,11 @@ namespace AICup
   public:
     CommandMoveToLine(model::LaneType line);
 
-    bool check(const model::Wizard& self, model::Move& move);
+    bool check(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move);
+    int priority(const model::Wizard& self) override;
+
+    void execute(const model::Wizard& self, model::Move& move) override;
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;

@@ -24,7 +24,9 @@ namespace AICup
   public:
 
     /// проверяет возможность исполнения команды
-    virtual bool check(const model::Wizard& self, model::Move& move) = 0;
+    virtual bool check(const model::Wizard& self) = 0;
+
+    virtual int priority(const model::Wizard& self) = 0;
 
     /// исполнить команду
     virtual void execute(const model::Wizard& self, model::Move& move) = 0;

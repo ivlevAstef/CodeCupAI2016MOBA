@@ -15,12 +15,15 @@ CommandMoveToPoint::CommandMoveToPoint(const double x, const double y, const dou
   point(x, y), speedLimit(speedLimit), style(style) {
 }
 
-bool CommandMoveToPoint::check(const model::Wizard& self, model::Move& move) {
+bool CommandMoveToPoint::check(const model::Wizard& self) {
   path = Move::path(Position(self.getX(), self.getY()), point, pathLength);
 
   return path.size() >= 2 && pathLength > 1;
 }
 
+int CommandMoveToPoint::priority(const model::Wizard& self) {
+  return 0;
+}
 
 void CommandMoveToPoint::execute(const model::Wizard& self, model::Move& move) {
   obstaclesGroups = World::instance().obstaclesGroup(self);
