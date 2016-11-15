@@ -43,7 +43,7 @@ namespace AICup
     void line(double x1, double y1, double x2, double y2, int32_t color = 0x7F7F7F) const;
     void text(double x, double y, const char* text, int32_t color = 0x7F7F7F) const;
     void text(double x, double y, double value, int32_t color = 0x7F7F7F) const;
-    void text(double x, double y, int64_t value, int32_t color = 0x7F7F7F) const;
+    void text(double x, double y, int value, int32_t color = 0x7F7F7F) const;
 
   private:
     void init();

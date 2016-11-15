@@ -46,6 +46,20 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
     usedCommands.push_back(moveToLineCommand);
   }
 
+  const auto avoidAroundCommand = fabric.avoidAround();
+  bool needAvoidAround = avoidAroundCommand->check(self);
+
+  if (needAvoidAround && self.getLife() < 50) {
+    usedCommands.push_back(avoidAroundCommand);
+  } else {
+    const auto getExpirienceCommand = fabric.moveGetExpirience();
+    if (getExpirienceCommand->check(self)) {
+      usedCommands.push_back(getExpirienceCommand);
+    } else if (needAvoidAround) {
+      usedCommands.push_back(avoidAroundCommand);
+    }
+  }
+
   ///
 
   const auto attackCommand = createMaxPriorityAttackEnemy(self);

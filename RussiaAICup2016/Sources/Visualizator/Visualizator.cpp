@@ -168,9 +168,9 @@ void Visualizator::text(double x, double y, double value, int32_t color) const {
   }
 }
 
-void Visualizator::text(double x, double y, int64_t value, int32_t color) const {
+void Visualizator::text(double x, double y, int value, int32_t color) const {
   if (INVALID_SOCKET != openSocket) {
-    sprintf(buf, "text %.3f %.3f %I64d", rev(x), rev(y), value);
+    sprintf(buf, "text %.3f %.3f %d", rev(x), rev(y), value);
     writeWithColor(buf, color);
   }
 }

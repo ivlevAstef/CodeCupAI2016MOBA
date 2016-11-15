@@ -44,11 +44,18 @@ bool CommandFollow::check(const model::Wizard& self) {
 
     /// находимся за спиной
     if (backVec.dot(currentBackVec) > cos(AICUP_PI / 18)) {
-      /// двигаемся к нему но с его предположительной скоростью (по факту разворачиваемся)
-      const auto pos = unitPos;
-      const double speedLimit = Vector(unit->getSpeedX(), unit->getSpeedY()).length();
 
-      commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y, speedLimit);
+      const auto speed = Vector(unit->getSpeedX(), unit->getSpeedY());
+
+      auto pos = unitPos; /// двигаемся к нему но с его предположительной скоростью (по факту разворачиваемся)
+      /// если скорость противоположна углу куда смотрим юнит, значит он двигаеться задом
+      if (abs(Math::angleDiff(speed.angle(), unit->getAngle())) > AICUP_PI) {
+        /// двигаемся от него
+        pos = selfPos + (selfPos - unitPos).normal() * self.getVisionRange();
+      }
+
+
+      commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y, speed.length());
     } else {
       // двигаться за спину объекта в центр дистанции
       const auto pos = unitPos + backVec * (minDistance + (maxDistance - minDistance) * 0.5);

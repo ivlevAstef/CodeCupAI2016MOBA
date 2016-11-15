@@ -100,7 +100,7 @@ const size_t Graph::addPoint(const Position& pos) {
     }
   }
 
-  assert(UINT16_MAX != nearJoinIndex);
+  assert(100000 != nearJoinIndex);
 
   auto insertIndex = [this, &pointIndex] (size_t index) {
     joinMemory.push_back(CreateJoin(index, pointIndex));

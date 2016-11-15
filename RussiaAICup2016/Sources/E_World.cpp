@@ -40,7 +40,7 @@ std::vector<model::Wizard>& AICup::World::wizards() {
 }
 
 void World::init() {
-  /// а мы всегда одна фракция... 
+  /// а мы всегда одна фракция...
   topLinePosition = Graph::instance().position(Graph::TOP_CENTER);
   middleLinePosition = Graph::instance().position(Graph::CENTER_ACADEMY);
   bottomLinePosition = Graph::instance().position(Graph::BOTTOM_CENTER);
@@ -263,11 +263,12 @@ const model::LivingUnit* World::unit(long long id) const {
   return nullptr;
 }
 
-std::vector<const model::LivingUnit*> World::around(const model::Wizard& unit, const model::Faction faction) const {
+std::vector<const model::LivingUnit*> World::around(const model::Wizard& unit, const model::Faction faction, double radius) const {
   std::vector<const model::LivingUnit*> result;
 
   const auto unitPos = Position(unit.getX(), unit.getY());
-  const auto radius2 = unit.getVisionRange() * unit.getVisionRange();
+  radius = (radius < 0) ? unit.getVisionRange() : radius;
+  const auto radius2 = radius * radius;
 
   for (const auto& wizard : model().getWizards()) {
     if (wizard.getFaction() == faction && wizard.getId() != unit.getId()) {
@@ -299,8 +300,8 @@ std::vector<const model::LivingUnit*> World::around(const model::Wizard& unit, c
   return result;
 }
 
-std::vector<const model::LivingUnit*> World::aroundEnemies(const model::Wizard& unit) const {
-  return around(unit, Game::instance().enemyFaction(unit.getFaction()));
+std::vector<const model::LivingUnit*> World::aroundEnemies(const model::Wizard& unit, const double radius) const {
+  return around(unit, Game::instance().enemyFaction(unit.getFaction()), radius);
 }
 
 #ifdef ENABLE_VISUALIZATOR

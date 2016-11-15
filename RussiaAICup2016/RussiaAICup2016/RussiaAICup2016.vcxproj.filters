@@ -105,6 +105,18 @@
     <ClCompile Include="..\Sources\Tests\CM_TestMoveStrategy.cpp">
       <Filter>Sources\Command\Strategy\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAvoidEnemy.cpp">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAvoidAround.cpp">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandKeepDistance.cpp">
+      <Filter>Sources\Command\Commands\move</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandMoveGetExpirience.cpp">
+      <Filter>Sources\Command\Commands\move</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -184,6 +196,18 @@
     </ClInclude>
     <ClInclude Include="..\Sources\Tests\CM_TestMoveStrategy.h">
       <Filter>Sources\Command\Strategy\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAvoidEnemy.h">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAvoidAround.h">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandKeepDistance.h">
+      <Filter>Sources\Command\Commands\move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandMoveGetExpirience.h">
+      <Filter>Sources\Command\Commands\move</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

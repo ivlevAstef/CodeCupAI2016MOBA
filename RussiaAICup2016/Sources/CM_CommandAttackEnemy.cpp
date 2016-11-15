@@ -17,6 +17,10 @@ CommandAttackEnemy::CommandAttackEnemy(long long enemyId): enemyId(enemyId) {
 }
 
 bool CommandAttackEnemy::check(const model::Wizard& self) {
+  if (self.getRemainingActionCooldownTicks() > 0) {
+    return false;
+  }
+
   const auto enemy = World::instance().unit(enemyId);
   if (nullptr == enemy) {
     return false;
@@ -41,26 +45,33 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
     return false;
   }
 
+  const auto constants = Game::instance().model();
+
+  const auto enemyPos = Position(enemy->getX(), enemy->getY());
+  const double distance = (selfPos - enemyPos).length();
+
   const double lifePriority = double(enemy->getMaxLife()-enemy->getLife()) / double(enemy->getMaxLife());
 
-  const auto wizardEnemy = static_cast<const model::Wizard*>(enemy);
-  const auto minionEnemy = static_cast<const model::Minion*>(enemy);
-  const auto buildEnemy = static_cast<const model::Building*>(enemy);
+  const auto wizardEnemy = dynamic_cast<const model::Wizard*>(enemy);
+  const auto minionEnemy = dynamic_cast<const model::Minion*>(enemy);
+  const auto buildEnemy = dynamic_cast<const model::Building*>(enemy);
 
   double typePriority = 0;
   if (nullptr != wizardEnemy) {
     typePriority = 1;
   } else if (nullptr != minionEnemy) {
+    const double range = constants.getOrcWoodcutterAttackRange() + self.getRadius();
+
     switch (minionEnemy->getType()) {
       case model::MINION_ORC_WOODCUTTER:
-        typePriority = 0.3;
+        typePriority = 0.2 + 0.7 * (distance*distance / range*range);
         break;
       case model::MINION_FETISH_BLOWDART:
         typePriority = 0.5;
         break;
     }
   } else if (nullptr != buildEnemy) {
-    typePriority = 0.6;
+    typePriority = 0.2 + lifePriority * 0.7;
   }
 
   double statusPriority = 0.5;

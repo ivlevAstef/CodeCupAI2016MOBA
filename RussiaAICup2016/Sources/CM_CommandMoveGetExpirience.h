@@ -1,21 +1,20 @@
 //
-//File: CM_CommandAvoidEnemy.h
+//File: CM_CommandMoveGetExpirience.h
 //Author: Ivlev Alexander. Stef
-//Created: 14/11/2016
+//Created: 15/11/2016
 //
 
 
 #pragma once
 
 #include "CM_Command.h"
-#include "model\Minion.h"
-#include "model\Building.h"
+#include "C_Vector2D.h"
 
 namespace AICup
 {
-  class CommandAvoidEnemy: public Command {
+  class CommandMoveGetExpirience: public Command {
   public:
-    CommandAvoidEnemy(const long long enemyId);
+    CommandMoveGetExpirience();
 
     bool check(const model::Wizard& self) override;
 
@@ -23,21 +22,14 @@ namespace AICup
 
     void execute(const model::Wizard& self, model::Move& move) override;
 
+
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;
 #endif // ENABLE_VISUALIZATOR
 
-    friend class CommandAvoidAround;
-
   private:
-    const long long enemyId;
     CommandPtr followCommand;
-    double minDistance;
-    double maxDistance;
 
-    const model::LivingUnit* enemy;
-    const model::Wizard* wizardEnemy;
-    const model::Minion* minionEnemy;
-    const model::Building* buildEnemy;
+    Position expiriencePos;
   };
 }

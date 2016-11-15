@@ -1,5 +1,5 @@
 //
-//File: CM_CommandDefendPointt.h
+//File: CM_CommandDefendPoint.h
 //Author: Ivlev Alexander. Stef
 //Created: 07/11/2016
 //
