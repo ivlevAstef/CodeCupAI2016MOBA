@@ -1,5 +1,7 @@
 #include "CM_FirstStrategy.h"
 #include "E_World.h"
+#include "E_Graph.h"
+#include "C_Math.h"
 
 using namespace AICup;
 
@@ -32,6 +34,13 @@ void FirstStrategy::init(const model::Wizard& self, model::Move& move) {
 }
 
 void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
+  /// если мы умерали и воскресли, то подумать снова куда лучше пойти
+  if (World::instance().model().getTickIndex() - lastControlTick >= 1200) {
+    changeLane();
+  }
+
+  lastControlTick = World::instance().model().getTickIndex();
+
   if (!isInitialized) {
     init(self, move);
     isInitialized = true;
@@ -67,22 +76,58 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
     usedCommands.push_back(attackCommand);
   }
 
+  if (nullptr == moveToBonus.get()) {
+    const auto newMoveToBonus = fabric.moveToBonus();
+    if (newMoveToBonus->check(self)) {
+      moveToBonus = newMoveToBonus;
+    }
+  } else if (moveToBonus->check(self)) {
+    usedCommands.push_back(moveToBonus);
+
+    changeLane();
+  } else {
+    moveToBonus = nullptr;
+  }
+
   /*
   как должно быть:
   1)!! пока нету крипов, иследуем карту и бъем нейтралов, для получения опыта и очков
-  2) когда все началось, стоим на той линии где были когда били нейтралов:
-     а) находим самую приоритетную цель, если такой нету, то двигаемся к точке войны
-     б) если цель есть, то атакуем её
-     с)!! если вокруг нас есть объекты способные нас бить (надо написать такую команду), то пытаемся от них отойти (follow можно использовать) - избегание
   3)!! при моменте появления руны (надо еще написать эту команду), идем к ней в двух случаях:
      а) это выгодно по xp (руна близко, и тут много не заработаешь)
      б) идем на ту линию где ситуация не очень
      с) идем на ту линию где своих меньше (дабы побольше оттяпать)
-  4)
  */
 
   for (const auto& command : usedCommands) {
     command->execute(self, move);
+  }
+}
+
+void FirstStrategy::changeLane() {
+  const auto basePosition = Graph::instance().position(Graph::ACADEMY_BASE);
+
+  double topLength = 0;
+  double middleLength = 0;
+  double bottomLength = 0;
+
+  Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_TOP), topLength);
+  Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_MIDDLE), topLength);
+  Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_BOTTOM), topLength);
+
+  double min = MIN(topLength, MIN(middleLength, bottomLength));
+  double max = MAX(topLength, MAX(middleLength, bottomLength));
+
+  /// если линии сильно не отличаються то не будем менять
+  if (max - min < 200) {
+    return;
+  }
+
+  if (topLength < middleLength && topLength < bottomLength) {
+    myLine = model::LANE_TOP;
+  } else if (middleLength < topLength && middleLength < bottomLength) {
+    myLine = model::LANE_MIDDLE;
+  } else {
+    myLine = model::LANE_BOTTOM;
   }
 }
 

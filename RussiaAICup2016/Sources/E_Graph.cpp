@@ -37,7 +37,6 @@ Path Graph::path(const Position& from, const Position& to, double& length) {
   // update graph
   const auto& pointFrom = addPoint(from);
   const auto& pointTo = addPoint(to);
-  adaptPoints(pointFrom, pointTo);
 
   // calc path
   const auto& reversedPrivatePath = dijkstraPath(pointFrom, pointTo, length);
@@ -102,41 +101,33 @@ const size_t Graph::addPoint(const Position& pos) {
 
   assert(100000 != nearJoinIndex);
 
-  auto insertIndex = [this, &pointIndex] (size_t index) {
-    joinMemory.push_back(CreateJoin(index, pointIndex));
-    joinsForPoints[pointIndex].push_back(joinMemory.size() - 1);
+  const auto& join = joinMemory[nearJoinIndex];
+  const auto& pos1 = pointMemory[join.p1Index];
+  const auto& pos2 = pointMemory[join.p2Index];
+
+  const auto& additionalPoint = Math::point_distanceToLine(pos, pos1, pos2);
+  const auto& additionalPointIndex = pointMemory.size();
+  pointMemory.push_back({additionalPoint.x, additionalPoint.y});
+  joinsForPoints.push_back({ });
+
+  auto insertIndex = [this] (size_t index, size_t index2) {
+    joinMemory.push_back(CreateJoin(index, index2));
+    joinsForPoints[index2].push_back(joinMemory.size() - 1);
     joinsForPoints[index].push_back(joinMemory.size() - 1);
   };
 
   /// added point for join
-  insertIndex(joinMemory[nearJoinIndex].p1Index);
-  insertIndex(joinMemory[nearJoinIndex].p2Index);
+  insertIndex(pointIndex, additionalPointIndex);
+
+  insertIndex(join.p1Index, additionalPointIndex);
+  insertIndex(join.p2Index, additionalPointIndex);
+
+  /// remove old join
+  joinMemory[nearJoinIndex].weight = 9999999;
 
   return pointIndex;
 }
 
-/// создает связь из текущей точки в конечную, если это возможно
-void Graph::adaptPoints(const size_t p1Index, const size_t p2Index) {
-  std::unordered_set<size_t> pIndexes;
-
-  for (const auto& joinIndex : joinsForPoints[p1Index]) {
-    const auto& join = joinMemory[joinIndex];
-    pIndexes.insert((p1Index == join.p1Index) ? join.p2Index : join.p1Index);
-  }
-
-  size_t intersectCount = 0;
-  for (const auto& joinIndex : joinsForPoints[p2Index]) {
-    const auto& join = joinMemory[joinIndex];
-    const auto& result = pIndexes.insert((p2Index == join.p1Index) ? join.p2Index : join.p1Index);
-    intersectCount += result.second ? 0 : 1;
-  }
-
-  if (intersectCount > 2) {
-    joinMemory.push_back(CreateJoin(p1Index, p2Index));
-    joinsForPoints[p1Index].push_back(joinMemory.size() - 1);
-    joinsForPoints[p2Index].push_back(joinMemory.size() - 1);
-  }
-}
 
 struct DijkstraData {
   double weight;

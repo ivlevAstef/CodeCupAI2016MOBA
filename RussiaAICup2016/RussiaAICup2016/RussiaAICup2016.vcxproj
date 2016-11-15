@@ -165,6 +165,7 @@ powershell start-process local-runner.bat</Command>
     <ClCompile Include="..\Sources\CM_CommandKeepDistance.cpp" />
     <ClCompile Include="..\Sources\CM_CommandManager.cpp" />
     <ClCompile Include="..\Sources\CM_CommandMoveGetExpirience.cpp" />
+    <ClCompile Include="..\Sources\CM_CommandMoveToBonus.cpp" />
     <ClCompile Include="..\Sources\CM_CommandMoveToLine.cpp" />
     <ClCompile Include="..\Sources\CM_CommandMoveToPoint.cpp" />
     <ClCompile Include="..\Sources\CM_CommandObserveMap.cpp" />
@@ -194,6 +195,7 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\CM_CommandKeepDistance.h" />
     <ClInclude Include="..\Sources\CM_CommandManager.h" />
     <ClInclude Include="..\Sources\CM_CommandMoveGetExpirience.h" />
+    <ClInclude Include="..\Sources\CM_CommandMoveToBonus.h" />
     <ClInclude Include="..\Sources\CM_CommandMoveToLine.h" />
     <ClInclude Include="..\Sources\CM_CommandMoveToPoint.h" />
     <ClInclude Include="..\Sources\CM_CommandObserveMap.h" />

@@ -30,6 +30,9 @@ namespace AICup
     /// подойти за получением опыта
     CommandPtr moveGetExpirience() const;
 
+    /// подойти чтобы взять руну
+    CommandPtr moveToBonus() const;
+
     /// обследование карты - посещение мест где был давно
     CommandPtr observeMap() const;
 

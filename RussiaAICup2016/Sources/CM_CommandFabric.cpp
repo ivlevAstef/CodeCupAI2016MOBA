@@ -11,6 +11,7 @@
 #include "CM_CommandMoveToLine.h"
 #include "CM_CommandFollow.h"
 #include "CM_CommandMoveGetExpirience.h"
+#include "CM_CommandMoveToBonus.h"
 #include "CM_CommandObserveMap.h"
 
 #include "CM_CommandAttackEnemy.h"
@@ -32,6 +33,11 @@ CommandPtr CommandFabric::moveToPoint(const double x, const double y) const {
 
 CommandPtr CommandFabric::moveToLine(const model::LaneType line) const {
   return std::make_shared<CommandMoveToLine>(line);
+}
+
+/// подойти чтобы взять руну
+CommandPtr CommandFabric::moveToBonus() const {
+  return std::make_shared<CommandMoveToBonus>();
 }
 
 CommandPtr CommandFabric::follow(const long long unitId, const double minDistance, const double maxDistance) const {

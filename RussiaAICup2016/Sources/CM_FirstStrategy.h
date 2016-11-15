@@ -25,11 +25,15 @@ namespace AICup
     void init(const model::Wizard& self, model::Move& move);
 
     CommandPtr createMaxPriorityAttackEnemy(const model::Wizard& self);
+    void changeLane();
+
 
   private:
+    int lastControlTick;
     bool isInitialized;
     model::LaneType myLine;
 
     std::vector<CommandPtr> usedCommands;
+    CommandPtr moveToBonus;
   };
 };

@@ -117,6 +117,9 @@
     <ClCompile Include="..\Sources\CM_CommandMoveGetExpirience.cpp">
       <Filter>Sources\Command\Commands\move</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandMoveToBonus.cpp">
+      <Filter>Sources\Command\Commands\move</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -207,6 +210,9 @@
       <Filter>Sources\Command\Commands\move</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandMoveGetExpirience.h">
+      <Filter>Sources\Command\Commands\move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandMoveToBonus.h">
       <Filter>Sources\Command\Commands\move</Filter>
     </ClInclude>
   </ItemGroup>

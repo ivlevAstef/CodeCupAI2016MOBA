@@ -28,7 +28,7 @@ bool CommandAvoidAround::check(const model::Wizard& self) {
   double followMaxDinstance = 0;
   double minDistance = 100000;
 
-  for (const auto& enemy : World::instance().aroundEnemies(self)) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + self.getRadius() * 2)) {
     auto avoidCommand = CommandAvoidEnemy(enemy->getId());
     if (avoidCommand.check(self)) {
       const auto priority = avoidCommand.priority(self);

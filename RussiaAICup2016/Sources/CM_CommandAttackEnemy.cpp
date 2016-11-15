@@ -17,10 +17,6 @@ CommandAttackEnemy::CommandAttackEnemy(long long enemyId): enemyId(enemyId) {
 }
 
 bool CommandAttackEnemy::check(const model::Wizard& self) {
-  if (self.getRemainingActionCooldownTicks() > 0) {
-    return false;
-  }
-
   const auto enemy = World::instance().unit(enemyId);
   if (nullptr == enemy) {
     return false;
@@ -32,6 +28,15 @@ bool CommandAttackEnemy::check(const model::Wizard& self) {
 
   /// если враг совсем далеко, то атака невозможна
   if (distance > self.getCastRange()) {
+    return false;
+  }
+
+  const auto dir = enemyPos - selfPos;
+  const double angleDeviation = Math::angleDiff(dir.angle(), self.getAngle());
+
+
+  /// если времени до атаки больше чем времени до разворота, то можно пока не атаковать
+  if (self.getRemainingActionCooldownTicks() > abs(angleDeviation) / Game::instance().model().getWizardMaxTurnAngle()) {
     return false;
   }
 
@@ -50,7 +55,12 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
   const auto enemyPos = Position(enemy->getX(), enemy->getY());
   const double distance = (selfPos - enemyPos).length();
 
-  const double lifePriority = double(enemy->getMaxLife()-enemy->getLife()) / double(enemy->getMaxLife());
+  double lifePriority = double(enemy->getMaxLife()-enemy->getLife()) / double(enemy->getMaxLife());
+
+  /// если хп мало, то очков мне дадут меньше, пускай другие добивают
+  if (enemy->getLife() < constants.getMagicMissileDirectDamage()) {
+    lifePriority *= 0;
+  }
 
   const auto wizardEnemy = dynamic_cast<const model::Wizard*>(enemy);
   const auto minionEnemy = dynamic_cast<const model::Minion*>(enemy);
@@ -89,11 +99,11 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
         statusPriority -= 1.0;
     }
   }
-  statusPriority = MAX(0, MIN(statusPriority, 1));
+  statusPriority = MAX(-1, MIN(statusPriority, 1));
 
 
 
-  return 1000 * (0.3 * lifePriority + 0.6 * typePriority + 0.1 * statusPriority);
+  return 1000 * (0.3 * lifePriority + 0.5 * typePriority + 0.2 * statusPriority);
 }
 
 void CommandAttackEnemy::execute(const model::Wizard& self, model::Move& move) {
