@@ -40,27 +40,36 @@ bool CommandFollow::check(const model::Wizard& self) {
     commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y);
   } else {
     const auto currentBackVec = (selfPos - unitPos).normal();
-    const auto backVec = Vector(1,0).rotate(unit->getAngle() + AICUP_PI);
 
-    /// находимся за спиной
-    if (backVec.dot(currentBackVec) > cos(AICUP_PI / 18)) {
-
-      const auto speed = Vector(unit->getSpeedX(), unit->getSpeedY());
-
-      auto pos = unitPos; /// двигаемся к нему но с его предположительной скоростью (по факту разворачиваемся)
-      /// если скорость противоположна углу куда смотрим юнит, значит он двигаеться задом
-      if (abs(Math::angleDiff(speed.angle(), unit->getAngle())) > AICUP_PI) {
-        /// двигаемся от него
-        pos = selfPos + (selfPos - unitPos).normal() * self.getVisionRange();
-      }
-
-
-      commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y, speed.length());
-    } else {
-      // двигаться за спину объекта в центр дистанции
-      const auto pos = unitPos + backVec * (minDistance + (maxDistance - minDistance) * 0.5);
+    /// если это здание
+    if (nullptr != dynamic_cast<const model::Building*>(unit)) {
+      // двигаться назад в центр дистанции
+      const auto pos = unitPos + currentBackVec * (minDistance + (maxDistance - minDistance) * 0.5);
 
       commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y);
+    } else {
+      const auto backVec = Vector(1, 0).rotate(unit->getAngle() + AICUP_PI);
+
+      /// находимся за спиной
+      if (backVec.dot(currentBackVec) > cos(AICUP_PI / 18)) {
+
+        const auto speed = Vector(unit->getSpeedX(), unit->getSpeedY());
+
+        auto pos = unitPos; /// двигаемся к нему но с его предположительной скоростью (по факту разворачиваемся)
+                            /// если скорость противоположна углу куда смотрим юнит, значит он двигаеться задом
+        if (abs(Math::angleDiff(speed.angle(), unit->getAngle())) > AICUP_PI) {
+          /// двигаемся от него
+          pos = selfPos + (selfPos - unitPos).normal() * self.getVisionRange();
+        }
+
+
+        commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y, speed.length());
+      } else {
+        // двигаться за спину объекта в центр дистанции
+        const auto pos = unitPos + backVec * (minDistance + (maxDistance - minDistance) * 0.5);
+
+        commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y);
+      }
     }
   }
 

@@ -64,7 +64,7 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
 
     switch (minionEnemy->getType()) {
       case model::MINION_ORC_WOODCUTTER:
-        typePriority = 0.2 + 0.7 * (distance*distance / range*range);
+        typePriority = 0.2 + 0.7 * (range*range / distance*distance);
         break;
       case model::MINION_FETISH_BLOWDART:
         typePriority = 0.5;

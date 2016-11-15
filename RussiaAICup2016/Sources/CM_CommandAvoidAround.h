@@ -28,17 +28,6 @@ namespace AICup
 
 
   private:
-    struct EnemyData {
-      Position pos;
-      int priority;
-      double minDistance;
-      double maxDistance;
-    };
-
-
-    std::vector<EnemyData> aroundEnemies;
-
-
     CommandPtr keepDistance;
   };
 }

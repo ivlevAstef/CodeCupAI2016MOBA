@@ -39,7 +39,7 @@ bool CommandAvoidEnemy::check(const model::Wizard& self) {
     minDistance = MAX(minDistance, constants.getStaffRange() + self.getRadius());
   } else if (nullptr != minionEnemy) {
     if (model::MINION_ORC_WOODCUTTER == minionEnemy->getType()) {
-      minDistance = constants.getOrcWoodcutterAttackRange() + self.getRadius();
+      minDistance = constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2;
     } else {
       minDistance = constants.getFetishBlowdartAttackRange() + self.getRadius() + constants.getDartRadius();
     }
@@ -69,14 +69,14 @@ int CommandAvoidEnemy::priority(const model::Wizard& self) {
 
   if (nullptr != wizardEnemy) {
     const int veryNearPrior = (distance < constants.getStaffRange() + self.getRadius()) ? 400 : 0;
-    return 300 + lifePriority - wizardEnemy->getRemainingActionCooldownTicks() * 10 + veryNearPrior;
+    return 300 + lifePriority - wizardEnemy->getRemainingActionCooldownTicks() * 5 + veryNearPrior;
   } else if (nullptr != minionEnemy) {
-    if (distance < constants.getOrcWoodcutterAttackRange() + self.getRadius()) {
+    if (distance < constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2) {
       return 800 + lifePriority;
     }
     return 150 + lifePriority;
   } else if (nullptr != buildEnemy) {
-    return 800 + lifePriority - buildEnemy->getCooldownTicks() * 3;
+    return 800 + lifePriority;
   }
 
   return 0;
