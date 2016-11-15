@@ -21,7 +21,6 @@ bool CommandMoveGetExpirience::check(const model::Wizard& self) {
   static const double expirienceRadius = 600 - 10/*на всякий случай*/;
   const model::LivingUnit* selectedUnit = nullptr;
   double minLive = 100000;
-  double selectedDistance = 100000;
 
 
   const auto selfPos = Position(self.getX(), self.getY());
@@ -34,7 +33,6 @@ bool CommandMoveGetExpirience::check(const model::Wizard& self) {
       if (distance > expirienceRadius) {
         selectedUnit = enemy;
         minLive = enemy->getLife();
-        selectedDistance = distance;
       }
     }
   }

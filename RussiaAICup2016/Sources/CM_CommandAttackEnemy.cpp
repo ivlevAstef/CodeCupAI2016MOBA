@@ -79,6 +79,8 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
       case model::MINION_FETISH_BLOWDART:
         typePriority = 0.5;
         break;
+      default:
+        break;
     }
   } else if (nullptr != buildEnemy) {
     typePriority = 0.2 + lifePriority * 0.7;
@@ -89,14 +91,21 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
     switch (status.getType()) {
       case model::STATUS_BURNING:
         statusPriority += 0.1;
+        break;
       case model::STATUS_EMPOWERED:
         statusPriority += 0.2;
+        break;
       case model::STATUS_FROZEN:
         statusPriority += 1.0;
+        break;
       case model::STATUS_HASTENED:
         statusPriority -= 0.3;
+        break;
       case model::STATUS_SHIELDED:
         statusPriority -= 1.0;
+        break;
+      default:
+        break;
     }
   }
   statusPriority = MAX(-1, MIN(statusPriority, 1));

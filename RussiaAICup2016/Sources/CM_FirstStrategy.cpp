@@ -111,14 +111,14 @@ void FirstStrategy::changeLane() {
   double bottomLength = 0;
 
   Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_TOP), topLength);
-  Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_MIDDLE), topLength);
-  Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_BOTTOM), topLength);
+  Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_MIDDLE), middleLength);
+  Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_BOTTOM), bottomLength);
 
   double min = MIN(topLength, MIN(middleLength, bottomLength));
   double max = MAX(topLength, MAX(middleLength, bottomLength));
 
   /// если линии сильно не отличаються то не будем менять
-  if (max - min < 200) {
+  if (max - min < 1000) {
     return;
   }
 

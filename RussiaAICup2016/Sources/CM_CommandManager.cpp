@@ -7,9 +7,11 @@
 
 #include "CM_CommandManager.h"
 
+#ifdef ENABLE_TESTS
 #include "CM_TestMoveStrategy.h"
 #include "CM_TestMoveAndAttackStrategy.h"
 #include "CM_TestFollowStrategy.h"
+#endif
 #include "CM_FirstStrategy.h"
 
 using namespace AICup;
