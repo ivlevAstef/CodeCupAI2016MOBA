@@ -125,9 +125,10 @@ double Extension::timeToTurnForAttack(const model::Unit& attacked, const model::
   const auto enemyPos = Position(attacked.getX(), attacked.getY());
 
   const auto dir = enemyPos - selfPos;
-  const double angleDeviation = Math::angleDiff(dir.angle(), attacking.getAngle());
+  double angleDeviation = Math::angleDiff(dir.angle(), attacking.getAngle());
+  angleDeviation = ABS(angleDeviation);
 
-  const double needTurnAngle = MAX(0, abs(angleDeviation) - Game::instance().model().getStaffSector()* 0.5);
+  const double needTurnAngle = MAX(0, angleDeviation - Game::instance().model().getStaffSector()* 0.5);
   /// если времени до атаки больше чем времени до разворота, то можно пока не атаковать
 
   return needTurnAngle / turnSpeed(attacking);

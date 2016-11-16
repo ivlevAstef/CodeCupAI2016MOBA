@@ -27,9 +27,6 @@ bool CommandAvoidEnemy::check(const model::Wizard& self) {
 
   const auto constants = Game::instance().model();
 
-  const auto selfPos = Position(self.getX(), self.getY());
-  const auto enemyPos = Position(enemy->getX(), enemy->getY());
-
   wizardEnemy = dynamic_cast<const model::Wizard*>(enemy);
   minionEnemy = dynamic_cast<const model::Minion*>(enemy);
   buildEnemy = dynamic_cast<const model::Building*>(enemy);
