@@ -32,8 +32,7 @@ namespace AICup
   private:
     const long long enemyId;
     CommandPtr followCommand;
-    double minDistance;
-    double maxDistance;
+    double distance;
 
     const model::LivingUnit* enemy;
     const model::Wizard* wizardEnemy;

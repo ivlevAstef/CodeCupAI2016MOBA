@@ -90,7 +90,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;ENABLE_TESTS;ENABLE_VISUALIZATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)Sources;$(SolutionDir)Sources\Visualizator;$(SolutionDir)Sources\Tests;$(SolutionDir)..\..\cpp-cgdk;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\cpp-cgdk;$(SolutionDir)Sources;$(SolutionDir)Sources\Visualizator;$(SolutionDir)Sources\Tests</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -28,30 +28,28 @@ bool CommandAvoidEnemy::check(const model::Wizard& self) {
 
   const auto selfPos = Position(self.getX(), self.getY());
   const auto enemyPos = Position(enemy->getX(), enemy->getY());
-  //const double distance = (selfPos - enemyPos).length();
 
   wizardEnemy = dynamic_cast<const model::Wizard*>(enemy);
   minionEnemy = dynamic_cast<const model::Minion*>(enemy);
   buildEnemy = dynamic_cast<const model::Building*>(enemy);
 
   if (nullptr != wizardEnemy) {
-    minDistance = wizardEnemy->getCastRange() - wizardEnemy->getRemainingActionCooldownTicks() * constants.getWizardBackwardSpeed()  + self.getRadius();
-    minDistance = MAX(minDistance, constants.getStaffRange() + self.getRadius());
+    distance = wizardEnemy->getCastRange() - wizardEnemy->getRemainingActionCooldownTicks() * constants.getWizardBackwardSpeed()  + self.getRadius();
+    distance = MAX(distance, constants.getStaffRange() + self.getRadius());
   } else if (nullptr != minionEnemy) {
     if (model::MINION_ORC_WOODCUTTER == minionEnemy->getType()) {
-      minDistance = constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2;
+      distance = constants.getOrcWoodcutterAttackRange() + self.getRadius() + 100/*на всякий случай*/;
     } else {
-      minDistance = constants.getFetishBlowdartAttackRange() + self.getRadius() + constants.getDartRadius();
+      distance = constants.getFetishBlowdartAttackRange() + self.getRadius() + constants.getDartRadius();
     }
   } else if (nullptr != buildEnemy) {
-    minDistance = buildEnemy->getAttackRange() - buildEnemy->getRemainingActionCooldownTicks() * constants.getWizardBackwardSpeed() + self.getRadius();
-    minDistance = MAX(minDistance, buildEnemy->getRadius() + self.getRadius());
+    distance = buildEnemy->getAttackRange() - buildEnemy->getRemainingActionCooldownTicks() * constants.getWizardBackwardSpeed() + self.getRadius();
+    distance = MAX(distance, buildEnemy->getRadius() + self.getRadius());
   } else {
     return false;
   }
 
-  maxDistance = minDistance + self.getRadius();
-  followCommand = std::make_shared<CommandFollow>(enemyId, minDistance, maxDistance);
+  followCommand = std::make_shared<CommandFollow>(enemyId, distance, distance + self.getRadius());
 
   return true;
 }

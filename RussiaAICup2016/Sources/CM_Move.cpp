@@ -116,8 +116,10 @@ bool isIntersectVectorWithGroup(const Position& from, const Vector& vec, const P
 
 struct ObstacleData {
   double deviation;
-  Position obstaclePos;
+  Position pos;
+  double radius;
   Vector tangent;
+
 };
 /// ищет края группы - точки в группе до которых вектор изменения от движения максимален. таких точки две - в разные стороны поворота
 /// после чего для экономии времени, сразуже находит тот вариант который имеет минимальное отклонение, и выдает касательную нужной длины
@@ -140,7 +142,7 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
     for (const auto& tanget : obstacleTangets) {
       /// отклонение от нормально движения, чем больше тем больше отклонение, интервал от 0 до 2
       double deviation = 1 - delta.dot(tanget);
-      dataArr.push_back(ObstacleData{deviation, obstaclePos, tanget});
+      dataArr.push_back(ObstacleData{deviation, obstaclePos, obstacle.getRadius(), tanget});
     }
   }
 
@@ -151,11 +153,11 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
 
   /// идем от меньшего отклонения к большему, и проверяем что нет пересечений.
   for (const ObstacleData& data : dataArr) {
-    const Position& obstaclePos = data.obstaclePos;
-    const Vector& tangent = data.tangent;
+    if (!isIntersectVectorWithGroup(from, data.tangent, data.pos, radius, group)) {
+      double length = abs((data.pos - from).dot(data.tangent.normal()));
+      length = MAX(1, length);
 
-    if (!isIntersectVectorWithGroup(from, tangent, obstaclePos, radius, group)) {
-      return tangent.normal() * (obstaclePos - from).length();
+      return data.tangent.normal() * length;
     }
 
   }
