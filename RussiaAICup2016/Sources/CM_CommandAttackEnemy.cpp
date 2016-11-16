@@ -74,7 +74,7 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
 
     switch (minionEnemy->getType()) {
       case model::MINION_ORC_WOODCUTTER:
-        typePriority = 0.2 + 0.7 * (range*range / distance*distance);
+        typePriority = 0.2 + 0.7 * (range*range / (distance*distance));
         break;
       case model::MINION_FETISH_BLOWDART:
         typePriority = 0.5;
@@ -128,7 +128,7 @@ void CommandAttackEnemy::execute(const model::Wizard& self, model::Move& move) {
   move.setTurn(angleDeviation);
 
   /// не тот угол, чтобы атаковать
-  if (abs(angleDeviation) > Game::instance().model().getStaffSector()) {
+  if (abs(angleDeviation) > Game::instance().model().getStaffSector()* 0.5) {
     return;
   }
 

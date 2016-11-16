@@ -40,6 +40,10 @@ namespace AICup
 
     const Position& linePosition(model::LaneType line) const;
 
+    const int wizardCount(model::LaneType line) const;
+    const int wizardCount(model::LaneType line, const model::Wizard& excludeWizard) const;
+    const model::LaneType positionToLine(const double x, const double y) const;
+
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const;
 #endif // ENABLE_VISUALIZATOR

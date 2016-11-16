@@ -36,16 +36,16 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
   const auto bottomBonusPos = Graph::instance().position(Graph::BONUS_BOTTOM);
 
   /// к сожалению длина пути считаеться по графу где можно точно пройти, а он обычно длинее чем реальный путь
-  /// поэтому в вычислениях береться среднее значение между прямым путем, и путем по графу
+  /// поэтому в вычислениях береться среднее значение между прямым путем, и путем по графу (лучшебы какоенибудь другое но пока такое)
 
   double length = 99999;
   Graph::instance().path(selfPos, topBonusPos, length); // сам путь нас не интерисует
-  length = length * 0.4 + (selfPos - topBonusPos).length() * 0.6;
+  length = length * 0.25 + (selfPos - topBonusPos).length() * 0.75;
   double ticksToTop = length / Game::instance().model().getWizardForwardSpeed();
 
   length = 99999;
   Graph::instance().path(selfPos, bottomBonusPos, length); // сам путь нас не интерисует
-  length = length * 0.4 + (selfPos - topBonusPos).length() * 0.6;
+  length = length * 0.25 + (selfPos - topBonusPos).length() * 0.75;
   double ticksToBottom = length / Game::instance().model().getWizardForwardSpeed();
 
   int maxTicksToBonus = Game::instance().model().getBonusAppearanceIntervalTicks();

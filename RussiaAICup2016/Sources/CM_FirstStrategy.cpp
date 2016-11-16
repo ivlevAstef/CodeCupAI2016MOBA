@@ -7,6 +7,7 @@ using namespace AICup;
 
 FirstStrategy::FirstStrategy(const CommandFabric& fabric) : CommandStategy(fabric) {
   isInitialized = false;
+  lastChangeLineTick = 0;
 }
 
 void FirstStrategy::init(const model::Wizard& self, model::Move& move) {
@@ -34,14 +35,12 @@ void FirstStrategy::init(const model::Wizard& self, model::Move& move) {
 }
 
 void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
-  Math::intersectSegmentWithCircle(Position(200, 3800), 600, Position(200, 3800), Position(200,3200));
 
-  /// если мы умерали и воскресли, то подумать снова куда лучше пойти
-  if (World::instance().model().getTickIndex() - lastControlTick >= 1200) {
-    changeLane();
+  /// раз в 600 тиков пересматриваю линию
+  if (World::instance().model().getTickIndex() - lastChangeLineTick >= 600) {
+    changeLane(self);
+    lastChangeLineTick = World::instance().model().getTickIndex();
   }
-
-  lastControlTick = World::instance().model().getTickIndex();
 
   if (!isInitialized) {
     init(self, move);
@@ -71,11 +70,6 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
 
   ///
 
-  const auto attackCommand = createMaxPriorityAttackEnemy(self);
-  if (nullptr != attackCommand.get()) {
-    usedCommands.push_back(attackCommand);
-  }
-
   if (nullptr == moveToBonus.get()) {
     const auto newMoveToBonus = fabric.moveToBonus();
     if (newMoveToBonus->check(self)) {
@@ -83,11 +77,16 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
     }
   } else if (moveToBonus->check(self)) {
     usedCommands.push_back(moveToBonus);
-
-    changeLane();
   } else {
     moveToBonus = nullptr;
   }
+
+  const auto attackCommand = createMaxPriorityAttackEnemy(self);
+  if (nullptr != attackCommand.get()) {
+    usedCommands.push_back(attackCommand);
+  }
+
+
 
   /*
   как должно быть:
@@ -103,28 +102,38 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
   }
 }
 
-void FirstStrategy::changeLane() {
+void FirstStrategy::changeLane(const model::Wizard& self) {
+  const auto selfPos = Position(self.getX(), self.getY());
+
   const auto basePosition = Graph::instance().position(Graph::ACADEMY_BASE);
+  const auto topPosition = World::instance().linePosition(model::LANE_TOP);
+  const auto middlePosition = World::instance().linePosition(model::LANE_MIDDLE);
+  const auto bottomPosition = World::instance().linePosition(model::LANE_BOTTOM);
 
-  double topLength = 0;
-  double middleLength = 0;
-  double bottomLength = 0;
+  double selfTopLength = (selfPos - topPosition).length();
+  double selfMiddleLength = (selfPos - middlePosition).length();
+  double selfTBottomLength = (selfPos - bottomPosition).length();
 
-  Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_TOP), topLength);
-  Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_MIDDLE), middleLength);
-  Graph::instance().path(basePosition, World::instance().linePosition(model::LANE_BOTTOM), bottomLength);
+  double topLength = abs((basePosition - topPosition).x) + abs((basePosition - topPosition).y);
+  double middleLength = (basePosition - middlePosition).length();
+  double bottomLength = abs((basePosition - bottomPosition).x) + abs((basePosition - bottomPosition).y);
 
-  double min = MIN(topLength, MIN(middleLength, bottomLength));
-  double max = MAX(topLength, MAX(middleLength, bottomLength));
 
-  /// если линии сильно не отличаються то не будем менять
-  if (max - min < 1000) {
-    return;
-  }
+  double priorityTop = (8000 - topLength) / selfTopLength;
+  priorityTop *= (topLength < 1200) ? (1200 - topLength) : 1;
+  double priorityMiddle = (6000 - middleLength) / selfMiddleLength;
+  priorityMiddle *= (middleLength < 1200) ? (1200 - middleLength) : 1;
+  double priorityBottom = (8000 - bottomLength) / selfTBottomLength;
+  priorityBottom *= (bottomLength < 1200) ? (1200 - bottomLength) : 1;
 
-  if (topLength < middleLength && topLength < bottomLength) {
+  priorityTop /= MAX(0.5, World::instance().wizardCount(model::LANE_TOP, self));
+  priorityMiddle /= MAX(0.5, World::instance().wizardCount(model::LANE_MIDDLE, self));
+  priorityBottom /= MAX(0.5, World::instance().wizardCount(model::LANE_BOTTOM, self));
+
+
+  if (priorityTop > priorityMiddle && priorityTop > priorityBottom) {
     myLine = model::LANE_TOP;
-  } else if (middleLength < topLength && middleLength < bottomLength) {
+  } else if (priorityMiddle > priorityTop && priorityMiddle > priorityBottom) {
     myLine = model::LANE_MIDDLE;
   } else {
     myLine = model::LANE_BOTTOM;

@@ -120,6 +120,9 @@
     <ClCompile Include="..\Sources\CM_CommandMoveToBonus.cpp">
       <Filter>Sources\Command\Commands\move</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\C_Extensions.cpp">
+      <Filter>Sources\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -214,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandMoveToBonus.h">
       <Filter>Sources\Command\Commands\move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\C_Extensions.h">
+      <Filter>Sources\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

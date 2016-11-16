@@ -8,7 +8,7 @@
 #include "E_Graph.h"
 #include "C_Math.h"
 #include "E_Game.h"
-#include <tuple>
+#include "C_Extensions.h"
 #include <algorithm>
 
 using namespace AICup;
@@ -17,13 +17,59 @@ std::vector<Position> Move::path(const Position from, const Position to, double&
   return Graph::instance().path(from, to, length);
 }
 
-MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const double speedLimit, MoveStyle style) {
+
+/// Если вектор выходит за границы карты это плохо, так как мы будем туда пытаться дойти но не сможем.
+/// Поэтому эта функция исправляет вектор, чтобы он не уходил за пределы карты
+const Position fitToMapRect(const model::CircularUnit& unit, const Position& toBase) {
+  static const Vector axisOX = Position(1, 0);
+  static const Vector axisOY = Position(0, 1);
+
+  const double padding = unit.getRadius();
+  const double size = 4000;
+
+  const auto vec = toBase - Position(unit.getX(), unit.getY());
+  double vecLength = vec.length();
+
+  Position result(
+    MAX(padding, MIN(toBase.x, size - padding)),
+    MAX(padding, MIN(toBase.y, size - padding))
+   );
+
+  vecLength -= (result - Position(unit.getX(), unit.getY())).length();
+
+  bool needXOverride = toBase.x < padding || toBase.x > size - padding;
+  bool needYOverride = toBase.y < padding || toBase.y > size - padding;
+
+  /// если мы пытаемся уйти в угол, то все плохо
+  /// пока будем считать, что это смерть
+  if (needXOverride && needYOverride) {
+    return result;
+  }
+
+  /// далее проецируем вектор на ось - узнаем знак тем самым
+  /// сдигаемся по оси с нужным знаком на длину вектора старого - длина вектора нового
+
+  if (needXOverride) {
+    result += (axisOY * vec.dot(axisOY)).normal() * vecLength;
+  }
+
+  if (needYOverride) {
+    result += (axisOX * vec.dot(axisOX)).normal() * vecLength;
+  }
+
+
+  return result;
+}
+
+MoveAction Move::move(const model::CircularUnit& unit, const Position& toBase, const double speedLimit, MoveStyle style) {
+  const Position to = fitToMapRect(unit, toBase);
+
   const auto dx = to.x - unit.getX();
   const auto dy = to.y - unit.getY();
   auto speedVec = Vector(dx, -dy).normalize().rotated(unit.getAngle());
   speedVec.y *= -1;
   if (-1.0e-3 + SPEED_LIMIT_NOT_SET < speedLimit && speedLimit < SPEED_LIMIT_NOT_SET + 1.0e-3) {
-    speedVec *= Game::instance().model().getWizardForwardSpeed();
+    speedVec *= Extension::maxSpeed(unit);
   } else {
     speedVec *= speedLimit;
   }

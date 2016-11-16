@@ -20,7 +20,7 @@ bool CommandMoveToLine::check(const model::Wizard& self) {
 
   return commandMoveToPoint->check(self);
 }
-
+ 
 int CommandMoveToLine::priority(const model::Wizard& self) {
   return 0;
 }

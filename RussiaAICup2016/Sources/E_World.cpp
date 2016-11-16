@@ -130,16 +130,16 @@ void World::recalculateLinePositions() {
     center /= group.size();
 
 
-    double delta = (model().getWidth() - center.x) - center.y;
+    const auto line = positionToLine(center.x, center.y);
 
     // center
     size_t* maxCount = &maxCounts[1];
     Position* position = &middleLinePosition;
 
-    if (delta > 400) { // top
+    if (line == model::LANE_TOP) {
       maxCount = &maxCounts[0];
       position = &topLinePosition;
-    } else if (delta < -400) { // bottom
+    } else if (line == model::LANE_BOTTOM) {
       maxCount = &maxCounts[2];
       position = &bottomLinePosition;
     }
@@ -164,6 +164,41 @@ const Position& World::linePosition(model::LaneType line) const {
       assert(false);
   }
   return middleLinePosition;
+}
+
+const model::LaneType World::positionToLine(const double x, const double y) const {
+  double delta = (model().getWidth() - x) - y;
+
+  if (delta > 1200) { // top
+    return model::LANE_TOP;
+  } else if (delta < -1200) {
+    return model::LANE_BOTTOM;
+  }
+
+  return model::LANE_MIDDLE;
+}
+
+const int World::wizardCount(model::LaneType line) const {
+  int result = 0;
+  for (const auto& wizard : model().getWizards()) {
+    if (model::FACTION_ACADEMY == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
+      result++;
+    }
+  }
+
+  return result;
+}
+
+const int World::wizardCount(model::LaneType line, const model::Wizard& excludeWizard) const {
+  int result = 0;
+  for (const auto& wizard : model().getWizards()) {
+    if (wizard.getId() != excludeWizard.getId()
+      && model::FACTION_ACADEMY == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
+      result++;
+    }
+  }
+
+  return result;
 }
 
 Obstacles World::obstacles(const model::Wizard& unit) const {
