@@ -83,8 +83,8 @@ std::vector<Position> Math::intersectSegmentWithCircle(const Position& point, co
   const auto rP1 = perpedicularPos + translateVector;
   const auto rP2 = perpedicularPos - translateVector;
 
-  bool rP1IsLine = (p1 - rP1).dot(p2 - rP1) < 0;
-  bool rP2IsLine = (p1 - rP2).dot(p2 - rP2) < 0;
+  bool rP1IsLine = (p1 - rP1).dot(p2 - rP1) <= 0;
+  bool rP2IsLine = (p1 - rP2).dot(p2 - rP2) <= 0;
 
   std::vector<Position> result;
 

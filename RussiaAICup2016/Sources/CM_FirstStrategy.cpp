@@ -34,6 +34,8 @@ void FirstStrategy::init(const model::Wizard& self, model::Move& move) {
 }
 
 void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
+  Math::intersectSegmentWithCircle(Position(200, 3800), 600, Position(200, 3800), Position(200,3200));
+
   /// если мы умерали и воскресли, то подумать снова куда лучше пойти
   if (World::instance().model().getTickIndex() - lastControlTick >= 1200) {
     changeLane();
@@ -44,8 +46,6 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
   if (!isInitialized) {
     init(self, move);
     isInitialized = true;
-
-    myLine = model::LANE_MIDDLE;
   }
 
   usedCommands.clear();
