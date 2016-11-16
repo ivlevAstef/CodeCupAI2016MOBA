@@ -9,6 +9,7 @@
 #include "E_World.h"
 #include "E_Game.h"
 #include "C_Math.h"
+#include "C_Extensions.h"
 
 using namespace AICup;
 
@@ -27,16 +28,12 @@ bool CommandAttackEnemy::check(const model::Wizard& self) {
   const double distance = (selfPos - enemyPos).length();
 
   /// если враг совсем далеко, то атака невозможна
-  if (distance > self.getCastRange()) {
+  if (distance > Extension::radiusForGuaranteedHit(self)) {
     return false;
   }
 
-  const auto dir = enemyPos - selfPos;
-  const double angleDeviation = Math::angleDiff(dir.angle(), self.getAngle());
-
-
   /// если времени до атаки больше чем времени до разворота, то можно пока не атаковать
-  if (self.getRemainingActionCooldownTicks() > abs(angleDeviation) / Game::instance().model().getWizardMaxTurnAngle()) {
+  if (self.getRemainingActionCooldownTicks() > Extension::timeToTurnForAttack(*enemy, self)) {
     return false;
   }
 
@@ -57,14 +54,19 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
 
   double lifePriority = double(enemy->getMaxLife()-enemy->getLife()) / double(enemy->getMaxLife());
 
-  /// если хп мало, то очков мне дадут меньше, пускай другие добивают
-  if (enemy->getLife() < constants.getMagicMissileDirectDamage()) {
-    lifePriority *= 0;
-  }
-
   const auto wizardEnemy = dynamic_cast<const model::Wizard*>(enemy);
   const auto minionEnemy = dynamic_cast<const model::Minion*>(enemy);
   const auto buildEnemy = dynamic_cast<const model::Building*>(enemy);
+
+  /// если хп мало у обычного крипа, то очков мне дадут меньше, пускай другие добивают
+  if (enemy->getLife() < constants.getMagicMissileDirectDamage() && nullptr != minionEnemy) {
+    lifePriority *= 0;
+  }
+
+  /// если хп мало у мага, то надо ему помочь умереть
+  if (enemy->getLife() <= Extension::magicMissleAttack(self) && nullptr != wizardEnemy) {
+    lifePriority *= 2;
+  }
 
   double typePriority = 0;
   if (nullptr != wizardEnemy) {
@@ -137,11 +139,11 @@ void CommandAttackEnemy::execute(const model::Wizard& self, model::Move& move) {
   const double distance = dir.length();
 
   /// если дистанция с врагом такая, что можно его ударить посохом, то бьем посохом
-  if (distance < Game::instance().model().getStaffRange() - enemy->getRadius()) {
+  if (distance < Game::instance().model().getStaffRange() + enemy->getRadius() - 4) {
     move.setAction(model::ACTION_STAFF);
   } else {
     move.setMinCastDistance(distance - enemy->getRadius());
-    move.setMaxCastDistance(distance + enemy->getRadius());
+    move.setMaxCastDistance(distance + enemy->getRadius() * 1.5);
     move.setAction(model::ACTION_MAGIC_MISSILE);
   }
 }

@@ -31,8 +31,21 @@ bool CommandAvoidAround::check(const model::Wizard& self) {
       const auto distance = (selfPos - enemyPos).length();
 
       if (distance < avoidCommand.distance) {
-        enemies.push_back(EnemyData{Position(enemy->getX(), enemy->getY()), priority, avoidCommand.distance});
+        enemies.push_back(EnemyData{enemyPos, priority, avoidCommand.distance});
       }
+    }
+  }
+
+  for (const auto& projectile : World::instance().model().getProjectiles()) {
+    const auto projectilePos = Position(projectile.getX(), projectile.getY());
+    const auto projectileSpeed = Vector(projectile.getSpeedX(), projectile.getSpeedY());
+    const auto distance = Math::distanceToLine(selfPos, projectilePos, projectilePos + projectileSpeed);
+    /// нахожусь на лиинии удара, и снаряд летит в мою сторону, и он близко
+    if (distance < self.getRadius() + projectile.getRadius() &&
+       (selfPos - projectilePos).dot(projectileSpeed) > 0 &&
+       (selfPos - projectilePos).length() < 645/*максимально доступная длина*/) {
+
+      enemies.push_back(EnemyData{projectilePos, 3000, 645});
     }
   }
 
