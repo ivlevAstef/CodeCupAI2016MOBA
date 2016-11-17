@@ -102,9 +102,9 @@ int CommandMoveToBonus::priority(const model::Wizard& self) {
 }
 
 
-void CommandMoveToBonus::execute(const model::Wizard& self, model::Move& move) {
+void CommandMoveToBonus::execute(const model::Wizard& self, Result& result) {
   assert(nullptr != moveToBonus.get());
-  moveToBonus->execute(self, move);
+  moveToBonus->execute(self, result);
 }
 
 #ifdef ENABLE_VISUALIZATOR

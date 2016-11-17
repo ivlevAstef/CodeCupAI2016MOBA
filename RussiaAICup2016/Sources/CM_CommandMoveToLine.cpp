@@ -6,6 +6,7 @@
 
 
 #include "CM_CommandMoveToLine.h"
+#include "CM_CommandMoveToPoint.h"
 #include "E_World.h"
 
 using namespace AICup;
@@ -20,15 +21,15 @@ bool CommandMoveToLine::check(const model::Wizard& self) {
 
   return commandMoveToPoint->check(self);
 }
- 
+
 int CommandMoveToLine::priority(const model::Wizard& self) {
   return 0;
 }
 
 
-void CommandMoveToLine::execute(const model::Wizard& self, model::Move& move) {
+void CommandMoveToLine::execute(const model::Wizard& self, Result& result) {
   assert(nullptr != commandMoveToPoint.get());
-  commandMoveToPoint->execute(self, move);
+  commandMoveToPoint->execute(self, result);
 }
 
 #ifdef ENABLE_VISUALIZATOR

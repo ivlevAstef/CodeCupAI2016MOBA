@@ -1,4 +1,4 @@
-#include "CM_TestFollowStrategy.h"
+#include "S_TestFollowStrategy.h"
 #include "E_World.h"
 
 using namespace AICup;

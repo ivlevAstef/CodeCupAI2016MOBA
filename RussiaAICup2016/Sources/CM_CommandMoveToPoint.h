@@ -7,22 +7,22 @@
 
 #pragma once
 
-#include "CM_Command.h"
+#include "CM_MoveCommand.h"
 #include "C_Vector2D.h"
 #include "E_Types.h"
-#include "CM_Move.h"
+#include "A_Move.h"
 
 namespace AICup
 {
-  class CommandMoveToPoint: public Command {
+  class CommandMoveToPoint: public MoveCommand {
   public:
-    CommandMoveToPoint(const double x, const double y, const double speedLimit = SPEED_LIMIT_NOT_SET, const MoveStyle style = MOVE_WITH_ROTATE);
+    CommandMoveToPoint(const double x, const double y, const TurnStyle style = TurnStyle::TURN);
 
     bool check(const model::Wizard& self) override;
 
     int priority(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move) override;
+    void execute(const model::Wizard& self, Result& result) override;
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;
@@ -30,8 +30,7 @@ namespace AICup
 
   private:
     const Position point;
-    const double speedLimit;
-    const MoveStyle style;
+    const TurnStyle style;
 
     Path path;
     ObstaclesGroups obstaclesGroups;

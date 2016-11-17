@@ -1,5 +1,5 @@
 //
-//File: CM_CommandManager.h
+//File: S_StrategyManager.h
 //Author: Ivlev Alexander. Stef
 //Created: 07/11/2016
 //
@@ -13,7 +13,7 @@
 #include "C_Singleton.h"
 
 #include "CM_CommandFabric.h"
-#include "CM_CommandStrategy.h"
+#include "S_CommandStrategy.h"
 
 #ifdef ENABLE_VISUALIZATOR
 #include "Visualizator.h"
@@ -21,9 +21,9 @@
 
 namespace AICup
 {
-  class CommandManager: public Singleton<CommandManager> {
+  class StrategyManager: public Singleton<StrategyManager> {
   public:
-    CommandManager();
+    StrategyManager();
 
     void update(const model::Wizard& self, model::Move& move);
 

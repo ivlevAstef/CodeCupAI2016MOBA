@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include "CM_Command.h"
+#include "CM_AttackCommand.h"
 #include "C_Vector2D.h"
 
 namespace AICup
 {
-  class CommandAttackEnemy: public Command {
+  class CommandAttackEnemy: public AttackCommand {
   public:
     CommandAttackEnemy(const long long enemyId);
 
@@ -20,7 +20,7 @@ namespace AICup
 
     int priority(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move) override;
+    void execute(const model::Wizard& self, Result& result) override;
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;

@@ -9,7 +9,7 @@
 #include "CM_CommandAvoidEnemy.h"
 #include "E_World.h"
 #include "C_Math.h"
-#include "CM_Move.h"
+#include "A_Move.h"
 
 using namespace AICup;
 
@@ -57,7 +57,7 @@ int CommandAvoidAround::priority(const model::Wizard& self) {
 }
 
 
-void CommandAvoidAround::execute(const model::Wizard& self, model::Move& move) {
+void CommandAvoidAround::execute(const model::Wizard& self, Result& result) {
   const auto selfPos = Position(self.getX(), self.getY());
 
   Vector summaryMoveVector;
@@ -77,11 +77,9 @@ void CommandAvoidAround::execute(const model::Wizard& self, model::Move& move) {
   const auto pos = selfPos + summaryMoveVector.normal() * self.getVisionRange();
   const auto obstaclesGroups = World::instance().obstaclesGroup(self);
 
-  const auto action = Move::move(self, pos, obstaclesGroups, SPEED_LIMIT_NOT_SET, MOVE_WITH_BACKWARD_ROTATE);
-
-  move.setSpeed(action.speed);
-  move.setStrafeSpeed(action.strafeSpeed);
-  move.setTurn(action.turn);
+  result.moveDirection = Algorithm::move(self, pos, obstaclesGroups);
+  result.turnStyle = TurnStyle::BACK_TURN;
+  result.priority = priority(self);
 }
 
 

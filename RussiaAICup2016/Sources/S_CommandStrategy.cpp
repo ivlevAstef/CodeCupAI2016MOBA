@@ -1,4 +1,4 @@
-#include "CM_CommandStrategy.h"
+#include "S_CommandStrategy.h"
 
 using namespace AICup;
 

@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "CM_Command.h"
+#include "CM_AttackCommand.h"
 
 namespace AICup
 {
-  class CommandPool: public Command {
+  class CommandPool: public AttackCommand {
   public:
     CommandPool(long long neutralUnitId);
 
@@ -19,7 +19,7 @@ namespace AICup
 
     int priority(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move) override;
+    void execute(const model::Wizard& self, Result& result) override;
 
   private:
   };

@@ -21,6 +21,5 @@ int CommandObserveMap::priority(const model::Wizard& self) {
   return 0;
 }
 
-
-void CommandObserveMap::execute(const model::Wizard& self, model::Move& move) {
+void CommandObserveMap::execute(const model::Wizard& self, Result& result) {
 }

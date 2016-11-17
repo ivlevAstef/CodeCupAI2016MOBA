@@ -7,13 +7,12 @@
 
 #pragma once
 
-#include "CM_Command.h"
+#include "CM_MoveCommand.h"
 #include "model\LaneType.h"
-#include "CM_CommandMoveToPoint.h"
 
 namespace AICup
 {
-  class CommandMoveToLine: public Command {
+  class CommandMoveToLine: public MoveCommand {
   public:
     CommandMoveToLine(model::LaneType line);
 
@@ -21,7 +20,7 @@ namespace AICup
 
     int priority(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move) override;
+    void execute(const model::Wizard& self, Result& result) override;
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;
@@ -30,6 +29,6 @@ namespace AICup
   private:
     const model::LaneType line;
 
-    std::shared_ptr<CommandMoveToPoint> commandMoveToPoint;
+    MoveCommandPtr commandMoveToPoint;
   };
 }

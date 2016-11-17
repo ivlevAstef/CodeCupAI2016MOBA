@@ -8,7 +8,7 @@
 #include "CM_CommandMoveGetExpirience.h"
 #include "CM_CommandFollow.h"
 #include "E_World.h"
-#include "CM_Move.h"
+#include "A_Move.h"
 #include "E_Game.h"
 
 using namespace AICup;
@@ -56,9 +56,9 @@ int CommandMoveGetExpirience::priority(const model::Wizard& self) {
   return followCommand->priority(self);
 }
 
-void CommandMoveGetExpirience::execute(const model::Wizard& self, model::Move& move) {
+void CommandMoveGetExpirience::execute(const model::Wizard& self, Result& result) {
   assert(nullptr != followCommand.get());
-  followCommand->execute(self, move);
+  followCommand->execute(self, result);
 }
 
 #ifdef ENABLE_VISUALIZATOR

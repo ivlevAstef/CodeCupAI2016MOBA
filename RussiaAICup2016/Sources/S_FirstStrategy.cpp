@@ -1,4 +1,4 @@
-#include "CM_FirstStrategy.h"
+#include "S_FirstStrategy.h"
 #include "E_World.h"
 #include "E_Graph.h"
 #include "C_Math.h"
@@ -38,9 +38,9 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
 
   /// раз в 500 тиков пересматриваю линию,
   /// 500 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
-  if (World::instance().model().getTickIndex() - lastChangeLineTick >= 500) {
+  if (World::model().getTickIndex() - lastChangeLineTick >= 500) {
     changeLane(self);
-    lastChangeLineTick = World::instance().model().getTickIndex();
+    lastChangeLineTick = World::model().getTickIndex();
   }
 
   if (!isInitialized) {

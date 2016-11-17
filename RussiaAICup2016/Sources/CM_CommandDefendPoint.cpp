@@ -22,5 +22,5 @@ int CommandDefendPoint::priority(const model::Wizard& self) {
 }
 
 
-void CommandDefendPoint::execute(const model::Wizard& self, model::Move& move) {
+void CommandDefendPoint::execute(const model::Wizard& self, Result& result) {
 }

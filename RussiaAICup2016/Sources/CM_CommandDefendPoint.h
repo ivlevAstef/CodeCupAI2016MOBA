@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "CM_Command.h"
+#include "CM_MoveCommand.h"
 
 namespace AICup
 {
-  class CommandDefendPoint: public Command {
+  class CommandDefendPoint: public MoveCommand {
   public:
     CommandDefendPoint(double x, double y);
 
@@ -19,7 +19,7 @@ namespace AICup
 
     int priority(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move) override;
+    void execute(const model::Wizard& self, Result& result) override;
 
   private:
   };

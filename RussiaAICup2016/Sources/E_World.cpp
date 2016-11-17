@@ -27,10 +27,6 @@ void World::update(const model::World& world) {
   recalculateLinePositions();
 }
 
-const model::World& AICup::World::model() const {
-  return *modelWorld;
-}
-
 std::vector<model::Tree>& AICup::World::trees() {
   return supposedTrees;
 }

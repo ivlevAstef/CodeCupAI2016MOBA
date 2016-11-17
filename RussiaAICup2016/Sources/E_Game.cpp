@@ -12,10 +12,6 @@ void Game::update(const model::Game& Game) {
   modelGame = &Game;
 }
 
-const model::Game& Game::model() const {
-  return *modelGame;
-}
-
 model::Faction Game::enemyFaction(const model::Faction faction) const {
   if (model::FACTION_ACADEMY == faction) {
     return model::FACTION_RENEGADES;

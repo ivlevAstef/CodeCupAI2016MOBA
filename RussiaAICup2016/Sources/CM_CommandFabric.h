@@ -7,6 +7,7 @@
 #pragma once
 
 #include "CM_Command.h"
+#include "E_Types.h"
 #include "model\LaneType.h"
 #include <initializer_list>
 
@@ -19,7 +20,7 @@ namespace AICup
     CommandPtr keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const;
 
     /// переместиться в точку
-    CommandPtr moveToPoint(const double x, const double y) const;
+    CommandPtr moveToPoint(const double x, const double y, const TurnStyle style = TurnStyle::TURN) const;
 
     /// переместиться на линию
     CommandPtr moveToLine(const model::LaneType line) const;

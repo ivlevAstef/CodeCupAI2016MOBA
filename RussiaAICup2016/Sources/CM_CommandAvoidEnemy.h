@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include "CM_Command.h"
+#include "CM_MoveCommand.h"
 #include "model\Minion.h"
 #include "model\Building.h"
 
 namespace AICup
 {
-  class CommandAvoidEnemy: public Command {
+  class CommandAvoidEnemy: public MoveCommand {
   public:
     CommandAvoidEnemy(const long long enemyId);
 
@@ -21,7 +21,7 @@ namespace AICup
 
     int priority(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move) override;
+    void execute(const model::Wizard& self, Result& result) override;
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;
@@ -31,7 +31,7 @@ namespace AICup
 
   private:
     const long long enemyId;
-    CommandPtr followCommand;
+    MoveCommandPtr followCommand;
     double distance;
 
     const model::LivingUnit* enemy;

@@ -32,9 +32,9 @@ bool CommandAvoidEnemy::check(const model::Wizard& self) {
   buildEnemy = dynamic_cast<const model::Building*>(enemy);
 
   if (nullptr != wizardEnemy) {
-    const double radius = Extension::radiusForGuaranteedHit(*wizardEnemy);
-    const double distance1 = radius - Extension::minTimeForMagic(*wizardEnemy) * constants.getWizardBackwardSpeed()  + self.getRadius();
-    const double distance2 = radius - Extension::timeToTurnForAttack(self, *wizardEnemy) * constants.getWizardBackwardSpeed() + self.getRadius();
+    const double radius = EX::radiusForGuaranteedHit(*wizardEnemy);
+    const double distance1 = radius - EX::minTimeForMagic(*wizardEnemy) * constants.getWizardBackwardSpeed()  + self.getRadius();
+    const double distance2 = radius - EX::timeToTurnForAttack(self, *wizardEnemy) * constants.getWizardBackwardSpeed() + self.getRadius();
     distance = MIN(distance1, distance2);
 
     distance = MAX(distance, constants.getStaffRange() + self.getRadius());
@@ -68,13 +68,13 @@ int CommandAvoidEnemy::priority(const model::Wizard& self) {
   int lifePriority = (200 * enemy->getLife()) / enemy->getMaxLife();
 
   /// если врага можно быстро добить, то боятся его стоит меньше
-  if (enemy->getLife() < Extension::magicMissleAttack(self) * 2) {
+  if (enemy->getLife() < EX::magicMissleAttack(self) * 2) {
     lifePriority = -500;
   }
 
   if (nullptr != wizardEnemy) {
     const int veryNearPrior = (distance < constants.getStaffRange() + self.getRadius()) ? 400 : 0;
-    return 300 + lifePriority - Extension::minTimeForMagic(*wizardEnemy) * 5 + veryNearPrior;
+    return 300 + lifePriority - EX::minTimeForMagic(*wizardEnemy) * 5 + veryNearPrior;
   } else if (nullptr != minionEnemy) {
     if (distance < constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2) {
       return 800 + lifePriority;
@@ -88,9 +88,9 @@ int CommandAvoidEnemy::priority(const model::Wizard& self) {
 }
 
 
-void CommandAvoidEnemy::execute(const model::Wizard& self, model::Move& move) {
+void CommandAvoidEnemy::execute(const model::Wizard& self, Result& result) {
   assert(nullptr != followCommand.get());
-  followCommand->execute(self, move);
+  followCommand->execute(self, result);
 }
 
 #ifdef ENABLE_VISUALIZATOR

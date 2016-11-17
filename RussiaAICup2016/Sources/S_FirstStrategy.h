@@ -1,12 +1,12 @@
 //
-//File: CM_FisrtStrategy.h
+//File: S_FisrtStrategy.h
 //Author: Ivlev Alexander. Stef
 //Created: 14/11/2016
 //
 
 #pragma once
 
-#include "CM_CommandStrategy.h"
+#include "S_CommandStrategy.h"
 
 namespace AICup
 {

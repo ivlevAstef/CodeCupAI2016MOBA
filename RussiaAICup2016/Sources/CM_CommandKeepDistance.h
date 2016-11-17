@@ -7,12 +7,11 @@
 
 #pragma once
 
-#include "CM_Command.h"
-#include "CM_CommandMoveToPoint.h"
+#include "CM_MoveCommand.h"
 
 namespace AICup
 {
-  class CommandKeepDistance: public Command {
+  class CommandKeepDistance: public MoveCommand {
   public:
     CommandKeepDistance(const double x, const double y, const double minDistance, const double maxDistance);
 
@@ -20,7 +19,7 @@ namespace AICup
 
     int priority(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move) override;
+    void execute(const model::Wizard& self, Result& result) override;
 
 
 #ifdef ENABLE_VISUALIZATOR
@@ -33,6 +32,6 @@ namespace AICup
     const double minDistance;
     const double maxDistance;
 
-    std::shared_ptr<CommandMoveToPoint> commandMoveToPoint;
+    MoveCommandPtr commandMoveToPoint;
   };
 }

@@ -28,12 +28,12 @@ bool CommandAttackEnemy::check(const model::Wizard& self) {
   const double distance = (selfPos - enemyPos).length();
 
   /// если враг совсем далеко, то атака невозможна
-  if (distance > Extension::radiusForGuaranteedHit(self)) {
+  if (distance > EX::radiusForGuaranteedHit(self)) {
     return false;
   }
 
   /// если времени до атаки больше чем времени до разворота, то можно пока не атаковать
-  if (self.getRemainingActionCooldownTicks() > Extension::timeToTurnForAttack(*enemy, self)) {
+  if (self.getRemainingActionCooldownTicks() > EX::timeToTurnForAttack(*enemy, self)) {
     return false;
   }
 
@@ -44,10 +44,10 @@ bool CommandAttackEnemy::check(const model::Wizard& self) {
 int CommandAttackEnemy::priority(const model::Wizard& self) {
   const auto enemy = World::instance().unit(enemyId);
   if (nullptr == enemy) {
-    return false;
+    return 0;
   }
 
-  const auto constants = Game::instance().model();
+  const auto constants = Game::model();
 
   const auto enemyPos = Position(enemy->getX(), enemy->getY());
   const double distance = (selfPos - enemyPos).length();
@@ -64,7 +64,7 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
   }
 
   /// если хп мало у мага, то надо ему помочь умереть
-  if (enemy->getLife() <= Extension::magicMissleAttack(self) && nullptr != wizardEnemy) {
+  if (enemy->getLife() <= EX::magicMissleAttack(self) && nullptr != wizardEnemy) {
     lifePriority *= 2;
   }
 
@@ -113,38 +113,22 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
   statusPriority = MAX(-1, MIN(statusPriority, 1));
 
 
-
   return 1000 * (0.3 * lifePriority + 0.5 * typePriority + 0.2 * statusPriority);
 }
 
-void CommandAttackEnemy::execute(const model::Wizard& self, model::Move& move) {
+void CommandAttackEnemy::execute(const model::Wizard& self, Result& result) {
   const auto enemy = World::instance().unit(enemyId);
   assert(nullptr != enemy);
 
-  const auto enemyPos = Position(enemy->getX(), enemy->getY());
-  const auto dir = enemyPos - selfPos;
+  const double distance = self.getDistanceTo(*enemy);
 
-  const double angleDeviation = Math::angleDiff(dir.angle(), self.getAngle());
+  result.unit = enemy;
+  result.priority = priority(self);
 
-  /// в любом случае поворачиваемся к врагу, для упрощения своей жизни
-  move.setTurn(angleDeviation);
-
-  /// не тот угол, чтобы атаковать
-  if (abs(angleDeviation) > Game::instance().model().getStaffSector()* 0.5) {
-    return;
-  }
-
-  move.setCastAngle(angleDeviation);
-
-  const double distance = dir.length();
-
-  /// если дистанция с врагом такая, что можно его ударить посохом, то бьем посохом
-  if (distance < Game::instance().model().getStaffRange() + enemy->getRadius() - 4) {
-    move.setAction(model::ACTION_STAFF);
+  if (distance < Game::model().getStaffRange() + enemy->getRadius() - 4) {
+    result.action = model::ACTION_STAFF;
   } else {
-    move.setMinCastDistance(distance - enemy->getRadius());
-    move.setMaxCastDistance(distance + enemy->getRadius() * 1.5);
-    move.setAction(model::ACTION_MAGIC_MISSILE);
+    result.action = model::ACTION_MAGIC_MISSILE;
   }
 }
 

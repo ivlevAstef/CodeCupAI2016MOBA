@@ -1,18 +1,18 @@
 //
-//File: CM_TestMoveAndAttackStrategy.h
+//File: S_TestMoveStrategy.h
 //Author: Ivlev Alexander. Stef
 //Created: 13/11/2016
 //
 
 #pragma once
 
-#include "CM_CommandStrategy.h"
+#include "S_CommandStrategy.h"
 
 namespace AICup
 {
-  class TestMoveAndAttackStrategy: public CommandStategy {
+  class TestMoveStrategy: public CommandStategy {
   public:
-    TestMoveAndAttackStrategy(const CommandFabric& fabric);
+    TestMoveStrategy(const CommandFabric& fabric);
 
     void update(const model::Wizard& self, model::Move& move) override;
 
@@ -24,7 +24,5 @@ namespace AICup
   private:
     size_t currentMoveCommandIndex;
     std::vector<CommandPtr> moveCommands;
-
-    CommandPtr attackCommand;
   };
 };

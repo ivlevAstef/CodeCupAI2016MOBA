@@ -7,7 +7,7 @@
 
 using namespace AICup;
 
-double Extension::maxSpeed(const model::CircularUnit& obj) {
+double EX::maxSpeed(const model::CircularUnit& obj) {
   const auto livingObj = dynamic_cast<const model::LivingUnit*>(&obj);
   if (nullptr == livingObj) {
     return 0;
@@ -47,7 +47,7 @@ double Extension::maxSpeed(const model::CircularUnit& obj) {
   return maxSpeed;
 }
 
-double Extension::radiusForGuaranteedHit(const model::Wizard& obj) {
+double EX::radiusForGuaranteedHit(const model::Wizard& obj) {
   static const double magicCalcConstant = 8;
 
   double radius = obj.getCastRange() + magicCalcConstant;
@@ -68,7 +68,7 @@ double Extension::radiusForGuaranteedHit(const model::Wizard& obj) {
   return radius;
 }
 
-std::vector<bool> Extension::availableSkills(const model::Wizard& obj) {
+std::vector<bool> EX::availableSkills(const model::Wizard& obj) {
   std::vector<bool> available;
   available.resize(7);
   available[model::ACTION_NONE] = true;
@@ -90,7 +90,7 @@ std::vector<bool> Extension::availableSkills(const model::Wizard& obj) {
   return available;
 }
 
-int Extension::minTimeForMagic(const model::Wizard& obj) {
+int EX::minTimeForMagic(const model::Wizard& obj) {
   const auto& actionCooldowns = obj.getRemainingCooldownTicksByAction();
   const auto available = availableSkills(obj);
 
@@ -107,7 +107,7 @@ int Extension::minTimeForMagic(const model::Wizard& obj) {
 
 }
 
-double Extension::turnSpeed(const model::Wizard& obj) {
+double EX::turnSpeed(const model::Wizard& obj) {
   double maxTurnSpeed = Game::instance().model().getWizardMaxTurnAngle();
 
 
@@ -120,7 +120,7 @@ double Extension::turnSpeed(const model::Wizard& obj) {
   return maxTurnSpeed;
 }
 
-double Extension::timeToTurnForAttack(const model::Unit& attacked, const model::Wizard& attacking) {
+double EX::timeToTurnForAttack(const model::Unit& attacked, const model::Wizard& attacking) {
   const auto selfPos = Position(attacking.getX(), attacking.getY());
   const auto enemyPos = Position(attacked.getX(), attacked.getY());
 
@@ -134,7 +134,7 @@ double Extension::timeToTurnForAttack(const model::Unit& attacked, const model::
   return needTurnAngle / turnSpeed(attacking);
 }
 
-double Extension::magicMissleAttack(const model::Wizard& obj) {
+double EX::magicMissleAttack(const model::Wizard& obj) {
   double power = Game::instance().model().getMagicMissileDirectDamage();
 
 

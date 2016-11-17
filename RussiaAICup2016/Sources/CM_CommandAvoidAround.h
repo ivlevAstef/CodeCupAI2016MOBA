@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include "CM_Command.h"
+#include "CM_MoveCommand.h"
 #include "C_Vector2D.h"
 
 namespace AICup
 {
-  class CommandAvoidAround: public Command {
+  class CommandAvoidAround: public MoveCommand {
   public:
     CommandAvoidAround();
 
@@ -20,7 +20,7 @@ namespace AICup
 
     int priority(const model::Wizard& self) override;
 
-    void execute(const model::Wizard& self, model::Move& move) override;
+    void execute(const model::Wizard& self, Result& result) override;
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;

@@ -7,13 +7,18 @@
 //
 #pragma once
 
+#include "C_Vector2D.h"
 #include "model/CircularUnit.h"
 #include "model/Wizard.h"
 
 namespace AICup
 {
-  namespace Extension
+  namespace EX
   {
+    inline Position pos(const model::Unit& unit) {
+      return Position(unit.getX(), unit.getY());
+    }
+
     double maxSpeed(const model::CircularUnit& obj);
     double radiusForGuaranteedHit(const model::Wizard& obj);
 

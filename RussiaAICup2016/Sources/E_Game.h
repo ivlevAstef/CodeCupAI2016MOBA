@@ -16,7 +16,9 @@ namespace AICup
   public:
     void update(const model::Game& game);
 
-    const model::Game& model() const;
+    static inline const model::Game& model() {
+      return *instance().modelGame;
+    }
 
     model::Faction enemyFaction(const model::Faction faction) const;
 

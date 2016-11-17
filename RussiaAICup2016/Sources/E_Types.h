@@ -16,4 +16,10 @@ namespace AICup
   typedef std::vector<model::CircularUnit> Obstacles;
   typedef std::vector<Obstacles> ObstaclesGroups;
   typedef std::vector<Position> Path;
+
+  enum class TurnStyle {
+    TURN,
+    NO_TURN,
+    BACK_TURN
+  };
 };

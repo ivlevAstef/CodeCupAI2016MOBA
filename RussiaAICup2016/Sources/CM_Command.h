@@ -6,10 +6,8 @@
 
 #pragma once
 
-#include <vector>
 #include <memory>
 #include "model\Wizard.h"
-#include "model\Move.h"
 
 #ifdef ENABLE_VISUALIZATOR
 #include "Visualizator.h"
@@ -27,9 +25,6 @@ namespace AICup
     virtual bool check(const model::Wizard& self) = 0;
 
     virtual int priority(const model::Wizard& self) = 0;
-
-    /// исполнить команду
-    virtual void execute(const model::Wizard& self, model::Move& move) = 0;
 
 
 #ifdef ENABLE_VISUALIZATOR

@@ -1,10 +1,4 @@
-//
-//File: CM_Move.cpp
-//Author: Ivlev Alexander. Stef
-//Created: 07/11/2016
-//
-
-#include "CM_Move.h"
+#include "A_Move.h"
 #include "E_Graph.h"
 #include "C_Math.h"
 #include "E_Game.h"
@@ -13,7 +7,7 @@
 
 using namespace AICup;
 
-std::vector<Position> Move::path(const Position from, const Position to, double& length) {
+std::vector<Position> Algorithm::path(const Position from, const Position to, double& length) {
   return Graph::instance().path(from, to, length);
 }
 
@@ -33,7 +27,7 @@ const Position fitToMapRect(const model::CircularUnit& unit, const Position& toB
   Position result(
     MAX(padding, MIN(toBase.x, size - padding)),
     MAX(padding, MIN(toBase.y, size - padding))
-   );
+    );
 
   vecLength -= (result - Position(unit.getX(), unit.getY())).length();
 
@@ -60,35 +54,9 @@ const Position fitToMapRect(const model::CircularUnit& unit, const Position& toB
 
   return result;
 }
-
-MoveAction Move::move(const model::CircularUnit& unit, const Position& toBase, const double speedLimit, MoveStyle style) {
-  const Position to = fitToMapRect(unit, toBase);
-
-  const auto dx = to.x - unit.getX();
-  const auto dy = to.y - unit.getY();
-  auto speedVec = Vector(dx, -dy).normalize().rotated(unit.getAngle());
-  speedVec.y *= -1;
-  if (-1.0e-3 + SPEED_LIMIT_NOT_SET < speedLimit && speedLimit < SPEED_LIMIT_NOT_SET + 1.0e-3) {
-    speedVec *= Extension::maxSpeed(unit);
-  } else {
-    speedVec *= speedLimit;
-  }
-
-
-  if (MOVE_WITH_ROTATE == style) {
-    const auto vecAngle = Vector(dx, dy).angle();
-    const auto diff = Math::angleDiff(vecAngle, unit.getAngle());
-    return MoveAction{speedVec.x, speedVec.y, diff, false};
-  } else if (MOVE_WITH_BACKWARD_ROTATE == style) {
-    const auto vecAngle = Vector(dx, dy).angle() + AICUP_PI;
-    const auto diff = Math::angleDiff(vecAngle, unit.getAngle());
-    return MoveAction{speedVec.x, speedVec.y, diff, false};
-  } else if (MOVE_CONST_ANGLE == style) {
-    return MoveAction{speedVec.x, speedVec.y, 0, false};
-  }
-
-  assert(false && "incorrect move style");
-  return MoveAction{0, 0, 0, false};
+//TODO: удалить оба метода, один заменить на массив деревьев по краю, второй на прямую вствавку кода
+Vector calcVector(const model::CircularUnit& unit, const Position& to) {
+  return fitToMapRect(unit, to) - EX::pos(unit);
 }
 
 /// находит ближайшую группу, с которой пересекаеться вектор движения юнита.
@@ -212,7 +180,7 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
   return Vector();
 }
 
-MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const ObstaclesGroups& obstacles, const double speedLimit, MoveStyle style) {
+Vector Algorithm::move(const model::CircularUnit& unit, const Position& to, const ObstaclesGroups& obstacles) {
   const auto from = Position(unit.getX(), unit.getY());
 
   Position iterTo = to;
@@ -228,7 +196,7 @@ MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const
     const auto tanget = findGroupPartsAndReturnTangets(from, unit.getRadius(), to, *nearestGroup);
     /// находимся в окружении
     if (tanget.length2() < 1.0e-9) {
-      return MoveAction{0,0,0, true};
+      return Vector();
     }
 
 
@@ -239,7 +207,7 @@ MoveAction Move::move(const model::CircularUnit& unit, const Position& to, const
   };
 
 
-  return move(unit, iterTo, speedLimit, style);
+  return calcVector(unit, iterTo);
 }
 
 Position simplePathToPosition(const Path& path) {
@@ -286,26 +254,26 @@ Position adaptivePathToPosition(const Path& path, const model::Wizard& unit) {
 }
 
 
-MoveAction Move::move(const model::CircularUnit& unit, const Path& path, const double speedLimit, MoveStyle style) {
+Vector Algorithm::move(const model::CircularUnit& unit, const Path& path) {
   const auto pos = simplePathToPosition(path);
-  return move(unit, pos, speedLimit, style);
+  return calcVector(unit, pos);
 }
 
-MoveAction Move::move(const model::Wizard& unit, const Path& path, const double speedLimit, MoveStyle style) {
+Vector Algorithm::move(const model::Wizard& unit, const Path& path) {
   const auto pos = simplePathToPosition(path);
   /// так как адаптивный путь строиться так чтобы как можно быстрее дойти на поворотах,
   /// не стоит применять его без учета препятствий, ибо они скорей всего будут, и мы в них уткнемся
   /// const auto pos = adaptivePathToPosition(path, unit);
 
-  return move(unit, pos, speedLimit, style);
+  return calcVector(unit, pos);
 }
 
-MoveAction Move::move(const model::CircularUnit& unit, const Path& path, const ObstaclesGroups& obstacles, const double speedLimit, MoveStyle style) {
+Vector Algorithm::move(const model::CircularUnit& unit, const Path& path, const ObstaclesGroups& obstacles) {
   const auto pos = simplePathToPosition(path);
-  return move(unit, pos, obstacles, speedLimit, style);
+  return move(unit, pos, obstacles);
 }
 
-MoveAction Move::move(const model::Wizard& unit, const Path& path, const ObstaclesGroups& obstacles, const double speedLimit, MoveStyle style) {
+Vector Algorithm::move(const model::Wizard& unit, const Path& path, const ObstaclesGroups& obstacles) {
   const auto pos = adaptivePathToPosition(path, unit);
-  return move(unit, pos, obstacles, speedLimit, style);
+  return move(unit, pos, obstacles);
 }

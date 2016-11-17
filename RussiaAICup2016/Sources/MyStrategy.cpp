@@ -9,11 +9,12 @@
 #include "E_Game.h"
 #include "E_Graph.h"
 #include "C_Logger.h"
-#include "CM_CommandManager.h"
+#include "S_StrategyManager.h"
 
 
 using namespace model;
 using namespace AICup;
+
 
 MyStrategy::MyStrategy() {
 #ifdef ENABLE_VISUALIZATOR
@@ -27,7 +28,7 @@ void MyStrategy::move(const model::Wizard& self, const model::World& world, cons
   AICup::World::instance().update(world);
   AICup::Graph::instance().update();
 
-  AICup::CommandManager::instance().update(self, move);
+  AICup::StrategyManager::instance().update(self, move);
 
 #ifdef ENABLE_VISUALIZATOR
   auto& visualizator = Visualizator::instance();
@@ -38,7 +39,7 @@ void MyStrategy::move(const model::Wizard& self, const model::World& world, cons
 
   AICup::World::instance().visualization(visualizator);
   AICup::Graph::instance().visualization(visualizator);
-  AICup::CommandManager::instance().visualization(visualizator);
+  AICup::StrategyManager::instance().visualization(visualizator);
 
   visualizator.endPost();
 

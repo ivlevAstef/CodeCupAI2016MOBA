@@ -1,12 +1,12 @@
 //
-//File: CM_TestFollowStrategy.h
+//File: S_TestFollowStrategy.h
 //Author: Ivlev Alexander. Stef
 //Created: 13/11/2016
 //
 
 #pragma once
 
-#include "CM_CommandStrategy.h"
+#include "S_CommandStrategy.h"
 
 namespace AICup
 {

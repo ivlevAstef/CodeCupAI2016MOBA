@@ -6,8 +6,9 @@
 
 
 #include "CM_CommandKeepDistance.h"
+#include "CM_CommandMoveToPoint.h"
 #include "E_World.h"
-#include "CM_Move.h"
+#include "A_Move.h"
 #include "C_Math.h"
 
 using namespace AICup;
@@ -28,7 +29,7 @@ bool CommandKeepDistance::check(const model::Wizard& self) {
     /// противоположная точка, точке где находиться объект, и длиной = радиусу обзора
     const auto pos = selfPos + (selfPos - pointPos).normal() * self.getVisionRange();
 
-    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y, SPEED_LIMIT_NOT_SET, MOVE_WITH_BACKWARD_ROTATE);
+    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y, TurnStyle::BACK_TURN);
   } else if (distance > maxDistance) {
     const auto pos = pointPos;
 
@@ -44,9 +45,9 @@ int CommandKeepDistance::priority(const model::Wizard& self) {
   return 0;
 }
 
-void CommandKeepDistance::execute(const model::Wizard& self, model::Move& move) {
+void CommandKeepDistance::execute(const model::Wizard& self, Result& result) {
   assert(nullptr != commandMoveToPoint.get());
-  commandMoveToPoint->execute(self, move);
+  commandMoveToPoint->execute(self, result);
 }
 
 #ifdef ENABLE_VISUALIZATOR

@@ -6,17 +6,17 @@
 
 
 #include "CM_CommandMoveToPoint.h"
-#include "CM_Move.h"
+#include "A_Move.h"
 #include "E_World.h"
 
 using namespace AICup;
 
-CommandMoveToPoint::CommandMoveToPoint(const double x, const double y, const double speedLimit, const MoveStyle style):
-  point(x, y), speedLimit(speedLimit), style(style) {
+CommandMoveToPoint::CommandMoveToPoint(const double x, const double y, const TurnStyle style):
+  point(x, y), style(style) {
 }
 
 bool CommandMoveToPoint::check(const model::Wizard& self) {
-  path = Move::path(Position(self.getX(), self.getY()), point, pathLength);
+  path = Algorithm::path(Position(self.getX(), self.getY()), point, pathLength);
 
   return path.size() >= 2 && pathLength > 1;
 }
@@ -25,14 +25,12 @@ int CommandMoveToPoint::priority(const model::Wizard& self) {
   return 0;
 }
 
-void CommandMoveToPoint::execute(const model::Wizard& self, model::Move& move) {
+void CommandMoveToPoint::execute(const model::Wizard& self, Result& result) {
   obstaclesGroups = World::instance().obstaclesGroup(self);
 
-  const auto action = Move::move(self, path, obstaclesGroups, speedLimit, style);
-
-  move.setSpeed(action.speed);
-  move.setStrafeSpeed(action.strafeSpeed);
-  move.setTurn(action.turn);
+  result.moveDirection = Algorithm::move(self, path, obstaclesGroups);
+  result.turnStyle = style;
+  result.priority = priority(self);
 }
 
 #ifdef ENABLE_VISUALIZATOR
