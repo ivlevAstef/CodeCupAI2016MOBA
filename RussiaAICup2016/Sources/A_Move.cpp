@@ -60,27 +60,28 @@ Vector calcVector(const model::CircularUnit& unit, const Position& to) {
 }
 
 /// находит ближайшую группу, с которой пересекаеться вектор движения юнита.
-const Obstacles* findNearestGroup(const Position& from, const double radius, const Position& to, const ObstaclesGroups& obstacles) {
-  double minDistance = 100000;
+const Obstacles* findNearestGroup(const Position& from, const double radius, const Position& to, const ObstaclesGroups& obstacles, double& minDistance) {
+  minDistance = 100000;
   const Obstacles* nearestGroup = nullptr;
 
   for (const auto& group : obstacles) {
     for (const auto& obstacle : group) {
       const auto obstaclePos = Position(obstacle.getX(), obstacle.getY());
+      const auto fullRadius = radius + obstacle.getRadius();
 
       /// проверяем перечение с препятствием, но увеличенного радиуса, так как пряпятствия стоят не притык друг к другу
-      if (Math::distanceToLine(obstaclePos, to, from) < obstacle.getRadius() + radius) {
+      if (Math::distanceToLine(obstaclePos, to, from) < fullRadius) {
         /// пряпятствие за нашей спиной
         if ((to - from).dot(obstaclePos - from) < 0) {
           continue;
         }
 
         /// препятствие дальше точки окончания движения
-        if ((from - to).dot(obstaclePos - to) < 0) {
+        if ((from - to).length() < (obstaclePos - to).length() - fullRadius) {
           continue;
         }
 
-        double distance = (from - obstaclePos).length();
+        double distance = (from - obstaclePos).length() - fullRadius;
         if (distance < minDistance) {
           minDistance = distance;
           nearestGroup = &group;
@@ -210,12 +211,15 @@ Vector Algorithm::move(const model::CircularUnit& unit, const Position& to, cons
   ObstaclesGroups obstaclesGroups = obstacles;
 
   while (obstaclesGroups.size() > 0) {
-    const Obstacles* nearestGroup = findNearestGroup(from, unit.getRadius(), from + tangent, obstaclesGroups);
+    double minDistance = 0;
+    const Obstacles* nearestGroup = findNearestGroup(from, unit.getRadius(), from + tangent, obstaclesGroups, minDistance);
     if (nullptr == nearestGroup) { // препятствий на пути следования нет
       break;
     }
+    minDistance = MAX(1, minDistance);
 
     tangent = findGroupPartsAndReturnTangets(from, unit.getRadius(), to, *nearestGroup);
+    tangent = minDistance < tangent.length() ? tangent.normal() * minDistance : tangent;
     double length = tangent.length();
     /// находимся в окружении
     if (length< 1.0e-9) {
@@ -226,7 +230,7 @@ Vector Algorithm::move(const model::CircularUnit& unit, const Position& to, cons
     }
 
     // удаляем группу с которой уже пересеклись
-    const size_t groupIndex = (nearestGroup - &obstaclesGroups[0]) / sizeof(Obstacles);
+    const size_t groupIndex = nearestGroup - &obstaclesGroups[0];
     obstaclesGroups.erase(obstaclesGroups.begin() + groupIndex);
   };
 
@@ -244,11 +248,10 @@ Position simplePathToPosition(const Path& path) {
   return path[1];
 }
 
-Position adaptivePathToPosition(const Path& path, const model::Wizard& unit) {
+Position adaptivePathToPosition(const Path& path, const model::Wizard& unit, const double radius) {
   assert(path.size() >= 1);
 
   const auto unitPos = Position(unit.getX(), unit.getY());
-  const auto radius = unit.getVisionRange();
 
   const auto& lastPos = path[path.size() - 1];
   /// если последняя точка находиться в обзоре, то двигаемся к ней
@@ -297,7 +300,7 @@ Vector Algorithm::move(const model::CircularUnit& unit, const Path& path, const 
   return move(unit, pos, obstacles);
 }
 
-Vector Algorithm::move(const model::Wizard& unit, const Path& path, const ObstaclesGroups& obstacles) {
-  const auto pos = adaptivePathToPosition(path, unit);
+Vector Algorithm::move(const model::Wizard& unit, const Path& path, const ObstaclesGroups& obstacles, double range) {
+  const auto pos = adaptivePathToPosition(path, unit, (range < 0) ? unit.getVisionRange() : range);
   return move(unit, pos, obstacles);
 }

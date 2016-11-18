@@ -7,7 +7,7 @@ using namespace AICup;
 static long long idIndex = 100000;
 
 
-Tree::Tree(const Tree& tree, double radius):
+Tree::Tree(const model::Tree& tree, double radius):
   model::Tree(++idIndex,
     tree.getX(), tree.getY(), 0, 0, 0,
     model::FACTION_ACADEMY, tree.getRadius(), tree.getLife(), tree.getMaxLife(), std::vector<model::Status>())
@@ -39,8 +39,20 @@ Building::Building(const model::Building& building, double radius):
 
 }
 
-class Looking: public model::LivingUnit {
-  Looking(const model::LivingUnit& unit, double visibleRange) {
+Looking::Looking(const model::Wizard& unit) {
+  x = unit.getX();
+  y = unit.getY();
+  visionRange = unit.getVisionRange();
+}
 
-  }
+Looking::Looking(const model::Minion& unit) {
+  x = unit.getX();
+  y = unit.getY();
+  visionRange = unit.getVisionRange();
+}
+
+Looking::Looking(const model::Building& unit) {
+  x = unit.getX();
+  y = unit.getY();
+  visionRange = unit.getVisionRange();
 }

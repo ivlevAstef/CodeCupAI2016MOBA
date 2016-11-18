@@ -9,14 +9,15 @@
 
 #include "model\Tree.h"
 #include "model\Building.h"
-#include "model\LivingUnit.h"
+#include "model\Wizard.h"
+#include "model\Minion.h"
 
 namespace AICup
 {
   class Tree: public model::Tree {
   public:
     //копия дерева но слегка с увеличенным радиусом, для того чтобы наверняка
-    Tree(const Tree& tree, double radius);
+    Tree(const model::Tree& tree, double radius);
 
     //свое дерево, дабы чтобы было в неизвестных зонах
     Tree(double x, double y, double radius);
@@ -30,17 +31,26 @@ namespace AICup
 
   class Looking {
   public:
-    //копия строения но слегка с увеличенным радиусом, для того чтобы наверняка
-    Looking(const model::Unit& unit, double visibleRange);
+    Looking(const model::Wizard& unit);
+    Looking(const model::Minion& unit);
+    Looking(const model::Building& unit);
 
-    double getVisibleRange() {
-      return visibleRange;
+    double getVisionRange() const {
+      return visionRange;
+    }
+
+    double getX() const {
+      return x;
+    }
+
+    double getY() const {
+      return y;
     }
 
   private:
     double x;
     double y;
 
-    double visibleRange;
+    double visionRange;
   };
 };

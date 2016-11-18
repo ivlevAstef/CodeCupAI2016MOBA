@@ -26,9 +26,9 @@ int CommandMoveToPoint::priority(const model::Wizard& self) {
 }
 
 void CommandMoveToPoint::execute(const model::Wizard& self, Result& result) {
-  obstaclesGroups = World::instance().obstaclesGroup(self);
+  obstaclesGroups = World::instance().obstaclesGroup(self, self.getVisionRange() * 2);
 
-  result.moveDirection = Algorithm::move(self, path, obstaclesGroups);
+  result.moveDirection = Algorithm::move(self, path, obstaclesGroups, self.getVisionRange() * 2);
   result.turnStyle = style;
   result.priority = priority(self);
 }

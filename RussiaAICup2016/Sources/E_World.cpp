@@ -20,6 +20,7 @@ World::World() {
 void World::update(const model::World& world) {
   modelWorld = &world;
 
+  updateVisionZone();
   updateSupposedData();
   recalculateLinePositions();
 }
@@ -73,23 +74,58 @@ static std::vector<Type> updateRadius(const std::vector<Type>& real) {
 }
 
 template<typename Type>
-static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real) {
+static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real, const std::vector<Looking> visionZone) {
+  //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
   std::vector<Type> result;
 
   for (const auto& sIter : supposed) {
+    bool found = false;
+    for (const auto& vision : visionZone) {
+      double dx = sIter.getX() - vision.getX();
+      double dy = sIter.getY() - vision.getY();
+      if (sqrt(dx*dx + dy*dy) < vision.getVisionRange()) {
+        found = true;
+        break;
+      }
+    }
 
+    if (!found) {
+      result.push_back(sIter);
+    }
   }
 
-  //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
+  for (const auto& rIter : real) {
+    result.push_back(rIter);
+  }
 
-  //TODO: need merge
-  return real;
+  return result;
+}
+
+void World::updateVisionZone() {
+  visionZone.clear();
+
+  for (const auto& wizard : model().getWizards()) {
+    if (model::FACTION_ACADEMY == wizard.getFaction()) {
+      visionZone.emplace_back(wizard);
+    }
+  }
+
+  for (const auto& minion : model().getMinions()) {
+    if (model::FACTION_ACADEMY == minion.getFaction()) {
+      visionZone.emplace_back(minion);
+    }
+  }
+
+  for (const auto& building : model().getBuildings()) {
+    if (model::FACTION_ACADEMY == building.getFaction()) {
+      visionZone.emplace_back(building);
+    }
+  }
 }
 
 void World::updateSupposedData() {
-  std::vector<allSawZone
 
-  supposedTrees = merge(supposedTrees, updateRadius<model::Tree, Tree>(modelWorld->getTrees()));
+  supposedTrees = merge(supposedTrees, updateRadius<model::Tree, Tree>(modelWorld->getTrees()), visionZone);
   supposedWizards = modelWorld->getWizards();
   supposedBuilding = updateRadius<model::Building, Building>(modelWorld->getBuildings());
 }
@@ -235,30 +271,32 @@ const int World::wizardCount(model::LaneType line, const model::Wizard& excludeW
   return result;
 }
 
-Obstacles World::obstacles(const model::Wizard& unit) const {
+Obstacles World::obstacles(const model::Wizard& unit, double range) const {
   Obstacles aroundObstacles;
   aroundObstacles.reserve(32); // Приблизительно сколько объектов вокруг мага в среднем
 
+  double visionRange = (range < -1) ? unit.getVisionRange() : range;
+
   for (const auto& tree : trees()) {
-    if (unit.getDistanceTo(tree) < unit.getVisionRange()) {
+    if (unit.getDistanceTo(tree) < visionRange) {
       aroundObstacles.push_back(tree);
     }
   }
 
   for (const auto& minion : model().getMinions()) {
-    if (unit.getDistanceTo(minion) < unit.getVisionRange()) {
+    if (unit.getDistanceTo(minion) < visionRange) {
       aroundObstacles.push_back(minion);
     }
   }
 
   for (const auto& build : buildings()) {
-    if (unit.getDistanceTo(build) < unit.getVisionRange()) {
+    if (unit.getDistanceTo(build) < visionRange) {
       aroundObstacles.push_back(build);
     }
   }
 
   for (const auto& wizard : model().getWizards()) {
-    if (unit.getId() != wizard.getId() && unit.getDistanceTo(wizard) < unit.getVisionRange()) {
+    if (unit.getId() != wizard.getId() && unit.getDistanceTo(wizard) < visionRange) {
       aroundObstacles.push_back(wizard);
     }
   }
@@ -268,8 +306,8 @@ Obstacles World::obstacles(const model::Wizard& unit) const {
   return aroundObstacles;
 }
 
-ObstaclesGroups World::obstaclesGroup(const model::Wizard& unit) const {
-  const auto aroundObstacles = obstacles(unit);
+ObstaclesGroups World::obstaclesGroup(const model::Wizard& unit, double range) const {
+  const auto aroundObstacles = obstacles(unit, range);
 
   ObstaclesGroups result;
 

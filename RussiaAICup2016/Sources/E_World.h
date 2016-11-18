@@ -11,6 +11,7 @@
 #include "C_Vector2D.h"
 #include "C_Singleton.h"
 #include "E_Types.h"
+#include "E_WorldObjects.h"
 
 #ifdef ENABLE_VISUALIZATOR
 #include "Visualizator.h"
@@ -33,8 +34,8 @@ namespace AICup
     const std::vector<model::Building>& buildings() const;
     const std::vector<model::Wizard>& wizards() const;
 
-    Obstacles obstacles(const model::Wizard& unit) const;
-    ObstaclesGroups obstaclesGroup(const model::Wizard& unit) const;
+    Obstacles obstacles(const model::Wizard& unit, double range = -1) const;
+    ObstaclesGroups obstaclesGroup(const model::Wizard& unit, double range = -1) const;
 
     const model::LivingUnit* unit(long long id) const;
 
@@ -56,6 +57,7 @@ namespace AICup
     void initTrees();
 
     void recalculateLinePositions();
+    void updateVisionZone();
     void updateSupposedData();
 
 
@@ -64,6 +66,7 @@ namespace AICup
 
     const model::World* modelWorld;
 
+    std::vector<Looking> visionZone;
     std::vector<model::Tree> supposedTrees;
     std::vector<model::Building> supposedBuilding;
     std::vector<model::Wizard> supposedWizards;

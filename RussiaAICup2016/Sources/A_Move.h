@@ -28,7 +28,7 @@ namespace AICup
 
     ///  Возращает вектор движения, учитывая путь и препятствия
     Vector move(const model::CircularUnit& unit, const Path& path, const ObstaclesGroups& obstacles);
-    Vector move(const model::Wizard& unit, const Path& path, const ObstaclesGroups& obstacles);
+    Vector move(const model::Wizard& unit, const Path& path, const ObstaclesGroups& obstacles, double range = -1);
 
   };
 
