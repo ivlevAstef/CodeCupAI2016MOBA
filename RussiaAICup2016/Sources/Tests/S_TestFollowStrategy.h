@@ -13,15 +13,5 @@ namespace AICup
   class TestFollowStrategy: public CommandStategy {
   public:
     TestFollowStrategy(const CommandFabric& fabric);
-
-    void update(const model::Wizard& self, model::Move& move) override;
-
-#ifdef ENABLE_VISUALIZATOR
-    void visualization(const Visualizator& visualizator) const override;
-#endif // ENABLE_VISUALIZATOR
-
-
-  private:
-    CommandPtr moveCommand;
   };
 };

@@ -64,7 +64,7 @@ bool CommandFollow::check(const model::Wizard& self) {
         }
 
 
-        commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y, speed.length());
+        commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y);
       } else {
         // двигаться за спину объекта в центр дистанции
         const auto pos = unitPos + backVec * (minDistance + (maxDistance - minDistance) * 0.5);

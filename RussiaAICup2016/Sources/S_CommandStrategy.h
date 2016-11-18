@@ -9,7 +9,8 @@
 #include "model\Wizard.h"
 #include "model\Move.h"
 
-#include "CM_Command.h"
+#include "CM_MoveCommand.h"
+#include "CM_AttackCommand.h"
 #include "CM_CommandFabric.h"
 
 #ifdef ENABLE_VISUALIZATOR
@@ -23,15 +24,24 @@ namespace AICup
   public:
     CommandStategy(const CommandFabric& fabric);
 
-    virtual void update(const model::Wizard& self, model::Move& move) = 0;
+    virtual void update(const model::Wizard& self, model::Move& move);
 
 #ifdef ENABLE_VISUALIZATOR
     virtual void visualization(const Visualizator& visualizator) const;
 #endif // ENABLE_VISUALIZATOR
 
+  protected:
+    void clear();
+
+  private:
+    const Vector move(const model::Wizard& self, TurnStyle& turnStyle);
+    const model::LivingUnit& attack(const model::Wizard& self, model::ActionType& action);
 
   protected:
     const CommandFabric& fabric;
+
+    std::vector<MoveCommandPtr> moveCommands;
+    std::vector<AttackCommandPtr> attackCommands;
   };
 
   typedef std::shared_ptr<CommandStategy> CommandStategyPtr;

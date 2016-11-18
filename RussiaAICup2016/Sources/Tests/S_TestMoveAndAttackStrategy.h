@@ -16,15 +16,8 @@ namespace AICup
 
     void update(const model::Wizard& self, model::Move& move) override;
 
-#ifdef ENABLE_VISUALIZATOR
-    void visualization(const Visualizator& visualizator) const override;
-#endif // ENABLE_VISUALIZATOR
-
-
   private:
     size_t currentMoveCommandIndex;
-    std::vector<CommandPtr> moveCommands;
-
-    CommandPtr attackCommand;
+    std::vector<MoveCommandPtr> allMoveCommands;
   };
 };

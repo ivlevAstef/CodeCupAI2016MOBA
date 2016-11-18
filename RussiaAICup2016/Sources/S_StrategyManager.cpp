@@ -17,7 +17,7 @@
 using namespace AICup;
 
 StrategyManager::StrategyManager() {
-  currentStrategy = std::make_shared<FirstStrategy>(fabric);
+  currentStrategy = std::make_shared<TestMoveAndAttackStrategy>(fabric);
 }
 
 void StrategyManager::update(const model::Wizard& self, model::Move& move) {

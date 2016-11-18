@@ -29,8 +29,9 @@ namespace AICup
       return *instance().modelWorld;
     }
 
-    std::vector<model::Tree>& trees();
-    std::vector<model::Wizard>& wizards();
+    const std::vector<model::Tree>& trees() const;
+    const std::vector<model::Building>& buildings() const;
+    const std::vector<model::Wizard>& wizards() const;
 
     Obstacles obstacles(const model::Wizard& unit) const;
     ObstaclesGroups obstaclesGroup(const model::Wizard& unit) const;
@@ -51,7 +52,8 @@ namespace AICup
 #endif // ENABLE_VISUALIZATOR
 
   private:
-    void init();
+    void initLinePosition();
+    void initTrees();
 
     void recalculateLinePositions();
     void updateSupposedData();
@@ -63,6 +65,7 @@ namespace AICup
     const model::World* modelWorld;
 
     std::vector<model::Tree> supposedTrees;
+    std::vector<model::Building> supposedBuilding;
     std::vector<model::Wizard> supposedWizards;
 
     Position topLinePosition;

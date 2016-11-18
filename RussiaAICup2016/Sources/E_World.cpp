@@ -8,52 +8,90 @@
 #include "E_Graph.h"
 #include "E_Game.h"
 #include "C_Math.h"
+#include "E_WorldObjects.h"
 
 using namespace AICup;
 
-World::World(): isInitialized(false) {
-
+World::World() {
+  initLinePosition();
+  initTrees();
 }
 
 void World::update(const model::World& world) {
   modelWorld = &world;
 
-  if (!isInitialized) {
-    init();
-    isInitialized = true;
-  }
-
   updateSupposedData();
   recalculateLinePositions();
 }
 
-std::vector<model::Tree>& AICup::World::trees() {
+const std::vector<model::Tree>& World::trees() const {
   return supposedTrees;
 }
 
-std::vector<model::Wizard>& AICup::World::wizards() {
+const std::vector<model::Building>& World::buildings() const {
+  return supposedBuilding;
+}
+
+const std::vector<model::Wizard>& World::wizards() const {
   return supposedWizards;
 }
 
-void World::init() {
+void World::initTrees() {
+  for (int x = 400; x <= 4000 - 400; x += 100) {
+    for (int y = 400; y <= 4000 - 400; y += 100) {
+      if (-200 < (x - y) && (x - y) < 200) {
+        continue;
+      }
+
+      if (-400 < ((4000-x) - y) && ((4000-x) - y) < 400) {
+        continue;
+      }
+
+      supposedTrees.push_back(Tree(x, y, 50));
+    }
+  }
+
+}
+
+void World::initLinePosition() {
   /// а мы всегда одна фракция...
   topLinePosition = Graph::instance().position(Graph::TOP_CENTER);
   middleLinePosition = Graph::instance().position(Graph::CENTER_ACADEMY);
   bottomLinePosition = Graph::instance().position(Graph::BOTTOM_CENTER);
 }
 
+template<typename Type, typename CreateType>
+static std::vector<Type> updateRadius(const std::vector<Type>& real) {
+  std::vector<Type> result;
+  result.reserve(real.size());
+
+  for (const auto& obj : real) {
+    result.push_back(CreateType(obj, obj.getRadius() + 0.1));
+  }
+
+  return result;
+}
+
 template<typename Type>
 static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real) {
-  //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
+  std::vector<Type> result;
 
+  for (const auto& sIter : supposed) {
+
+  }
+
+  //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
 
   //TODO: need merge
   return real;
 }
 
 void World::updateSupposedData() {
-  supposedTrees = merge(supposedTrees, modelWorld->getTrees());
-  supposedWizards = merge(supposedWizards, modelWorld->getWizards());
+  std::vector<allSawZone
+
+  supposedTrees = merge(supposedTrees, updateRadius<model::Tree, Tree>(modelWorld->getTrees()));
+  supposedWizards = modelWorld->getWizards();
+  supposedBuilding = updateRadius<model::Building, Building>(modelWorld->getBuildings());
 }
 
 void World::recalculateLinePositions() {
@@ -199,9 +237,9 @@ const int World::wizardCount(model::LaneType line, const model::Wizard& excludeW
 
 Obstacles World::obstacles(const model::Wizard& unit) const {
   Obstacles aroundObstacles;
-  aroundObstacles.reserve(24); // Приблизительно сколько объектов вокруг мага в среднем
+  aroundObstacles.reserve(32); // Приблизительно сколько объектов вокруг мага в среднем
 
-  for (const auto& tree : model().getTrees()) {
+  for (const auto& tree : trees()) {
     if (unit.getDistanceTo(tree) < unit.getVisionRange()) {
       aroundObstacles.push_back(tree);
     }
@@ -213,7 +251,7 @@ Obstacles World::obstacles(const model::Wizard& unit) const {
     }
   }
 
-  for (const auto& build : model().getBuildings()) {
+  for (const auto& build : buildings()) {
     if (unit.getDistanceTo(build) < unit.getVisionRange()) {
       aroundObstacles.push_back(build);
     }
@@ -285,7 +323,7 @@ const model::LivingUnit* World::unit(long long id) const {
     }
   }
 
-  for (const auto& build : model().getBuildings()) {
+  for (const auto& build : buildings()) {
     if (build.getId() == id) {
       return &build;
     }
@@ -319,7 +357,7 @@ std::vector<const model::LivingUnit*> World::around(const model::Wizard& unit, c
     }
   }
 
-  for (const auto& build : model().getBuildings()) {
+  for (const auto& build : buildings()) {
     if (build.getFaction() == faction) {
       const auto buildPos = Position(build.getX(), build.getY());
       if ((buildPos - unitPos).length2() < radius2) {

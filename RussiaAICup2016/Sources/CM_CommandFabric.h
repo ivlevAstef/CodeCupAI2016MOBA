@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include "CM_Command.h"
+#include "CM_MoveCommand.h"
+#include "CM_AttackCommand.h"
 #include "E_Types.h"
 #include "model\LaneType.h"
-#include <initializer_list>
 
 namespace AICup
 {
@@ -17,43 +17,43 @@ namespace AICup
   public:
 #pragma mark - перемещение
     /// даржаться от точки на определенном расстоянии
-    CommandPtr keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const;
+    MoveCommandPtr keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const;
 
     /// переместиться в точку
-    CommandPtr moveToPoint(const double x, const double y, const TurnStyle style = TurnStyle::TURN) const;
+    MoveCommandPtr moveToPoint(const double x, const double y, const TurnStyle style = TurnStyle::TURN) const;
 
     /// переместиться на линию
-    CommandPtr moveToLine(const model::LaneType line) const;
+    MoveCommandPtr moveToLine(const model::LaneType line) const;
 
     /// следовать за юнитом
-    CommandPtr follow(const long long unitId, const double minDistance = 0, const double maxDistance = 10000) const;
+    MoveCommandPtr follow(const long long unitId, const double minDistance = 0, const double maxDistance = 10000) const;
 
     /// подойти за получением опыта
-    CommandPtr moveGetExpirience() const;
+    MoveCommandPtr moveGetExpirience() const;
 
     /// подойти чтобы взять руну
-    CommandPtr moveToBonus() const;
+    MoveCommandPtr moveToBonus() const;
 
     /// обследование карты - посещение мест где был давно
-    CommandPtr observeMap() const;
+    MoveCommandPtr observeMap() const;
 
 #pragma mark - атака
     /// атаковать врага
-    CommandPtr attack(const long long enemyId) const;
+    AttackCommandPtr attack(const long long enemyId) const;
 
     /// пул нейтральных крипов
-    CommandPtr pool(const long long neutralUnitId) const;
+    AttackCommandPtr pool(const long long neutralUnitId) const;
 
 
 #pragma mark - защита
     /// защищать позицию
-    CommandPtr defend(const double x, const double y) const;
+    MoveCommandPtr defend(const double x, const double y) const;
 
     /// держаться на безопасном расстоянии от юнита
-    CommandPtr avoidEnemy(const long long unitId) const;
+    MoveCommandPtr avoidEnemy(const long long unitId) const;
 
     /// держаться на безопасном расстоянии от всех врагов вокруге
-    CommandPtr avoidAround() const;
+    MoveCommandPtr avoidAround() const;
 
   };
 }

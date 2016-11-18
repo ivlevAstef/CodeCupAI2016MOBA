@@ -35,6 +35,7 @@ void FirstStrategy::init(const model::Wizard& self, model::Move& move) {
 }
 
 void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
+  CommandStategy::clear();
 
   /// раз в 500 тиков пересматриваю линию,
   /// 500 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
@@ -48,24 +49,22 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
     isInitialized = true;
   }
 
-  usedCommands.clear();
-
   const auto moveToLineCommand = fabric.moveToLine(myLine);
   if (moveToLineCommand->check(self)) {
-    usedCommands.push_back(moveToLineCommand);
+    moveCommands.push_back(moveToLineCommand);
   }
 
   const auto avoidAroundCommand = fabric.avoidAround();
   bool needAvoidAround = avoidAroundCommand->check(self);
 
   if (needAvoidAround && self.getLife() < 50) {
-    usedCommands.push_back(avoidAroundCommand);
+    moveCommands.push_back(avoidAroundCommand);
   } else {
     const auto getExpirienceCommand = fabric.moveGetExpirience();
     if (getExpirienceCommand->check(self)) {
-      usedCommands.push_back(getExpirienceCommand);
+      moveCommands.push_back(getExpirienceCommand);
     } else if (needAvoidAround) {
-      usedCommands.push_back(avoidAroundCommand);
+      moveCommands.push_back(avoidAroundCommand);
     }
   }
 
@@ -77,16 +76,17 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
       moveToBonus = newMoveToBonus;
     }
   } else if (moveToBonus->check(self)) {
-    usedCommands.push_back(moveToBonus);
+    moveCommands.push_back(moveToBonus);
   } else {
     moveToBonus = nullptr;
   }
 
-  const auto attackCommand = createMaxPriorityAttackEnemy(self);
-  if (nullptr != attackCommand.get()) {
-    usedCommands.push_back(attackCommand);
+  for (const auto& enemy : World::instance().aroundEnemies(self)) {
+    const auto attackCommand = fabric.attack(enemy->getId());
+    if (attackCommand->check(self)) {
+      attackCommands.push_back(attackCommand);
+    }
   }
-
 
 
   /*
@@ -98,9 +98,7 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
      с) идем на ту линию где своих меньше (дабы побольше оттяпать)
  */
 
-  for (const auto& command : usedCommands) {
-    command->execute(self, move);
-  }
+  CommandStategy::update(self, move);
 }
 
 void FirstStrategy::changeLane(const model::Wizard& self) {
@@ -140,29 +138,3 @@ void FirstStrategy::changeLane(const model::Wizard& self) {
     myLine = model::LANE_BOTTOM;
   }
 }
-
-CommandPtr FirstStrategy::createMaxPriorityAttackEnemy(const model::Wizard& self) {
-  CommandPtr maxPriorityAttackCommand = nullptr;
-  int maxPriority = -1;
-  for (const auto& enemy : World::instance().aroundEnemies(self)) {
-    const auto attackCommand = fabric.attack(enemy->getId());
-    if (attackCommand->check(self)) {
-      const int priority = attackCommand->priority(self);
-      if (priority > maxPriority) {
-        maxPriorityAttackCommand = attackCommand;
-        maxPriority = priority;
-      }
-    }
-  }
-
-  return maxPriorityAttackCommand;
-}
-
-#ifdef ENABLE_VISUALIZATOR
-void FirstStrategy::visualization(const Visualizator& visualizator) const {
-  for (const auto& command : usedCommands) {
-    command->visualization(visualizator);
-  }
-}
-
-#endif

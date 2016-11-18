@@ -135,6 +135,9 @@
     <ClCompile Include="..\Sources\A_Exec.cpp">
       <Filter>Sources\Algorithms</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\E_WorldObjects.cpp">
+      <Filter>Sources\Environment</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -241,6 +244,9 @@
     </ClInclude>
     <ClInclude Include="..\Sources\A_Exec.h">
       <Filter>Sources\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\E_WorldObjects.h">
+      <Filter>Sources\Environment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

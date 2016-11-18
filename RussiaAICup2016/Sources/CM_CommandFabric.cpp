@@ -23,51 +23,51 @@
 
 using namespace AICup;
 
-CommandPtr CommandFabric::keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const {
+MoveCommandPtr CommandFabric::keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const {
   return std::make_shared<CommandKeepDistance>(x, y, minDistance, maxDistance);
 }
 
-CommandPtr CommandFabric::moveToPoint(const double x, const double y, const TurnStyle style) const {
+MoveCommandPtr CommandFabric::moveToPoint(const double x, const double y, const TurnStyle style) const {
   return std::make_shared<CommandMoveToPoint>(x, y, style);
 }
 
-CommandPtr CommandFabric::moveToLine(const model::LaneType line) const {
+MoveCommandPtr CommandFabric::moveToLine(const model::LaneType line) const {
   return std::make_shared<CommandMoveToLine>(line);
 }
 
 /// подойти чтобы взять руну
-CommandPtr CommandFabric::moveToBonus() const {
+MoveCommandPtr CommandFabric::moveToBonus() const {
   return std::make_shared<CommandMoveToBonus>();
 }
 
-CommandPtr CommandFabric::follow(const long long unitId, const double minDistance, const double maxDistance) const {
+MoveCommandPtr CommandFabric::follow(const long long unitId, const double minDistance, const double maxDistance) const {
   return std::make_shared<CommandFollow>(unitId, minDistance, maxDistance);
 }
 
-CommandPtr CommandFabric::moveGetExpirience() const {
+MoveCommandPtr CommandFabric::moveGetExpirience() const {
   return std::make_shared<CommandMoveGetExpirience>();
 }
 
-CommandPtr CommandFabric::observeMap() const {
+MoveCommandPtr CommandFabric::observeMap() const {
   return std::make_shared<CommandObserveMap>();
 }
 
-CommandPtr CommandFabric::attack(const long long enemyId) const {
+AttackCommandPtr CommandFabric::attack(const long long enemyId) const {
   return std::make_shared<CommandAttackEnemy>(enemyId);
 }
 
-CommandPtr CommandFabric::pool(const long long neutralUnitId) const {
+AttackCommandPtr CommandFabric::pool(const long long neutralUnitId) const {
   return std::make_shared<CommandPool>(neutralUnitId);
 }
 
-CommandPtr CommandFabric::defend(const double x, const double y) const {
+MoveCommandPtr CommandFabric::defend(const double x, const double y) const {
   return std::make_shared<CommandDefendPoint>(x, y);
 }
 
-CommandPtr CommandFabric::avoidEnemy(const long long unitId) const {
+MoveCommandPtr CommandFabric::avoidEnemy(const long long unitId) const {
   return std::make_shared<CommandAvoidEnemy>(unitId);
 }
 
-CommandPtr CommandFabric::avoidAround() const {
+MoveCommandPtr CommandFabric::avoidAround() const {
   return std::make_shared<CommandAvoidAround>();
 }

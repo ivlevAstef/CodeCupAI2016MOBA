@@ -131,7 +131,7 @@ bool isIntersectVectorWithGroup(const Position& from, const Vector& vec, const P
 struct ObstacleData {
   double deviation;
   Position pos;
-  double radius;
+  double length;
   Vector tangent;
 
 };
@@ -143,71 +143,95 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
 
   const auto delta = (to - from).normal();
 
-  /// deviations, obstacle, tangent
-  std::vector<ObstacleData> dataArr;
-  dataArr.reserve(group.size() * 2);
+  ObstacleData result[2] = {
+    {999, Position(), 9999, Vector()},
+    {999, Position(), 9999, Vector()}
+  };
+  double maxRadius = 0;
+  int resultIndex = 0;
+
 
   for (const auto& obstacle : group) {
-    const auto obstaclePos = Position(obstacle.getX(), obstacle.getY());
+    const auto obstaclePos = EX::pos(obstacle);
+    /// возращает нормализованные вектора касательных
     auto obstacleTangets = Math::tangetsForTwoCircle(from, radius, obstaclePos, obstacle.getRadius());
     assert(2 == obstacleTangets.size());
     setTangetsDirection(from, obstaclePos, obstacleTangets);
 
-    for (const auto& tanget : obstacleTangets) {
-      /// отклонение от нормально движения, чем больше тем больше отклонение, интервал от 0 до 2
-      double deviation = 1 - delta.dot(tanget);
-      dataArr.push_back(ObstacleData{deviation, obstaclePos, obstacle.getRadius(), tanget});
+    for (const auto& tangent : obstacleTangets) {
+      if (!isIntersectVectorWithGroup(from, tangent, obstaclePos, radius, group)) {
+        /// отклонение от нормально движения, чем больше тем больше отклонение, интервал от 0 до 2
+        double deviation = 1 - delta.dot(tangent);
+        double length = abs((obstaclePos - from).dot(tangent));
+
+        assert(resultIndex < 2); // всегда должно получаться 2
+        result[resultIndex++] = {deviation, obstaclePos,  MAX(1, length), tangent};
+        maxRadius = MAX(maxRadius, obstacle.getRadius());
+      }
     }
   }
 
-  std::sort(dataArr.begin(), dataArr.end(), [] (ObstacleData a, ObstacleData b) {
-    return a.deviation < b.deviation;
-  });
+  if (0 == resultIndex) {
+    /// нет возможности выйти из группы - окружен.
+    return Vector();
+  }
+  assert(2 == resultIndex);
 
+  int obstacleCount[2] = {0, 0};
+  for (const auto& obstacle : group) {
+    Vector obstacleVec = EX::pos(obstacle) - from;
 
-  /// идем от меньшего отклонения к большему, и проверяем что нет пересечений.
-  for (const ObstacleData& data : dataArr) {
-    if (!isIntersectVectorWithGroup(from, data.tangent, data.pos, radius, group)) {
-      double length = abs((data.pos - from).dot(data.tangent.normal()));
-      length = MAX(1, length);
-
-      return data.tangent.normal() * length;
+    int sign0 = SIGN(delta.cross(obstacleVec));
+    int sign1 = SIGN(result[0].tangent.cross(obstacleVec));
+    //int sing2 = SIGN(result[1].tangent.cross(obstacleVec));
+    if (sign1 == sign0) {
+      obstacleCount[1]++;
+    } else {
+      obstacleCount[0]++;
     }
-
   }
 
-  /// нет возможности выйти из группы - окружен.
-  return Vector();
+  double distance = (result[0].pos - result[1].pos).length();
+  if (obstacleCount[0] == obstacleCount[1] || Math::distanceToLine(from, result[0].pos, result[1].pos) > distance) {
+    resultIndex = (result[0].deviation < result[1].deviation) ? 0 : 1;
+  } else {
+    resultIndex = (obstacleCount[0] < obstacleCount[1]) ? 0 : 1;
+  }
+
+  return result[resultIndex].tangent * result[resultIndex].length;
 }
 
 Vector Algorithm::move(const model::CircularUnit& unit, const Position& to, const ObstaclesGroups& obstacles) {
   const auto from = Position(unit.getX(), unit.getY());
+  const auto minLength = EX::maxSpeed(unit);
 
-  Position iterTo = to;
+  Vector tangent = to - from;
 
   ObstaclesGroups obstaclesGroups = obstacles;
 
   while (obstaclesGroups.size() > 0) {
-    const Obstacles* nearestGroup = findNearestGroup(from, unit.getRadius(), iterTo, obstaclesGroups);
+    const Obstacles* nearestGroup = findNearestGroup(from, unit.getRadius(), from + tangent, obstaclesGroups);
     if (nullptr == nearestGroup) { // препятствий на пути следования нет
       break;
     }
 
-    const auto tanget = findGroupPartsAndReturnTangets(from, unit.getRadius(), to, *nearestGroup);
+    tangent = findGroupPartsAndReturnTangets(from, unit.getRadius(), to, *nearestGroup);
+    double length = tangent.length();
     /// находимся в окружении
-    if (tanget.length2() < 1.0e-9) {
+    if (length< 1.0e-9) {
       return Vector();
+    } else if (length < minLength) {
+      tangent = tangent.normal() * minLength;
+      break;
     }
 
-
-    iterTo = from + tanget;
-
+    // удаляем группу с которой уже пересеклись
     const size_t groupIndex = (nearestGroup - &obstaclesGroups[0]) / sizeof(Obstacles);
     obstaclesGroups.erase(obstaclesGroups.begin() + groupIndex);
   };
 
 
-  return calcVector(unit, iterTo);
+  return calcVector(unit, from + tangent);
 }
 
 Position simplePathToPosition(const Path& path) {

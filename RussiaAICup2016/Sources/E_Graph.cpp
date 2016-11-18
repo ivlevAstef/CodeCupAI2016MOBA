@@ -203,9 +203,8 @@ void Graph::initDefaultGraph() {
 
 
 void Graph::initDefaultPointMemory() {
-  const auto model = World::instance().model();
-  const auto width = model.getWidth();
-  const auto height = model.getHeight();
+  const auto width = 4000; /// хардкодим по жескому
+  const auto height = 4000; /// хардкодим по жескому
   const auto padding = 0.05;
 
   const auto left = width * padding;
