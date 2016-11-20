@@ -27,8 +27,8 @@ MoveCommandPtr CommandFabric::keepDistance(const double x, const double y, const
   return std::make_shared<CommandKeepDistance>(x, y, minDistance, maxDistance);
 }
 
-MoveCommandPtr CommandFabric::moveToPoint(const double x, const double y, const TurnStyle style) const {
-  return std::make_shared<CommandMoveToPoint>(x, y, style);
+MoveCommandPtr CommandFabric::moveToPoint(const double x, const double y, const TurnStyle style, const double speedLimit) const {
+  return std::make_shared<CommandMoveToPoint>(x, y, style, speedLimit);
 }
 
 MoveCommandPtr CommandFabric::moveToLine(const model::LaneType line) const {

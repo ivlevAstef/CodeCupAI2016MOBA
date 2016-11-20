@@ -21,6 +21,8 @@ namespace AICup
       Vector moveDirection; /// вместе с длиной
       TurnStyle turnStyle;
 
+      double speedLimit;
+
       int priority;
     };
 

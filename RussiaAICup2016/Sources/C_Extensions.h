@@ -20,6 +20,9 @@ namespace AICup
     }
 
     double maxSpeed(const model::CircularUnit& obj);
+    double maxStrafeSpeed(const model::Wizard& obj);
+    double maxBackwardSpeed(const model::Wizard& obj);
+
     double radiusForGuaranteedHit(const model::Wizard& obj);
 
     std::vector<bool> availableSkills(const model::Wizard& obj);

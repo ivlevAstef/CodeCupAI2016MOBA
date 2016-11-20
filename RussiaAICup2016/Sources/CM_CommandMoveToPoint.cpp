@@ -11,8 +11,8 @@
 
 using namespace AICup;
 
-CommandMoveToPoint::CommandMoveToPoint(const double x, const double y, const TurnStyle style):
-  point(x, y), style(style) {
+CommandMoveToPoint::CommandMoveToPoint(const double x, const double y, const TurnStyle style, const double speedLimit):
+  point(x, y), style(style), speedLimit(speedLimit) {
 }
 
 bool CommandMoveToPoint::check(const model::Wizard& self) {
@@ -31,6 +31,7 @@ void CommandMoveToPoint::execute(const model::Wizard& self, Result& result) {
   result.moveDirection = Algorithm::move(self, path, obstaclesGroups, self.getVisionRange() * 2);
   result.turnStyle = style;
   result.priority = priority(self);
+  result.speedLimit = speedLimit;
 }
 
 #ifdef ENABLE_VISUALIZATOR

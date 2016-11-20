@@ -19,6 +19,10 @@ TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric
 void TestMoveAndAttackStrategy::update(const model::Wizard& self, model::Move& move) {
   CommandStategy::clear();
 
+  if (2.5 * 2.5 > self.getSpeedX()*self.getSpeedX() + self.getSpeedY()*self.getSpeedY()) {
+    printf("Small Speed: %f %f\n", self.getSpeedX(), self.getSpeedY());
+  }
+
   for (const auto& enemy : World::instance().aroundEnemies(self)) {
     const auto attackCommand = fabric.attack(enemy->getId());
     if (attackCommand->check(self)) {

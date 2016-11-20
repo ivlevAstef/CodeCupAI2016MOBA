@@ -10,7 +10,7 @@ static long long idIndex = 100000;
 Tree::Tree(const model::Tree& tree, double radius):
   model::Tree(++idIndex,
     tree.getX(), tree.getY(), 0, 0, 0,
-    model::FACTION_ACADEMY, tree.getRadius(), tree.getLife(), tree.getMaxLife(), std::vector<model::Status>())
+    model::FACTION_ACADEMY, radius, tree.getLife(), tree.getMaxLife(), std::vector<model::Status>())
 {
 }
 
@@ -31,7 +31,7 @@ Tree::Tree(double x, double y, double radius):
 Building::Building(const model::Building& building, double radius):
   model::Building(building.getId(),
     building.getX(), building.getY(), 0, 0, 0,
-    building.getFaction(), building.getRadius(),
+    building.getFaction(), radius,
     building.getLife(), building.getMaxLife(),
     std::vector<model::Status>(),
     building.getType(), building.getVisionRange(), building.getAttackRange(),

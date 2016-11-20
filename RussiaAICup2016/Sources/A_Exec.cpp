@@ -6,15 +6,19 @@
 
 using namespace AICup;
 
-bool Algorithm::execMove(const model::Wizard& self, const TurnStyle style, const Vector& direction, model::Move& move) {
+bool Algorithm::execMove(const model::Wizard& self, const TurnStyle style, const Vector& direction, const double speedLimit, model::Move& move) {
   ///вообще я так и не понял как эта магия работает, но без двух минусов не пашет
   Vector speed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
   speed.y *= -1;
 
-  const double directionLength = direction.length();
-  const double maxSpeed = EX::maxSpeed(self);
+  double maxSpeed = (speed.x > 0) ? EX::maxSpeed(self) : EX::maxBackwardSpeed(self);
+  maxSpeed = maxSpeed * abs(speed.x/(speed.x+speed.y)) + EX::maxStrafeSpeed(self) * abs(speed.y/(speed.x + speed.y));
 
-  speed *= MIN(directionLength, maxSpeed);
+  if (speedLimit < 0) {
+    speed *= MIN(maxSpeed, direction.length());
+  } else {
+    speed *= MIN(maxSpeed, MIN(speedLimit, direction.length()));
+  }
 
   move.setSpeed(speed.x);
   move.setStrafeSpeed(speed.y);

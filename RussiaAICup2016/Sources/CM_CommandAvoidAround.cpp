@@ -80,6 +80,7 @@ void CommandAvoidAround::execute(const model::Wizard& self, Result& result) {
   result.moveDirection = Algorithm::move(self, pos, obstaclesGroups);
   result.turnStyle = TurnStyle::BACK_TURN;
   result.priority = priority(self);
+  result.speedLimit = -1;
 }
 
 

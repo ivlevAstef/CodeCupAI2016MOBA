@@ -11,9 +11,10 @@ CommandStategy::CommandStategy(const CommandFabric& fabric) : fabric(fabric) {
 void CommandStategy::update(const model::Wizard& self, model::Move& finalMove) {
   if (!moveCommands.empty()) {
     TurnStyle turnStyle;
-    const Vector direction = move(self, turnStyle);
+    double speedLimit = -1;
+    const Vector direction = move(self, turnStyle, speedLimit);
 
-    Algorithm::execMove(self, turnStyle, direction, finalMove);
+    Algorithm::execMove(self, turnStyle, direction, speedLimit, finalMove);
   }
 
   if (!attackCommands.empty()) {
@@ -29,7 +30,7 @@ void CommandStategy::clear() {
   attackCommands.clear();
 }
 
-const Vector CommandStategy::move(const model::Wizard& self, TurnStyle& turnStyle) {
+const Vector CommandStategy::move(const model::Wizard& self, TurnStyle& turnStyle, double& speedLimit) {
   std::vector<MoveCommand::Result> moveResults;
   moveResults.resize(moveCommands.size());
 
@@ -50,6 +51,10 @@ const Vector CommandStategy::move(const model::Wizard& self, TurnStyle& turnStyl
     if (result.priority > maxPriority) {
       turnStyle = result.turnStyle;
       maxPriority = result.priority;
+    }
+
+    if (result.speedLimit > 0 && (result.speedLimit < speedLimit || speedLimit < 0)) {
+      speedLimit = result.speedLimit;
     }
   }
 

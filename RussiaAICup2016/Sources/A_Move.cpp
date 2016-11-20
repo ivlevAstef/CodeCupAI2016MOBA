@@ -12,61 +12,13 @@ std::vector<Position> Algorithm::path(const Position from, const Position to, do
 }
 
 
-/// Если вектор выходит за границы карты это плохо, так как мы будем туда пытаться дойти но не сможем.
-/// Поэтому эта функция исправляет вектор, чтобы он не уходил за пределы карты
-const Position fitToMapRect(const model::CircularUnit& unit, const Position& toBase) {
-  static const Vector axisOX = Position(1, 0);
-  static const Vector axisOY = Position(0, 1);
-
-  const double padding = unit.getRadius();
-  const double size = 4000;
-
-  const auto vec = toBase - Position(unit.getX(), unit.getY());
-  double vecLength = vec.length();
-
-  Position result(
-    MAX(padding, MIN(toBase.x, size - padding)),
-    MAX(padding, MIN(toBase.y, size - padding))
-    );
-
-  vecLength -= (result - Position(unit.getX(), unit.getY())).length();
-
-  bool needXOverride = toBase.x < padding || toBase.x > size - padding;
-  bool needYOverride = toBase.y < padding || toBase.y > size - padding;
-
-  /// если мы пытаемся уйти в угол, то все плохо
-  /// пока будем считать, что это смерть
-  if (needXOverride && needYOverride) {
-    return result;
-  }
-
-  /// далее проецируем вектор на ось - узнаем знак тем самым
-  /// сдигаемся по оси с нужным знаком на длину вектора старого - длина вектора нового
-
-  if (needXOverride) {
-    result += (axisOY * vec.dot(axisOY)).normal() * vecLength;
-  }
-
-  if (needYOverride) {
-    result += (axisOX * vec.dot(axisOX)).normal() * vecLength;
-  }
-
-
-  return result;
-}
-//TODO: удалить оба метода, один заменить на массив деревьев по краю, второй на прямую вствавку кода
-Vector calcVector(const model::CircularUnit& unit, const Position& to) {
-  return fitToMapRect(unit, to) - EX::pos(unit);
-}
-
 /// находит ближайшую группу, с которой пересекаеться вектор движения юнита.
 const Obstacles* findNearestGroup(const Position& from, const double radius, const Position& to, const ObstaclesGroups& obstacles, double& minDistance) {
-  minDistance = 100000;
   const Obstacles* nearestGroup = nullptr;
 
   for (const auto& group : obstacles) {
     for (const auto& obstacle : group) {
-      const auto obstaclePos = Position(obstacle.getX(), obstacle.getY());
+      const auto obstaclePos = EX::pos(obstacle);
       const auto fullRadius = radius + obstacle.getRadius();
 
       /// проверяем перечение с препятствием, но увеличенного радиуса, так как пряпятствия стоят не притык друг к другу
@@ -77,7 +29,7 @@ const Obstacles* findNearestGroup(const Position& from, const double radius, con
         }
 
         /// препятствие дальше точки окончания движения
-        if ((from - to).length() < (obstaclePos - to).length() - fullRadius) {
+        if ((to - from).length() < (obstaclePos - from).length() - fullRadius) {
           continue;
         }
 
@@ -111,16 +63,16 @@ void setTangetsDirection(const Position& from, const Position& obstaclePos, std:
 
 
 bool isIntersectVectorWithGroup(const Position& from, const Vector& vec, const Position& checkPos, const double radius, const Obstacles& group) {
-  const Position p2 = from + vec * 10000;
+  const Position p2 = from + vec;
   for (const auto& obstacle : group) {
-    const auto obstaclePos = Position(obstacle.getX(), obstacle.getY());
+    const auto obstaclePos = EX::pos(obstacle);
     /// игнорируем самого себя
-    if ((obstaclePos - checkPos).length2() < 1) {
+    if ((obstaclePos - checkPos).length2() < 0.1) {
       continue;
     }
 
-    const double distance = Math::distanceToSegment(obstaclePos, from, p2);
-    if (distance < obstacle.getRadius() + radius) {
+    const double distance = Math::distanceToLine(obstaclePos, from, p2);
+    if (vec.dot(obstaclePos - from) >=0 && distance < obstacle.getRadius() + radius) {
       return true;
     }
   }
@@ -203,39 +155,40 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
 }
 
 Vector Algorithm::move(const model::CircularUnit& unit, const Position& to, const ObstaclesGroups& obstacles) {
-  const auto from = Position(unit.getX(), unit.getY());
-  const auto minLength = EX::maxSpeed(unit);
+  const auto from = EX::pos(unit);
 
+  Vector toIter = to;
   Vector tangent = to - from;
+  bool found = false;
 
   ObstaclesGroups obstaclesGroups = obstacles;
 
   while (obstaclesGroups.size() > 0) {
-    double minDistance = 0;
-    const Obstacles* nearestGroup = findNearestGroup(from, unit.getRadius(), from + tangent, obstaclesGroups, minDistance);
+    double minDistance = 4000;
+    const Obstacles* nearestGroup = findNearestGroup(from, unit.getRadius(), toIter, obstaclesGroups, minDistance);
     if (nullptr == nearestGroup) { // препятствий на пути следования нет
+      if (found) {
+        tangent = tangent.normal() * minDistance;
+      }
       break;
     }
-    minDistance = MAX(1, minDistance);
 
+    found = true;
     tangent = findGroupPartsAndReturnTangets(from, unit.getRadius(), to, *nearestGroup);
-    tangent = minDistance < tangent.length() ? tangent.normal() * minDistance : tangent;
-    double length = tangent.length();
+
     /// находимся в окружении
-    if (length< 1.0e-9) {
+    if (tangent.length() < 1.0e-9) {
       return Vector();
-    } else if (length < minLength) {
-      tangent = tangent.normal() * minLength;
-      break;
     }
+
+    toIter = from + ((tangent.length() < minDistance) ? tangent : tangent.normal() * minDistance);
 
     // удаляем группу с которой уже пересеклись
     const size_t groupIndex = nearestGroup - &obstaclesGroups[0];
     obstaclesGroups.erase(obstaclesGroups.begin() + groupIndex);
-  };
+  }
 
-
-  return calcVector(unit, from + tangent);
+  return tangent;
 }
 
 Position simplePathToPosition(const Path& path) {
@@ -283,7 +236,7 @@ Position adaptivePathToPosition(const Path& path, const model::Wizard& unit, con
 
 Vector Algorithm::move(const model::CircularUnit& unit, const Path& path) {
   const auto pos = simplePathToPosition(path);
-  return calcVector(unit, pos);
+  return pos - EX::pos(unit);
 }
 
 Vector Algorithm::move(const model::Wizard& unit, const Path& path) {
@@ -292,7 +245,7 @@ Vector Algorithm::move(const model::Wizard& unit, const Path& path) {
   /// не стоит применять его без учета препятствий, ибо они скорей всего будут, и мы в них уткнемся
   /// const auto pos = adaptivePathToPosition(path, unit);
 
-  return calcVector(unit, pos);
+  return pos - EX::pos(unit);
 }
 
 Vector Algorithm::move(const model::CircularUnit& unit, const Path& path, const ObstaclesGroups& obstacles) {

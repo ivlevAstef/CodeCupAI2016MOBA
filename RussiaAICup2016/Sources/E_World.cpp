@@ -40,7 +40,7 @@ const std::vector<model::Wizard>& World::wizards() const {
 void World::initTrees() {
   for (int x = 400; x <= 4000 - 400; x += 100) {
     for (int y = 400; y <= 4000 - 400; y += 100) {
-      if (-200 < (x - y) && (x - y) < 200) {
+      if (-400 < (x - y) && (x - y) < 400) {
         continue;
       }
 
@@ -83,7 +83,7 @@ static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vec
     for (const auto& vision : visionZone) {
       double dx = sIter.getX() - vision.getX();
       double dy = sIter.getY() - vision.getY();
-      if (sqrt(dx*dx + dy*dy) < vision.getVisionRange()) {
+      if (sqrt(dx*dx + dy*dy) < vision.getVisionRange() - sIter.getRadius()) {
         found = true;
         break;
       }

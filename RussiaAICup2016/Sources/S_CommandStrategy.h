@@ -34,7 +34,7 @@ namespace AICup
     void clear();
 
   private:
-    const Vector move(const model::Wizard& self, TurnStyle& turnStyle);
+    const Vector move(const model::Wizard& self, TurnStyle& turnStyle, double& speedLimit);
     const model::LivingUnit& attack(const model::Wizard& self, model::ActionType& action);
 
   protected:

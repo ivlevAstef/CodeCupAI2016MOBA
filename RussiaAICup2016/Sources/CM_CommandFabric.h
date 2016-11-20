@@ -20,7 +20,7 @@ namespace AICup
     MoveCommandPtr keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const;
 
     /// переместиться в точку
-    MoveCommandPtr moveToPoint(const double x, const double y, const TurnStyle style = TurnStyle::TURN) const;
+    MoveCommandPtr moveToPoint(const double x, const double y, const TurnStyle style = TurnStyle::TURN, const double speedLimit = -1) const;
 
     /// переместиться на линию
     MoveCommandPtr moveToLine(const model::LaneType line) const;

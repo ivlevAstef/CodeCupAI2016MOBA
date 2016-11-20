@@ -7,6 +7,35 @@
 
 using namespace AICup;
 
+double speedFactor(const model::LivingUnit& obj) {
+  const auto wizard = dynamic_cast<const model::Wizard*>(&obj);
+  const auto minion = dynamic_cast<const model::Minion*>(&obj);
+
+  double factor = 1;
+
+  for (const auto& status : obj.getStatuses()) {
+    if (model::STATUS_HASTENED == status.getType()) {
+      factor *= (1.0 + Game::instance().model().getHastenedMovementBonusFactor());
+    }
+  }
+
+  if (nullptr != wizard) {
+    for (const auto& skill : wizard->getSkills()) {
+      if (model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_1 == skill) {
+        factor *= (1.0 + Game::instance().model().getMovementBonusFactorPerSkillLevel());
+      } else if (model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_1 == skill) {
+        factor *= (1.0 + 2 * Game::instance().model().getMovementBonusFactorPerSkillLevel());
+      } else if (model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_2 == skill) {
+        factor *= (1.0 + 3 * Game::instance().model().getMovementBonusFactorPerSkillLevel());
+      } else if (model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_2 == skill) {
+        factor *= (1.0 + 4 * Game::instance().model().getMovementBonusFactorPerSkillLevel());
+      }
+    }
+  }
+
+  return factor;
+}
+
 double EX::maxSpeed(const model::CircularUnit& obj) {
   const auto livingObj = dynamic_cast<const model::LivingUnit*>(&obj);
   if (nullptr == livingObj) {
@@ -23,28 +52,17 @@ double EX::maxSpeed(const model::CircularUnit& obj) {
     maxSpeed = Game::instance().model().getMinionSpeed();
   }
 
+  return maxSpeed * speedFactor(*livingObj);
+}
 
-  for (const auto& status : livingObj->getStatuses()) {
-    if (model::STATUS_HASTENED == status.getType()) {
-      maxSpeed *= (1.0 + Game::instance().model().getHastenedMovementBonusFactor());
-    }
-  }
+double EX::maxStrafeSpeed(const model::Wizard& obj) {
+  double maxSpeed = Game::instance().model().getWizardStrafeSpeed();
+  return maxSpeed *= speedFactor(obj);
+}
 
-  if (nullptr != wizard) {
-    for (const auto& skill : wizard->getSkills()) {
-      if (model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_1 == skill) {
-        maxSpeed *= (1.0 + Game::instance().model().getMovementBonusFactorPerSkillLevel());
-      } else if (model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_1 == skill) {
-        maxSpeed *= (1.0 + 2 * Game::instance().model().getMovementBonusFactorPerSkillLevel());
-      } else if (model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_2 == skill) {
-        maxSpeed *= (1.0 + 3 * Game::instance().model().getMovementBonusFactorPerSkillLevel());
-      } else if (model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_2 == skill) {
-        maxSpeed *= (1.0 + 4 * Game::instance().model().getMovementBonusFactorPerSkillLevel());
-      }
-    }
-  }
-
-  return maxSpeed;
+double EX::maxBackwardSpeed(const model::Wizard& obj) {
+  double maxSpeed = Game::instance().model().getWizardBackwardSpeed();
+  return maxSpeed *= speedFactor(obj);
 }
 
 double EX::radiusForGuaranteedHit(const model::Wizard& obj) {
