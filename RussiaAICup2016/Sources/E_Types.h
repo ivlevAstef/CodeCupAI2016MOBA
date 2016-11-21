@@ -7,15 +7,14 @@
 
 #pragma once
 
-#include "model\CircularUnit.h"
+#include "model\LivingUnit.h"
 #include "C_Vector2D.h"
 #include <vector>
 
 namespace AICup
 {
-  typedef std::vector<model::CircularUnit> Obstacles;
+  typedef std::vector<model::LivingUnit> Obstacles;
   typedef std::vector<Obstacles> ObstaclesGroups;
-  typedef std::vector<Position> Path;
 
   enum class TurnStyle {
     TURN,

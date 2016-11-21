@@ -1,15 +1,14 @@
 //
-//File: E_Graph.h
+//File: E_Points.h
 //Author: Ivlev Alexander. Stef
 //Created: 07/11/2016
+//Renamed: 21/11/2016
 //
 
 #pragma once
 
 #include "C_Singleton.h"
 #include "C_Vector2D.h"
-#include "E_Types.h"
-#include "model/LaneType.h"
 #include <vector>
 
 #ifdef ENABLE_VISUALIZATOR
@@ -18,18 +17,7 @@
 
 namespace AICup
 {
-  class Graph: public Singleton<Graph> {
-  private:
-    typedef Position Point;
-
-    struct Join {
-      size_t p1Index;
-      size_t p2Index;
-      double weight;
-    };
-
-    typedef std::vector<size_t> JoinsForPoint;
-
+  class Points: public Singleton<Points> {
   public:
     enum PointType {
       ACADEMY_BASE = 0,
@@ -67,7 +55,6 @@ namespace AICup
 
       /// additional
 
-
       CENTER_BONUS_TOP,
       CENTER_ACADEMY,
       CENTER_BONUS_BOTTOM,
@@ -85,34 +72,19 @@ namespace AICup
     };
 
   public:
-    Graph();
+    Points();
 
-    Path path(const Position& from, const Position& to, double& length);
-
-    const Position& position(PointType type) const;
-
-    void update(); /// использует World
+    static const Position& point(PointType type);
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const;
 #endif // ENABLE_VISUALIZATOR
 
-  private:
-    void initDefaultGraph();
-    void initDefaultPointMemory();
-    void initDefaultJoinMemory();
-
-    const size_t addPoint(const Position& pos);
-    void adaptPoints(const size_t p1Index, const size_t p2Index);
-
-    void updatePointsByMemory();
-
-    std::vector<size_t> dijkstraPath(const size_t& fromPIndex, const size_t& toPIndex, double& length);
 
   private:
-    std::vector<Join> joinMemory;
-    std::vector<Point> pointMemory;
+    void initPoints();
 
-    std::vector<JoinsForPoint> joinsForPoints;
+  private:
+    std::vector<Position> points;
   };
 }

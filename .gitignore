@@ -6,3 +6,6 @@ RussiaAICup2016/RussiaAICup2016/Debug/
 RussiaAICup2016/Sources/Sources.zip
 RussiaAICup2016/RussiaAICup2016/x64/
 RussiaAICup2016/x64/Debug/cpp-cgdk.pdb
+RussiaAICup2016/RussiaAICup2016/Release/
+*.vspx
+RussiaAICup2016/Release/

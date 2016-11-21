@@ -9,7 +9,7 @@
 #include "CM_CommandMoveToPoint.h"
 #include "CM_CommandKeepDistance.h"
 #include "E_World.h"
-#include "E_Graph.h"
+#include "E_Points.h"
 #include "E_Game.h"
 #include "C_Math.h"
 
@@ -32,19 +32,19 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
   }
 
 
-  const auto topBonusPos = Graph::instance().position(Graph::BONUS_TOP);
-  const auto bottomBonusPos = Graph::instance().position(Graph::BONUS_BOTTOM);
+  const auto topBonusPos = Points::point(Points::BONUS_TOP);
+  const auto bottomBonusPos = Points::point(Points::BONUS_BOTTOM);
 
   /// к сожалению длина пути считаеться по графу где можно точно пройти, а он обычно длинее чем реальный путь
   /// поэтому в вычислениях береться среднее значение между прямым путем, и путем по графу (лучшебы какоенибудь другое но пока такое)
 
   double length = 99999;
-  Graph::instance().path(selfPos, topBonusPos, length); // сам путь нас не интерисует
+  //Graph::instance().path(selfPos, topBonusPos, length); // сам путь нас не интерисует
   length = length * 0.25 + (selfPos - topBonusPos).length() * 0.75;
   double ticksToTop = length / Game::instance().model().getWizardForwardSpeed();
 
   length = 99999;
-  Graph::instance().path(selfPos, bottomBonusPos, length); // сам путь нас не интерисует
+  //Graph::instance().path(selfPos, bottomBonusPos, length); // сам путь нас не интерисует
   length = length * 0.25 + (selfPos - topBonusPos).length() * 0.75;
   double ticksToBottom = length / Game::instance().model().getWizardForwardSpeed();
 

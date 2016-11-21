@@ -1,6 +1,6 @@
 #include "S_FirstStrategy.h"
 #include "E_World.h"
-#include "E_Graph.h"
+#include "E_Points.h"
 #include "C_Math.h"
 
 using namespace AICup;
@@ -104,7 +104,7 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
 void FirstStrategy::changeLane(const model::Wizard& self) {
   const auto selfPos = Position(self.getX(), self.getY());
 
-  const auto basePosition = Graph::instance().position(Graph::ACADEMY_BASE);
+  const auto basePosition = Points::point(Points::ACADEMY_BASE);
   const auto topPosition = World::instance().linePosition(model::LANE_TOP);
   const auto middlePosition = World::instance().linePosition(model::LANE_MIDDLE);
   const auto bottomPosition = World::instance().linePosition(model::LANE_BOTTOM);

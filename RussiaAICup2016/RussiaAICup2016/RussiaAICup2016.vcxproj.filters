@@ -54,9 +54,6 @@
     <ClCompile Include="..\Sources\CM_CommandFabric.cpp">
       <Filter>Sources\Command</Filter>
     </ClCompile>
-    <ClCompile Include="..\Sources\E_Graph.cpp">
-      <Filter>Sources\Environment</Filter>
-    </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandFollow.cpp">
       <Filter>Sources\Command\Commands\move</Filter>
     </ClCompile>
@@ -138,6 +135,12 @@
     <ClCompile Include="..\Sources\E_WorldObjects.cpp">
       <Filter>Sources\Environment</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\A_PathFinder.cpp">
+      <Filter>Sources\Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\E_Points.cpp">
+      <Filter>Sources\Environment</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -160,9 +163,6 @@
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandFabric.h">
       <Filter>Sources\Command</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\E_Graph.h">
-      <Filter>Sources\Environment</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandFollow.h">
       <Filter>Sources\Command\Commands\move</Filter>
@@ -246,6 +246,12 @@
       <Filter>Sources\Algorithms</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\E_WorldObjects.h">
+      <Filter>Sources\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\A_PathFinder.h">
+      <Filter>Sources\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\E_Points.h">
       <Filter>Sources\Environment</Filter>
     </ClInclude>
   </ItemGroup>

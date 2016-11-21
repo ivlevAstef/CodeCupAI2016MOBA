@@ -75,9 +75,9 @@ void CommandAvoidAround::execute(const model::Wizard& self, Result& result) {
   summaryMoveVector /= summaryPriority;
 
   const auto pos = selfPos + summaryMoveVector.normal() * self.getVisionRange();
-  const auto obstaclesGroups = World::instance().obstaclesGroup(self);
+  const auto obstaclesGroups = World::instance().obstaclesGroup(self, self.getVisionRange());
 
-  result.moveDirection = Algorithm::move(self, pos, obstaclesGroups);
+  result.moveDirection = Algorithm::move(self, pos, obstaclesGroups, self.getVisionRange());
   result.turnStyle = TurnStyle::BACK_TURN;
   result.priority = priority(self);
   result.speedLimit = -1;

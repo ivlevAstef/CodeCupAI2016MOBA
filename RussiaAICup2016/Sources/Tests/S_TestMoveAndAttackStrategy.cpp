@@ -4,7 +4,7 @@
 using namespace AICup;
 
 TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric) : CommandStategy(fabric) {
-  currentMoveCommandIndex = 0;
+  currentMoveCommandIndex = 2;
 
   allMoveCommands.push_back(fabric.moveToPoint(800, 3200));
   allMoveCommands.push_back(fabric.moveToPoint(200, 2400));

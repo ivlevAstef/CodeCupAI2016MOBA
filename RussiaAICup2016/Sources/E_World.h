@@ -34,8 +34,8 @@ namespace AICup
     const std::vector<model::Building>& buildings() const;
     const std::vector<model::Wizard>& wizards() const;
 
-    Obstacles obstacles(const model::Wizard& unit, double range = -1) const;
-    ObstaclesGroups obstaclesGroup(const model::Wizard& unit, double range = -1) const;
+    Obstacles obstacles(const model::CircularUnit& unit, const double range, const bool onlyStatic = false) const;
+    ObstaclesGroups obstaclesGroup(const model::CircularUnit& unit, const double range, const bool onlyStatic = false) const;
 
     const model::LivingUnit* unit(long long id) const;
 

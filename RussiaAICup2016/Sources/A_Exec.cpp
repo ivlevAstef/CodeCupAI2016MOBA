@@ -6,13 +6,38 @@
 
 using namespace AICup;
 
+static std::vector<Position> stackForBugFix;
+
+/// один из способов выбраться из ситуации когда алгоритм дал багу и не может выйти/ найти путь
+void TwitchOperator(const model::Wizard& self, Vector& speed, model::Move& move) {
+  const auto selfPos = EX::pos(self);
+
+  stackForBugFix.push_back(EX::pos(self));
+  while (stackForBugFix.size() > 5) {
+    stackForBugFix.erase(stackForBugFix.begin());
+  }
+
+  for (const auto& data : stackForBugFix) {
+    if ((data - selfPos).length() > EX::maxSpeed(self)) {
+      return;
+    }
+  }
+
+  speed.x = EX::maxSpeed(self) * (rand() % 1000) / 1000;
+  speed.y = EX::maxStrafeSpeed(self) * (rand() % 1000) / 1000;
+  move.setTurn(((rand() % 100) / 100) - 0.5);
+  printf("Twitch\n");
+}
+
 bool Algorithm::execMove(const model::Wizard& self, const TurnStyle style, const Vector& direction, const double speedLimit, model::Move& move) {
   ///вообще я так и не понял как эта магия работает, но без двух минусов не пашет
   Vector speed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
   speed.y *= -1;
 
   double maxSpeed = (speed.x > 0) ? EX::maxSpeed(self) : EX::maxBackwardSpeed(self);
-  maxSpeed = maxSpeed * abs(speed.x/(speed.x+speed.y)) + EX::maxStrafeSpeed(self) * abs(speed.y/(speed.x + speed.y));
+  const double sx = abs(speed.x);
+  const double sy = abs(speed.y);
+  maxSpeed = (maxSpeed * sx + EX::maxStrafeSpeed(self) * sy)/(sx + sy);
 
   if (speedLimit < 0) {
     speed *= MIN(maxSpeed, direction.length());
@@ -35,6 +60,8 @@ bool Algorithm::execMove(const model::Wizard& self, const TurnStyle style, const
   default:
     assert(false && "incorrect turn style");
   }
+
+  //TwitchOperator(self, speed, move);
 
   return true;
 }

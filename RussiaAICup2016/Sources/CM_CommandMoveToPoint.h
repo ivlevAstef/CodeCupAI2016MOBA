@@ -11,6 +11,7 @@
 #include "C_Vector2D.h"
 #include "E_Types.h"
 #include "A_Move.h"
+#include "A_PathFinder.h"
 
 namespace AICup
 {
@@ -33,9 +34,9 @@ namespace AICup
     const TurnStyle style;
     const double speedLimit;
 
-    Path path;
-    ObstaclesGroups obstaclesGroups;
-
-    double pathLength;
+    Algorithm::PathFinder path;
+    Position from;
+    Position preEndPoint;
+    Position endPoint;
   };
 }

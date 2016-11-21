@@ -8,8 +8,13 @@
 
 using namespace AICup;
 
-void Game::update(const model::Game& Game) {
-  modelGame = &Game;
+void Game::update(const model::Game& game) {
+  if (!isInitialized) {
+    srand(game.getRandomSeed());
+    isInitialized = true;
+  }
+
+  modelGame = &game;
 }
 
 model::Faction Game::enemyFaction(const model::Faction faction) const {

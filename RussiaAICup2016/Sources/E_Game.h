@@ -14,6 +14,9 @@ namespace AICup
 {
   class Game: public Singleton<Game> {
   public:
+    Game() : isInitialized(false) {
+    }
+
     void update(const model::Game& game);
 
     static inline const model::Game& model() {
@@ -24,5 +27,7 @@ namespace AICup
 
   private:
     const model::Game* modelGame;
+
+    bool isInitialized;
   };
 }

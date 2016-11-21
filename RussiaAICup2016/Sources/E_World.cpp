@@ -5,7 +5,7 @@
 //
 
 #include "E_World.h"
-#include "E_Graph.h"
+#include "E_Points.h"
 #include "E_Game.h"
 #include "C_Math.h"
 #include "E_WorldObjects.h"
@@ -56,9 +56,9 @@ void World::initTrees() {
 
 void World::initLinePosition() {
   /// а мы всегда одна фракция...
-  topLinePosition = Graph::instance().position(Graph::TOP_CENTER);
-  middleLinePosition = Graph::instance().position(Graph::CENTER_ACADEMY);
-  bottomLinePosition = Graph::instance().position(Graph::BOTTOM_CENTER);
+  topLinePosition = Points::point(Points::TOP_CENTER);
+  middleLinePosition = Points::point(Points::CENTER_ACADEMY);
+  bottomLinePosition = Points::point(Points::BOTTOM_CENTER);
 }
 
 template<typename Type, typename CreateType>
@@ -67,7 +67,7 @@ static std::vector<Type> updateRadius(const std::vector<Type>& real) {
   result.reserve(real.size());
 
   for (const auto& obj : real) {
-    result.push_back(CreateType(obj, obj.getRadius() + 0.1));
+    result.push_back(CreateType(obj, obj.getRadius() + 0.5));
   }
 
   return result;
@@ -83,7 +83,7 @@ static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vec
     for (const auto& vision : visionZone) {
       double dx = sIter.getX() - vision.getX();
       double dy = sIter.getY() - vision.getY();
-      if (sqrt(dx*dx + dy*dy) < vision.getVisionRange() - sIter.getRadius()) {
+      if (sqrt(dx*dx + dy*dy) < vision.getVisionRange() + sIter.getRadius()) {
         found = true;
         break;
       }
@@ -271,43 +271,41 @@ const int World::wizardCount(model::LaneType line, const model::Wizard& excludeW
   return result;
 }
 
-Obstacles World::obstacles(const model::Wizard& unit, double range) const {
+Obstacles World::obstacles(const model::CircularUnit& unit, const double range, const bool onlyStatic) const {
   Obstacles aroundObstacles;
-  aroundObstacles.reserve(32); // Приблизительно сколько объектов вокруг мага в среднем
-
-  double visionRange = (range < -1) ? unit.getVisionRange() : range;
+  aroundObstacles.reserve(64); // Приблизительно сколько объектов в среднем
 
   for (const auto& tree : trees()) {
-    if (unit.getDistanceTo(tree) < visionRange) {
+    if (unit.getDistanceTo(tree) < range) {
       aroundObstacles.push_back(tree);
     }
   }
 
-  for (const auto& minion : model().getMinions()) {
-    if (unit.getDistanceTo(minion) < visionRange) {
-      aroundObstacles.push_back(minion);
-    }
-  }
-
   for (const auto& build : buildings()) {
-    if (unit.getDistanceTo(build) < visionRange) {
+    if (unit.getDistanceTo(build) < range) {
       aroundObstacles.push_back(build);
     }
   }
 
-  for (const auto& wizard : model().getWizards()) {
-    if (unit.getId() != wizard.getId() && unit.getDistanceTo(wizard) < visionRange) {
-      aroundObstacles.push_back(wizard);
+  if (!onlyStatic) {
+    for (const auto& minion : model().getMinions()) {
+      if (unit.getId() != minion.getId() && unit.getDistanceTo(minion) < range) {
+        aroundObstacles.push_back(minion);
+      }
+    }
+
+    for (const auto& wizard : model().getWizards()) {
+      if (unit.getId() != wizard.getId() && unit.getDistanceTo(wizard) < range) {
+        aroundObstacles.push_back(wizard);
+      }
     }
   }
-
-  //after model().getProjectiles()
 
   return aroundObstacles;
 }
 
-ObstaclesGroups World::obstaclesGroup(const model::Wizard& unit, double range) const {
-  const auto aroundObstacles = obstacles(unit, range);
+ObstaclesGroups World::obstaclesGroup(const model::CircularUnit& unit, const double range, const bool onlyStatic) const {
+  const auto aroundObstacles = obstacles(unit, range, onlyStatic);
 
   ObstaclesGroups result;
 
