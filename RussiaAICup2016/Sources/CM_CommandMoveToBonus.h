@@ -13,7 +13,7 @@ namespace AICup
 {
   class CommandMoveToBonus: public MoveCommand {
   public:
-    CommandMoveToBonus();
+    CommandMoveToBonus(Algorithm::PathFinder& finder);
 
     bool check(const model::Wizard& self) override;
 

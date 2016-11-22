@@ -13,8 +13,8 @@
 
 using namespace AICup;
 
-CommandFollow::CommandFollow(const long long unitId, const double minDistance, const double maxDistance):
-  unitId(unitId), minDistance(minDistance), maxDistance(maxDistance) {
+CommandFollow::CommandFollow(Algorithm::PathFinder& finder, const long long unitId, const double minDistance, const double maxDistance):
+  MoveCommand(finder), unitId(unitId), minDistance(minDistance), maxDistance(maxDistance) {
 }
 
 
@@ -34,11 +34,11 @@ bool CommandFollow::check(const model::Wizard& self) {
     /// противоположная точка, точке где находиться объект, и длиной = радиусу обзора
     const auto pos = selfPos + (selfPos - unitPos).normal() * self.getVisionRange();
 
-    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y, TurnStyle::BACK_TURN);
+    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::BACK_TURN);
   } else if (distance > maxDistance) {
     const auto pos = unitPos;
 
-    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y);
+    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y);
   } else {
     const auto currentBackVec = (selfPos - unitPos).normal();
 
@@ -47,7 +47,7 @@ bool CommandFollow::check(const model::Wizard& self) {
       // двигаться назад в центр дистанции
       const auto pos = unitPos + currentBackVec * (minDistance + (maxDistance - minDistance) * 0.5);
 
-      commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y);
+      commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y);
     } else {
       const auto backVec = Vector(1, 0).rotate(unit->getAngle() + AICUP_PI);
 
@@ -64,12 +64,12 @@ bool CommandFollow::check(const model::Wizard& self) {
         }
 
 
-        commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y, TurnStyle::TURN, speed.length());
+        commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::TURN, speed.length());
       } else {
         // двигаться за спину объекта в центр дистанции
         const auto pos = unitPos + backVec * (minDistance + (maxDistance - minDistance) * 0.5);
 
-        commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y);
+        commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y);
       }
     }
   }

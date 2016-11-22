@@ -8,55 +8,148 @@
 using namespace AICup;
 using namespace Algorithm;
 
-void PathFinder::setTo(const Position& to) {
-  this->to = to;
+
+Position PathConstants::toReal(Vector2D<int> point, double dx, double dy) {
+  return Position((point.x + dx) * step, (point.y + dy) * step);
+}
+Vector2D<int> PathConstants::toInt(Position point) {
+  return Vector2D<int>(floor(point.x / step), floor(point.y / step));
 }
 
 
-Position PathFinder::calculate(const model::CircularUnit& unit, const double visionRange) {
-  const auto t1 = std::chrono::high_resolution_clock::now();
 
-  const auto from = EX::pos(unit);
-  const double radius = unit.getRadius();
 
-  for (size_t x = 0; x < memorySize; x++) {
-    for (size_t y = 0; y < memorySize; y++) {
-      weights[x][y] = maxValue;
-      costs[x][y] = 1;
+
+Path::Path(Position from, Position to, const double radius, const Obstacles& obstacles):
+  from(from), to(to), radius(radius), obstacles(obstacles) {
+  length = 0;
+  count = 0;
+}
+
+/// проверяем что дерево невозможно обойти.
+/// для этого надо убедиться что есть объекты рядом и они по разную сторону от пути
+bool Path::checkRemoved(const Obstacles& obstacles, const model::LivingUnit* obstacleForRemove) const {
+  size_t neightborsCount[2] = {0, 0};
+
+  for (const auto& obstacle : obstacles) {
+    const auto fullRadius = obstacleForRemove->getRadius() + 2 * radius + obstacle->getRadius();
+
+    /// находим близкие объекты
+    if ( obstacle->getId() != obstacleForRemove->getId()
+      && obstacle->getDistanceTo(*obstacleForRemove) < fullRadius) {
+      const auto obstaclePos = EX::pos(*obstacle);
+      /// проверям с какой стороны пути препятствие
+      for (size_t i = 1; i < count; i++) {
+        const auto dir = path[i] - path[i - 1];
+        double t = (obstaclePos - path[i-1]).dot(dir.normal());
+        if (0 < t && t < dir.length()) {
+          double alpha = (EX::pos(*obstacle) - path[i]).cross(dir);
+          neightborsCount[alpha > 0 ? 0 : 1]++;
+        }
+      }
     }
   }
 
-  /// по краям переходы стоят очень дорого, чтобы нельзя было за них зайти
-  for (size_t i = 0; i < memorySize; i++) {
-    costs[i][0] = maxValue + 1;
-    costs[0][i] = maxValue + 1;
-    costs[i][memorySize - 1] = maxValue + 1;
-    costs[memorySize - 1][i] = maxValue + 1;
+  return neightborsCount[0] >= 1 && neightborsCount[1] >= 1;
+}
+
+Obstacles Path::removeObstacles(Obstacles& obstacles) const {
+  Obstacles result;
+
+  for (size_t i = 1; i < count; i++) {
+
+    /// находим ближайшее дерево к сегменту.
+    int obstacleRemoveIndex = -1;
+    double minDistance = 88888;
+    for (size_t obstacleIndex = 0; obstacleIndex < obstacles.size(); obstacleIndex++) {
+      const auto& obstacle = obstacles[obstacleIndex];
+      if (!EX::isTree(*obstacle)) {
+        continue;
+      }
+
+      const auto obstaclePos = EX::pos(*obstacle);
+      const auto fullRadius = radius + obstacle->getRadius();
+
+      const double distance = Math::distanceToSegment(obstaclePos, path[i - 1], path[i]);
+      if (distance < minDistance && distance < fullRadius) {
+        obstacleRemoveIndex = obstacleIndex;
+        minDistance = distance;
+      }
+    }
+
+    /// если есть дерево для удаления, и его стоит удалять
+    if (obstacleRemoveIndex > 0 && checkRemoved(obstacles, obstacles[obstacleRemoveIndex])) {
+      result.push_back(obstacles[obstacleRemoveIndex]);
+      obstacles.erase(obstacles.begin() + obstacleRemoveIndex);
+    }
   }
 
-  const auto toByInt = toInt(to);
-  const auto fromByInt = toInt(from);
+  return result;
+}
 
-  calculateCost(World::instance().obstacles(unit, (to - from).length(), true), radius);
-  calculateWeight(toByInt);
-  findPath(fromByInt, toByInt);
 
-  const auto t2 = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<float> fs = t2 - t1;
-  std::cout << fs.count() << std::endl;
-  std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(fs).count() << std::endl;
-  return calculateNearestCurvaturePoint(from, to, visionRange);
+Position Path::calculateNearestCurvaturePoint(const double visionRange) const {
+  /// находим самое дальнее пересечение с окружностью
+  for (size_t i = 1; i < count; i++) {
+    const auto intersections = Math::intersectSegmentWithCircle(from, visionRange, path[i-1], path[i]);
+    if (1 == intersections.size()) {
+      return intersections[0];
+    } else if (2 == intersections.size()) {
+      return (intersections[0] - from).length2() >(intersections[1] - from).length2() ? intersections[0] : intersections[1];
+    }
+  }
+
+  return to;
+}
+
+
+
+
+PathFinder::PathFinder() {
+}
+
+void PathFinder::calculate(const model::CircularUnit& unit) {
+  const auto lastByInt = PathConstants::toInt(from);
+
+  from = EX::pos(unit);
+  radius = unit.getRadius();
+  const auto fromByInt = PathConstants::toInt(from);
+
+  /// при переходе на новую клетку пересчитываем
+  if (lastByInt != fromByInt) {
+    clean();
+
+    obstacles = World::instance().allObstacles(unit, true);
+    calculateCost(obstacles, unit.getRadius());
+    /// расчитываем все веса из точки где мы находимся
+    calculateWeight(fromByInt);
+  }
+}
+
+void PathFinder::calculatePath(const Position& to, Path** path) const {
+  (*path) = new Path(from, to, radius, obstacles);
+
+  calculatePath(**path);
 }
 
 void PathFinder::calculateCost(const Obstacles& obstacles, const double radius) {
   for (const auto& obstacle : obstacles) {
-    const auto obstaclePos = EX::pos(obstacle);
-    const auto fullRadius = radius + obstacle.getRadius();
+    double life = 1;
+    if (EX::isTree(*obstacle)) {
+      life = 1.5 * (obstacle->getLife() / 12); /// дерево
+    } else if (EX::isNeutral(*obstacle)) {
+      life = 10.0 * (obstacle->getLife() / 12); /// нейтрал
+    } else {
+      life = obstacle->getMaxLife(); /// здания
+    }
 
-    const double minRealX = (obstaclePos.x - fullRadius) / step;
-    const double maxRealX = (obstaclePos.x + fullRadius) / step;
-    const double minRealY = (obstaclePos.y - fullRadius) / step;
-    const double maxRealY = (obstaclePos.y + fullRadius) / step;
+    const auto obstaclePos = EX::pos(*obstacle);
+    const auto fullRadius = radius + obstacle->getRadius();
+
+    const double minRealX = (obstaclePos.x - fullRadius) / PathConstants::step;
+    const double maxRealX = (obstaclePos.x + fullRadius) / PathConstants::step;
+    const double minRealY = (obstaclePos.y - fullRadius) / PathConstants::step;
+    const double maxRealY = (obstaclePos.y + fullRadius) / PathConstants::step;
 
     const size_t minX = floor(minRealX);
     const size_t maxX = ceil(maxRealX);
@@ -64,56 +157,55 @@ void PathFinder::calculateCost(const Obstacles& obstacles, const double radius) 
     const size_t maxY = ceil(maxRealY);
 
     for (size_t x = minX; x < maxX; x++) {
-      double sXMin = 1 - MAX(0, minRealX - double(x));
-      double sXMax = 1 - MAX(0, double(x + 1) - maxRealX);
+      double sxMin = 1 - MAX(0, minRealX - double(x));
+      double sxMax = 1 - MAX(0, double(x + 1) - maxRealX);
       for (size_t y = minY; y < maxY; y++) {
         double syMin = 1 - MAX(0, minRealY - double(y));
         double syMax = 1 - MAX(0, double(y + 1) - maxRealY);
 
-        costs[x][y] += (sXMin + sXMax)*(syMin + syMax) * (obstacle.getLife() / 12);
+        costs[x][y] += (sxMin + sxMax - 1)*(syMin + syMax - 1) * life;
+
+        assert(sxMin >= 0 && sxMax >= 0 && syMin >= 0 && syMax >= 0);
       }
     }
   }
 }
 
 void PathFinder::calculateWeight(Vector2D<int> to) {
-  struct Neighbors {
-    Vector2D<int> vec;
-    float mult;
-  };
-  static const Neighbors neighbors[8] = {
-    Neighbors{{-1,  0}, 1},
-    Neighbors{{ 0, -1}, 1},
-    Neighbors{{ 1,  0}, 1},
-    Neighbors{{ 0,  1}, 1},
-    Neighbors{{ 1,  1}, sqrtf(2)},
-    Neighbors{{ 1, -1}, sqrtf(2)},
-    Neighbors{{-1, -1}, sqrtf(2)},
-    Neighbors{{-1,  1}, sqrtf(2)}
+  static const size_t areaSize = PathConstants::maxPath;
+  static Vector2D<int> area[areaSize];
+  static const Vector2D<int> neighbors[4] = {
+    {-1,  0},
+    { 0, -1},
+    { 1,  0},
+    { 0,  1},
   };
 
   int areaBegin = 0;
   int areaEnd = 1;
 
   area[areaBegin].set(to.x, to.y);
-  weights[area[areaBegin].x][area[areaBegin].y] = 0;
+  weights[to.x][to.y] = 0;
 
+  double costMult = 1; //специальный чит, чтобы несколько деревьев подрят были не выгоды
   do {
     int newAreaEnd = areaEnd;
     int areaIndex = areaBegin;
+
     while (areaIndex != areaEnd) {
-      const int x = area[areaIndex].x;
-      const int y = area[areaIndex].y;
-      const int weight = weights[x][y];
+      const int& x = area[areaIndex].x;
+      const int& y = area[areaIndex].y;
+      const float& weight = weights[x][y];
 
-      for (const auto& neighbor : neighbors) {
-        const int nX = x + neighbor.vec.x;
-        const int nY = y + neighbor.vec.y;
-        const float w = weight + costs[nX][nY] * neighbor.mult;
-        if (weights[nX][nY] > w) {
-          weights[nX][nY] = w;
+      for (const auto& neighbor: neighbors) {
+        const int nX = x + neighbor.x;
+        const int nY = y + neighbor.y;
+        const float& cost = costs[nX][nY];
+        if (weights[nX][nY] > weight + cost) {
+          weights[nX][nY] = weight + cost;
 
-          area[newAreaEnd++] = {nX, nY};
+          area[newAreaEnd].set(nX, nY);
+          newAreaEnd = (newAreaEnd + 1) % areaSize;
         }
       }
 
@@ -121,11 +213,11 @@ void PathFinder::calculateWeight(Vector2D<int> to) {
     }
 
     areaBegin = areaEnd;
-    areaEnd = newAreaEnd % areaSize;
+    areaEnd = newAreaEnd;
   } while (areaBegin != areaEnd); // пока не посчитаем всю карту
 }
 
-void PathFinder::findPath(Vector2D<int> from, Vector2D<int> to) {
+void PathFinder::calculatePath(Path& path) const {
   static const Vector2D<int> neighbors[8] = {
     Vector2D<int>(-1,  0),
     Vector2D<int>(0, -1),
@@ -137,17 +229,24 @@ void PathFinder::findPath(Vector2D<int> from, Vector2D<int> to) {
     Vector2D<int>(-1,  1)
   };
 
-  pathSize = 0;
+  // ревертируем точки
+  const auto to = PathConstants::toInt(path.from);
+  const auto from = PathConstants::toInt(path.to);
 
-  if (weights[from.x][from.y] >= maxValue) {
+  path.count = 0;
+  path.length = 0;
+
+  if (weights[from.x][from.y] >= PathConstants::maxValue) {
     assert(false && "can't found path... really?");
     return;
   }
 
+
   Vector2D<int> iter = from;
+  Position lastPos = path.to;
   do {
     const Vector2D<int> pos = iter;
-    int minWeight = maxValue;
+    int minWeight = PathConstants::maxValue;
 
     for (const auto& neighbor : neighbors) {
       const int nX = pos.x + neighbor.x;
@@ -158,40 +257,60 @@ void PathFinder::findPath(Vector2D<int> from, Vector2D<int> to) {
       }
     }
 
-    path[pathSize++] = iter;
+    const auto realPos = PathConstants::toReal(iter, 0.5, 0.5);
+    path.path[path.count++] = realPos;
+    path.length += (realPos - lastPos).length();
+
+    lastPos = realPos;
   } while (iter != to);
 }
 
-Position PathFinder::calculateNearestCurvaturePoint(const Position& from, Position to, const double radius) {
-  /// первую точку проверяем с вещественной конечной точкой, а потом уже их смещаем
-  for (size_t i = 1; i < pathSize - 1; i++) {
-    const auto p1 = toReal(path[pathSize-i], 0.5, 0.5);
-    const auto p2 = toReal(path[pathSize-i-1], 0.5, 0.5);
 
-    const auto intersections = Math::intersectSegmentWithCircle(from, radius, p1, p2);
-    if (1 == intersections.size()) {
-      return intersections[0];
-    } else if (2 == intersections.size()) {
-      return (intersections[0] - from).length2() > (intersections[1] - from).length2() ? intersections[0]: intersections[1];
+void PathFinder::clean() {
+  for (size_t x = 0; x < PathConstants::memorySize; x++) {
+    for (size_t y = 0; y < PathConstants::memorySize; y++) {
+      weights[x][y] = PathConstants::maxValue;
+      costs[x][y] = 1;
     }
   }
 
-  return to;
-}
-
-Position PathFinder::toReal(Vector2D<int> point, double dx, double dy) const {
-  return Position((point.x + dx) * step, (point.y + dy) * step);
-}
-Vector2D<int> PathFinder::toInt(Position point) const {
-  return Vector2D<int>(floor(point.x / step), floor(point.y / step));
+  /// по краям переходы стоят очень дорого, чтобы нельзя было за них зайти
+  for (size_t i = 0; i < PathConstants::memorySize; i++) {
+    costs[i][0] = PathConstants::maxValue + 1;
+    costs[0][i] = PathConstants::maxValue + 1;
+    costs[i][PathConstants::memorySize - 1] = PathConstants::maxValue + 1;
+    costs[PathConstants::memorySize - 1][i] = PathConstants::maxValue + 1;
+  }
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void PathFinder::visualization(const Visualizator& visualizator) const {
-  for (size_t i = 1; i < pathSize; i++) {
-    const auto p1 = toReal(path[i-1], 0.5, 0.5);
-    const auto p2 = toReal(path[i], 0.5, 0.5);
-    visualizator.line(p1.x, p1.y, p2.x, p2.y, 0x00ff00);
+void Path::visualization(const Visualizator& visualizator) const {
+  if (Visualizator::POST == visualizator.getStyle()) {
+    for (size_t i = 1; i < count; i++) {
+      const auto& p1 = path[i-1];
+      const auto& p2 = path[i];
+      visualizator.line(p1.x, p1.y, p2.x, p2.y, 0x00ff00);
+    }
   }
+}
+
+
+void PathFinder::visualization(const Visualizator& visualizator) const {
+  /*if (Visualizator::ABS == visualizator.getStyle()) {
+    for (int x = 0; x < memorySize; x++) {
+      for (int y = 0; y < memorySize; y++) {
+
+        const double weight = weights[x][y] / 200;
+        int color = 255 - MIN(255, (int)(weight * 255));
+        visualizator.line(x, y, x, y, color << 8);
+      }
+    }
+
+    for (size_t i = 0; i < pathSize; i++) {
+      visualizator.line(path[i].x, path[i].y, path[i].x, path[i].y, 0xff0000);
+    }
+
+  }
+  */
 }
 #endif // ENABLE_VISUALIZATOR

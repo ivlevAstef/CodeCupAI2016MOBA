@@ -14,6 +14,9 @@ Tree::Tree(const model::Tree& tree, double radius):
 {
 }
 
+Tree::~Tree() {
+}
+
 
 int lifeByRadius(double radius) {
   double a = (radius - 20.0) / 30.0;

@@ -15,7 +15,7 @@ namespace AICup
 {
   class CommandAvoidEnemy: public MoveCommand {
   public:
-    CommandAvoidEnemy(const long long enemyId);
+    CommandAvoidEnemy(Algorithm::PathFinder& finder, const long long enemyId);
 
     bool check(const model::Wizard& self) override;
 

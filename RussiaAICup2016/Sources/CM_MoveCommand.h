@@ -9,6 +9,7 @@
 #include "CM_Command.h"
 #include "E_Types.h"
 #include "C_Vector2D.h"
+#include "A_PathFinder.h"
 
 namespace AICup
 {
@@ -24,11 +25,19 @@ namespace AICup
       double speedLimit;
 
       int priority;
+
+      Obstacles treesForRemove;
     };
 
   public:
+    MoveCommand(Algorithm::PathFinder& finder) : pathFinder(finder) {
+    }
+
     /// исполнить команду
     virtual void execute(const model::Wizard& self, Result& result) = 0;
+
+  protected:
+    Algorithm::PathFinder& pathFinder;
   };
 }
 

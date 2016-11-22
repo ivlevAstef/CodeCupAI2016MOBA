@@ -10,8 +10,8 @@
 
 namespace AICup
 {
-  class TestFollowStrategy: public CommandStategy {
+  class TestFollowStrategy: public CommandStrategy {
   public:
-    TestFollowStrategy(const CommandFabric& fabric);
+    TestFollowStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
   };
 };

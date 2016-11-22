@@ -13,7 +13,8 @@
 
 using namespace AICup;
 
-CommandAvoidAround::CommandAvoidAround() {
+CommandAvoidAround::CommandAvoidAround(Algorithm::PathFinder& finder):
+  MoveCommand(finder) {
 
 }
 
@@ -24,7 +25,7 @@ bool CommandAvoidAround::check(const model::Wizard& self) {
 
 
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + self.getRadius() * 2)) {
-    auto avoidCommand = CommandAvoidEnemy(enemy->getId());
+    auto avoidCommand = CommandAvoidEnemy(pathFinder, enemy->getId());
     if (avoidCommand.check(self)) {
       const auto priority = avoidCommand.priority(self);
       const auto enemyPos = Position(enemy->getX(), enemy->getY());
@@ -75,7 +76,8 @@ void CommandAvoidAround::execute(const model::Wizard& self, Result& result) {
   summaryMoveVector /= summaryPriority;
 
   const auto pos = selfPos + summaryMoveVector.normal() * self.getVisionRange();
-  const auto obstaclesGroups = World::instance().obstaclesGroup(self, self.getVisionRange());
+  const auto obstacles = World::instance().obstacles(self, self.getVisionRange());
+  const auto obstaclesGroups = World::instance().createGroup(obstacles, self.getRadius());
 
   result.moveDirection = Algorithm::move(self, pos, obstaclesGroups, self.getVisionRange());
   result.turnStyle = TurnStyle::BACK_TURN;

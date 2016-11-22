@@ -14,7 +14,7 @@ namespace AICup
 {
   class CommandMoveGetExpirience: public MoveCommand {
   public:
-    CommandMoveGetExpirience();
+    CommandMoveGetExpirience(Algorithm::PathFinder& finder);
 
     bool check(const model::Wizard& self) override;
 

@@ -5,7 +5,8 @@
 
 using namespace AICup;
 
-FirstStrategy::FirstStrategy(const CommandFabric& fabric) : CommandStategy(fabric) {
+FirstStrategy::FirstStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder) :
+  CommandStrategy(fabric, pathFinder) {
   isInitialized = false;
   lastChangeLineTick = 0;
 }
@@ -35,7 +36,7 @@ void FirstStrategy::init(const model::Wizard& self, model::Move& move) {
 }
 
 void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
-  CommandStategy::clear();
+  CommandStrategy::clear();
 
   /// раз в 500 тиков пересматриваю линию,
   /// 500 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
@@ -98,7 +99,7 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
      с) идем на ту линию где своих меньше (дабы побольше оттяпать)
  */
 
-  CommandStategy::update(self, move);
+  CommandStrategy::update(self, move);
 }
 
 void FirstStrategy::changeLane(const model::Wizard& self) {

@@ -13,7 +13,8 @@
 
 using namespace AICup;
 
-CommandMoveGetExpirience::CommandMoveGetExpirience() {
+CommandMoveGetExpirience::CommandMoveGetExpirience(Algorithm::PathFinder& finder):
+  MoveCommand(finder) {
 }
 
 
@@ -47,7 +48,7 @@ bool CommandMoveGetExpirience::check(const model::Wizard& self) {
 
 
   expiriencePos = Position(selectedUnit->getX(), selectedUnit->getY());
-  followCommand = std::make_shared<CommandFollow>(selectedUnit->getId(), 0, expirienceRadius);
+  followCommand = std::make_shared<CommandFollow>(pathFinder, selectedUnit->getId(), 0, expirienceRadius);
   return followCommand->check(self);
 }
 

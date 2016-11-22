@@ -19,6 +19,10 @@ namespace AICup
       return Position(unit.getX(), unit.getY());
     }
 
+    bool isTree(const model::Unit& unit);
+    bool isNeutral(const model::Unit& unit);
+    bool isBuilding(const model::Unit& unit);
+
     double maxSpeed(const model::CircularUnit& obj);
     double maxStrafeSpeed(const model::Wizard& obj);
     double maxBackwardSpeed(const model::Wizard& obj);

@@ -37,6 +37,17 @@ bool CommandAttackEnemy::check(const model::Wizard& self) {
     return false;
   }
 
+  /// если на пути есть дерево, то не стоит атаковать
+  for (const auto& tree : World::instance().trees()) {
+    if (tree.getId() == enemy->getId()) {
+      continue;
+    }
+
+    if (Math::distanceToSegment(EX::pos(tree), selfPos, enemyPos) < tree.getRadius() + 10/*радиус патрона*/) {
+      return false;
+    }
+  }
+
   /// во всех остальных случаях возможна или атака, или поворот к юниту для атаки
   return true;
 }
@@ -57,6 +68,7 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
   const auto wizardEnemy = dynamic_cast<const model::Wizard*>(enemy);
   const auto minionEnemy = dynamic_cast<const model::Minion*>(enemy);
   const auto buildEnemy = dynamic_cast<const model::Building*>(enemy);
+  const auto treeEnemy = dynamic_cast<const model::Tree*>(enemy);
 
   /// если хп мало у обычного крипа, то очков мне дадут меньше, пускай другие добивают
   if (enemy->getLife() < constants.getMagicMissileDirectDamage() && nullptr != minionEnemy) {
@@ -65,7 +77,7 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
 
   /// если хп мало у мага, то надо ему помочь умереть
   if (enemy->getLife() <= EX::magicMissleAttack(self) && nullptr != wizardEnemy) {
-    lifePriority *= 2;
+    lifePriority *= 6;
   }
 
   double typePriority = 0;
@@ -86,6 +98,8 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
     }
   } else if (nullptr != buildEnemy) {
     typePriority = 0.2 + lifePriority * 0.7;
+  } else if (nullptr != treeEnemy) {
+    typePriority = 2 * (1 - distance / self.getVisionRange());
   }
 
   double statusPriority = 0.5;
@@ -125,7 +139,7 @@ void CommandAttackEnemy::execute(const model::Wizard& self, Result& result) {
   result.unit = enemy;
   result.priority = priority(self);
 
-  if (distance < Game::model().getStaffRange() + enemy->getRadius() - 4) {
+  if (distance < Game::model().getStaffRange() + self.getRadius() + enemy->getRadius() - 4) {
     result.action = model::ACTION_STAFF;
   } else {
     result.action = model::ACTION_MAGIC_MISSILE;

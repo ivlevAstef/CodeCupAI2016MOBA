@@ -13,8 +13,8 @@
 
 using namespace AICup;
 
-CommandKeepDistance::CommandKeepDistance(const double x, const double y, const double minDistance, const double maxDistance) :
-  x(x), y(y), minDistance(minDistance), maxDistance(maxDistance) {
+CommandKeepDistance::CommandKeepDistance(Algorithm::PathFinder& finder, const double x, const double y, const double minDistance, const double maxDistance) :
+  MoveCommand(finder), x(x), y(y), minDistance(minDistance), maxDistance(maxDistance) {
 }
 
 
@@ -29,11 +29,11 @@ bool CommandKeepDistance::check(const model::Wizard& self) {
     /// противоположная точка, точке где находиться объект, и длиной = радиусу обзора
     const auto pos = selfPos + (selfPos - pointPos).normal() * self.getVisionRange();
 
-    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y, TurnStyle::BACK_TURN);
+    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::BACK_TURN);
   } else if (distance > maxDistance) {
     const auto pos = pointPos;
 
-    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pos.x, pos.y);
+    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y);
   } else {
     return false;
   }

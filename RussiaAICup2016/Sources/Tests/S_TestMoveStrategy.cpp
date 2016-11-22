@@ -3,7 +3,8 @@
 
 using namespace AICup;
 
-TestMoveStrategy::TestMoveStrategy(const CommandFabric& fabric): CommandStategy(fabric) {
+TestMoveStrategy::TestMoveStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder):
+  CommandStrategy(fabric, pathFinder) {
   currentMoveCommandIndex = 0;
 
   allMoveCommands.push_back(fabric.moveToPoint(1200, 1200));
@@ -16,7 +17,7 @@ TestMoveStrategy::TestMoveStrategy(const CommandFabric& fabric): CommandStategy(
 }
 
 void TestMoveStrategy::update(const model::Wizard& self, model::Move& move) {
-  CommandStategy::clear();
+  CommandStrategy::clear();
 
   auto& command = allMoveCommands[currentMoveCommandIndex];
 
@@ -25,5 +26,5 @@ void TestMoveStrategy::update(const model::Wizard& self, model::Move& move) {
     allMoveCommands.push_back(allMoveCommands[currentMoveCommandIndex]);
   }
 
-  CommandStategy::update(self, move);
+  CommandStrategy::update(self, move);
 }

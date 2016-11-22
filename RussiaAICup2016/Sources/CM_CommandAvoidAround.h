@@ -14,7 +14,7 @@ namespace AICup
 {
   class CommandAvoidAround: public MoveCommand {
   public:
-    CommandAvoidAround();
+    CommandAvoidAround(Algorithm::PathFinder& finder);
 
     bool check(const model::Wizard& self) override;
 

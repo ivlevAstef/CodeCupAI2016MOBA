@@ -33,13 +33,25 @@ void MyStrategy::move(const model::Wizard& self, const model::World& world, cons
 
   visualizator.isReverse = (self.getFaction() == model::FACTION_RENEGADES);
 
-  visualizator.beginPost();
+  visualizator.beginPre();
 
   AICup::World::instance().visualization(visualizator);
   AICup::Points::instance().visualization(visualizator);
   AICup::StrategyManager::instance().visualization(visualizator);
 
+  visualizator.endPre();
+
+  visualizator.beginPost();
+
+  AICup::StrategyManager::instance().visualization(visualizator);
+
   visualizator.endPost();
+
+  visualizator.beginAbs();
+
+  AICup::StrategyManager::instance().visualization(visualizator);
+
+  visualizator.endAbs();
 
 #endif
 }

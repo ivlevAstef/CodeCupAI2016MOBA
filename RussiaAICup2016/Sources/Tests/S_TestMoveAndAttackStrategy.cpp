@@ -3,7 +3,8 @@
 
 using namespace AICup;
 
-TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric) : CommandStategy(fabric) {
+TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder):
+  CommandStrategy(fabric, pathFinder) {
   currentMoveCommandIndex = 2;
 
   allMoveCommands.push_back(fabric.moveToPoint(800, 3200));
@@ -17,7 +18,7 @@ TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric
 }
 
 void TestMoveAndAttackStrategy::update(const model::Wizard& self, model::Move& move) {
-  CommandStategy::clear();
+  CommandStrategy::clear();
 
   if (2.5 * 2.5 > self.getSpeedX()*self.getSpeedX() + self.getSpeedY()*self.getSpeedY()) {
     printf("Small Speed: %f %f\n", self.getSpeedX(), self.getSpeedY());
@@ -40,5 +41,5 @@ void TestMoveAndAttackStrategy::update(const model::Wizard& self, model::Move& m
 
   moveCommands.push_back(command);
 
-  CommandStategy::update(self, move);
+  CommandStrategy::update(self, move);
 }

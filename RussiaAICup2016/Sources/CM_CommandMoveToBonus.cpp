@@ -15,7 +15,8 @@
 
 using namespace AICup;
 
-CommandMoveToBonus::CommandMoveToBonus() {
+CommandMoveToBonus::CommandMoveToBonus(Algorithm::PathFinder& finder):
+  MoveCommand(finder) {
 
 }
 
@@ -26,7 +27,7 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
   for (const auto& bonus : World::instance().model().getBonuses()) {
     const auto bonusPos = Position(bonus.getX(), bonus.getY());
     if ((selfPos - bonusPos).length() < self.getVisionRange()) {
-      moveToBonus = std::make_shared<CommandMoveToPoint>(bonusPos.x, bonusPos.y);
+      moveToBonus = std::make_shared<CommandMoveToPoint>(pathFinder, bonusPos.x, bonusPos.y);
       return moveToBonus->check(self);
     }
   }
@@ -78,9 +79,9 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
   const double maxDistance = minDistance + self.getRadius();
 
   if (topBonusPos < bottomBonusPos) {
-    moveToBonus = std::make_shared<CommandKeepDistance>(topBonusPos.x, topBonusPos.y, minDistance, maxDistance);
+    moveToBonus = std::make_shared<CommandKeepDistance>(pathFinder, topBonusPos.x, topBonusPos.y, minDistance, maxDistance);
   } else {
-    moveToBonus = std::make_shared<CommandKeepDistance>(topBonusPos.x, topBonusPos.y, minDistance, maxDistance);
+    moveToBonus = std::make_shared<CommandKeepDistance>(pathFinder, topBonusPos.x, topBonusPos.y, minDistance, maxDistance);
   }
 
   return moveToBonus->check(self);

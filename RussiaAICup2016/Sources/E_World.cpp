@@ -67,7 +67,7 @@ static std::vector<Type> updateRadius(const std::vector<Type>& real) {
   result.reserve(real.size());
 
   for (const auto& obj : real) {
-    result.push_back(CreateType(obj, obj.getRadius() + 0.5));
+    result.push_back(CreateType(obj, obj.getRadius() + 0.1));
   }
 
   return result;
@@ -271,32 +271,61 @@ const int World::wizardCount(model::LaneType line, const model::Wizard& excludeW
   return result;
 }
 
+Obstacles World::allObstacles(const model::CircularUnit& unit, const bool onlyStatic) const {
+  Obstacles obstacles;
+  obstacles.reserve(500); // Приблизительно сколько объектов в среднем
+
+  for (const auto& tree : trees()) {
+    obstacles.push_back(&tree);
+  }
+
+  for (const auto& build : buildings()) {
+    obstacles.push_back(&build);
+  }
+
+  if (!onlyStatic) {
+    for (const auto& minion : model().getMinions()) {
+      if (unit.getId() != minion.getId()) {
+        obstacles.push_back(&minion);
+      }
+    }
+
+    for (const auto& wizard : model().getWizards()) {
+      if (unit.getId() != wizard.getId()) {
+        obstacles.push_back(&wizard);
+      }
+    }
+  }
+
+  return obstacles;
+}
+
 Obstacles World::obstacles(const model::CircularUnit& unit, const double range, const bool onlyStatic) const {
   Obstacles aroundObstacles;
   aroundObstacles.reserve(64); // Приблизительно сколько объектов в среднем
 
   for (const auto& tree : trees()) {
     if (unit.getDistanceTo(tree) < range) {
-      aroundObstacles.push_back(tree);
+      aroundObstacles.push_back(&tree);
     }
   }
 
   for (const auto& build : buildings()) {
     if (unit.getDistanceTo(build) < range) {
-      aroundObstacles.push_back(build);
+      aroundObstacles.push_back(&build);
     }
   }
 
   if (!onlyStatic) {
     for (const auto& minion : model().getMinions()) {
       if (unit.getId() != minion.getId() && unit.getDistanceTo(minion) < range) {
-        aroundObstacles.push_back(minion);
+        aroundObstacles.push_back(&minion);
       }
     }
 
     for (const auto& wizard : model().getWizards()) {
       if (unit.getId() != wizard.getId() && unit.getDistanceTo(wizard) < range) {
-        aroundObstacles.push_back(wizard);
+        aroundObstacles.push_back(&wizard);
       }
     }
   }
@@ -304,18 +333,17 @@ Obstacles World::obstacles(const model::CircularUnit& unit, const double range, 
   return aroundObstacles;
 }
 
-ObstaclesGroups World::obstaclesGroup(const model::CircularUnit& unit, const double range, const bool onlyStatic) const {
-  const auto aroundObstacles = obstacles(unit, range, onlyStatic);
 
+ObstaclesGroups World::createGroup(const Obstacles& obstacles, const double radius) const {
   ObstaclesGroups result;
 
   std::vector<size_t> groupsForMerge;
-  for (const auto& obstacle : aroundObstacles) {
+  for (const auto& obstacle : obstacles) {
     groupsForMerge.clear();
 
     for (size_t index = 0; index < result.size(); ++index) {
       for (const auto& obstacleInGroup : result[index]) {
-        if (obstacle.getDistanceTo(obstacleInGroup) < obstacle.getRadius() + obstacleInGroup.getRadius() + unit.getRadius()*2) {
+        if (obstacle->getDistanceTo(*obstacleInGroup) < obstacle->getRadius() + obstacleInGroup->getRadius() + radius * 2) {
           groupsForMerge.push_back(index);
           break;
         }
@@ -356,6 +384,12 @@ const model::LivingUnit* World::unit(long long id) const {
   for (const auto& minion : model().getMinions()) {
     if (minion.getId() == id) {
       return &minion;
+    }
+  }
+
+  for (const auto& tree : trees()) {
+    if (tree.getId() == id) {
+      return &tree;
     }
   }
 

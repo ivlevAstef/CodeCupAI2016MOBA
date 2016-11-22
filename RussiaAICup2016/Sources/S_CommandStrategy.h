@@ -1,5 +1,5 @@
 //
-//File: CM_CommandStategy.h
+//File: CM_CommandStrategy.h
 //Author: Ivlev Alexander. Stef
 //Created: 13/11/2016
 //
@@ -20,9 +20,9 @@
 
 namespace AICup
 {
-  class CommandStategy {
+  class CommandStrategy {
   public:
-    CommandStategy(const CommandFabric& fabric);
+    CommandStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
 
     virtual void update(const model::Wizard& self, model::Move& move);
 
@@ -37,12 +37,15 @@ namespace AICup
     const Vector move(const model::Wizard& self, TurnStyle& turnStyle, double& speedLimit);
     const model::LivingUnit& attack(const model::Wizard& self, model::ActionType& action);
 
+    void addTreeForRemove(const model::Wizard& self, const model::LivingUnit* tree);
+
   protected:
     const CommandFabric& fabric;
+    const Algorithm::PathFinder& pathFinder;
 
     std::vector<MoveCommandPtr> moveCommands;
     std::vector<AttackCommandPtr> attackCommands;
   };
 
-  typedef std::shared_ptr<CommandStategy> CommandStategyPtr;
+  typedef std::shared_ptr<CommandStrategy> CommandStrategyPtr;
 };

@@ -10,9 +10,9 @@
 
 namespace AICup
 {
-  class TestMoveStrategy: public CommandStategy {
+  class TestMoveStrategy: public CommandStrategy {
   public:
-    TestMoveStrategy(const CommandFabric& fabric);
+    TestMoveStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
 
     void update(const model::Wizard& self, model::Move& move) override;
 

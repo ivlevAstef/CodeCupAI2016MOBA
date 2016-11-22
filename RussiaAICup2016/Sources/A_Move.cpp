@@ -13,8 +13,8 @@ const Obstacles* findNearestGroup(const Position& from, const double radius, con
 
   for (const auto& group : obstacles) {
     for (const auto& obstacle : group) {
-      const auto obstaclePos = EX::pos(obstacle);
-      const auto fullRadius = radius + obstacle.getRadius();
+      const auto obstaclePos = EX::pos(*obstacle);
+      const auto fullRadius = radius + obstacle->getRadius();
 
       /// проверяем перечение с препятствием, но увеличенного радиуса, так как пряпятствия стоят не притык друг к другу
       if (Math::distanceToLine(obstaclePos, to, from) < fullRadius) {
@@ -60,14 +60,14 @@ void setTangetsDirection(const Position& from, const Position& obstaclePos, std:
 bool isIntersectVectorWithGroup(const Position& from, const Vector& vec, const Position& checkPos, const double radius, const Obstacles& group) {
   const Position p2 = from + vec;
   for (const auto& obstacle : group) {
-    const auto obstaclePos = EX::pos(obstacle);
+    const auto obstaclePos = EX::pos(*obstacle);
     /// игнорируем самого себя
     if ((obstaclePos - checkPos).length2() < 0.1) {
       continue;
     }
 
     const double distance = Math::distanceToLine(obstaclePos, from, p2);
-    if (vec.dot(obstaclePos - from) >=0 && distance <= obstacle.getRadius() + radius) {
+    if (vec.dot(obstaclePos - from) >=0 && distance <= obstacle->getRadius() + radius) {
       return true;
     }
   }
@@ -100,9 +100,9 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
 
 
   for (const auto& obstacle : group) {
-    const auto obstaclePos = EX::pos(obstacle);
+    const auto obstaclePos = EX::pos(*obstacle);
     /// возращает нормализованные вектора касательных
-    auto obstacleTangets = Math::tangetsForTwoCircle(from, radius, obstaclePos, obstacle.getRadius());
+    auto obstacleTangets = Math::tangetsForTwoCircle(from, radius, obstaclePos, obstacle->getRadius());
     assert(2 == obstacleTangets.size());
     setTangetsDirection(from, obstaclePos, obstacleTangets);
 
@@ -114,7 +114,7 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
 
         assert(resultIndex < 2); // всегда должно получаться 2
         result[resultIndex++] = {deviation, obstaclePos,  MAX(1, length), tangent};
-        maxRadius = MAX(maxRadius, obstacle.getRadius());
+        maxRadius = MAX(maxRadius, obstacle->getRadius());
 
         if (2 == resultIndex) {
           goto findGroupPartsAndReturnTangets_for_END; // экономия + защита

@@ -9,7 +9,8 @@
 
 using namespace AICup;
 
-CommandDefendPoint::CommandDefendPoint(double x, double y) {
+CommandDefendPoint::CommandDefendPoint(Algorithm::PathFinder& finder, double x, double y):
+  MoveCommand(finder) {
 
 }
 

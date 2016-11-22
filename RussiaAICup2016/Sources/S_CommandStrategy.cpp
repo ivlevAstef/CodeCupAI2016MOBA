@@ -5,10 +5,11 @@
 
 using namespace AICup;
 
-CommandStategy::CommandStategy(const CommandFabric& fabric) : fabric(fabric) {
+CommandStrategy::CommandStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& finder):
+  fabric(fabric), pathFinder(finder) {
 }
 
-void CommandStategy::update(const model::Wizard& self, model::Move& finalMove) {
+void CommandStrategy::update(const model::Wizard& self, model::Move& finalMove) {
   if (!moveCommands.empty()) {
     TurnStyle turnStyle;
     double speedLimit = -1;
@@ -25,12 +26,12 @@ void CommandStategy::update(const model::Wizard& self, model::Move& finalMove) {
   }
 }
 
-void CommandStategy::clear() {
+void CommandStrategy::clear() {
   moveCommands.clear();
   attackCommands.clear();
 }
 
-const Vector CommandStategy::move(const model::Wizard& self, TurnStyle& turnStyle, double& speedLimit) {
+const Vector CommandStrategy::move(const model::Wizard& self, TurnStyle& turnStyle, double& speedLimit) {
   std::vector<MoveCommand::Result> moveResults;
   moveResults.resize(moveCommands.size());
 
@@ -56,13 +57,31 @@ const Vector CommandStategy::move(const model::Wizard& self, TurnStyle& turnStyl
     if (result.speedLimit > 0 && (result.speedLimit < speedLimit || speedLimit < 0)) {
       speedLimit = result.speedLimit;
     }
+
+    for (const auto& tree : result.treesForRemove) {
+      addTreeForRemove(self, tree);
+    }
   }
 
   //assert(summaryPriority > 0);
   return summaryDirection / MAX(1.0, summaryPriority);
 }
 
-const model::LivingUnit& CommandStategy::attack(const model::Wizard& self, model::ActionType& action) {
+void CommandStrategy::addTreeForRemove(const model::Wizard& self, const model::LivingUnit* tree) {
+  assert(nullptr != tree);
+
+  const double distance = self.getDistanceTo(*tree);
+  if (distance > self.getVisionRange()) {
+    return;
+  }
+
+  const auto attack = fabric.attack(tree->getId());
+  if (attack->check(self)) {
+    attackCommands.push_back(attack);
+  }
+}
+
+const model::LivingUnit& CommandStrategy::attack(const model::Wizard& self, model::ActionType& action) {
   std::vector<AttackCommand::Result> attackResults;
   attackResults.resize(attackCommands.size());
 
@@ -89,7 +108,7 @@ const model::LivingUnit& CommandStategy::attack(const model::Wizard& self, model
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandStategy::visualization(const Visualizator & visualizator) const {
+void CommandStrategy::visualization(const Visualizator & visualizator) const {
   for (const auto& command : moveCommands) {
     command->visualization(visualizator);
   }

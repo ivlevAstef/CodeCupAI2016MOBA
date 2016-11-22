@@ -15,6 +15,8 @@ namespace AICup
 {
   class CommandFabric {
   public:
+    CommandFabric(Algorithm::PathFinder& finder);
+
 #pragma mark - перемещение
     /// даржаться от точки на определенном расстоянии
     MoveCommandPtr keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const;
@@ -55,5 +57,7 @@ namespace AICup
     /// держаться на безопасном расстоянии от всех врагов вокруге
     MoveCommandPtr avoidAround() const;
 
+  private:
+    Algorithm::PathFinder& finder;
   };
 }

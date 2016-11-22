@@ -13,7 +13,7 @@ namespace AICup
 {
   class CommandFollow: public MoveCommand {
   public:
-    CommandFollow(const long long unitId, const double minDistance = 0, const double maxDistance = 10000);
+    CommandFollow(Algorithm::PathFinder& finder, const long long unitId, const double minDistance = 0, const double maxDistance = 10000);
 
     bool check(const model::Wizard& self) override;
 

@@ -23,33 +23,38 @@
 
 using namespace AICup;
 
+CommandFabric::CommandFabric(Algorithm::PathFinder& finder):
+  finder(finder) {
+
+}
+
 MoveCommandPtr CommandFabric::keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const {
-  return std::make_shared<CommandKeepDistance>(x, y, minDistance, maxDistance);
+  return std::make_shared<CommandKeepDistance>(finder, x, y, minDistance, maxDistance);
 }
 
 MoveCommandPtr CommandFabric::moveToPoint(const double x, const double y, const TurnStyle style, const double speedLimit) const {
-  return std::make_shared<CommandMoveToPoint>(x, y, style, speedLimit);
+  return std::make_shared<CommandMoveToPoint>(finder, x, y, style, speedLimit);
 }
 
 MoveCommandPtr CommandFabric::moveToLine(const model::LaneType line) const {
-  return std::make_shared<CommandMoveToLine>(line);
+  return std::make_shared<CommandMoveToLine>(finder, line);
 }
 
 /// подойти чтобы взять руну
 MoveCommandPtr CommandFabric::moveToBonus() const {
-  return std::make_shared<CommandMoveToBonus>();
+  return std::make_shared<CommandMoveToBonus>(finder);
 }
 
 MoveCommandPtr CommandFabric::follow(const long long unitId, const double minDistance, const double maxDistance) const {
-  return std::make_shared<CommandFollow>(unitId, minDistance, maxDistance);
+  return std::make_shared<CommandFollow>(finder, unitId, minDistance, maxDistance);
 }
 
 MoveCommandPtr CommandFabric::moveGetExpirience() const {
-  return std::make_shared<CommandMoveGetExpirience>();
+  return std::make_shared<CommandMoveGetExpirience>(finder);
 }
 
 MoveCommandPtr CommandFabric::observeMap() const {
-  return std::make_shared<CommandObserveMap>();
+  return std::make_shared<CommandObserveMap>(finder);
 }
 
 AttackCommandPtr CommandFabric::attack(const long long enemyId) const {
@@ -61,13 +66,13 @@ AttackCommandPtr CommandFabric::pool(const long long neutralUnitId) const {
 }
 
 MoveCommandPtr CommandFabric::defend(const double x, const double y) const {
-  return std::make_shared<CommandDefendPoint>(x, y);
+  return std::make_shared<CommandDefendPoint>(finder, x, y);
 }
 
 MoveCommandPtr CommandFabric::avoidEnemy(const long long unitId) const {
-  return std::make_shared<CommandAvoidEnemy>(unitId);
+  return std::make_shared<CommandAvoidEnemy>(finder, unitId);
 }
 
 MoveCommandPtr CommandFabric::avoidAround() const {
-  return std::make_shared<CommandAvoidAround>();
+  return std::make_shared<CommandAvoidAround>(finder);
 }

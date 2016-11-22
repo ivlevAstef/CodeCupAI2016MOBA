@@ -14,7 +14,8 @@
 
 using namespace AICup;
 
-CommandAvoidEnemy::CommandAvoidEnemy(const long long enemyId): enemyId(enemyId) {
+CommandAvoidEnemy::CommandAvoidEnemy(Algorithm::PathFinder& finder, const long long enemyId):
+  MoveCommand(finder), enemyId(enemyId) {
 
 }
 
@@ -51,7 +52,7 @@ bool CommandAvoidEnemy::check(const model::Wizard& self) {
     return false;
   }
 
-  followCommand = std::make_shared<CommandFollow>(enemyId, distance, distance + self.getRadius());
+  followCommand = std::make_shared<CommandFollow>(pathFinder, enemyId, distance, distance + self.getRadius());
 
   return true;
 }

@@ -10,9 +10,9 @@
 
 namespace AICup
 {
-  class FirstStrategy: public CommandStategy {
+  class FirstStrategy: public CommandStrategy {
   public:
-    FirstStrategy(const CommandFabric& fabric);
+    FirstStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
 
     void update(const model::Wizard& self, model::Move& move) override;
 

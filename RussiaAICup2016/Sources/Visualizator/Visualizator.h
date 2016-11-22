@@ -24,17 +24,30 @@ namespace AICup
     std::vector<char> bufMemory;
 
   public:
+    enum Style {
+      PRE,
+      POST,
+      ABS,
+      UNKNOWN
+    };
+
     bool isReverse;
   public:
     Visualizator();
 
+    Style getStyle() const {
+      return style;
+    }
 
 
-    void beginPre() const;
-    void endPre() const;
+    void beginPre();
+    void endPre();
 
-    void beginPost() const;
-    void endPost() const;
+    void beginPost();
+    void endPost();
+
+    void beginAbs();
+    void endAbs();
 
     void circle(double x, double y, double r, int32_t color = 0x7F7F7F) const;
     void fillCircle(double x, double y, double r, int32_t color = 0x7F7F7F) const;
@@ -53,6 +66,7 @@ namespace AICup
     void sendCommand(const char* str) const;
     void writeWithColor(char* buf, int32_t color) const;
 
+    Style style;
     SOCKET openSocket;
   };
 

@@ -4,6 +4,8 @@
 
 #include "model/Minion.h"
 #include "model/ActionType.h"
+#include "model/Tree.h"
+#include "model/Building.h"
 
 using namespace AICup;
 
@@ -34,6 +36,16 @@ double speedFactor(const model::LivingUnit& obj) {
   }
 
   return factor;
+}
+
+bool EX::isTree(const model::Unit& unit) {
+  return nullptr != dynamic_cast<const model::Tree*>(&unit);
+}
+bool EX::isNeutral(const model::Unit& unit) {
+  return nullptr != dynamic_cast<const model::Minion*>(&unit) && unit.getFaction() == model::FACTION_NEUTRAL;
+}
+bool EX::isBuilding(const model::Unit& unit) {
+  return nullptr != dynamic_cast<const model::Building*>(&unit);
 }
 
 double EX::maxSpeed(const model::CircularUnit& obj) {

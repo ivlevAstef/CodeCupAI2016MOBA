@@ -33,7 +33,8 @@ namespace AICup
 
 
   private:
-    CommandStategyPtr currentStrategy;
+    CommandStrategyPtr currentStrategy;
     CommandFabric fabric;
+    Algorithm::PathFinder pathFinder;
   };
 }

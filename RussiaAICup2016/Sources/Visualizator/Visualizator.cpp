@@ -94,20 +94,33 @@ void Visualizator::sendCommand(const char* str) const {
   }
 }
 
-void Visualizator::beginPre() const {
+void Visualizator::beginPre() {
   sendCommand("begin pre\n");
+  style = PRE;
 }
 
-void Visualizator::endPre() const {
+void Visualizator::endPre() {
   sendCommand("end pre\n");
+  style = UNKNOWN;
 }
 
-void Visualizator::beginPost() const {
+void Visualizator::beginPost() {
   sendCommand("begin post\n");
+  style = POST;
 }
 
-void Visualizator::endPost() const {
+void Visualizator::endPost() {
   sendCommand("end post\n");
+  style = UNKNOWN;
+}
+
+void Visualizator::beginAbs() {
+  sendCommand("begin abs\n");
+  style = ABS;
+}
+void Visualizator::endAbs() {
+  sendCommand("end abs\n");
+  style = UNKNOWN;
 }
 
 void Visualizator::writeWithColor(char* buf, int32_t color) const {

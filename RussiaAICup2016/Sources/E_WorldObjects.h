@@ -21,6 +21,8 @@ namespace AICup
 
     //свое дерево, дабы чтобы было в неизвестных зонах
     Tree(double x, double y, double radius);
+
+    ~Tree() override;
   };
 
   class Building: public model::Building {

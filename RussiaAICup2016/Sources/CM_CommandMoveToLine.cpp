@@ -11,13 +11,14 @@
 
 using namespace AICup;
 
-CommandMoveToLine::CommandMoveToLine(model::LaneType line): line(line) {
+CommandMoveToLine::CommandMoveToLine(Algorithm::PathFinder& finder, model::LaneType line):
+  MoveCommand(finder), line(line) {
 
 }
 
 bool CommandMoveToLine::check(const model::Wizard& self) {
   auto position = World::instance().linePosition(line);
-  commandMoveToPoint = std::make_shared<CommandMoveToPoint>(position.x, position.y);
+  commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, position.x, position.y);
 
   return commandMoveToPoint->check(self);
 }

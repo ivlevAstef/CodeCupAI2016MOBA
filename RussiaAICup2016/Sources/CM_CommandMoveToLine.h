@@ -14,7 +14,7 @@ namespace AICup
 {
   class CommandMoveToLine: public MoveCommand {
   public:
-    CommandMoveToLine(model::LaneType line);
+    CommandMoveToLine(Algorithm::PathFinder& finder, model::LaneType line);
 
     bool check(const model::Wizard& self) override;
 

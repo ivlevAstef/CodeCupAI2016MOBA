@@ -16,11 +16,13 @@
 
 using namespace AICup;
 
-StrategyManager::StrategyManager() {
-  currentStrategy = std::make_shared<TestMoveAndAttackStrategy>(fabric);
+StrategyManager::StrategyManager(): fabric(pathFinder) {
+  currentStrategy = std::make_shared<TestMoveAndAttackStrategy>(fabric, pathFinder);
 }
 
 void StrategyManager::update(const model::Wizard& self, model::Move& move) {
+  pathFinder.calculate(self);
+
   if (nullptr != currentStrategy.get()) {
     currentStrategy->update(self, move);
   }
@@ -31,5 +33,7 @@ void StrategyManager::visualization(const Visualizator& visualizator) const {
   if (nullptr != currentStrategy.get()) {
     currentStrategy->visualization(visualizator);
   }
+
+  pathFinder.visualization(visualizator);
 }
 #endif // ENABLE_VISUALIZATOR
