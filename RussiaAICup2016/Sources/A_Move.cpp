@@ -132,34 +132,6 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
 
   resultIndex = (result[0].deviation < result[1].deviation) ? 0 : 1;
   return result[resultIndex].tangent * result[resultIndex].length;
-
-  /*if (result[0].tangent.dot(to - from)
-
-  resultIndex = 0; // всегда с нулевым индексом
-  return result[resultIndex].tangent * result[resultIndex].length;
-
-  int obstacleCount[2] = {0, 0};
-  for (const auto& obstacle : group) {
-    Vector obstacleVec = EX::pos(obstacle) - from;
-
-    int sign0 = SIGN(delta.cross(obstacleVec));
-    int sign1 = SIGN(result[0].tangent.cross(obstacleVec));
-    //int sing2 = SIGN(result[1].tangent.cross(obstacleVec));
-    if (sign1 == sign0) {
-      obstacleCount[1]++;
-    } else {
-      obstacleCount[0]++;
-    }
-  }
-
-  double distance = (result[0].pos - result[1].pos).length();
-  if (obstacleCount[0] == obstacleCount[1] || Math::distanceToLine(from, result[0].pos, result[1].pos) > distance) {
-    resultIndex = (result[0].deviation < result[1].deviation) ? 0 : 1;
-  } else {
-    resultIndex = (obstacleCount[0] < obstacleCount[1]) ? 0 : 1;
-  }
-
-  return result[resultIndex].tangent * result[resultIndex].length;*/
 }
 
 Vector Algorithm::move(const model::CircularUnit& unit, const Position& to, const ObstaclesGroups& obstacles, const double range) {

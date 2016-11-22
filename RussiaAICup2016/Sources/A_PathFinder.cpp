@@ -63,7 +63,7 @@ Obstacles Path::removeObstacles(Obstacles& obstacles) const {
     double minDistance = 88888;
     for (size_t obstacleIndex = 0; obstacleIndex < obstacles.size(); obstacleIndex++) {
       const auto& obstacle = obstacles[obstacleIndex];
-      if (!EX::isTree(*obstacle)) {
+      if (!(EX::isTree(*obstacle) || EX::isNeutral(*obstacle))) {
         continue;
       }
 
@@ -106,6 +106,7 @@ Position Path::calculateNearestCurvaturePoint(const double visionRange) const {
 
 
 PathFinder::PathFinder() {
+  lastCalculateTick = -10000;
 }
 
 void PathFinder::calculate(const model::CircularUnit& unit) {
@@ -115,14 +116,25 @@ void PathFinder::calculate(const model::CircularUnit& unit) {
   radius = unit.getRadius();
   const auto fromByInt = PathConstants::toInt(from);
 
-  /// при переходе на новую клетку пересчитываем
-  if (lastByInt != fromByInt) {
+  /// раз в некоторое время обновляем карту целиком
+  if (lastCalculateTick + 30 < World::model().getTickIndex()) {
+    lastCalculateTick = World::model().getTickIndex();
+    fastCalculateWeight = 1;
+
     clean();
 
     obstacles = World::instance().allObstacles(unit, true);
     calculateCost(obstacles, unit.getRadius());
     /// расчитываем все веса из точки где мы находимся
     calculateWeight(fromByInt);
+
+    /// при переходе на новую клетку делаем быстрый пересчет
+  } else if (lastByInt != fromByInt) {
+    assert(0 == weights[lastByInt.x][lastByInt.y]);
+
+    weights[fromByInt.x][fromByInt.y] = 0;
+    fastCalculateWeight = fastCalculateWeight - 0.005;
+    weights[lastByInt.x][lastByInt.y] = fastCalculateWeight;
   }
 }
 
@@ -136,11 +148,11 @@ void PathFinder::calculateCost(const Obstacles& obstacles, const double radius) 
   for (const auto& obstacle : obstacles) {
     double life = 1;
     if (EX::isTree(*obstacle)) {
-      life = 1.5 * (obstacle->getLife() / 12); /// дерево
+      life = 2.0 * (obstacle->getLife() / 12); /// дерево
     } else if (EX::isNeutral(*obstacle)) {
-      life = 10.0 * (obstacle->getLife() / 12); /// нейтрал
+      life = PathConstants::maxValue; /// нейтрал очень дорогое удовольствие
     } else {
-      life = obstacle->getMaxLife(); /// здания
+      life = PathConstants::maxValue; /// здания
     }
 
     const auto obstaclePos = EX::pos(*obstacle);
@@ -163,7 +175,7 @@ void PathFinder::calculateCost(const Obstacles& obstacles, const double radius) 
         double syMin = 1 - MAX(0, minRealY - double(y));
         double syMax = 1 - MAX(0, double(y + 1) - maxRealY);
 
-        costs[x][y] += (sxMin + sxMax - 1)*(syMin + syMax - 1) * life;
+        costs[x][y] += sqrt(sxMin + sxMax - 1)*sqrt(syMin + syMax - 1) * life;
 
         assert(sxMin >= 0 && sxMax >= 0 && syMin >= 0 && syMax >= 0);
       }
@@ -230,23 +242,23 @@ void PathFinder::calculatePath(Path& path) const {
   };
 
   // ревертируем точки
-  const auto to = PathConstants::toInt(path.from);
-  const auto from = PathConstants::toInt(path.to);
+  const auto from = PathConstants::toInt(path.from);
+  const auto to = PathConstants::toInt(path.to);
 
   path.count = 0;
   path.length = 0;
 
-  if (weights[from.x][from.y] >= PathConstants::maxValue) {
+  if (weights[to.x][to.y] >= PathConstants::maxValue) {
     assert(false && "can't found path... really?");
     return;
   }
 
 
-  Vector2D<int> iter = from;
+  Vector2D<int> iter = to;
   Position lastPos = path.to;
   do {
     const Vector2D<int> pos = iter;
-    int minWeight = PathConstants::maxValue;
+    float minWeight = weights[pos.x][pos.y];
 
     for (const auto& neighbor : neighbors) {
       const int nX = pos.x + neighbor.x;
@@ -262,7 +274,7 @@ void PathFinder::calculatePath(Path& path) const {
     path.length += (realPos - lastPos).length();
 
     lastPos = realPos;
-  } while (iter != to);
+  } while (iter != from);
 }
 
 
@@ -297,20 +309,28 @@ void Path::visualization(const Visualizator& visualizator) const {
 
 void PathFinder::visualization(const Visualizator& visualizator) const {
   /*if (Visualizator::ABS == visualizator.getStyle()) {
-    for (int x = 0; x < memorySize; x++) {
-      for (int y = 0; y < memorySize; y++) {
+    for (int x = 0; x < PathConstants::memorySize; x++) {
+      for (int y = 0; y < PathConstants::memorySize; y++) {
 
         const double weight = weights[x][y] / 200;
         int color = 255 - MIN(255, (int)(weight * 255));
         visualizator.line(x, y, x, y, color << 8);
       }
     }
+  }*/
 
-    for (size_t i = 0; i < pathSize; i++) {
-      visualizator.line(path[i].x, path[i].y, path[i].x, path[i].y, 0xff0000);
+
+  /*if (Visualizator::PRE == visualizator.getStyle()) {
+    for (int x = 0; x < PathConstants::memorySize - 1; x++) {
+      for (int y = 0; y < PathConstants::memorySize - 1; y++) {
+        const auto p1 = PathConstants::toReal({x,y}, 0, 0);
+        const auto p2 = PathConstants::toReal({x,y}, 1, 1);
+
+        const double weight = weights[x][y];
+        int color = 255 - MIN(255, (int)(weight));
+        visualizator.fillRect(p1.x, p1.y, p2.x, p2.y, color);
+      }
     }
-
-  }
-  */
+  }*/
 }
 #endif // ENABLE_VISUALIZATOR

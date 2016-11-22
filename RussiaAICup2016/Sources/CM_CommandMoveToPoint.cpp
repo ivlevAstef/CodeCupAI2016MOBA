@@ -28,7 +28,7 @@ void CommandMoveToPoint::execute(const model::Wizard& self, Result& result) {
   pathFinder.calculatePath(point, &path);
   assert(nullptr != path);
 
-  preEndPoint = path->calculateNearestCurvaturePoint(self.getVisionRange());
+  preEndPoint = path->calculateNearestCurvaturePoint(self.getVisionRange()/2);
 
   /// need remove obstacles
   auto obstacles = World::instance().obstacles(self, self.getVisionRange());

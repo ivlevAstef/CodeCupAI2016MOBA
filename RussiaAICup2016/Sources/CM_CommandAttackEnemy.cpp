@@ -139,7 +139,7 @@ void CommandAttackEnemy::execute(const model::Wizard& self, Result& result) {
   result.unit = enemy;
   result.priority = priority(self);
 
-  if (distance < Game::model().getStaffRange() + self.getRadius() + enemy->getRadius() - 4) {
+  if (distance < Game::model().getStaffRange() + enemy->getRadius() - EX::maxSpeed(*enemy)) {
     result.action = model::ACTION_STAFF;
   } else {
     result.action = model::ACTION_MAGIC_MISSILE;

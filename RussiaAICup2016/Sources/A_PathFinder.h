@@ -22,7 +22,7 @@ namespace AICup
   {
     class PathConstants {
     public:
-      static const size_t step = 25;
+      static const size_t step = 32;
       static const size_t memorySize = 4000 / step;
       static const size_t maxValue = 100000;
 
@@ -93,6 +93,9 @@ namespace AICup
       void clean();
 
     private:
+      int lastCalculateTick;
+      float fastCalculateWeight;
+
       Position from;
       double radius;
 
