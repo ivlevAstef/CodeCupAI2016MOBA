@@ -66,6 +66,8 @@ void CommandMoveGetExpirience::execute(const model::Wizard& self, Result& result
 void CommandMoveGetExpirience::visualization(const Visualizator& visualizator) const {
   assert(nullptr != followCommand.get());
 
-  visualizator.fillCircle(expiriencePos.x, expiriencePos.y, 10, 0xffff00);
+  if (Visualizator::POST == visualizator.getStyle()) {
+    visualizator.fillCircle(expiriencePos.x, expiriencePos.y, 10, 0xffff00);
+  }
 }
 #endif // ENABLE_VISUALIZATOR

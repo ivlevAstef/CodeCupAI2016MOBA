@@ -283,13 +283,13 @@ Obstacles World::allObstacles(const model::CircularUnit& unit, const bool onlySt
     obstacles.push_back(&build);
   }
 
-  if (!onlyStatic) {
-    for (const auto& minion : model().getMinions()) {
-      if (unit.getId() != minion.getId()) {
-        obstacles.push_back(&minion);
-      }
+  for (const auto& minion : model().getMinions()) {
+    if (unit.getId() != minion.getId() && (!onlyStatic || model::FACTION_NEUTRAL == minion.getFaction())) {
+      obstacles.push_back(&minion);
     }
+  }
 
+  if (!onlyStatic) {
     for (const auto& wizard : model().getWizards()) {
       if (unit.getId() != wizard.getId()) {
         obstacles.push_back(&wizard);
@@ -300,7 +300,7 @@ Obstacles World::allObstacles(const model::CircularUnit& unit, const bool onlySt
   return obstacles;
 }
 
-Obstacles World::obstacles(const model::CircularUnit& unit, const double range, const bool onlyStatic) const {
+Obstacles World::obstacles(const model::CircularUnit& unit, const double range) const {
   Obstacles aroundObstacles;
   aroundObstacles.reserve(64); // Приблизительно сколько объектов в среднем
 
@@ -316,17 +316,15 @@ Obstacles World::obstacles(const model::CircularUnit& unit, const double range, 
     }
   }
 
-  if (!onlyStatic) {
-    for (const auto& minion : model().getMinions()) {
-      if (unit.getId() != minion.getId() && unit.getDistanceTo(minion) < range) {
-        aroundObstacles.push_back(&minion);
-      }
+  for (const auto& minion : model().getMinions()) {
+    if (unit.getId() != minion.getId() && unit.getDistanceTo(minion) < range) {
+      aroundObstacles.push_back(&minion);
     }
+  }
 
-    for (const auto& wizard : model().getWizards()) {
-      if (unit.getId() != wizard.getId() && unit.getDistanceTo(wizard) < range) {
-        aroundObstacles.push_back(&wizard);
-      }
+  for (const auto& wizard : model().getWizards()) {
+    if (unit.getId() != wizard.getId() && unit.getDistanceTo(wizard) < range) {
+      aroundObstacles.push_back(&wizard);
     }
   }
 

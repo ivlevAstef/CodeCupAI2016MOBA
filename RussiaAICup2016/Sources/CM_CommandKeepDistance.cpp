@@ -55,6 +55,8 @@ void CommandKeepDistance::visualization(const Visualizator& visualizator) const 
   assert(nullptr != commandMoveToPoint.get());
   commandMoveToPoint->visualization(visualizator);
 
-  visualizator.fillCircle(x, y, 10, 0x00ffff);
+  if (Visualizator::POST == visualizator.getStyle()) {
+    visualizator.fillCircle(x, y, 10, 0x00ffff);
+  }
 }
 #endif // ENABLE_VISUALIZATOR

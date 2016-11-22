@@ -36,18 +36,13 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
   const auto topBonusPos = Points::point(Points::BONUS_TOP);
   const auto bottomBonusPos = Points::point(Points::BONUS_BOTTOM);
 
-  /// к сожалению длина пути считаеться по графу где можно точно пройти, а он обычно длинее чем реальный путь
-  /// поэтому в вычислениях береться среднее значение между прямым путем, и путем по графу (лучшебы какоенибудь другое но пока такое)
+  Algorithm::Path* path = nullptr;
 
-  double length = 99999;
-  //Graph::instance().path(selfPos, topBonusPos, length); // сам путь нас не интерисует
-  length = length * 0.25 + (selfPos - topBonusPos).length() * 0.75;
-  double ticksToTop = length / Game::instance().model().getWizardForwardSpeed();
+  pathFinder.calculatePath(topBonusPos, &path);
+  double ticksToTop = path->getLength() / Game::instance().model().getWizardForwardSpeed();
 
-  length = 99999;
-  //Graph::instance().path(selfPos, bottomBonusPos, length); // сам путь нас не интерисует
-  length = length * 0.25 + (selfPos - topBonusPos).length() * 0.75;
-  double ticksToBottom = length / Game::instance().model().getWizardForwardSpeed();
+  pathFinder.calculatePath(bottomBonusPos, &path);
+  double ticksToBottom = path->getLength() / Game::instance().model().getWizardForwardSpeed();
 
   int maxTicksToBonus = Game::instance().model().getBonusAppearanceIntervalTicks();
   int ticksToBonus = maxTicksToBonus - World::instance().model().getTickIndex() % maxTicksToBonus;
@@ -78,7 +73,7 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
   const double minDistance = self.getRadius() + Game::instance().model().getBonusRadius();
   const double maxDistance = minDistance + self.getRadius();
 
-  if (topBonusPos < bottomBonusPos) {
+  if (ticksToTop < ticksToBottom) {
     moveToBonus = std::make_shared<CommandKeepDistance>(pathFinder, topBonusPos.x, topBonusPos.y, minDistance, maxDistance);
   } else {
     moveToBonus = std::make_shared<CommandKeepDistance>(pathFinder, topBonusPos.x, topBonusPos.y, minDistance, maxDistance);
@@ -99,7 +94,7 @@ double CommandMoveToBonus::potensialExpirience(const model::Wizard& self) {
 }
 
 int CommandMoveToBonus::priority(const model::Wizard& self) {
-  return 0;
+  return 2000;
 }
 
 

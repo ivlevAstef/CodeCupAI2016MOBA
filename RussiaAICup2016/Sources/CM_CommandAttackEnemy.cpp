@@ -148,10 +148,12 @@ void CommandAttackEnemy::execute(const model::Wizard& self, Result& result) {
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandAttackEnemy::visualization(const Visualizator& visualizator) const {
-  const auto enemy = World::instance().unit(enemyId);
-  assert(nullptr != enemy);
+  if (Visualizator::POST == visualizator.getStyle()) {
+    const auto enemy = World::instance().unit(enemyId);
+    assert(nullptr != enemy);
 
-  visualizator.line(selfPos.x, selfPos.y, enemy->getX(), enemy->getY(), 0xff0000);
-  visualizator.fillCircle(enemy->getX(), enemy->getY(), enemy->getRadius() * 0.75, 0xff0000);
+    visualizator.line(selfPos.x, selfPos.y, enemy->getX(), enemy->getY(), 0xff0000);
+    visualizator.fillCircle(enemy->getX(), enemy->getY(), enemy->getRadius() * 0.75, 0xff0000);
+  }
 }
 #endif // ENABLE_VISUALIZATOR
