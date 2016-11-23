@@ -5,7 +5,7 @@ using namespace AICup;
 
 TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder):
   CommandStrategy(fabric, pathFinder) {
-  currentMoveCommandIndex = 2;
+  currentMoveCommandIndex = 0;
 
   allMoveCommands.push_back(fabric.moveToPoint(800, 3200));
   allMoveCommands.push_back(fabric.moveToPoint(200, 2400));

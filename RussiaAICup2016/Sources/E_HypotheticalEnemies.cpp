@@ -16,7 +16,7 @@ void HypotheticalEnemies::update() {
   //TODO: потом переделать на волны, ибо такой вариант плох по многим причинам
   hypotheticalMinions.clear();
 
-  for (const auto& minion : World::instance().minions()) {
+  /*for (const auto& minion : World::instance().minions()) {
     if (model::FACTION_ACADEMY == minion.getFaction()) {
       const auto reversePos = reverse(EX::pos(minion));
 
@@ -32,7 +32,7 @@ void HypotheticalEnemies::update() {
         hypotheticalMinions.push_back(Minion(minion, reversePos.x, reversePos.y, model::FACTION_RENEGADES));
       }
     }
-  }
+  }*/
 }
 
 const std::vector<model::Minion>& HypotheticalEnemies::getHypotheticalMinions() const {
@@ -41,10 +41,10 @@ const std::vector<model::Minion>& HypotheticalEnemies::getHypotheticalMinions() 
 
 #ifdef ENABLE_VISUALIZATOR
 void HypotheticalEnemies::visualization(const Visualizator& visualizator) const {
-  if (Visualizator::POST == visualizator.getStyle()) {
-    for (const auto& minion : hypotheticalMinions) {
-      visualizator.fillCircle(minion.getX(), minion.getY(), minion.getRadius(), 0xff0066);
-    }
-  }
+  //if (Visualizator::POST == visualizator.getStyle()) {
+  //  for (const auto& minion : hypotheticalMinions) {
+  //    visualizator.fillCircle(minion.getX(), minion.getY(), minion.getRadius(), 0xff0066);
+  //  }
+  //}
 }
 #endif // ENABLE_VISUALIZATOR
