@@ -30,6 +30,9 @@ namespace AICup
   public:
     void update();
 
+    const float const* getFriendsMap() const;
+    const float const* getEnemiesMap() const;
+
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const;
 #endif // ENABLE_VISUALIZATOR

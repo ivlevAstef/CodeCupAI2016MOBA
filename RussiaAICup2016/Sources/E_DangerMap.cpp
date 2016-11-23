@@ -20,6 +20,13 @@ void DangerMap::update() {
   includeHypotheticalEnemies();
 }
 
+const float const* DangerMap::getFriendsMap() const {
+  return reinterpret_cast<const float const*>(friends);
+}
+const float const* DangerMap::getEnemiesMap() const {
+  return reinterpret_cast<const float const*>(enemies);
+}
+
 void DangerMap::clean() {
   for (size_t x = 0; x < DangerMapConstants::memorySize; x++) {
     for (size_t y = 0; y < DangerMapConstants::memorySize; y++) {
@@ -111,7 +118,7 @@ void DangerMap::includeEnemy(const model::Unit& unit, const double radius, const
 
 #ifdef ENABLE_VISUALIZATOR
 void DangerMap::visualization(const Visualizator& visualizator) const {
-  if (Visualizator::ABS == visualizator.getStyle()) {
+  /*if (Visualizator::ABS == visualizator.getStyle()) {
     for (int x = 0; x < DangerMapConstants::memorySize; x++) {
       for (int y = 0; y < DangerMapConstants::memorySize; y++) {
         const double fWeight = 100 + (friends[x][y] * 5);
@@ -121,6 +128,6 @@ void DangerMap::visualization(const Visualizator& visualizator) const {
         visualizator.fillRect(x*5, y*5, (x+1)*5, (y+1)*5 , (colorRed << 16) | (colorGreen << 8) | (100));
       }
     }
-  }
+  }*/
 }
 #endif // ENABLE_VISUALIZATOR

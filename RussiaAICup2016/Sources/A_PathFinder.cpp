@@ -1,5 +1,6 @@
 #include "A_PathFinder.h"
 #include "E_World.h"
+#include "E_DangerMap.h"
 #include "C_Extensions.h"
 #include "C_Math.h"
 #include <chrono>
@@ -160,6 +161,18 @@ void PathFinder::calculateCost(const Obstacles& obstacles, const double radius) 
 
     Math::fillGrid(reinterpret_cast<float*>(costs), oPos.x, oPos.y, PathConstants::step, fullRadius, life);
   }
+
+
+  const float* enemiesMap = DangerMap::instance().getEnemiesMap();
+  for (size_t x = 0; x < PathConstants::memorySize; x++) {
+    for (size_t y = 0; y < PathConstants::memorySize; y++) {
+      const size_t mapX = size_t((x * double(PathConstants::step)) / double(DangerMapConstants::step));
+      const size_t mapY = size_t((y * double(PathConstants::step)) / double(DangerMapConstants::step));
+      const float value = enemiesMap[mapX * DangerMapConstants::memorySize + mapY];
+      costs[x][y] += value;
+    }
+  }
+
 }
 
 void PathFinder::calculateWeight(Vector2D<int> to) {
@@ -287,7 +300,7 @@ void Path::visualization(const Visualizator& visualizator) const {
 
 
 void PathFinder::visualization(const Visualizator& visualizator) const {
-  /*if (Visualizator::ABS == visualizator.getStyle()) {
+ /* if (Visualizator::ABS == visualizator.getStyle()) {
     for (int x = 0; x < PathConstants::memorySize; x++) {
       for (int y = 0; y < PathConstants::memorySize; y++) {
 
