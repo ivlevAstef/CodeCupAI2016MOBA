@@ -15,6 +15,7 @@ using namespace AICup;
 World::World() {
   initLinePosition();
   initTrees();
+  initBuildings();
 }
 
 void World::update(const model::World& world) {
@@ -33,8 +34,26 @@ const std::vector<model::Building>& World::buildings() const {
   return supposedBuilding;
 }
 
+const std::vector<model::Minion>& World::minions() const {
+  return modelWorld->getMinions();
+}
+
 const std::vector<model::Wizard>& World::wizards() const {
-  return supposedWizards;
+  return modelWorld->getWizards();
+}
+
+void World::initBuildings() {
+  supposedBuilding.push_back(BaseBuilding(3600, 400, model::FACTION_RENEGADES));
+
+  // Top
+  supposedBuilding.push_back(TowerBuilding(3650, 2344, model::FACTION_RENEGADES));
+  supposedBuilding.push_back(TowerBuilding(3950, 1307, model::FACTION_RENEGADES));
+  // Middle
+  supposedBuilding.push_back(TowerBuilding(2071, 1600, model::FACTION_RENEGADES));
+  supposedBuilding.push_back(TowerBuilding(3095, 1232, model::FACTION_RENEGADES));
+  // Bottom
+  supposedBuilding.push_back(TowerBuilding(1688, 50, model::FACTION_RENEGADES));
+  supposedBuilding.push_back(TowerBuilding(2630, 350, model::FACTION_RENEGADES));
 }
 
 void World::initTrees() {
@@ -61,46 +80,6 @@ void World::initLinePosition() {
   bottomLinePosition = Points::point(Points::BOTTOM_CENTER);
 }
 
-template<typename Type, typename CreateType>
-static std::vector<Type> updateRadius(const std::vector<Type>& real) {
-  std::vector<Type> result;
-  result.reserve(real.size());
-
-  for (const auto& obj : real) {
-    result.push_back(CreateType(obj, obj.getRadius() + 0.1));
-  }
-
-  return result;
-}
-
-template<typename Type>
-static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real, const std::vector<Looking> visionZone) {
-  //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
-  std::vector<Type> result;
-
-  for (const auto& sIter : supposed) {
-    bool found = false;
-    for (const auto& vision : visionZone) {
-      double dx = sIter.getX() - vision.getX();
-      double dy = sIter.getY() - vision.getY();
-      if (sqrt(dx*dx + dy*dy) < vision.getVisionRange() + sIter.getRadius()) {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
-      result.push_back(sIter);
-    }
-  }
-
-  for (const auto& rIter : real) {
-    result.push_back(rIter);
-  }
-
-  return result;
-}
-
 void World::updateVisionZone() {
   visionZone.clear();
 
@@ -123,11 +102,64 @@ void World::updateVisionZone() {
   }
 }
 
+template<typename Type>
+static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real, const std::vector<Looking> visionZone) {
+  //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
+  std::vector<Type> result;
+
+  for (const auto& sIter : supposed) {
+    bool found = false;
+    for (const auto& vision : visionZone) {
+      const double dx = sIter.getX() - vision.getX();
+      const double dy = sIter.getY() - vision.getY();
+      if (sqrt(dx*dx + dy*dy) < vision.getVisionRange()) {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      result.push_back(sIter);
+    }
+  }
+
+  for (const auto& rIter : real) {
+    result.push_back(rIter);
+  }
+
+  return result;
+}
+
+
+template<typename Type, typename CreateType>
+static std::vector<Type> updateRadius(const std::vector<Type>& real) {
+  std::vector<Type> result;
+  result.reserve(real.size());
+
+  for (const auto& obj : real) {
+    result.push_back(CreateType(obj, obj.getRadius() + 0.1));
+  }
+
+  return result;
+}
+
+static std::vector<model::Building> updateBuildingTicks(const std::vector<model::Building>& real) {
+  std::vector<model::Building> result;
+  result.reserve(real.size());
+
+  for (const auto& obj : real) {
+    result.push_back(Building(obj, obj.getRemainingActionCooldownTicks() - 1));
+  }
+
+  return result;
+}
+
+
 void World::updateSupposedData() {
+  supposedBuilding = updateBuildingTicks(supposedBuilding);
 
   supposedTrees = merge(supposedTrees, updateRadius<model::Tree, Tree>(modelWorld->getTrees()), visionZone);
-  supposedWizards = modelWorld->getWizards();
-  supposedBuilding = updateRadius<model::Building, Building>(modelWorld->getBuildings());
+  supposedBuilding = merge(supposedBuilding, updateRadius<model::Building, Building>(modelWorld->getBuildings()), visionZone);
 }
 
 void World::recalculateLinePositions() {
@@ -443,8 +475,21 @@ std::vector<const model::LivingUnit*> World::aroundEnemies(const model::Wizard& 
 
 #ifdef ENABLE_VISUALIZATOR
 void World::visualization(const Visualizator& visualizator) const {
-  visualizator.circle(topLinePosition.x, topLinePosition.y, 200, 0xff0000);
-  visualizator.circle(middleLinePosition.x, middleLinePosition.y, 200, 0xff0000);
-  visualizator.circle(bottomLinePosition.x, bottomLinePosition.y, 200, 0xff0000);
+  if (Visualizator::PRE == visualizator.getStyle()) {
+    visualizator.circle(topLinePosition.x, topLinePosition.y, 200, 0xff0000);
+    visualizator.circle(middleLinePosition.x, middleLinePosition.y, 200, 0xff0000);
+    visualizator.circle(bottomLinePosition.x, bottomLinePosition.y, 200, 0xff0000);
+
+    for (const auto& build : supposedBuilding) {
+      visualizator.fillCircle(build.getX(), build.getY(), build.getRadius(), 0xffff00);
+    }
+  }
+
+  if (Visualizator::POST == visualizator.getStyle()) {
+    for (const auto& tree : supposedTrees) {
+      visualizator.fillCircle(tree.getX(), tree.getY(), tree.getRadius(), 0xff7700);
+    }
+  }
+
 }
 #endif // ENABLE_VISUALIZATOR

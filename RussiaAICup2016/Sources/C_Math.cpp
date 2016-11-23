@@ -136,3 +136,31 @@ std::vector<Vector> Math::tangetsForTwoCircle(const Position& p1, const double r
 
   return{tangent1.normal(), tangent2.normal()};
 }
+
+void Math::fillGrid(float* grid, const double x, const double y, const double step, const double radius, const float value) {
+  const size_t size = 4000 / step;
+
+  const double minRealX = MAX(0, x - radius) / step;
+  const double maxRealX = MIN(4000, x + radius) / step;
+  const double minRealY = MAX(0, y - radius) / step;
+  const double maxRealY = MIN(4000, y + radius) / step;
+
+  const size_t minX = floor(minRealX);
+  const size_t maxX = ceil(maxRealX);
+  const size_t minY = floor(minRealY);
+  const size_t maxY = ceil(maxRealY);
+
+  for (size_t x = minX; x < maxX; x++) {
+    const float sxMin = 1 - MAX(0, minRealX - double(x));
+    const float sxMax = 1 - MAX(0, double(x + 1) - maxRealX);
+    for (size_t y = minY; y < maxY; y++) {
+      const float syMin = 1 - MAX(0, minRealY - double(y));
+      const float syMax = 1 - MAX(0, double(y + 1) - maxRealY);
+
+      const float dx = sxMin + sxMax - 1;
+      const float dy = syMin + syMax - 1;
+
+      grid[x * size + y] += dx*dx*dy*dy * value;
+    }
+  }
+}

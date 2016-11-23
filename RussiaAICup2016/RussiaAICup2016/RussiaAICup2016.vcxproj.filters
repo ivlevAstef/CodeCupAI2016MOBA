@@ -141,6 +141,12 @@
     <ClCompile Include="..\Sources\E_Points.cpp">
       <Filter>Sources\Environment</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\E_DangerMap.cpp">
+      <Filter>Sources\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\E_HypotheticalEnemies.cpp">
+      <Filter>Sources\Environment</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -252,6 +258,12 @@
       <Filter>Sources\Algorithms</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\E_Points.h">
+      <Filter>Sources\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\E_DangerMap.h">
+      <Filter>Sources\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\E_HypotheticalEnemies.h">
       <Filter>Sources\Environment</Filter>
     </ClInclude>
   </ItemGroup>

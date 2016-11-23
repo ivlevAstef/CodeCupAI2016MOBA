@@ -32,7 +32,9 @@ namespace AICup
 
     const std::vector<model::Tree>& trees() const;
     const std::vector<model::Building>& buildings() const;
+    const std::vector<model::Minion>& minions() const;
     const std::vector<model::Wizard>& wizards() const;
+
 
     Obstacles allObstacles(const model::CircularUnit& unit, const bool onlyStatic = false) const;
     Obstacles obstacles(const model::CircularUnit& unit, const double range) const;
@@ -55,6 +57,7 @@ namespace AICup
 
   private:
     void initLinePosition();
+    void initBuildings();
     void initTrees();
 
     void recalculateLinePositions();
@@ -63,14 +66,11 @@ namespace AICup
 
 
   private:
-    bool isInitialized;
-
     const model::World* modelWorld;
 
     std::vector<Looking> visionZone;
     std::vector<model::Tree> supposedTrees;
     std::vector<model::Building> supposedBuilding;
-    std::vector<model::Wizard> supposedWizards;
 
     Position topLinePosition;
     Position middleLinePosition;

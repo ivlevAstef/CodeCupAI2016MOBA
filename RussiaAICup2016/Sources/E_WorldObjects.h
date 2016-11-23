@@ -29,6 +29,21 @@ namespace AICup
   public:
     //копия строения но слегка с увеличенным радиусом, для того чтобы наверняка
     Building(const model::Building& building, double radius);
+
+    //копия строения но c уменьшенным временем удара
+    Building(const model::Building& building, int ticks);
+  };
+
+  class BaseBuilding: public model::Building {
+  public:
+    //свое строение, дабы чтобы было в неизвестных зонах
+    BaseBuilding(double x, double y, model::Faction faction);
+  };
+
+  class TowerBuilding: public model::Building {
+  public:
+    //свое строение, дабы чтобы было в неизвестных зонах
+    TowerBuilding(double x, double y, model::Faction faction);
   };
 
   class Looking {

@@ -45,5 +45,7 @@ namespace AICup
 
     /// касательная между двумя сторонами круга с разных сторон!!!
     std::vector<Vector> tangetsForTwoCircle(const Position& p1, const double radius1, const Position& p2, const double radius2);
+
+    void fillGrid(float* grid, const double x, const double y, const double step, const double radius, const float value);
   }
 }

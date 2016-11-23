@@ -155,31 +155,10 @@ void PathFinder::calculateCost(const Obstacles& obstacles, const double radius) 
       life = PathConstants::maxValue; /// здания
     }
 
-    const auto obstaclePos = EX::pos(*obstacle);
+    const auto oPos = EX::pos(*obstacle);
     const auto fullRadius = radius + obstacle->getRadius();
 
-    const double minRealX = (obstaclePos.x - fullRadius) / PathConstants::step;
-    const double maxRealX = (obstaclePos.x + fullRadius) / PathConstants::step;
-    const double minRealY = (obstaclePos.y - fullRadius) / PathConstants::step;
-    const double maxRealY = (obstaclePos.y + fullRadius) / PathConstants::step;
-
-    const size_t minX = floor(minRealX);
-    const size_t maxX = ceil(maxRealX);
-    const size_t minY = floor(minRealY);
-    const size_t maxY = ceil(maxRealY);
-
-    for (size_t x = minX; x < maxX; x++) {
-      double sxMin = 1 - MAX(0, minRealX - double(x));
-      double sxMax = 1 - MAX(0, double(x + 1) - maxRealX);
-      for (size_t y = minY; y < maxY; y++) {
-        double syMin = 1 - MAX(0, minRealY - double(y));
-        double syMax = 1 - MAX(0, double(y + 1) - maxRealY);
-
-        costs[x][y] += sqrt(sxMin + sxMax - 1)*sqrt(syMin + syMax - 1) * life;
-
-        assert(sxMin >= 0 && sxMax >= 0 && syMin >= 0 && syMax >= 0);
-      }
-    }
+    Math::fillGrid(reinterpret_cast<float*>(costs), oPos.x, oPos.y, PathConstants::step, fullRadius, life);
   }
 }
 

@@ -78,8 +78,10 @@ void Points::initPoints() {
 
 #ifdef ENABLE_VISUALIZATOR
 void Points::visualization(const Visualizator& visualizator) const {
-  for (const auto& point : points) {
-    visualizator.fillCircle(point.x, point.y, 10, 0x0000aa);
+  if (Visualizator::PRE == visualizator.getStyle()) {
+    for (const auto& point : points) {
+      visualizator.fillCircle(point.x, point.y, 10, 0x0000aa);
+    }
   }
 }
 #endif // ENABLE_VISUALIZATOR

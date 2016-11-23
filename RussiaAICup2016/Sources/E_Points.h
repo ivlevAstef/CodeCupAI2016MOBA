@@ -80,7 +80,6 @@ namespace AICup
     void visualization(const Visualizator& visualizator) const;
 #endif // ENABLE_VISUALIZATOR
 
-
   private:
     void initPoints();
 

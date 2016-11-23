@@ -172,6 +172,8 @@ powershell start-process local-runner.bat</Command>
     <ClCompile Include="..\Sources\CM_CommandFabric.cpp" />
     <ClCompile Include="..\Sources\CM_CommandFollow.cpp" />
     <ClCompile Include="..\Sources\CM_CommandKeepDistance.cpp" />
+    <ClCompile Include="..\Sources\E_DangerMap.cpp" />
+    <ClCompile Include="..\Sources\E_HypotheticalEnemies.cpp" />
     <ClCompile Include="..\Sources\E_WorldObjects.cpp" />
     <ClCompile Include="..\Sources\S_StrategyManager.cpp" />
     <ClCompile Include="..\Sources\CM_CommandMoveGetExpirience.cpp" />
@@ -208,6 +210,8 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\CM_CommandFollow.h" />
     <ClInclude Include="..\Sources\CM_CommandKeepDistance.h" />
     <ClInclude Include="..\Sources\CM_MoveCommand.h" />
+    <ClInclude Include="..\Sources\E_DangerMap.h" />
+    <ClInclude Include="..\Sources\E_HypotheticalEnemies.h" />
     <ClInclude Include="..\Sources\E_WorldObjects.h" />
     <ClInclude Include="..\Sources\S_StrategyManager.h" />
     <ClInclude Include="..\Sources\CM_CommandMoveGetExpirience.h" />

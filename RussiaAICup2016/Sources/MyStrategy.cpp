@@ -6,9 +6,11 @@
 
 #include "MyStrategy.h"
 #include "E_World.h"
+#include "E_DangerMap.h"
 #include "E_Game.h"
 #include "E_Points.h"
 #include "C_Logger.h"
+#include "E_HypotheticalEnemies.h"
 #include "S_StrategyManager.h"
 
 
@@ -22,35 +24,39 @@ MyStrategy::MyStrategy() {
 #endif
 }
 
+void visualization(const Visualizator& visualizator) {
+  AICup::World::instance().visualization(visualizator);
+  AICup::Points::instance().visualization(visualizator);
+  AICup::HypotheticalEnemies::instance().update();
+
+  if (AICup::World::model().getTickIndex() > 800) { /// до появления крипов не шибком нужна
+    AICup::DangerMap::instance().visualization(visualizator);
+  }
+
+  AICup::StrategyManager::instance().visualization(visualizator);
+}
+
 void MyStrategy::move(const model::Wizard& self, const model::World& world, const model::Game& game, model::Move& move) {
   AICup::Game::instance().update(game);
   AICup::World::instance().update(world);
-
+  AICup::HypotheticalEnemies::instance().update();
+  AICup::DangerMap::instance().update();
   AICup::StrategyManager::instance().update(self, move);
 
 #ifdef ENABLE_VISUALIZATOR
   auto& visualizator = Visualizator::instance();
-
   visualizator.isReverse = (self.getFaction() == model::FACTION_RENEGADES);
 
   visualizator.beginPre();
-
-  AICup::World::instance().visualization(visualizator);
-  AICup::Points::instance().visualization(visualizator);
-  AICup::StrategyManager::instance().visualization(visualizator);
-
+  visualization(visualizator);
   visualizator.endPre();
 
   visualizator.beginPost();
-
-  AICup::StrategyManager::instance().visualization(visualizator);
-
+  visualization(visualizator);
   visualizator.endPost();
 
   visualizator.beginAbs();
-
-  AICup::StrategyManager::instance().visualization(visualizator);
-
+  visualization(visualizator);
   visualizator.endAbs();
 
 #endif
