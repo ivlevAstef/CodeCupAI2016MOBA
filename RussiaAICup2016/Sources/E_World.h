@@ -35,6 +35,8 @@ namespace AICup
     const std::vector<model::Minion>& minions() const;
     const std::vector<model::Wizard>& wizards() const;
 
+    const std::vector<Looking>& getVisionZone() const;
+
 
     Obstacles allObstacles(const model::CircularUnit& unit, const bool onlyStatic = false) const;
     Obstacles obstacles(const model::CircularUnit& unit, const double range) const;

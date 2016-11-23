@@ -4,11 +4,15 @@ using namespace AICup;
 
 
 /// будет так, искреннне надеюсь что я не создаю за 20к тиков объектов превышающих long long
-static long long idIndex = 100000;
+static long long calcId() {
+  static long long idIndex = 100000;
+  idIndex++;
+  return 100000 + (idIndex - 100000) % 100000000;
+}
 
 
 Tree::Tree(const model::Tree& tree, double radius):
-  model::Tree(++idIndex,
+  model::Tree(calcId(),
     tree.getX(), tree.getY(), 0, 0, 0,
     model::FACTION_ACADEMY, radius, tree.getLife(), tree.getMaxLife(), std::vector<model::Status>())
 {
@@ -25,7 +29,7 @@ int lifeByRadius(double radius) {
 
 //свое дерево, дабы чтобы было в неизвестных зонах
 Tree::Tree(double x, double y, double radius):
-  model::Tree(++idIndex,
+  model::Tree(calcId(),
     x, y, 0, 0, 0,
     model::FACTION_ACADEMY, radius, lifeByRadius(radius), lifeByRadius(radius), std::vector<model::Status>())
 {
@@ -56,7 +60,7 @@ Building::Building(const model::Building& building, int ticks):
 
 
 BaseBuilding::BaseBuilding(double x, double y, model::Faction faction):
-  model::Building(++idIndex,
+  model::Building(calcId(),
     x, y, 0, 0, 0,
     faction, 100,
     2000, 2000,
@@ -68,13 +72,24 @@ BaseBuilding::BaseBuilding(double x, double y, model::Faction faction):
 }
 
 TowerBuilding::TowerBuilding(double x, double y, model::Faction faction):
-  model::Building(++idIndex,
+  model::Building(calcId(),
     x, y, 0, 0, 0,
     faction, 50,
     1000, 1000,
     std::vector<model::Status>(),
     model::BUILDING_GUARDIAN_TOWER, 600, 600,
     36, 240, 0) {
+
+}
+
+Minion::Minion(const model::Minion& minion, double x, double y, model::Faction faction):
+  model::Minion(calcId(),
+    x, y, 0, 0, 0,
+    faction, minion.getRadius(),
+    minion.getMaxLife(), minion.getMaxLife(),
+    std::vector<model::Status>(),
+    minion.getType(), minion.getVisionRange(),
+    minion.getDamage(), minion.getCooldownTicks(), 0) {
 
 }
 

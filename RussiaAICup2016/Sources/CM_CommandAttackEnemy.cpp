@@ -127,7 +127,7 @@ int CommandAttackEnemy::priority(const model::Wizard& self) {
   statusPriority = MAX(-1, MIN(statusPriority, 1));
 
 
-  return 1000 * (0.3 * lifePriority + 0.5 * typePriority + 0.2 * statusPriority);
+  return int(1000 * (0.3 * lifePriority + 0.5 * typePriority + 0.2 * statusPriority));
 }
 
 void CommandAttackEnemy::execute(const model::Wizard& self, Result& result) {

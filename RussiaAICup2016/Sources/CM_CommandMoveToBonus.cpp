@@ -36,12 +36,12 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
   const auto topBonusPos = Points::point(Points::BONUS_TOP);
   const auto bottomBonusPos = Points::point(Points::BONUS_BOTTOM);
 
-  Algorithm::Path* path = nullptr;
+  std::shared_ptr<Algorithm::Path> path;
 
-  pathFinder.calculatePath(topBonusPos, &path);
+  pathFinder.calculatePath(topBonusPos, path);
   double ticksToTop = path->getLength() / Game::instance().model().getWizardForwardSpeed();
 
-  pathFinder.calculatePath(bottomBonusPos, &path);
+  pathFinder.calculatePath(bottomBonusPos, path);
   double ticksToBottom = path->getLength() / Game::instance().model().getWizardForwardSpeed();
 
   int maxTicksToBonus = Game::instance().model().getBonusAppearanceIntervalTicks();

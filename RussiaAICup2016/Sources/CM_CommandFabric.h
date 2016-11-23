@@ -17,7 +17,7 @@ namespace AICup
   public:
     CommandFabric(Algorithm::PathFinder& finder);
 
-#pragma mark - перемещение
+/// #pragma mark - перемещение
     /// даржаться от точки на определенном расстоянии
     MoveCommandPtr keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const;
 
@@ -39,7 +39,7 @@ namespace AICup
     /// обследование карты - посещение мест где был давно
     MoveCommandPtr observeMap() const;
 
-#pragma mark - атака
+/// #pragma mark - атака
     /// атаковать врага
     AttackCommandPtr attack(const long long enemyId) const;
 
@@ -47,7 +47,7 @@ namespace AICup
     AttackCommandPtr pool(const long long neutralUnitId) const;
 
 
-#pragma mark - защита
+/// #pragma mark - защита
     /// защищать позицию
     MoveCommandPtr defend(const double x, const double y) const;
 

@@ -9,19 +9,19 @@
 
 using namespace AICup;
 
-CommandDefendPoint::CommandDefendPoint(Algorithm::PathFinder& finder, double x, double y):
+CommandDefendPoint::CommandDefendPoint(Algorithm::PathFinder& finder, double, double):
   MoveCommand(finder) {
 
 }
 
-bool CommandDefendPoint::check(const model::Wizard& self) {
+bool CommandDefendPoint::check(const model::Wizard&) {
   return false;
 }
 
-int CommandDefendPoint::priority(const model::Wizard& self) {
+int CommandDefendPoint::priority(const model::Wizard&) {
   return 0;
 }
 
 
-void CommandDefendPoint::execute(const model::Wizard& self, Result& result) {
+void CommandDefendPoint::execute(const model::Wizard&, Result&) {
 }

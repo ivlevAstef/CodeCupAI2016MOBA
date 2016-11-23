@@ -53,7 +53,7 @@ bool CommandAvoidAround::check(const model::Wizard& self) {
   return !enemies.empty();
 }
 
-int CommandAvoidAround::priority(const model::Wizard& self) {
+int CommandAvoidAround::priority(const model::Wizard&) {
   return 0;
 }
 
@@ -87,7 +87,7 @@ void CommandAvoidAround::execute(const model::Wizard& self, Result& result) {
 
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandAvoidAround::visualization(const Visualizator& visualizator) const {
+void CommandAvoidAround::visualization(const Visualizator&) const {
 
 }
 #endif // ENABLE_VISUALIZATOR

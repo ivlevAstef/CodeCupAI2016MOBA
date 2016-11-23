@@ -41,7 +41,7 @@ bool CommandKeepDistance::check(const model::Wizard& self) {
   return commandMoveToPoint->check(self);
 }
 
-int CommandKeepDistance::priority(const model::Wizard& self) {
+int CommandKeepDistance::priority(const model::Wizard&) {
   return 0;
 }
 

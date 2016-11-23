@@ -13,13 +13,13 @@ CommandObserveMap::CommandObserveMap(Algorithm::PathFinder& finder): MoveCommand
 
 }
 
-bool CommandObserveMap::check(const model::Wizard& self) {
+bool CommandObserveMap::check(const model::Wizard&) {
   return false;
 }
 
-int CommandObserveMap::priority(const model::Wizard& self) {
+int CommandObserveMap::priority(const model::Wizard&) {
   return 0;
 }
 
-void CommandObserveMap::execute(const model::Wizard& self, Result& result) {
+void CommandObserveMap::execute(const model::Wizard&, Result&) {
 }

@@ -10,6 +10,7 @@
 #include "E_Types.h"
 #include "C_Vector2D.h"
 #include "model\CircularUnit.h"
+#include <memory>
 
 #ifdef ENABLE_VISUALIZATOR
 #include "Visualizator.h"
@@ -33,7 +34,7 @@ namespace AICup
     };
 
     class Path {
-    private:
+    public:
       Path(Position from, Position to, const double radius, const Obstacles&);
 
     public:
@@ -78,7 +79,7 @@ namespace AICup
       ///Возращает точку куда надо идти
       void calculate(const model::CircularUnit& unit);
 
-      void calculatePath(const Position& to, Path** path) const;
+      void calculatePath(const Position& to, std::shared_ptr<Path>& path) const;
 
 #ifdef ENABLE_VISUALIZATOR
       void visualization(const Visualizator& visualizator) const;

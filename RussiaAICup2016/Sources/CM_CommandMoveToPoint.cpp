@@ -25,7 +25,7 @@ int CommandMoveToPoint::priority(const model::Wizard& self) {
 }
 
 void CommandMoveToPoint::execute(const model::Wizard& self, Result& result) {
-  pathFinder.calculatePath(point, &path);
+  pathFinder.calculatePath(point, path);
   assert(nullptr != path);
 
   preEndPoint = path->calculateNearestCurvaturePoint(self.getVisionRange()/2);

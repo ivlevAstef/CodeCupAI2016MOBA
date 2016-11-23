@@ -110,13 +110,13 @@ void FirstStrategy::changeLane(const model::Wizard& self) {
   const auto middlePosition = World::instance().linePosition(model::LANE_MIDDLE);
   const auto bottomPosition = World::instance().linePosition(model::LANE_BOTTOM);
 
-  Algorithm::Path* path = nullptr;
+  std::shared_ptr<Algorithm::Path> path;
 
-  pathFinder.calculatePath(topPosition, &path);
+  pathFinder.calculatePath(topPosition, path);
   double selfTopLength = path->getLength();
-  pathFinder.calculatePath(middlePosition, &path);
+  pathFinder.calculatePath(middlePosition, path);
   double selfMiddleLength = path->getLength();
-  pathFinder.calculatePath(bottomPosition, &path);
+  pathFinder.calculatePath(bottomPosition, path);
   double selfTBottomLength = path->getLength();
 
   double topLength = abs((basePosition - topPosition).x) + abs((basePosition - topPosition).y);

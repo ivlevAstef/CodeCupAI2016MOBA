@@ -13,7 +13,7 @@ Position PathConstants::toReal(Vector2D<int> point, double dx, double dy) {
   return Position((point.x + dx) * step, (point.y + dy) * step);
 }
 Vector2D<int> PathConstants::toInt(Position point) {
-  return Vector2D<int>(floor(point.x / step), floor(point.y / step));
+  return Vector2D<int>((int)floor(point.x / step), (int)floor(point.y / step));
 }
 
 
@@ -138,10 +138,10 @@ void PathFinder::calculate(const model::CircularUnit& unit) {
   }
 }
 
-void PathFinder::calculatePath(const Position& to, Path** path) const {
-  (*path) = new Path(from, to, radius, obstacles);
+void PathFinder::calculatePath(const Position& to, std::shared_ptr<Path>& path) const {
+  path.swap(std::make_shared<Path>(from, to, radius, obstacles));
 
-  calculatePath(**path);
+  calculatePath(*path.get());
 }
 
 void PathFinder::calculateCost(const Obstacles& obstacles, const double radius) {

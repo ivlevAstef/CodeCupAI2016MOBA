@@ -46,6 +46,13 @@ namespace AICup
     TowerBuilding(double x, double y, model::Faction faction);
   };
 
+  class Minion: public model::Minion {
+  public:
+    //копия миньона но с другим расположением, и фракцией
+    Minion(const model::Minion& minion, double x, double y, model::Faction faction);
+
+  };
+
   class Looking {
   public:
     Looking(const model::Wizard& unit);

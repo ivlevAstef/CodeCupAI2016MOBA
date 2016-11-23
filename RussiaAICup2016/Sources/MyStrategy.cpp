@@ -27,11 +27,9 @@ MyStrategy::MyStrategy() {
 void visualization(const Visualizator& visualizator) {
   AICup::World::instance().visualization(visualizator);
   AICup::Points::instance().visualization(visualizator);
-  AICup::HypotheticalEnemies::instance().update();
+  AICup::HypotheticalEnemies::instance().visualization(visualizator);
 
-  if (AICup::World::model().getTickIndex() > 800) { /// до появления крипов не шибком нужна
-    AICup::DangerMap::instance().visualization(visualizator);
-  }
+  AICup::DangerMap::instance().visualization(visualizator);
 
   AICup::StrategyManager::instance().visualization(visualizator);
 }

@@ -160,7 +160,7 @@ void Math::fillGrid(float* grid, const double x, const double y, const double st
       const float dx = sxMin + sxMax - 1;
       const float dy = syMin + syMax - 1;
 
-      grid[x * size + y] += dx*dx*dy*dy * value;
+      grid[x * size + y] += dx*dy * value;
     }
   }
 }

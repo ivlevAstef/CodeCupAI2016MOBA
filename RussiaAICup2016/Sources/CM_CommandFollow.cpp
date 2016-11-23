@@ -78,7 +78,7 @@ bool CommandFollow::check(const model::Wizard& self) {
   return commandMoveToPoint->check(self);
 }
 
-int CommandFollow::priority(const model::Wizard& self) {
+int CommandFollow::priority(const model::Wizard&) {
   return 0;
 }
 

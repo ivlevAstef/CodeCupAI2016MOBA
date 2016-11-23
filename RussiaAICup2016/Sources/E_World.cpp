@@ -42,6 +42,10 @@ const std::vector<model::Wizard>& World::wizards() const {
   return modelWorld->getWizards();
 }
 
+const std::vector<Looking>& World::getVisionZone() const {
+  return visionZone;
+}
+
 void World::initBuildings() {
   supposedBuilding.push_back(BaseBuilding(3600, 400, model::FACTION_RENEGADES));
 
@@ -148,7 +152,7 @@ static std::vector<model::Building> updateBuildingTicks(const std::vector<model:
   result.reserve(real.size());
 
   for (const auto& obj : real) {
-    result.push_back(Building(obj, obj.getRemainingActionCooldownTicks() - 1));
+    result.push_back(Building(obj, MAX(0, obj.getRemainingActionCooldownTicks() - 1)));
   }
 
   return result;
@@ -475,21 +479,21 @@ std::vector<const model::LivingUnit*> World::aroundEnemies(const model::Wizard& 
 
 #ifdef ENABLE_VISUALIZATOR
 void World::visualization(const Visualizator& visualizator) const {
-  if (Visualizator::PRE == visualizator.getStyle()) {
-    visualizator.circle(topLinePosition.x, topLinePosition.y, 200, 0xff0000);
-    visualizator.circle(middleLinePosition.x, middleLinePosition.y, 200, 0xff0000);
-    visualizator.circle(bottomLinePosition.x, bottomLinePosition.y, 200, 0xff0000);
+  //if (Visualizator::PRE == visualizator.getStyle()) {
+  //  visualizator.circle(topLinePosition.x, topLinePosition.y, 200, 0xff0000);
+  //  visualizator.circle(middleLinePosition.x, middleLinePosition.y, 200, 0xff0000);
+  //  visualizator.circle(bottomLinePosition.x, bottomLinePosition.y, 200, 0xff0000);
 
-    for (const auto& build : supposedBuilding) {
-      visualizator.fillCircle(build.getX(), build.getY(), build.getRadius(), 0xffff00);
-    }
-  }
+  //  for (const auto& build : supposedBuilding) {
+  //    visualizator.fillCircle(build.getX(), build.getY(), build.getRadius(), 0xffff00);
+  //  }
+  //}
 
-  if (Visualizator::POST == visualizator.getStyle()) {
-    for (const auto& tree : supposedTrees) {
-      visualizator.fillCircle(tree.getX(), tree.getY(), tree.getRadius(), 0xff7700);
-    }
-  }
+  //if (Visualizator::POST == visualizator.getStyle()) {
+  //  for (const auto& tree : supposedTrees) {
+  //    visualizator.fillCircle(tree.getX(), tree.getY(), tree.getRadius(), 0xff7700);
+  //  }
+  //}
 
 }
 #endif // ENABLE_VISUALIZATOR

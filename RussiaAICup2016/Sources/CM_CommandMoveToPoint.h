@@ -34,7 +34,7 @@ namespace AICup
     const TurnStyle style;
     const double speedLimit;
 
-    Algorithm::Path* path;
+    std::shared_ptr<Algorithm::Path> path;
     Position preEndPoint;
     Position endPoint;
   };
