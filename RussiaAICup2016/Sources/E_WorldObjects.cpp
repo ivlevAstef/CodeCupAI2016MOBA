@@ -12,7 +12,7 @@ static long long calcId() {
 
 
 Tree::Tree(const model::Tree& tree, double radius):
-  model::Tree(calcId(),
+  model::Tree(tree.getId(),
     tree.getX(), tree.getY(), 0, 0, 0,
     model::FACTION_ACADEMY, radius, tree.getLife(), tree.getMaxLife(), std::vector<model::Status>())
 {
@@ -83,7 +83,7 @@ TowerBuilding::TowerBuilding(double x, double y, model::Faction faction):
 }
 
 Minion::Minion(const model::Minion& minion, double x, double y, model::Faction faction):
-  model::Minion(calcId(),
+  model::Minion(minion.getId(),
     x, y, 0, 0, 0,
     faction, minion.getRadius(),
     minion.getMaxLife(), minion.getMaxLife(),

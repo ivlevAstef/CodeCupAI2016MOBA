@@ -6,7 +6,7 @@
 
 #include "MyStrategy.h"
 #include "E_World.h"
-#include "E_DangerMap.h"
+#include "E_InfluenceMap.h"
 #include "E_Game.h"
 #include "E_Points.h"
 #include "C_Logger.h"
@@ -29,7 +29,7 @@ void visualization(const Visualizator& visualizator) {
   AICup::Points::instance().visualization(visualizator);
   AICup::HypotheticalEnemies::instance().visualization(visualizator);
 
-  AICup::DangerMap::instance().visualization(visualizator);
+  AICup::InfluenceMap::instance().visualization(visualizator);
 
   AICup::StrategyManager::instance().visualization(visualizator);
 }
@@ -38,7 +38,7 @@ void MyStrategy::move(const model::Wizard& self, const model::World& world, cons
   AICup::Game::instance().update(game);
   AICup::World::instance().update(world);
   AICup::HypotheticalEnemies::instance().update();
-  AICup::DangerMap::instance().update();
+  AICup::InfluenceMap::instance().update();
   AICup::StrategyManager::instance().update(self, move);
 
 #ifdef ENABLE_VISUALIZATOR

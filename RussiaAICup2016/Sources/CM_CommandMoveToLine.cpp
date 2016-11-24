@@ -7,7 +7,7 @@
 
 #include "CM_CommandMoveToLine.h"
 #include "CM_CommandMoveToPoint.h"
-#include "E_World.h"
+#include "E_InfluenceMap.h"
 
 using namespace AICup;
 
@@ -17,7 +17,7 @@ CommandMoveToLine::CommandMoveToLine(Algorithm::PathFinder& finder, model::LaneT
 }
 
 bool CommandMoveToLine::check(const model::Wizard& self) {
-  auto position = World::instance().linePosition(line);
+  auto position = InfluenceMap::instance().getForeFront(line, 100);
   commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, position.x, position.y);
 
   return commandMoveToPoint->check(self);

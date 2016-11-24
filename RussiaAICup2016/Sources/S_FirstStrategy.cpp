@@ -1,6 +1,7 @@
 #include "S_FirstStrategy.h"
 #include "E_World.h"
 #include "E_Points.h"
+#include "E_InfluenceMap.h"
 #include "C_Math.h"
 
 using namespace AICup;
@@ -106,9 +107,9 @@ void FirstStrategy::changeLane(const model::Wizard& self) {
   const auto selfPos = Position(self.getX(), self.getY());
 
   const auto basePosition = Points::point(Points::ACADEMY_BASE);
-  const auto topPosition = World::instance().linePosition(model::LANE_TOP);
-  const auto middlePosition = World::instance().linePosition(model::LANE_MIDDLE);
-  const auto bottomPosition = World::instance().linePosition(model::LANE_BOTTOM);
+  const auto topPosition = InfluenceMap::instance().getForeFront(model::LANE_TOP, 0);
+  const auto middlePosition = InfluenceMap::instance().getForeFront(model::LANE_MIDDLE, 0);
+  const auto bottomPosition = InfluenceMap::instance().getForeFront(model::LANE_BOTTOM, 0);
 
   std::shared_ptr<Algorithm::Path> path;
 

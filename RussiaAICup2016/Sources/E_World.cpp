@@ -13,7 +13,6 @@
 using namespace AICup;
 
 World::World() {
-  initLinePosition();
   initTrees();
   initBuildings();
 }
@@ -23,7 +22,6 @@ void World::update(const model::World& world) {
 
   updateVisionZone();
   updateSupposedData();
-  recalculateLinePositions();
 }
 
 const std::vector<model::Tree>& World::trees() const {
@@ -75,13 +73,6 @@ void World::initTrees() {
     }
   }
 
-}
-
-void World::initLinePosition() {
-  /// а мы всегда одна фракция...
-  topLinePosition = Points::point(Points::TOP_CENTER);
-  middleLinePosition = Points::point(Points::CENTER_ACADEMY);
-  bottomLinePosition = Points::point(Points::BOTTOM_CENTER);
 }
 
 void World::updateVisionZone() {
@@ -166,111 +157,6 @@ void World::updateSupposedData() {
   supposedBuilding = merge(supposedBuilding, updateRadius<model::Building, Building>(modelWorld->getBuildings()), visionZone);
 }
 
-void World::recalculateLinePositions() {
-  const auto& minions = model().getMinions();
-
-  const auto faction = model().getMyPlayer().getFaction();
-
-  std::vector<model::Minion> myMinions;
-  myMinions.reserve(minions.size());
-
-  std::vector<model::Minion> enemyMinions;
-  enemyMinions.reserve(minions.size());
-
-
-  /// separate minions
-  for (const auto& minion : minions) {
-    const auto& mFaction = minion.getFaction();
-    if (mFaction == model::FACTION_ACADEMY || mFaction == model::FACTION_RENEGADES) {
-      if (mFaction == faction) {
-        myMinions.push_back(minion);
-      } else {
-        enemyMinions.push_back(minion);
-      }
-    }
-  }
-
-
-  /// find all hassles
-  std::vector<Position> hassles;
-  hassles.reserve(myMinions.size());
-
-  const double attackDistance = MAX(
-    Game::instance().model().getFetishBlowdartAttackRange(),
-    Game::instance().model().getOrcWoodcutterAttackRange()
-  );
-
-
-  for (const auto& myMinion : myMinions) {
-    for (const auto& enemyMinion : enemyMinions) {
-      if (myMinion.getDistanceTo(enemyMinion) < attackDistance) {
-        hassles.push_back(Position(myMinion.getX(), myMinion.getY()));
-      }
-    }
-  }
-
-  /// calculate hassles count
-  std::vector<std::vector<Position>> hassleGroups;
-  hassleGroups.resize(hassles.size());
-  const double attackDistance2 = attackDistance * attackDistance;
-
-  for (size_t index = 0; index < hassles.size(); index++) {
-    const auto& cHassle = hassles[index];
-    for (const auto& hassle : hassles) {
-      if ((hassle - cHassle).length2() < attackDistance2) {
-        hassleGroups[index].push_back(hassle);
-      }
-    }
-  }
-
-  /// calculate line centers
-  size_t maxCounts[3] = {1, 1, 1};
-
-  for (size_t index = 0; index < hassles.size(); index++) {
-    const auto& group = hassleGroups[index];
-
-    Position center(0, 0);
-    for (const auto& hassle : group) {
-      center += hassle;
-    }
-    center /= group.size();
-
-
-    const auto line = positionToLine(center.x, center.y);
-
-    // center
-    size_t* maxCount = &maxCounts[1];
-    Position* position = &middleLinePosition;
-
-    if (line == model::LANE_TOP) {
-      maxCount = &maxCounts[0];
-      position = &topLinePosition;
-    } else if (line == model::LANE_BOTTOM) {
-      maxCount = &maxCounts[2];
-      position = &bottomLinePosition;
-    }
-
-    if (*maxCount < group.size()) {
-      *position = center;
-      *maxCount = group.size();
-    }
-  }
-
-}
-
-const Position& World::linePosition(model::LaneType line) const {
-  switch (line) {
-    case model::LANE_TOP:
-      return topLinePosition;
-    case model::LANE_MIDDLE:
-      return middleLinePosition;
-    case model::LANE_BOTTOM:
-      return bottomLinePosition;
-    default:
-      assert(false);
-  }
-  return middleLinePosition;
-}
 
 const model::LaneType World::positionToLine(const double x, const double y) const {
   double delta = (model().getWidth() - x) - y;

@@ -47,8 +47,6 @@ namespace AICup
     std::vector<const model::LivingUnit*> around(const model::Wizard& unit, const model::Faction faction, double radius = -1) const;
     std::vector<const model::LivingUnit*> aroundEnemies(const model::Wizard& unit, const double radius = -1) const;
 
-    const Position& linePosition(model::LaneType line) const;
-
     const int wizardCount(model::LaneType line) const;
     const int wizardCount(model::LaneType line, const model::Wizard& excludeWizard) const;
     const model::LaneType positionToLine(const double x, const double y) const;
@@ -58,14 +56,11 @@ namespace AICup
 #endif // ENABLE_VISUALIZATOR
 
   private:
-    void initLinePosition();
     void initBuildings();
     void initTrees();
 
-    void recalculateLinePositions();
     void updateVisionZone();
     void updateSupposedData();
-
 
   private:
     const model::World* modelWorld;
@@ -73,9 +68,5 @@ namespace AICup
     std::vector<Looking> visionZone;
     std::vector<model::Tree> supposedTrees;
     std::vector<model::Building> supposedBuilding;
-
-    Position topLinePosition;
-    Position middleLinePosition;
-    Position bottomLinePosition;
   };
 }

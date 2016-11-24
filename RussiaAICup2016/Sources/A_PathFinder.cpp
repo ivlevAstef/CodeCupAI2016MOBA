@@ -1,6 +1,6 @@
 #include "A_PathFinder.h"
 #include "E_World.h"
-#include "E_DangerMap.h"
+#include "E_InfluenceMap.h"
 #include "C_Extensions.h"
 #include "C_Math.h"
 #include <chrono>
@@ -39,13 +39,18 @@ bool Path::checkRemoved(const Obstacles& obstacles, const model::LivingUnit* obs
     if ( obstacle->getId() != obstacleForRemove->getId()
       && obstacle->getDistanceTo(*obstacleForRemove) < fullRadius) {
       const auto obstaclePos = EX::pos(*obstacle);
+      int lastTSign = 0;
       /// проверям с какой стороны пути препятствие
       for (size_t i = 1; i < count; i++) {
         const auto dir = path[i] - path[i - 1];
-        double t = (obstaclePos - path[i-1]).dot(dir.normal());
-        if (0 < t && t < dir.length()) {
+        const double t = (obstaclePos - path[i - 1]).dot(dir.normal());
+        const int tSign = SIGN(t);
+        if ((0 < t && t < dir.length()) || lastTSign == -tSign) {
           double alpha = (EX::pos(*obstacle) - path[i]).cross(dir);
           neightborsCount[alpha > 0 ? 0 : 1]++;
+          lastTSign = 0;
+        } else {
+          lastTSign = tSign;
         }
       }
     }
@@ -163,12 +168,12 @@ void PathFinder::calculateCost(const Obstacles& obstacles, const double radius) 
   }
 
 
-  const float* enemiesMap = DangerMap::instance().getEnemiesMap();
+  const float* enemiesMap = InfluenceMap::instance().getEnemiesMap();
   for (size_t x = 0; x < PathConstants::memorySize; x++) {
     for (size_t y = 0; y < PathConstants::memorySize; y++) {
-      const size_t mapX = size_t((x * double(PathConstants::step)) / double(DangerMapConstants::step));
-      const size_t mapY = size_t((y * double(PathConstants::step)) / double(DangerMapConstants::step));
-      const float value = enemiesMap[mapX * DangerMapConstants::memorySize + mapY];
+      const size_t mapX = size_t((x * double(PathConstants::step)) / double(InfluenceMapConstants::step));
+      const size_t mapY = size_t((y * double(PathConstants::step)) / double(InfluenceMapConstants::step));
+      const float value = enemiesMap[mapX * InfluenceMapConstants::memorySize + mapY];
       costs[x][y] += value;
     }
   }

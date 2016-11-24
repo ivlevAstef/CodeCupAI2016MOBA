@@ -58,9 +58,9 @@ void Points::initPoints() {
   points[BONUS_BOTTOM] = {width * 0.7, height * 0.7};
 
 
-  points[TOP_CENTER] = {left + width * 0.04, top + width * 0.04};
-  points[BOTTOM_CENTER] = {right - width * 0.04, bottom - width * 0.04};
+  points[TOP_CENTER] = {left, top};
   points[MIDDLE_CENTER] = {width * 0.5, height * 0.5};
+  points[BOTTOM_CENTER] = {right, bottom};
 
   points[CENTER_BONUS_TOP] = {width*0.5 - width*0.1, height*0.5 - height*0.1};
   points[CENTER_ACADEMY] = {width*0.5 - width*0.05, height*0.5 + height*0.05};

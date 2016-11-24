@@ -141,10 +141,10 @@
     <ClCompile Include="..\Sources\E_Points.cpp">
       <Filter>Sources\Environment</Filter>
     </ClCompile>
-    <ClCompile Include="..\Sources\E_DangerMap.cpp">
+    <ClCompile Include="..\Sources\E_HypotheticalEnemies.cpp">
       <Filter>Sources\Environment</Filter>
     </ClCompile>
-    <ClCompile Include="..\Sources\E_HypotheticalEnemies.cpp">
+    <ClCompile Include="..\Sources\E_InfluenceMap.cpp">
       <Filter>Sources\Environment</Filter>
     </ClCompile>
   </ItemGroup>
@@ -260,10 +260,10 @@
     <ClInclude Include="..\Sources\E_Points.h">
       <Filter>Sources\Environment</Filter>
     </ClInclude>
-    <ClInclude Include="..\Sources\E_DangerMap.h">
+    <ClInclude Include="..\Sources\E_HypotheticalEnemies.h">
       <Filter>Sources\Environment</Filter>
     </ClInclude>
-    <ClInclude Include="..\Sources\E_HypotheticalEnemies.h">
+    <ClInclude Include="..\Sources\E_InfluenceMap.h">
       <Filter>Sources\Environment</Filter>
     </ClInclude>
   </ItemGroup>
