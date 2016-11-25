@@ -25,7 +25,7 @@ namespace AICup
     public:
       static const size_t step = 32;
       static const size_t memorySize = 4000 / step;
-      static const size_t maxValue = 100000;
+      static const size_t maxValue = 10000000;
 
       static const size_t maxPath = memorySize * memorySize / 2;
 

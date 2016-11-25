@@ -10,6 +10,8 @@
 #include "E_World.h"
 #include "A_Move.h"
 #include "E_Game.h"
+#include "CM_MovePriorities.h"
+#include "C_Extensions.h"
 
 using namespace AICup;
 
@@ -19,10 +21,11 @@ CommandMoveGetExpirience::CommandMoveGetExpirience(Algorithm::PathFinder& finder
 
 
 bool CommandMoveGetExpirience::check(const model::Wizard& self) {
-  static const double expirienceRadius = 600 - 10/*на всякий случай*/;
-  const model::LivingUnit* selectedUnit = nullptr;
-  double minLive = 100000;
+  unit = nullptr;
+  followCommand = nullptr;
 
+  static const double expirienceRadius = 600 - 10/*на всякий случай*/;
+  double minLive = 100000;
 
   const auto selfPos = Position(self.getX(), self.getY());
 
@@ -32,34 +35,29 @@ bool CommandMoveGetExpirience::check(const model::Wizard& self) {
       const auto enemyPos = Position(enemy->getX(), enemy->getY());
       const double distance = (selfPos - enemyPos).length();
       if (distance > expirienceRadius) {
-        selectedUnit = enemy;
+        unit = enemy;
         minLive = enemy->getLife();
       }
     }
   }
 
-  if (nullptr == selectedUnit) {
+  if (nullptr == unit) {
     return false;
   }
 
-  if (selectedUnit->getLife() > 24) {
+  if (unit->getLife() > 24) {
     return false;
   }
 
 
-  expiriencePos = Position(selectedUnit->getX(), selectedUnit->getY());
-  followCommand = std::make_shared<CommandFollow>(pathFinder, selectedUnit->getId(), 0, expirienceRadius);
+  followCommand = std::make_shared<CommandFollow>(pathFinder, unit->getId(), 0, expirienceRadius);
   return followCommand->check(self);
-}
-
-int CommandMoveGetExpirience::priority(const model::Wizard& self) {
-  assert(nullptr != followCommand.get());
-  return followCommand->priority(self);
 }
 
 void CommandMoveGetExpirience::execute(const model::Wizard& self, Result& result) {
   assert(nullptr != followCommand.get());
   followCommand->execute(self, result);
+  result.priority = MovePriorities::getExpirience(self, *unit);
 }
 
 #ifdef ENABLE_VISUALIZATOR
@@ -67,7 +65,8 @@ void CommandMoveGetExpirience::visualization(const Visualizator& visualizator) c
   assert(nullptr != followCommand.get());
 
   if (Visualizator::POST == visualizator.getStyle()) {
-    visualizator.fillCircle(expiriencePos.x, expiriencePos.y, 10, 0xffff00);
+    const auto pos = EX::pos(*unit);
+    visualizator.fillCircle(pos.x, pos.y, 10, 0xffff00);
   }
 }
 #endif // ENABLE_VISUALIZATOR

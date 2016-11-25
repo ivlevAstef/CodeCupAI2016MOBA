@@ -315,13 +315,13 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
     const auto middleLine = getForeFront(model::LANE_MIDDLE, 0);
     const auto bottomLine = getForeFront(model::LANE_BOTTOM, 0);
 
-    const auto topFriendLine    = getForeFront(model::LANE_TOP, 100);
-    const auto middleFriendLine = getForeFront(model::LANE_MIDDLE, 100);
-    const auto bottomFriendLine = getForeFront(model::LANE_BOTTOM, 100);
+    const auto topFriendLine    = getForeFront(model::LANE_TOP, 200);
+    const auto middleFriendLine = getForeFront(model::LANE_MIDDLE, 200);
+    const auto bottomFriendLine = getForeFront(model::LANE_BOTTOM, 200);
 
-    const auto topEnemyLine    = getForeFront(model::LANE_TOP, -100);
-    const auto middleEnemyLine = getForeFront(model::LANE_MIDDLE, -100);
-    const auto bottomEnemyLine = getForeFront(model::LANE_BOTTOM, -100);
+    const auto topEnemyLine    = getForeFront(model::LANE_TOP, -200);
+    const auto middleEnemyLine = getForeFront(model::LANE_MIDDLE, -200);
+    const auto bottomEnemyLine = getForeFront(model::LANE_BOTTOM, -200);
 
     visualizator.fillCircle(topFriendLine.x, topFriendLine.y, 150, 0xaaffaa);
     visualizator.fillCircle(middleFriendLine.x, middleFriendLine.y, 150, 0xaaffaa);

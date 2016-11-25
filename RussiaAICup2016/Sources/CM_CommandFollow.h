@@ -17,8 +17,6 @@ namespace AICup
 
     bool check(const model::Wizard& self) override;
 
-    int priority(const model::Wizard& self) override;
-
     void execute(const model::Wizard& self, Result& result) override;
 
 
@@ -31,6 +29,7 @@ namespace AICup
     const double minDistance;
     const double maxDistance;
 
+    const model::LivingUnit* unit;
     MoveCommandPtr commandMoveToPoint;
   };
 }

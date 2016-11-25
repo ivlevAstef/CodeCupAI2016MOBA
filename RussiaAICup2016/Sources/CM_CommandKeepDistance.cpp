@@ -10,6 +10,7 @@
 #include "E_World.h"
 #include "A_Move.h"
 #include "C_Math.h"
+#include "CM_MovePriorities.h"
 
 using namespace AICup;
 
@@ -41,13 +42,10 @@ bool CommandKeepDistance::check(const model::Wizard& self) {
   return commandMoveToPoint->check(self);
 }
 
-int CommandKeepDistance::priority(const model::Wizard&) {
-  return 0;
-}
-
 void CommandKeepDistance::execute(const model::Wizard& self, Result& result) {
   assert(nullptr != commandMoveToPoint.get());
   commandMoveToPoint->execute(self, result);
+  result.priority = MovePriorities::keepDistance(self, Position(x, y), minDistance, maxDistance);
 }
 
 #ifdef ENABLE_VISUALIZATOR

@@ -54,9 +54,6 @@ namespace AICup
     /// держаться на безопасном расстоянии от юнита
     MoveCommandPtr avoidEnemy(const long long unitId) const;
 
-    /// держаться на безопасном расстоянии от всех врагов вокруге
-    MoveCommandPtr avoidAround() const;
-
   private:
     Algorithm::PathFinder& finder;
   };

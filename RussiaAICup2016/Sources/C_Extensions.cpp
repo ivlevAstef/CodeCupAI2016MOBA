@@ -1,11 +1,7 @@
 #include "C_Extensions.h"
 #include "E_Game.h"
 #include "C_Math.h"
-
-#include "model/Minion.h"
 #include "model/ActionType.h"
-#include "model/Tree.h"
-#include "model/Building.h"
 
 using namespace AICup;
 
@@ -42,10 +38,30 @@ bool EX::isTree(const model::Unit& unit) {
   return nullptr != dynamic_cast<const model::Tree*>(&unit);
 }
 bool EX::isNeutral(const model::Unit& unit) {
-  return nullptr != dynamic_cast<const model::Minion*>(&unit) && unit.getFaction() == model::FACTION_NEUTRAL;
+  return isMinion(unit) && unit.getFaction() == model::FACTION_NEUTRAL;
+}
+bool EX::isMinion(const model::Unit& unit) {
+  return nullptr != dynamic_cast<const model::Minion*>(&unit);
 }
 bool EX::isBuilding(const model::Unit& unit) {
   return nullptr != dynamic_cast<const model::Building*>(&unit);
+}
+bool EX::isWizard(const model::Unit& unit) {
+  return nullptr != dynamic_cast<const model::Wizard*>(&unit);
+}
+
+
+const model::Tree& EX::asTree(const model::Unit& unit) {
+  return *dynamic_cast<const model::Tree*>(&unit);
+}
+const model::Minion& EX::asMinion(const model::Unit& unit) {
+  return *dynamic_cast<const model::Minion*>(&unit);
+}
+const model::Building& EX::asBuilding(const model::Unit& unit) {
+  return *dynamic_cast<const model::Building*>(&unit);
+}
+const model::Wizard& EX::asWizard(const model::Unit& unit) {
+  return *dynamic_cast<const model::Wizard*>(&unit);
 }
 
 double EX::maxSpeed(const model::CircularUnit& obj) {

@@ -6,6 +6,7 @@
 
 
 #include "CM_CommandObserveMap.h"
+#include "CM_MovePriorities.h"
 
 using namespace AICup;
 
@@ -15,10 +16,6 @@ CommandObserveMap::CommandObserveMap(Algorithm::PathFinder& finder): MoveCommand
 
 bool CommandObserveMap::check(const model::Wizard&) {
   return false;
-}
-
-int CommandObserveMap::priority(const model::Wizard&) {
-  return 0;
 }
 
 void CommandObserveMap::execute(const model::Wizard&, Result&) {

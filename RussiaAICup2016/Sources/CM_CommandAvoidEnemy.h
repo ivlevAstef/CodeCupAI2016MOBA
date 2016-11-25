@@ -19,8 +19,6 @@ namespace AICup
 
     bool check(const model::Wizard& self) override;
 
-    int priority(const model::Wizard& self) override;
-
     void execute(const model::Wizard& self, Result& result) override;
 
 #ifdef ENABLE_VISUALIZATOR
@@ -31,12 +29,9 @@ namespace AICup
 
   private:
     const long long enemyId;
-    MoveCommandPtr followCommand;
+    MoveCommandPtr moveToPointCommand;
     double distance;
 
     const model::LivingUnit* enemy;
-    const model::Wizard* wizardEnemy;
-    const model::Minion* minionEnemy;
-    const model::Building* buildEnemy;
   };
 }

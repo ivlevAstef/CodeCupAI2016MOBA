@@ -1,6 +1,7 @@
 #include "S_CommandStrategy.h"
 #include "A_Exec.h"
 #include "C_Math.h"
+#include "C_Extensions.h"
 
 
 using namespace AICup;
@@ -37,34 +38,55 @@ const Vector CommandStrategy::move(const model::Wizard& self, TurnStyle& turnSty
 
   for (size_t index = 0; index < moveCommands.size(); index++) {
     moveCommands[index]->execute(self, moveResults[index]);
+    assert(moveResults[index].moveDirection.length() > 0.1);
+    assert(moveResults[index].priority > 0);
   }
 
-  Vector summaryDirection;
-  double summaryPriority = 0;
-
-  int maxPriority = -10000;
-
-  //TODO: адаптировать этот алгоритм, на более сильную формулу сложения векторов
   for (const auto& result : moveResults) {
-    summaryPriority += result.priority / 1000.0;
-    summaryDirection += result.moveDirection;
-
-    if (result.priority > maxPriority) {
-      turnStyle = result.turnStyle;
-      maxPriority = result.priority;
-    }
-
-    if (result.speedLimit > 0 && (result.speedLimit < speedLimit || speedLimit < 0)) {
-      speedLimit = result.speedLimit;
-    }
-
     for (const auto& tree : result.treesForRemove) {
       addTreeForRemove(self, tree);
     }
   }
 
-  //assert(summaryPriority > 0);
-  return summaryDirection / MAX(1.0, summaryPriority);
+
+  int maxPriority = -10000;
+  for (const auto& result : moveResults) {
+    if (result.priority > maxPriority) {
+      turnStyle = result.turnStyle;
+      maxPriority = result.priority;
+    }
+  }
+
+
+  double minDeviation = 9999999;
+  Vector result = Vector(0, 0);
+  //Проходим по углам, и высчитываем какой вариант даст наименьшое отклонение
+  for (size_t alphaI = 0; alphaI < 360; alphaI++) {
+    const double alpha = AICUP_PI * double(alphaI) / 180.0;
+
+    const auto direction = Vector(1, 0).rotate(alpha);
+
+    double summaryDeviation = 0;
+    for (const auto& move : moveResults) {
+      const double deviation = 1 - move.moveDirection.normal().dot(direction);
+      summaryDeviation += deviation * double(move.priority) / 1000.0;
+    }
+
+    if (summaryDeviation < minDeviation) {
+      minDeviation = summaryDeviation;
+      result = direction;
+    }
+  }
+
+
+  speedLimit = EX::maxSpeed(self);
+  for (const auto& result : moveResults) {
+    if (result.speedLimit > 0 && result.speedLimit < speedLimit) {
+      speedLimit = result.speedLimit;
+    }
+  }
+
+  return result * speedLimit;
 }
 
 void CommandStrategy::addTreeForRemove(const model::Wizard& self, const model::LivingUnit* tree) {

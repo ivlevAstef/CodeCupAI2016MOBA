@@ -24,8 +24,6 @@ namespace AICup
     /// проверяет возможность исполнения команды
     virtual bool check(const model::Wizard& self) = 0;
 
-    virtual int priority(const model::Wizard& self) = 0;
-
 
 #ifdef ENABLE_VISUALIZATOR
     virtual void visualization(const Visualizator&) const { }

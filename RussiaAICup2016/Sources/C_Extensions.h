@@ -9,6 +9,10 @@
 
 #include "C_Vector2D.h"
 #include "model/CircularUnit.h"
+
+#include "model/Minion.h"
+#include "model/Tree.h"
+#include "model/Building.h"
 #include "model/Wizard.h"
 
 namespace AICup
@@ -21,7 +25,14 @@ namespace AICup
 
     bool isTree(const model::Unit& unit);
     bool isNeutral(const model::Unit& unit);
+    bool isMinion(const model::Unit& unit);
     bool isBuilding(const model::Unit& unit);
+    bool isWizard(const model::Unit& unit);
+
+    const model::Tree& asTree(const model::Unit& unit);
+    const model::Minion& asMinion(const model::Unit& unit);
+    const model::Building& asBuilding(const model::Unit& unit);
+    const model::Wizard& asWizard(const model::Unit& unit);
 
     double maxSpeed(const model::CircularUnit& obj);
     double maxStrafeSpeed(const model::Wizard& obj);

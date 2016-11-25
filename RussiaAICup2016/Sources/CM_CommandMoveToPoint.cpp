@@ -9,20 +9,21 @@
 #include "A_Move.h"
 #include "E_World.h"
 #include "C_Extensions.h"
+#include "CM_MovePriorities.h"
+#include "C_Math.h"
 
 using namespace AICup;
 
+/// так как какие-нибудь алгоритмы аля follow могут выдать плохие координаты, то лучше их обрезать
 CommandMoveToPoint::CommandMoveToPoint(Algorithm::PathFinder& finder, const double x, const double y, const TurnStyle style, const double speedLimit):
-  MoveCommand(finder), point(x, y), style(style), speedLimit(speedLimit) {
+  MoveCommand(finder), point(MAX(0,MIN(x, 4000)), MAX(0, MIN(y, 4000))), style(style), speedLimit(speedLimit) {
+
 }
 
 bool CommandMoveToPoint::check(const model::Wizard& self) {
   return (EX::pos(self) - point).length() > 20;
 }
 
-int CommandMoveToPoint::priority(const model::Wizard& self) {
-  return 0;
-}
 
 void CommandMoveToPoint::execute(const model::Wizard& self, Result& result) {
   pathFinder.calculatePath(point, path);
@@ -37,7 +38,7 @@ void CommandMoveToPoint::execute(const model::Wizard& self, Result& result) {
 
   result.moveDirection = Algorithm::move(self, preEndPoint, obstaclesGroups, self.getVisionRange());
   result.turnStyle = style;
-  result.priority = priority(self);
+  result.priority = MovePriorities::moveToPoint(self, point);
   result.speedLimit = speedLimit;
 
   endPoint = path->getFrom() + result.moveDirection;

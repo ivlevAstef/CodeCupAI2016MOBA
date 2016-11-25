@@ -17,8 +17,6 @@ namespace AICup
 
     bool check(const model::Wizard& self) override;
 
-    int priority(const model::Wizard& self) override;
-
     void execute(const model::Wizard& self, Result& result) override;
 
 

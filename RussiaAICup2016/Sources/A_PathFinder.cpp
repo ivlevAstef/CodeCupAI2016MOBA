@@ -156,9 +156,9 @@ void PathFinder::calculateCost(const Obstacles& obstacles, const double radius) 
     if (EX::isTree(*obstacle)) {
       life = 2.0 * (obstacle->getLife() / 12); /// дерево
     } else if (EX::isNeutral(*obstacle)) {
-      life = PathConstants::maxValue; /// нейтрал очень дорогое удовольствие
+      life = 1000; /// нейтрал очень дорогое удовольствие
     } else {
-      life = PathConstants::maxValue; /// здания
+      life = 5000; /// здания вообще не обходимо
     }
 
     const auto oPos = EX::pos(*obstacle);
@@ -239,8 +239,15 @@ void PathFinder::calculatePath(Path& path) const {
   };
 
   // ревертируем точки
-  const auto from = PathConstants::toInt(path.from);
-  const auto to = PathConstants::toInt(path.to);
+  auto from = PathConstants::toInt(path.from);
+  auto to = PathConstants::toInt(path.to);
+  assert(0 <= from.x && from.x < PathConstants::memorySize);
+  assert(0 <= to.x && to.x < PathConstants::memorySize);
+  /// да в идеале точке не должны выходить за границы, но некоторые алгоритмы могут решить что надо бежать куда подальше...
+  to.x = MAX(1, MIN(to.x, PathConstants::memorySize - 2));
+  to.y = MAX(1, MIN(to.y, PathConstants::memorySize - 2));
+  from.x = MAX(1, MIN(from.x, PathConstants::memorySize - 2));
+  from.y = MAX(1, MIN(from.y, PathConstants::memorySize - 2));
 
   path.count = 0;
   path.length = 0;

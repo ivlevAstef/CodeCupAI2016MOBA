@@ -17,8 +17,6 @@ namespace AICup
 
     bool check(const model::Wizard& self) override;
 
-    int priority(const model::Wizard& self) override;
-
     void execute(const model::Wizard& self, Result& result) override;
 
 #ifdef ENABLE_VISUALIZATOR
@@ -30,6 +28,7 @@ namespace AICup
     double potensialExpirience(const model::Wizard& self);
 
   private:
+    Position bonusPos;
     MoveCommandPtr moveToBonus;
   };
 }

@@ -51,23 +51,19 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
     isInitialized = true;
   }
 
-  const auto moveToLineCommand = fabric.moveToLine(myLine);
-  if (moveToLineCommand->check(self)) {
-    moveCommands.push_back(moveToLineCommand);
+  const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + self.getRadius() * 2);
+
+  std::vector<MoveCommandPtr> avoidAroundCommands;
+  avoidAroundCommands.reserve(aroundEnemies.size());
+  for (const auto& enemy : aroundEnemies) {
+    const auto command = fabric.avoidEnemy(enemy->getId());
+    if (command->check(self)) {
+      avoidAroundCommands.push_back(command);
+    }
   }
 
-  const auto avoidAroundCommand = fabric.avoidAround();
-  bool needAvoidAround = avoidAroundCommand->check(self);
-
-  if (needAvoidAround && self.getLife() < 50) {
-    moveCommands.push_back(avoidAroundCommand);
-  } else {
-    const auto getExpirienceCommand = fabric.moveGetExpirience();
-    if (getExpirienceCommand->check(self)) {
-      moveCommands.push_back(getExpirienceCommand);
-    } else if (needAvoidAround) {
-      moveCommands.push_back(avoidAroundCommand);
-    }
+  if (!avoidAroundCommands.empty()) {
+    moveCommands.insert(moveCommands.end(), avoidAroundCommands.begin(), avoidAroundCommands.end());
   }
 
   ///
@@ -76,11 +72,25 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
     const auto newMoveToBonus = fabric.moveToBonus();
     if (newMoveToBonus->check(self)) {
       moveToBonus = newMoveToBonus;
+      moveCommands.push_back(moveToBonus);
     }
   } else if (moveToBonus->check(self)) {
     moveCommands.push_back(moveToBonus);
   } else {
     moveToBonus = nullptr;
+  }
+
+
+  if (nullptr == moveToBonus) {
+    const auto moveToLineCommand = fabric.moveToLine(myLine);
+    if (moveToLineCommand->check(self)) {
+      moveCommands.push_back(moveToLineCommand);
+    }
+
+    const auto getExpirienceCommand = fabric.moveGetExpirience();
+    if (getExpirienceCommand->check(self)) {
+      moveCommands.push_back(getExpirienceCommand);
+    }
   }
 
   for (const auto& enemy : World::instance().aroundEnemies(self)) {

@@ -6,6 +6,7 @@
 
 
 #include "CM_CommandDefendPoint.h"
+#include "CM_MovePriorities.h"
 
 using namespace AICup;
 
@@ -18,10 +19,6 @@ bool CommandDefendPoint::check(const model::Wizard&) {
   return false;
 }
 
-int CommandDefendPoint::priority(const model::Wizard&) {
-  return 0;
-}
-
-
-void CommandDefendPoint::execute(const model::Wizard&, Result&) {
+void CommandDefendPoint::execute(const model::Wizard& self, Result& result) {
+  //result.priority = MovePriorities::defendPoint(self, );
 }

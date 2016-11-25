@@ -12,6 +12,7 @@
 #include "E_Points.h"
 #include "E_Game.h"
 #include "C_Math.h"
+#include "CM_MovePriorities.h"
 
 using namespace AICup;
 
@@ -21,6 +22,7 @@ CommandMoveToBonus::CommandMoveToBonus(Algorithm::PathFinder& finder):
 }
 
 bool CommandMoveToBonus::check(const model::Wizard& self) {
+  static const double magicCoef = 0.95 ; /// Приблизительный коэфициент на сколько длиннее путь
   const auto selfPos = Position(self.getX(), self.getY());
 
   /// если есть бонусы рядом
@@ -33,19 +35,21 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
   }
 
 
+  const double fullRadius = self.getRadius() + Game::model().getBonusRadius();
+
   const auto topBonusPos = Points::point(Points::BONUS_TOP);
   const auto bottomBonusPos = Points::point(Points::BONUS_BOTTOM);
 
   std::shared_ptr<Algorithm::Path> path;
 
   pathFinder.calculatePath(topBonusPos, path);
-  double ticksToTop = path->getLength() / Game::instance().model().getWizardForwardSpeed();
+  double ticksToTop = magicCoef * (path->getLength() - fullRadius) / Game::model().getWizardForwardSpeed();
 
   pathFinder.calculatePath(bottomBonusPos, path);
-  double ticksToBottom = path->getLength() / Game::instance().model().getWizardForwardSpeed();
+  double ticksToBottom = magicCoef * (path->getLength() - fullRadius) / Game::model().getWizardForwardSpeed();
 
-  int maxTicksToBonus = Game::instance().model().getBonusAppearanceIntervalTicks();
-  int ticksToBonus = maxTicksToBonus - World::instance().model().getTickIndex() % maxTicksToBonus;
+  int maxTicksToBonus = Game::model().getBonusAppearanceIntervalTicks();
+  int ticksToBonus = maxTicksToBonus - World::model().getTickIndex() % maxTicksToBonus;
 
   double minMoveTicks = MIN(ticksToTop, ticksToBottom);
 
@@ -66,18 +70,20 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
   }
 
   /// если опыт на линии + тот опыт который может еще прийти, больше того что дают за бонус, то он не нужен
-  if (potensialExpirience(self) + minMoveTicks * 0.1  > Game::instance().model().getBonusScoreAmount()) {
+  if (potensialExpirience(self) + minMoveTicks * 0.1  > Game::model().getBonusScoreAmount()) {
     return false;
   }
 
-  const double minDistance = self.getRadius() + Game::instance().model().getBonusRadius();
+  const double minDistance = self.getRadius() + Game::model().getBonusRadius();
   const double maxDistance = minDistance + self.getRadius();
 
   if (ticksToTop < ticksToBottom) {
-    moveToBonus = std::make_shared<CommandKeepDistance>(pathFinder, topBonusPos.x, topBonusPos.y, minDistance, maxDistance);
+    bonusPos = topBonusPos;
   } else {
-    moveToBonus = std::make_shared<CommandKeepDistance>(pathFinder, topBonusPos.x, topBonusPos.y, minDistance, maxDistance);
+    bonusPos = bottomBonusPos;
   }
+
+  moveToBonus = std::make_shared<CommandKeepDistance>(pathFinder, bonusPos.x, bonusPos.y, minDistance, maxDistance);
 
   return moveToBonus->check(self);
 }
@@ -93,14 +99,10 @@ double CommandMoveToBonus::potensialExpirience(const model::Wizard& self) {
   return result;
 }
 
-int CommandMoveToBonus::priority(const model::Wizard& self) {
-  return 2000;
-}
-
-
 void CommandMoveToBonus::execute(const model::Wizard& self, Result& result) {
   assert(nullptr != moveToBonus.get());
   moveToBonus->execute(self, result);
+  result.priority = MovePriorities::moveToBonus(self, bonusPos);
 }
 
 #ifdef ENABLE_VISUALIZATOR

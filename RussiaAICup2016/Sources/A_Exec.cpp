@@ -3,47 +3,59 @@
 #include "C_Math.h"
 
 #include "E_Game.h"
+#include "E_World.h"
 
 using namespace AICup;
 
 static std::vector<Position> stackForBugFix;
 
-/// один из способов выбраться из ситуации когда алгоритм дал багу и не может выйти/ найти путь
-void TwitchOperator(const model::Wizard& self, Vector& speed, model::Move& move) {
-  const auto selfPos = EX::pos(self);
-
-  stackForBugFix.push_back(EX::pos(self));
-  while (stackForBugFix.size() > 5) {
-    stackForBugFix.erase(stackForBugFix.begin());
-  }
-
-  for (const auto& data : stackForBugFix) {
-    if ((data - selfPos).length() > EX::maxSpeed(self)) {
-      return;
-    }
-  }
-
-  speed.x = EX::maxSpeed(self) * (rand() % 1000) / 1000;
-  speed.y = EX::maxStrafeSpeed(self) * (rand() % 1000) / 1000;
-  move.setTurn(((rand() % 100) / 100) - 0.5);
-  printf("Twitch\n");
-}
-
-bool Algorithm::execMove(const model::Wizard& self, const TurnStyle style, const Vector& direction, const double speedLimit, model::Move& move) {
-  ///вообще я так и не понял как эта магия работает, но без двух минусов не пашет
+double calcMaxSpeed(const model::Wizard& self, const Vector& direction, const double speedLimit) {
   Vector speed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
-  speed.y *= -1;
 
   double maxSpeed = (speed.x > 0) ? EX::maxSpeed(self) : EX::maxBackwardSpeed(self);
   const double sx = abs(speed.x);
   const double sy = abs(speed.y);
-  maxSpeed = (maxSpeed * sx + EX::maxStrafeSpeed(self) * sy)/(sx + sy);
+  maxSpeed = (maxSpeed * sx + EX::maxStrafeSpeed(self) * sy) / (sx + sy);
 
   if (speedLimit < 0) {
-    speed *= MIN(maxSpeed, direction.length());
-  } else {
-    speed *= MIN(maxSpeed, MIN(speedLimit, direction.length()));
+    return MIN(maxSpeed, direction.length());
   }
+  return MIN(maxSpeed, MIN(speedLimit, direction.length()));
+}
+
+
+bool Algorithm::execMove(const model::Wizard& self, const TurnStyle style, const Vector& direction, const double speedLimit, model::Move& move) {
+  Vector prespeed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
+
+  double maxSpeed = calcMaxSpeed(self, direction, speedLimit);
+
+  const auto selfPos = EX::pos(self);
+  const auto toPos = selfPos + direction.normal() * maxSpeed;
+
+
+  Vector fixDirection = direction;
+  for (const auto& obstacle : World::instance().obstacles(self, self.getRadius() + maxSpeed + 100/*максимальный радиус в игре*/)) {
+    const auto oPos = EX::pos(*obstacle);
+    /// если мы пересекаемся за этот тик с препятствием, то меняем направление
+    if (Math::distanceToSegment(oPos, selfPos, toPos) < self.getRadius() + obstacle->getRadius()) {
+      const auto tangents = Math::tangetsForTwoCircle(selfPos, self.getRadius(), oPos, obstacle->getRadius());
+      /// чем меньше значение тем больше угол отклонения
+      if (tangents[0].dot(direction.normal()) < tangents[1].dot(direction.normal())) {
+        fixDirection = tangents[1];
+      } else {
+        fixDirection = tangents[0];
+      }
+
+      break; /// с двумя объекта за тик пересечься нереально
+    }
+  }
+
+
+  ///вообще я так и не понял как эта магия работает, но без двух минусов не пашет
+  Vector speed = Vector(fixDirection.x, -fixDirection.y).normal().rotated(self.getAngle());
+  speed.y *= -1;
+  speed *= maxSpeed;
+
 
   move.setSpeed(speed.x);
   move.setStrafeSpeed(speed.y);
@@ -60,8 +72,6 @@ bool Algorithm::execMove(const model::Wizard& self, const TurnStyle style, const
   default:
     assert(false && "incorrect turn style");
   }
-
-  //TwitchOperator(self, speed, move);
 
   return true;
 }

@@ -10,6 +10,7 @@
 #include "E_World.h"
 #include "A_Move.h"
 #include "C_Math.h"
+#include "CM_MovePriorities.h"
 
 using namespace AICup;
 
@@ -19,7 +20,7 @@ CommandFollow::CommandFollow(Algorithm::PathFinder& finder, const long long unit
 
 
 bool CommandFollow::check(const model::Wizard& self) {
-  const auto unit = World::instance().unit(unitId);
+  unit = World::instance().unit(unitId);
   if (nullptr == unit) {
     commandMoveToPoint = nullptr;
     return false;
@@ -78,13 +79,10 @@ bool CommandFollow::check(const model::Wizard& self) {
   return commandMoveToPoint->check(self);
 }
 
-int CommandFollow::priority(const model::Wizard&) {
-  return 0;
-}
-
 void CommandFollow::execute(const model::Wizard& self, Result& result) {
   assert(nullptr != commandMoveToPoint.get());
   commandMoveToPoint->execute(self, result);
+  result.priority = MovePriorities::follow(self, *unit);
 }
 
 #ifdef ENABLE_VISUALIZATOR

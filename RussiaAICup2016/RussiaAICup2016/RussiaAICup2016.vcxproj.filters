@@ -87,9 +87,6 @@
     <ClCompile Include="..\Sources\CM_CommandAvoidEnemy.cpp">
       <Filter>Sources\Command\Commands\defend</Filter>
     </ClCompile>
-    <ClCompile Include="..\Sources\CM_CommandAvoidAround.cpp">
-      <Filter>Sources\Command\Commands\defend</Filter>
-    </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandKeepDistance.cpp">
       <Filter>Sources\Command\Commands\move</Filter>
     </ClCompile>
@@ -146,6 +143,12 @@
     </ClCompile>
     <ClCompile Include="..\Sources\E_InfluenceMap.cpp">
       <Filter>Sources\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_MovePriorities.cpp">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_AttackPriorities.cpp">
+      <Filter>Sources\Command\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -206,9 +209,6 @@
     <ClInclude Include="..\Sources\CM_CommandAvoidEnemy.h">
       <Filter>Sources\Command\Commands\defend</Filter>
     </ClInclude>
-    <ClInclude Include="..\Sources\CM_CommandAvoidAround.h">
-      <Filter>Sources\Command\Commands\defend</Filter>
-    </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandKeepDistance.h">
       <Filter>Sources\Command\Commands\move</Filter>
     </ClInclude>
@@ -265,6 +265,12 @@
     </ClInclude>
     <ClInclude Include="..\Sources\E_InfluenceMap.h">
       <Filter>Sources\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_MovePriorities.h">
+      <Filter>Sources\Command\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_AttackPriorities.h">
+      <Filter>Sources\Command\Commands</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

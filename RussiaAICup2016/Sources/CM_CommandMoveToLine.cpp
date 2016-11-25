@@ -8,6 +8,7 @@
 #include "CM_CommandMoveToLine.h"
 #include "CM_CommandMoveToPoint.h"
 #include "E_InfluenceMap.h"
+#include "CM_MovePriorities.h"
 
 using namespace AICup;
 
@@ -17,20 +18,18 @@ CommandMoveToLine::CommandMoveToLine(Algorithm::PathFinder& finder, model::LaneT
 }
 
 bool CommandMoveToLine::check(const model::Wizard& self) {
-  auto position = InfluenceMap::instance().getForeFront(line, 100);
+  /// Чем больше хп, тем больше можно наглеть и идти вперед
+  auto position = InfluenceMap::instance().getForeFront(line, 5 * (80 - self.getLife()));
   commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, position.x, position.y);
 
   return commandMoveToPoint->check(self);
-}
-
-int CommandMoveToLine::priority(const model::Wizard&) {
-  return 0;
 }
 
 
 void CommandMoveToLine::execute(const model::Wizard& self, Result& result) {
   assert(nullptr != commandMoveToPoint.get());
   commandMoveToPoint->execute(self, result);
+  result.priority = MovePriorities::moveToLine(self, line);
 }
 
 #ifdef ENABLE_VISUALIZATOR

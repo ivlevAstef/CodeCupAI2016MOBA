@@ -6,20 +6,17 @@
 
 
 #include "CM_CommandPool.h"
+#include "CM_AttackPriorities.h"
 
 using namespace AICup;
 
-CommandPool::CommandPool(long long neutralUnitId) {
+CommandPool::CommandPool(long long) {
 
 }
 
-bool CommandPool::check(const model::Wizard& self) {
+bool CommandPool::check(const model::Wizard&) {
   return false;
 }
 
-int CommandPool::priority(const model::Wizard& self) {
-  return 0;
-}
-
-void CommandPool::execute(const model::Wizard& self, Result& result) {
+void CommandPool::execute(const model::Wizard&, Result&) {
 }

@@ -19,7 +19,6 @@
 
 #include "CM_CommandDefendPoint.h"
 #include "CM_CommandAvoidEnemy.h"
-#include "CM_CommandAvoidAround.h"
 
 using namespace AICup;
 
@@ -71,8 +70,4 @@ MoveCommandPtr CommandFabric::defend(const double x, const double y) const {
 
 MoveCommandPtr CommandFabric::avoidEnemy(const long long unitId) const {
   return std::make_shared<CommandAvoidEnemy>(finder, unitId);
-}
-
-MoveCommandPtr CommandFabric::avoidAround() const {
-  return std::make_shared<CommandAvoidAround>(finder);
 }

@@ -6,11 +6,12 @@
 
 
 #include "CM_CommandAvoidEnemy.h"
-#include "CM_CommandFollow.h"
+#include "CM_CommandMoveToPoint.h"
 #include "E_World.h"
 #include "E_Game.h"
 #include "C_Math.h"
 #include "C_Extensions.h"
+#include "CM_MovePriorities.h"
 
 using namespace AICup;
 
@@ -22,81 +23,67 @@ CommandAvoidEnemy::CommandAvoidEnemy(Algorithm::PathFinder& finder, const long l
 bool CommandAvoidEnemy::check(const model::Wizard& self) {
   enemy = World::instance().unit(enemyId);
   if (nullptr == enemy) {
-    followCommand = nullptr;
+    moveToPointCommand = nullptr;
     return false;
   }
 
   const auto constants = Game::instance().model();
 
-  wizardEnemy = dynamic_cast<const model::Wizard*>(enemy);
-  minionEnemy = dynamic_cast<const model::Minion*>(enemy);
-  buildEnemy = dynamic_cast<const model::Building*>(enemy);
-
-  if (nullptr != wizardEnemy) {
-    const double radius = EX::radiusForGuaranteedHit(*wizardEnemy);
-    const double distance1 = radius - EX::minTimeForMagic(*wizardEnemy) * constants.getWizardBackwardSpeed()  + self.getRadius();
-    const double distance2 = radius - EX::timeToTurnForAttack(self, *wizardEnemy) * constants.getWizardBackwardSpeed() + self.getRadius();
+  if (EX::isWizard(*enemy)) {
+    const model::Wizard& wizard = EX::asWizard(*enemy);
+    const double radius = EX::radiusForGuaranteedHit(wizard);
+    const double distance1 = radius - EX::minTimeForMagic(wizard) * constants.getWizardBackwardSpeed()  + self.getRadius();
+    const double distance2 = radius - EX::timeToTurnForAttack(self, wizard) * constants.getWizardBackwardSpeed() + self.getRadius();
     distance = MIN(distance1, distance2);
 
     distance = MAX(distance, constants.getStaffRange() + self.getRadius());
-  } else if (nullptr != minionEnemy) {
-    if (model::MINION_ORC_WOODCUTTER == minionEnemy->getType()) {
+
+  } else if (EX::isMinion(*enemy)) {
+    const model::Minion& minion = EX::asMinion(*enemy);
+
+    if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
       distance = constants.getOrcWoodcutterAttackRange() + self.getRadius() + 100/*на всякий случай*/;
     } else {
       distance = constants.getFetishBlowdartAttackRange() + self.getRadius() + constants.getDartRadius();
     }
-  } else if (nullptr != buildEnemy) {
-    distance = buildEnemy->getAttackRange() - buildEnemy->getRemainingActionCooldownTicks() * constants.getWizardBackwardSpeed() + self.getRadius();
-    distance = MAX(distance, buildEnemy->getRadius() + self.getRadius());
+
+  } else if (EX::isBuilding(*enemy)) {
+    const model::Building& build = EX::asBuilding(*enemy);
+
+    distance = build.getAttackRange() - build.getRemainingActionCooldownTicks() * constants.getWizardBackwardSpeed() + self.getRadius();
+    distance = MAX(distance, build.getRadius() + self.getRadius());
+
   } else {
     return false;
   }
 
-  followCommand = std::make_shared<CommandFollow>(pathFinder, enemyId, distance, distance + self.getRadius());
 
-  return true;
-}
+  const auto selfPos = EX::pos(self);
+  const auto unitPos = EX::pos(*enemy);
 
-int CommandAvoidEnemy::priority(const model::Wizard& self) {
-  assert(nullptr != followCommand.get());
-
-  const auto constants = Game::instance().model();
-
-  const auto selfPos = Position(self.getX(), self.getY());
-  const auto enemyPos = Position(enemy->getX(), enemy->getY());
-  // const double distance = (selfPos - enemyPos).length();
-
-  int lifePriority = (200 * enemy->getLife()) / enemy->getMaxLife();
-
-  /// если врага можно быстро добить, то боятся его стоит меньше
-  if (enemy->getLife() < EX::magicMissleAttack(self) * 2) {
-    lifePriority = -500;
+  const auto currentDistance = (selfPos - unitPos).length();
+  if (currentDistance > distance) {
+    return false;
   }
 
-  if (nullptr != wizardEnemy) {
-    const int veryNearPrior = (distance < constants.getStaffRange() + self.getRadius()) ? 400 : 0;
-    return 300 + lifePriority - EX::minTimeForMagic(*wizardEnemy) * 5 + veryNearPrior;
-  } else if (nullptr != minionEnemy) {
-    if (distance < constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2) {
-      return 800 + lifePriority;
-    }
-    return 150 + lifePriority;
-  } else if (nullptr != buildEnemy) {
-    return 800 + lifePriority;
-  }
 
-  return 0;
+  /// противоположная точка, точке где находиться объект
+  const auto pos = selfPos + (selfPos - unitPos).normal() * (distance - currentDistance);
+  moveToPointCommand = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::BACK_TURN);
+
+
+  return moveToPointCommand->check(self);
 }
-
 
 void CommandAvoidEnemy::execute(const model::Wizard& self, Result& result) {
-  assert(nullptr != followCommand.get());
-  followCommand->execute(self, result);
+  assert(nullptr != moveToPointCommand.get());
+  moveToPointCommand->execute(self, result);
+  result.priority = MovePriorities::avoidEnemy(self, *enemy);
 }
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandAvoidEnemy::visualization(const Visualizator& visualizator) const {
-  assert(nullptr != followCommand.get());
-  followCommand->visualization(visualizator);
+  assert(nullptr != moveToPointCommand.get());
+  moveToPointCommand->visualization(visualizator);
 }
 #endif // ENABLE_VISUALIZATOR
