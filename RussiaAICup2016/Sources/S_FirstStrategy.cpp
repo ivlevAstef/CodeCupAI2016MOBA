@@ -40,9 +40,9 @@ void FirstStrategy::init(const model::Wizard& self) {
 void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
   CommandStrategy::clear();
 
-  /// раз в 500 тиков пересматриваю линию,
-  /// 500 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
-  if (World::model().getTickIndex() - lastChangeLineTick >= 500) {
+  /// раз в 250 тиков пересматриваю линию,
+  /// 250 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
+  if (World::model().getTickIndex() - lastChangeLineTick >= 250) {
     changeLane(self);
     lastChangeLineTick = World::model().getTickIndex();
   }
@@ -151,10 +151,18 @@ void FirstStrategy::changeLane(const model::Wizard& self) {
   double bottomLength = abs((basePosition - bottomPosition).x) + abs((basePosition - bottomPosition).y);
 
 
-  double priorityTop = (8000 - topLength) / selfTopLength;
-  double priorityMiddle = (5657 - middleLength) / selfMiddleLength;
-  double priorityBottom = (8000 - bottomLength) / selfBottomLength;
+  double priorityTop = (8000 - topLength) - selfTopLength;
+  double priorityMiddle = (5657 - middleLength) - selfMiddleLength;
+  double priorityBottom = (8000 - bottomLength) - selfBottomLength;
+  /// если очень близко к базе то увеличиваем
+  const double cTop = (1600 - topLength) / 250.0;
+  const double cMiddle = (1600 - middleLength) / 250.0;
+  const double cBottom = (1600 - bottomLength) / 250.0;
+  priorityTop *= (topLength < 1600) ? (1 + cTop*cTop) : 1;
+  priorityMiddle *= (middleLength < 1600) ? (1 + cMiddle*cMiddle) : 1;
+  priorityBottom *= (bottomLength < 1600) ? (1 + cBottom*cBottom) : 1;
 
+  // Если много своих то уменьшаем
   priorityTop /= MAX(0.5, World::instance().wizardCount(model::LANE_TOP, self));
   priorityMiddle /= MAX(0.5, World::instance().wizardCount(model::LANE_MIDDLE, self));
   priorityBottom /= MAX(0.5, World::instance().wizardCount(model::LANE_BOTTOM, self));

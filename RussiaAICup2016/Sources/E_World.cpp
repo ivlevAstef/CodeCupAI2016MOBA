@@ -203,6 +203,16 @@ void World::updateSupposedData() {
 const model::LaneType World::positionToLine(const double x, const double y) const {
   double delta = (size() - x) - y;
 
+  /// если база своя
+  if (x < 600 && (size() - y) < 600) {
+    return model::_LANE_UNKNOWN_;
+  }
+
+  /// если база противника
+  if ((size()-x) < 600 && y < 600) {
+    return model::_LANE_UNKNOWN_;
+  }
+
   if (delta > size()/8) {
     return model::LANE_TOP;
   } else if (delta < -size() / 8) {

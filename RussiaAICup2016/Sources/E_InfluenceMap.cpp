@@ -49,26 +49,29 @@ void InfluenceMap::updateLinePosition() {
   float middleDistance = (float)(newMiddleForeFront - middleForeFront).length();
   float bottomDistance = (float)(newBottomForeFront - bottomForeFront).length();
 
-  auto newMoveTopForeFront = getForeFront(model::LANE_TOP, MIN(maxSpeed, topDistance));
-  auto newMoveMiddleForeFront = getForeFront(model::LANE_MIDDLE, MIN(maxSpeed, middleDistance));
-  auto newMoveBottomForeFront = getForeFront(model::LANE_BOTTOM, MIN(maxSpeed, bottomDistance));
+  const auto newMove1TopForeFront = getForeFront(model::LANE_TOP, MIN(maxSpeed, topDistance));
+  const auto newMove1MiddleForeFront = getForeFront(model::LANE_MIDDLE, MIN(maxSpeed, middleDistance));
+  const auto newMove1BottomForeFront = getForeFront(model::LANE_BOTTOM, MIN(maxSpeed, bottomDistance));
+  const auto newMove2TopForeFront = getForeFront(model::LANE_TOP, -MIN(maxSpeed, topDistance));
+  const auto newMove2MiddleForeFront = getForeFront(model::LANE_MIDDLE, -MIN(maxSpeed, middleDistance));
+  const auto newMove2BottomForeFront = getForeFront(model::LANE_BOTTOM, -MIN(maxSpeed, bottomDistance));
 
-  if ((float)(newTopForeFront - newMoveTopForeFront).length() > topDistance) {
-    topForeFront = getForeFront(model::LANE_TOP, -MIN(maxSpeed, topDistance));
+  if ((newTopForeFront - newMove1TopForeFront).length() < (newTopForeFront - newMove2TopForeFront).length()) {
+    topForeFront = newMove1TopForeFront;
   } else {
-    topForeFront = newMoveTopForeFront;
+    topForeFront = newMove2TopForeFront;
   }
 
-  if ((float)(newMiddleForeFront - newMoveMiddleForeFront).length() > middleDistance) {
-    middleForeFront = getForeFront(model::LANE_MIDDLE, -MIN(maxSpeed, middleDistance));
+  if ((newMiddleForeFront - newMove1MiddleForeFront).length() < (newMiddleForeFront - newMove2MiddleForeFront).length()) {
+    middleForeFront = newMove1MiddleForeFront;
   } else {
-    middleForeFront = newMoveMiddleForeFront;
+    middleForeFront = newMove2MiddleForeFront;
   }
 
-  if ((float)(newBottomForeFront - newMoveBottomForeFront).length() > bottomDistance) {
-    bottomForeFront = getForeFront(model::LANE_BOTTOM, -MIN(maxSpeed, bottomDistance));
+  if ((newBottomForeFront - newMove1BottomForeFront).length() < (newBottomForeFront - newMove2BottomForeFront).length()) {
+    bottomForeFront = newMove1BottomForeFront;
   } else {
-    bottomForeFront = newMoveBottomForeFront;
+    bottomForeFront = newMove2BottomForeFront;
   }
 
 }
@@ -141,7 +144,7 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
 
     if (abs(delta.x) > abs(delta.y)) {
       int sign = SIGN(p2.x - p1.x);
-      for (int x = p1.x; x != p2.x; x += sign) {
+      for (int x = p1.x; x != p2.x+sign; x += sign) {
         const int y = p1.y + ((x - p1.x) * delta.y) / delta.x;
         if (isFriendZone(x, y)) {
           return pointToForeFront(x, y, linePoints, i);
@@ -149,7 +152,7 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
       }
     } else {
       int sign = SIGN(p2.y - p1.y);
-      for (int y = p1.y; y != p2.y; y += sign) {
+      for (int y = p1.y; y != p2.y+sign; y += sign) {
         const int x = p1.x + ((y - p1.y) * delta.x) / delta.y;
         if (isFriendZone(x, y)) {
           return pointToForeFront(x, y, linePoints, i);
@@ -158,14 +161,31 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
     }
   }
 
-  LogAssertMsg(false, "hmmmmm... not found friend zone? really");
+  //LogAssertMsg(false, "hmmmmm... not found friend zone? really");
+  // Возможно только если крипы на нашей базе
   return linePoints[linePoints.size()-1];
 }
 
 bool InfluenceMap::isFriendZone(const int x, const int y) const {
-  const auto friendForce = friends[x][y] + friends[x + 1][y] + friends[x][y + 1] + friends[x - 1][y] + friends[x][y - 1];
-  const auto enemyForce = enemies[x][y] + enemies[x + 1][y] + enemies[x][y + 1] + enemies[x - 1][y] + enemies[x][y - 1];
-  ///если в этой клетке силы сильнее на одного юнита чем у врага, то значит подходит
+  static const Vector2D<int> neighbors[8] = {
+    Vector2D<int>(-1,  0),
+    Vector2D<int>(0, -1),
+    Vector2D<int>(1,  0),
+    Vector2D<int>(0,  1),
+    Vector2D<int>(1,  1),
+    Vector2D<int>(1, -1),
+    Vector2D<int>(-1, -1),
+    Vector2D<int>(-1,  1)
+  };
+
+  auto friendForce = friends[x][y];
+  auto enemyForce = enemies[x][y];
+  for (const auto& n : neighbors) {
+    friendForce += friends[x + n.x][y + n.y];
+    enemyForce += enemies[x + n.x][y + n.y];
+  }
+
+  ///если в округе силы сильнее на одного юнита чем у врага, то значит подходит
   return 20 < friendForce - enemyForce;
 }
 
