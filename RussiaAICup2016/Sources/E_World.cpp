@@ -13,12 +13,17 @@
 using namespace AICup;
 
 World::World() {
-  initTrees();
-  initBuildings();
+  isInitial = true;
 }
 
 void World::update(const model::World& world) {
   modelWorld = &world;
+
+  if (isInitial) {
+    initTrees();
+    initBuildings();
+    isInitial = false;
+  }
 
   updateVisionZone();
   updateSupposedData();
@@ -45,27 +50,27 @@ const std::vector<Looking>& World::getVisionZone() const {
 }
 
 void World::initBuildings() {
-  supposedBuilding.push_back(BaseBuilding(3600, 400, Game::enemyFaction()));
+  for (const auto& build : model().getBuildings()) {
+    if (build.getFaction() == Game::friendFaction()) {
+      const Position pos = Position(size() - build.getX(), size() - build.getY());
 
-  // Top
-  supposedBuilding.push_back(TowerBuilding(3650, 2344, Game::enemyFaction()));
-  supposedBuilding.push_back(TowerBuilding(3950, 1307, Game::enemyFaction()));
-  // Middle
-  supposedBuilding.push_back(TowerBuilding(2071, 1600, Game::enemyFaction()));
-  supposedBuilding.push_back(TowerBuilding(3095, 1232, Game::enemyFaction()));
-  // Bottom
-  supposedBuilding.push_back(TowerBuilding(1688, 50, Game::enemyFaction()));
-  supposedBuilding.push_back(TowerBuilding(2630, 350, Game::enemyFaction()));
+      if (build.getType() == model::BUILDING_FACTION_BASE) {
+        supposedBuilding.push_back(BaseBuilding(pos.x, pos.y, Game::enemyFaction()));
+      } else {
+        supposedBuilding.push_back(TowerBuilding(pos.x, pos.y, Game::enemyFaction()));
+      }
+    }
+  }
 }
 
 void World::initTrees() {
-  for (int x = 400; x <= 4000 - 400; x += 100) {
-    for (int y = 400; y <= 4000 - 400; y += 100) {
+  for (int x = 400; x <= size() - 400; x += 100) {
+    for (int y = 400; y <= size() - 400; y += 100) {
       if (-400 < (x - y) && (x - y) < 400) {
         continue;
       }
 
-      if (-400 < ((4000-x) - y) && ((4000-x) - y) < 400) {
+      if (-400 < ((size() -x) - y) && ((size() -x) - y) < 400) {
         continue;
       }
 
@@ -159,11 +164,11 @@ void World::updateSupposedData() {
 
 
 const model::LaneType World::positionToLine(const double x, const double y) const {
-  double delta = (model().getWidth() - x) - y;
+  double delta = (size() - x) - y;
 
-  if (delta > 1200) { // top
+  if (delta > size()/3.3) { // top
     return model::LANE_TOP;
-  } else if (delta < -1200) {
+  } else if (delta < -size() / 3.3) {
     return model::LANE_BOTTOM;
   }
 
@@ -365,15 +370,11 @@ std::vector<const model::LivingUnit*> World::aroundEnemies(const model::Wizard& 
 
 #ifdef ENABLE_VISUALIZATOR
 void World::visualization(const Visualizator& visualizator) const {
-  //if (Visualizator::PRE == visualizator.getStyle()) {
-  //  visualizator.circle(topLinePosition.x, topLinePosition.y, 200, 0xff0000);
-  //  visualizator.circle(middleLinePosition.x, middleLinePosition.y, 200, 0xff0000);
-  //  visualizator.circle(bottomLinePosition.x, bottomLinePosition.y, 200, 0xff0000);
-
-  //  for (const auto& build : supposedBuilding) {
-  //    visualizator.fillCircle(build.getX(), build.getY(), build.getRadius(), 0xffff00);
-  //  }
-  //}
+  if (Visualizator::PRE == visualizator.getStyle()) {
+    for (const auto& build : supposedBuilding) {
+      visualizator.fillCircle(build.getX(), build.getY(), build.getRadius(), 0xffff00);
+    }
+  }
 
   //if (Visualizator::POST == visualizator.getStyle()) {
   //  for (const auto& tree : supposedTrees) {

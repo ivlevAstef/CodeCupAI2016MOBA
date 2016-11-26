@@ -18,7 +18,6 @@ void Game::update(const model::Game& game, const model::Wizard& self) {
   setFaction(self);
 }
 
-
 model::Faction Game::friendFaction() {
   return instance().friendFactionValue;
 }

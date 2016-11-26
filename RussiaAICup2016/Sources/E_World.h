@@ -30,6 +30,11 @@ namespace AICup
       return *instance().modelWorld;
     }
 
+    static inline double size() {
+      assert(model().getWidth() == model().getHeight());
+      return model().getWidth();
+    }
+
     const std::vector<model::Tree>& trees() const;
     const std::vector<model::Building>& buildings() const;
     const std::vector<model::Minion>& minions() const;
@@ -63,6 +68,8 @@ namespace AICup
     void updateSupposedData();
 
   private:
+    bool isInitial;
+
     const model::World* modelWorld;
 
     std::vector<Looking> visionZone;

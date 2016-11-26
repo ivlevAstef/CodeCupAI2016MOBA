@@ -16,7 +16,7 @@ using namespace AICup;
 
 /// так как какие-нибудь алгоритмы аля follow могут выдать плохие координаты, то лучше их обрезать
 CommandMoveToPoint::CommandMoveToPoint(Algorithm::PathFinder& finder, const double x, const double y, const TurnStyle style, const double speedLimit):
-  MoveCommand(finder), point(MAX(0,MIN(x, 4000)), MAX(0, MIN(y, 4000))), style(style), speedLimit(speedLimit) {
+  MoveCommand(finder), point(MAX(0,MIN(x, World::size())), MAX(0, MIN(y, World::size()))), style(style), speedLimit(speedLimit) {
 
 }
 

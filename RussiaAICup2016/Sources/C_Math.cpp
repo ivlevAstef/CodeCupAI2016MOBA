@@ -1,4 +1,5 @@
 #include "C_Math.h"
+#include "E_World.h"
 #include <cmath>
 
 using namespace AICup;
@@ -138,12 +139,12 @@ std::vector<Vector> Math::tangetsForTwoCircle(const Position& p1, const double r
 }
 
 void Math::fillGrid(float* grid, const double x, const double y, const double step, const double radius, const float value) {
-  const size_t size = 4000 / step;
+  const size_t size = World::size() / step;
 
   const double minRealX = MAX(0, x - radius) / step;
-  const double maxRealX = MIN(4000, x + radius) / step;
+  const double maxRealX = MIN(World::size(), x + radius) / step;
   const double minRealY = MAX(0, y - radius) / step;
-  const double maxRealY = MIN(4000, y + radius) / step;
+  const double maxRealY = MIN(World::size(), y + radius) / step;
 
   const size_t minX = floor(minRealX);
   const size_t maxX = ceil(maxRealX);

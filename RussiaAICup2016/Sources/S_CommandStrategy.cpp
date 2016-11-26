@@ -39,7 +39,6 @@ const Vector CommandStrategy::move(const model::Wizard& self, TurnStyle& turnSty
 
   for (size_t index = 0; index < moveCommands.size(); index++) {
     moveCommands[index]->execute(self, moveResults[index]);
-    assert(moveResults[index].moveDirection.length() > 0.1);
     assert(moveResults[index].priority > 0);
   }
 
@@ -69,6 +68,9 @@ const Vector CommandStrategy::move(const model::Wizard& self, TurnStyle& turnSty
 
     double summaryDeviation = 0;
     for (const auto& move : moveResults) {
+      if (move.moveDirection.length() < 0.01) {
+        continue;
+      }
       const double deviation = 1 - move.moveDirection.normal().dot(direction);
       summaryDeviation += deviation * double(move.priority) / 1000.0;
     }

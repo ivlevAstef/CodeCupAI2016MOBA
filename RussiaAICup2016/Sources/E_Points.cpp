@@ -1,5 +1,6 @@
 
 #include "E_Points.h"
+#include "E_World.h"
 
 using namespace AICup;
 
@@ -13,8 +14,8 @@ const Position& Points::point(PointType type) {
 }
 
 void Points::initPoints() {
-  const auto width = 4000; /// хардкодим по жескому
-  const auto height = 4000; /// хардкодим по жескому
+  const auto width = World::size();
+  const auto height = World::size();
   const auto padding = 0.05;
 
   const auto left = width * padding;
