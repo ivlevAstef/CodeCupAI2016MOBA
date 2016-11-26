@@ -12,7 +12,7 @@ Position InfluenceMapConstants::toReal(Vector2D<int> point, double dx, double dy
   return Position((point.x + dx) * step, (point.y + dy) * step);
 }
 Vector2D<int> InfluenceMapConstants::toInt(Position point) {
-  return Vector2D<int>(floor(point.x / step), floor(point.y / step));
+  return Vector2D<int>((int)floor(point.x / step), (int)floor(point.y / step));
 }
 
 InfluenceMap::InfluenceMap() {
@@ -38,33 +38,33 @@ const float* const InfluenceMap::getEnemiesMap() const {
 }
 
 void InfluenceMap::updateLinePosition() {
-  const double maxSpeed = 25;
+  const float maxSpeed = 25;
   /// Да мне было не лень копировать этот код ниже...
   auto newTopForeFront = calculateForeFront(model::LANE_TOP);
   auto newMiddleForeFront = calculateForeFront(model::LANE_MIDDLE);
   auto newBottomForeFront = calculateForeFront(model::LANE_BOTTOM);
 
-  float topDistance = (newTopForeFront - topForeFront).length();
-  float middleDistance = (newMiddleForeFront - middleForeFront).length();
-  float bottomDistance = (newBottomForeFront - bottomForeFront).length();
+  float topDistance = (float)(newTopForeFront - topForeFront).length();
+  float middleDistance = (float)(newMiddleForeFront - middleForeFront).length();
+  float bottomDistance = (float)(newBottomForeFront - bottomForeFront).length();
 
   auto newMoveTopForeFront = getForeFront(model::LANE_TOP, MIN(maxSpeed, topDistance));
   auto newMoveMiddleForeFront = getForeFront(model::LANE_MIDDLE, MIN(maxSpeed, middleDistance));
   auto newMoveBottomForeFront = getForeFront(model::LANE_BOTTOM, MIN(maxSpeed, bottomDistance));
 
-  if ((newTopForeFront - newMoveTopForeFront).length() > topDistance) {
+  if ((float)(newTopForeFront - newMoveTopForeFront).length() > topDistance) {
     topForeFront = getForeFront(model::LANE_TOP, -MIN(maxSpeed, topDistance));
   } else {
     topForeFront = newMoveTopForeFront;
   }
 
-  if ((newMiddleForeFront - newMoveMiddleForeFront).length() > middleDistance) {
+  if ((float)(newMiddleForeFront - newMoveMiddleForeFront).length() > middleDistance) {
     middleForeFront = getForeFront(model::LANE_MIDDLE, -MIN(maxSpeed, middleDistance));
   } else {
     middleForeFront = newMoveMiddleForeFront;
   }
 
-  if ((newBottomForeFront - newMoveBottomForeFront).length() > bottomDistance) {
+  if ((float)(newBottomForeFront - newMoveBottomForeFront).length() > bottomDistance) {
     bottomForeFront = getForeFront(model::LANE_BOTTOM, -MIN(maxSpeed, bottomDistance));
   } else {
     bottomForeFront = newMoveBottomForeFront;
@@ -192,7 +192,7 @@ Position InfluenceMap::offsetForeFront(const Position& foreFront, float offset, 
   while (offset > 0 && index < line.size()) {
     //const auto& p1 = line[index - 1];
     const auto& p2 = line[index];
-    const double length = (p2 - iterPos).length();
+    const float length = float((p2 - iterPos).length());
     if (length < offset) {
       offset -= length;
       index++;
@@ -217,11 +217,11 @@ void InfluenceMap::clean() {
 }
 
 
-double minionDps(const model::Minion& minion) {
+float minionDps(const model::Minion& minion) {
   if (model::MINION_FETISH_BLOWDART == minion.getType()) {
-    return Game::model().getDartDirectDamage() / double(minion.getCooldownTicks());
+    return Game::model().getDartDirectDamage() / float(minion.getCooldownTicks());
   }
-  return Game::model().getOrcWoodcutterDamage() / double(minion.getCooldownTicks());
+  return Game::model().getOrcWoodcutterDamage() / float(minion.getCooldownTicks());
 }
 
 double minionRadius(const model::Minion& minion) {
@@ -231,12 +231,12 @@ double minionRadius(const model::Minion& minion) {
   return Game::model().getOrcWoodcutterAttackRange() + minion.getRadius();/*а то совсем маленький*/
 }
 
-double minionDanger(const model::Minion& minion) {
+float minionDanger(const model::Minion& minion) {
   return minion.getLife() * minionDps(minion);
 }
 
-double buildDps(const model::Building& build) {
-  return build.getDamage() / double(build.getCooldownTicks());
+float buildDps(const model::Building& build) {
+  return float(build.getDamage()) / float(build.getCooldownTicks());
 }
 
 double buildRadius(const model::Building& build, const double coef) {
@@ -245,10 +245,9 @@ double buildRadius(const model::Building& build, const double coef) {
   return MAX(build.getRadius(), build.getAttackRange() * ticks * coef);
 }
 
-double buildDanger(const model::Building& build, const double coef) {
-  const double ticks = 1 - ((double)build.getRemainingActionCooldownTicks() / (double)build.getCooldownTicks());
-  const double dps = build.getDamage() / build.getCooldownTicks();
-  return build.getLife() * coef * 0.08/*иначе слишком опасная*/ * buildDps(build) * ticks;
+float buildDanger(const model::Building& build, const double coef) {
+  const float ticks = 1.0f - ((float)build.getRemainingActionCooldownTicks() / (float)build.getCooldownTicks());
+  return float(build.getLife()) * float(coef) * 0.08f/*иначе слишком опасная*/ * buildDps(build) * ticks;
 }
 
 void InfluenceMap::includeFriends() {

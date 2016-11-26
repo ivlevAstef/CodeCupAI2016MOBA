@@ -11,9 +11,6 @@
 
 namespace AICup
 {
-  class AttackCommand;
-  typedef std::shared_ptr<AttackCommand> AttackCommandPtr;
-
   class AttackCommand: public Command {
   public:
     struct Result {
@@ -26,5 +23,7 @@ namespace AICup
     /// исполнить команду
     virtual void execute(const model::Wizard& self, Result& result) = 0;
   };
+
+  typedef std::shared_ptr<AttackCommand> AttackCommandPtr;
 }
 

@@ -21,8 +21,8 @@ Vector2D<int> PathConstants::toInt(Position point) {
 
 
 
-Path::Path(Position from, Position to, const double radius, const Obstacles& obstacles):
-  from(from), to(to), radius(radius), obstacles(obstacles) {
+Path::Path(Position from, Position to, const double radius):
+  from(from), to(to), radius(radius) {
   length = 0;
   count = 0;
 }
@@ -130,7 +130,7 @@ void PathFinder::calculate(const model::CircularUnit& unit) {
     clean();
 
     obstacles = World::instance().allObstacles(unit, true);
-    calculateCost(obstacles, unit.getRadius());
+    calculateCost();
     /// расчитываем все веса из точки где мы находимся
     calculateWeight(fromByInt);
 
@@ -139,27 +139,27 @@ void PathFinder::calculate(const model::CircularUnit& unit) {
     assert(0 == weights[lastByInt.x][lastByInt.y]);
 
     weights[fromByInt.x][fromByInt.y] = 0;
-    fastCalculateWeight = fastCalculateWeight - 0.005;
+    fastCalculateWeight = fastCalculateWeight - 0.005f;
     weights[lastByInt.x][lastByInt.y] = fastCalculateWeight;
   }
 }
 
 void PathFinder::calculatePath(const Position& to, std::shared_ptr<Path>& path) const {
-  auto newPath = std::make_shared<Path>(from, to, radius, obstacles);
+  auto newPath = std::make_shared<Path>(from, to, radius);
   path.swap(newPath);
 
   calculatePath(*path.get());
 }
 
-void PathFinder::calculateCost(const Obstacles& obstacles, const double radius) {
+void PathFinder::calculateCost() {
   for (const auto& obstacle : obstacles) {
-    double life = 1;
+    float life = 1;
     if (EX::isTree(*obstacle)) {
-      life = 2.0 * (obstacle->getLife() / 12); /// дерево
+      life = 2.0f * (float(obstacle->getLife()) / 12.0f); /// дерево
     } else if (EX::isNeutral(*obstacle)) {
-      life = 1000; /// нейтрал очень дорогое удовольствие
+      life = 1000.0f; /// нейтрал очень дорогое удовольствие
     } else {
-      life = 5000; /// здания вообще не обходимо
+      life = 5000.0f; /// здания вообще не обходимо
     }
 
     const auto oPos = EX::pos(*obstacle);
@@ -239,26 +239,26 @@ void PathFinder::calculatePath(Path& path) const {
   };
 
   // ревертируем точки
-  auto from = PathConstants::toInt(path.from);
-  auto to = PathConstants::toInt(path.to);
-  assert(0 <= from.x && from.x < PathConstants::memorySize);
-  assert(0 <= to.x && to.x < PathConstants::memorySize);
+  auto iFrom = PathConstants::toInt(path.from);
+  auto iTo = PathConstants::toInt(path.to);
+  assert(0 <= iFrom.x && iFrom.x < PathConstants::memorySize);
+  assert(0 <= iTo.x && iTo.x < PathConstants::memorySize);
   /// да в идеале точке не должны выходить за границы, но некоторые алгоритмы могут решить что надо бежать куда подальше...
-  to.x = MAX(1, MIN(to.x, PathConstants::memorySize - 2));
-  to.y = MAX(1, MIN(to.y, PathConstants::memorySize - 2));
-  from.x = MAX(1, MIN(from.x, PathConstants::memorySize - 2));
-  from.y = MAX(1, MIN(from.y, PathConstants::memorySize - 2));
+  iTo.x = MAX(1, MIN(iTo.x, PathConstants::memorySize - 2));
+  iTo.y = MAX(1, MIN(iTo.y, PathConstants::memorySize - 2));
+  iFrom.x = MAX(1, MIN(iFrom.x, PathConstants::memorySize - 2));
+  iFrom.y = MAX(1, MIN(iFrom.y, PathConstants::memorySize - 2));
 
   path.count = 0;
   path.length = 0;
 
-  if (weights[to.x][to.y] >= PathConstants::maxValue) {
+  if (weights[iTo.x][iTo.y] >= PathConstants::maxValue) {
     assert(false && "can't found path... really?");
     return;
   }
 
 
-  Vector2D<int> iter = to;
+  Vector2D<int> iter = iTo;
   Position lastPos = path.to;
   do {
     const Vector2D<int> pos = iter;
@@ -278,7 +278,7 @@ void PathFinder::calculatePath(Path& path) const {
     path.length += (realPos - lastPos).length();
 
     lastPos = realPos;
-  } while (iter != from);
+  } while (iter != iFrom);
 }
 
 

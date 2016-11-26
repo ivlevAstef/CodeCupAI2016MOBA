@@ -10,7 +10,7 @@ using namespace AICup;
 
 void Game::update(const model::Game& game, const model::Wizard& self) {
   if (!isInitialized) {
-    srand(game.getRandomSeed());
+    srand((unsigned int)game.getRandomSeed());
     isInitialized = true;
   }
 

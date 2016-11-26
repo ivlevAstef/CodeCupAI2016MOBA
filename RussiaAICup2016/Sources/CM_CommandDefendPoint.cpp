@@ -19,6 +19,6 @@ bool CommandDefendPoint::check(const model::Wizard&) {
   return false;
 }
 
-void CommandDefendPoint::execute(const model::Wizard& self, Result& result) {
+void CommandDefendPoint::execute(const model::Wizard&, Result&) {
   //result.priority = MovePriorities::defendPoint(self, );
 }

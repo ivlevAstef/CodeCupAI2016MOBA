@@ -9,7 +9,7 @@ Points::Points() {
 }
 
 const Position& Points::point(PointType type) {
-  assert(0 <= type && type < Points::instance().points.size());
+  assert(0 <= type && type < int(Points::instance().points.size()));
   return Points::instance().points[type];
 }
 

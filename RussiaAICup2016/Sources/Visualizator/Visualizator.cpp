@@ -123,13 +123,13 @@ void Visualizator::endAbs() {
   style = UNKNOWN;
 }
 
-void Visualizator::writeWithColor(char* buf, int32_t color) const {
-  size_t len = strlen(buf);
+void Visualizator::writeWithColor(char* buffer, int32_t color) const {
+  size_t len = strlen(buffer);
   double r = ((color & 0xFF0000) >> 16) / 256.0;
   double g = ((color & 0x00FF00) >> 8) / 256.0;
   double b = ((color & 0x0000FF)) / 256.0;
-  sprintf(buf + len, " %.3f %.3f %.3f\n", r, g, b);
-  sendCommand(buf);
+  sprintf(buffer + len, " %.3f %.3f %.3f\n", r, g, b);
+  sendCommand(buffer);
 }
 
 void Visualizator::circle(double x, double y, double r, int32_t color) const {

@@ -8,9 +8,9 @@ using namespace AICup;
 HypotheticalEnemies::HypotheticalEnemies() {
 }
 
-static Position reverse(Position pos) {
-  return Position(pos.y, pos.x);
-}
+//static Position reverse(Position pos) {
+//  return Position(pos.y, pos.x);
+//}
 
 void HypotheticalEnemies::update() {
   //TODO: потом переделать на волны, ибо такой вариант плох по многим причинам

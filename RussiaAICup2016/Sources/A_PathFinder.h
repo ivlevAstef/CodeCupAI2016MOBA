@@ -35,7 +35,7 @@ namespace AICup
 
     class Path {
     public:
-      Path(Position from, Position to, const double radius, const Obstacles&);
+      Path(Position from, Position to, const double radius);
 
     public:
       Position calculateNearestCurvaturePoint(const double visionRange) const;
@@ -65,8 +65,6 @@ namespace AICup
       Position path[PathConstants::maxPath];
 
       double length;
-
-      const Obstacles& obstacles;
     };
 
 
@@ -86,7 +84,7 @@ namespace AICup
 #endif // ENABLE_VISUALIZATOR
 
     private:
-      void calculateCost(const Obstacles& obstacles, const double radius);
+      void calculateCost();
       void calculateWeight(Vector2D<int> to);
       void calculatePath(Path& path) const;
 

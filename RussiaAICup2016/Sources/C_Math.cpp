@@ -138,28 +138,28 @@ std::vector<Vector> Math::tangetsForTwoCircle(const Position& p1, const double r
   return{tangent1.normal(), tangent2.normal()};
 }
 
-void Math::fillGrid(float* grid, const double x, const double y, const double step, const double radius, const float value) {
-  const size_t size = World::size() / step;
+void Math::fillGrid(float* grid, const double xReal, const double yReal, const double step, const double radius, const float value) {
+  const size_t size = size_t(World::size() / step);
 
-  const double minRealX = MAX(0, x - radius) / step;
-  const double maxRealX = MIN(World::size(), x + radius) / step;
-  const double minRealY = MAX(0, y - radius) / step;
-  const double maxRealY = MIN(World::size(), y + radius) / step;
+  const float minRealX = float(MAX(0, xReal - radius) / step);
+  const float maxRealX = float(MIN(World::size(), xReal + radius) / step);
+  const float minRealY = float(MAX(0, yReal - radius) / step);
+  const float maxRealY = float(MIN(World::size(), yReal + radius) / step);
 
-  const size_t minX = floor(minRealX);
-  const size_t maxX = ceil(maxRealX);
-  const size_t minY = floor(minRealY);
-  const size_t maxY = ceil(maxRealY);
+  const size_t minX = (size_t)floor(minRealX);
+  const size_t maxX = (size_t)ceil(maxRealX);
+  const size_t minY = (size_t)floor(minRealY);
+  const size_t maxY = (size_t)ceil(maxRealY);
 
   for (size_t x = minX; x < maxX; x++) {
-    const float sxMin = 1 - MAX(0, minRealX - double(x));
-    const float sxMax = 1 - MAX(0, double(x + 1) - maxRealX);
+    const float sxMin = 1.0f - MAX(0.0f, minRealX - float(x));
+    const float sxMax = 1.0f - MAX(0.0f, float(x + 1) - maxRealX);
     for (size_t y = minY; y < maxY; y++) {
-      const float syMin = 1 - MAX(0, minRealY - double(y));
-      const float syMax = 1 - MAX(0, double(y + 1) - maxRealY);
+      const float syMin = 1.0f - MAX(0.0f, minRealY - float(y));
+      const float syMax = 1.0f - MAX(0.0f, float(y + 1) - maxRealY);
 
-      const float dx = sxMin + sxMax - 1;
-      const float dy = syMin + syMax - 1;
+      const float dx = sxMin + sxMax - 1.0f;
+      const float dy = syMin + syMax - 1.0f;
 
       grid[x * size + y] += dx*dy * value;
     }

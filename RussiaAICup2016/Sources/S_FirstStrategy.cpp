@@ -12,7 +12,7 @@ FirstStrategy::FirstStrategy(const CommandFabric& fabric, const Algorithm::PathF
   lastChangeLineTick = 0;
 }
 
-void FirstStrategy::init(const model::Wizard& self, model::Move& move) {
+void FirstStrategy::init(const model::Wizard& self) {
   // вначале линию выбираем также как в smart game, так как это даст скорей всего наименьшее количество коллизий
   switch ((int)self.getId()) {
     case 1:
@@ -47,7 +47,7 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
   }
 
   if (!isInitialized) {
-    init(self, move);
+    init(self);
     isInitialized = true;
   }
 

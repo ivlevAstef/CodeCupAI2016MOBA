@@ -74,6 +74,6 @@ int AttackPriorities::attackEnemy(const model::Wizard& self, const model::Living
   return int(1000 * (0.3 * lifePriority + 0.5 * typePriority + 0.2 * statusPriority));
 }
 
-int AttackPriorities::pool(const model::Wizard& self, const model::Minion& neutral) {
+int AttackPriorities::pool(const model::Wizard&, const model::Minion&) {
   return 0;
 }

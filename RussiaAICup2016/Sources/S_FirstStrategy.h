@@ -17,7 +17,7 @@ namespace AICup
     void update(const model::Wizard& self, model::Move& move) override;
 
   private:
-    void init(const model::Wizard& self, model::Move& move);
+    void init(const model::Wizard& self);
 
     void changeLane(const model::Wizard& self);
 

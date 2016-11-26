@@ -42,18 +42,18 @@ const Vector CommandStrategy::move(const model::Wizard& self, TurnStyle& turnSty
     assert(moveResults[index].priority > 0);
   }
 
-  for (const auto& result : moveResults) {
-    for (const auto& tree : result.treesForRemove) {
+  for (const auto& move : moveResults) {
+    for (const auto& tree : move.treesForRemove) {
       addTreeForRemove(self, tree);
     }
   }
 
 
   int maxPriority = -10000;
-  for (const auto& result : moveResults) {
-    if (result.priority > maxPriority) {
-      turnStyle = result.turnStyle;
-      maxPriority = result.priority;
+  for (const auto& move : moveResults) {
+    if (move.priority > maxPriority) {
+      turnStyle = move.turnStyle;
+      maxPriority = move.priority;
     }
   }
 
@@ -83,9 +83,9 @@ const Vector CommandStrategy::move(const model::Wizard& self, TurnStyle& turnSty
 
 
   speedLimit = EX::maxSpeed(self);
-  for (const auto& result : moveResults) {
-    if (result.speedLimit > 0 && result.speedLimit < speedLimit) {
-      speedLimit = result.speedLimit;
+  for (const auto& move : moveResults) {
+    if (move.speedLimit > 0 && move.speedLimit < speedLimit) {
+      speedLimit = move.speedLimit;
     }
   }
 

@@ -34,34 +34,34 @@ int MovePriorities::avoidEnemy(const model::Wizard& self, const model::LivingUni
   return 1;
 }
 
-int MovePriorities::defendPoint(const model::Wizard& self, const Position& point) {
+int MovePriorities::defendPoint(const model::Wizard&, const Position&) {
   return 0;
 }
 
-int MovePriorities::follow(const model::Wizard& self, const model::LivingUnit& unit) {
+int MovePriorities::follow(const model::Wizard&, const model::LivingUnit&) {
   return 400;
 }
 
-int MovePriorities::getExpirience(const model::Wizard& self, const model::LivingUnit& unit) {
+int MovePriorities::getExpirience(const model::Wizard&, const model::LivingUnit&) {
   return 200;
 }
 
-int MovePriorities::keepDistance(const model::Wizard& self, const Position point, const double min, const double max) {
+int MovePriorities::keepDistance(const model::Wizard&, const Position, const double, const double) {
   return 500;
 }
 
-int MovePriorities::moveToBonus(const model::Wizard& self, const Position& bonusPos) {
+int MovePriorities::moveToBonus(const model::Wizard&, const Position&) {
   return 800;
 }
 
-int MovePriorities::moveToLine(const model::Wizard& self, const model::LaneType& lane) {
+int MovePriorities::moveToLine(const model::Wizard&, const model::LaneType&) {
   return 20;
 }
 
-int MovePriorities::moveToPoint(const model::Wizard& self, const Position& point) {
+int MovePriorities::moveToPoint(const model::Wizard&, const Position&) {
   return 10;
 }
 
-int MovePriorities::observeMap(const model::Wizard& self) {
+int MovePriorities::observeMap(const model::Wizard&) {
   return 0;
 }

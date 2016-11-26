@@ -27,9 +27,9 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
 
   /// если есть бонусы рядом
   for (const auto& bonus : World::instance().model().getBonuses()) {
-    const auto bonusPos = Position(bonus.getX(), bonus.getY());
-    if ((selfPos - bonusPos).length() < self.getVisionRange()) {
-      moveToBonus = std::make_shared<CommandMoveToPoint>(pathFinder, bonusPos.x, bonusPos.y);
+    const auto cBonusPos = Position(bonus.getX(), bonus.getY());
+    if ((selfPos - cBonusPos).length() < self.getVisionRange()) {
+      moveToBonus = std::make_shared<CommandMoveToPoint>(pathFinder, cBonusPos.x, cBonusPos.y);
       return moveToBonus->check(self);
     }
   }
