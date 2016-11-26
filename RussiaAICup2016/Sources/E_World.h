@@ -12,6 +12,7 @@
 #include "C_Singleton.h"
 #include "E_Types.h"
 #include "E_WorldObjects.h"
+#include <unordered_set>
 
 #ifdef ENABLE_VISUALIZATOR
 #include "Visualizator.h"
@@ -48,6 +49,7 @@ namespace AICup
     ObstaclesGroups createGroup(const Obstacles& obstacles, const double radius) const;
 
     const model::LivingUnit* unit(long long id) const;
+    const model::CircularUnit* unitOrProjectile(long long id) const;
 
     std::vector<const model::LivingUnit*> around(const model::Wizard& unit, const model::Faction faction, double radius = -1) const;
     std::vector<const model::LivingUnit*> aroundEnemies(const model::Wizard& unit, const double radius = -1) const;
@@ -67,13 +69,21 @@ namespace AICup
     void updateVisionZone();
     void updateSupposedData();
 
+    void updateMinions();
+
+    /// проверяет, что миньон перешел на темную сторону :)
+    bool checkMinionOnNeutral(const model::Minion& neutral) const;
+
   private:
     bool isInitial;
 
     const model::World* modelWorld;
 
     std::vector<Looking> visionZone;
+
     std::vector<model::Tree> supposedTrees;
     std::vector<model::Building> supposedBuilding;
+    std::vector<model::Minion> realMinions;
+    std::unordered_set<long long int> hateNeuralMinions;/// дада злые нейтральные миньоны
   };
 }

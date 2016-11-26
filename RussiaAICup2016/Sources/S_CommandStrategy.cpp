@@ -42,12 +42,11 @@ std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const
 
   for (size_t index = 0; index < moveCommands.size(); index++) {
     moveCommands[index]->execute(self, moveResults[index]);
-    LogAssert(moveResults[index].priority > 0);
   }
   /// Удаляем вектора, которые очень короткие.
   for (size_t index = 0; index < moveResults.size(); index++) {
     const size_t i = moveResults.size() - index - 1;
-    if (moveResults[i].moveDirection.length() < 0.5) {
+    if (moveResults[i].priority < 1 || moveResults[i].moveDirection.length() < 0.5) {
       moveResults.erase(moveResults.begin() + i);
     }
   }

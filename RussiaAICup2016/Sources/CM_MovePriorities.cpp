@@ -5,33 +5,45 @@
 
 using namespace AICup;
 
-int MovePriorities::avoidEnemy(const model::Wizard& self, const model::LivingUnit& enemy) {
+int MovePriorities::avoidEnemy(const model::Wizard& self, const model::CircularUnit& enemy) {
   const auto constants = Game::instance().model();
 
   const auto selfPos = EX::pos(self);
   const auto enemyPos = EX::pos(enemy);
   const double distance = (selfPos - enemyPos).length();
 
-  int lifePriority = (200 * enemy.getLife()) / enemy.getMaxLife();
+  if (EX::isProjectile(enemy)) {
+    return 1500;
+  }
+
+  const model::LivingUnit* checkLivingUnit = dynamic_cast<const model::LivingUnit*>(&enemy);
+  assert(nullptr != checkLivingUnit);
+  if (nullptr == checkLivingUnit) {
+    return 0;
+  }
+
+  const model::LivingUnit& livingUnit = *checkLivingUnit;
+
+  int lifePriority = (200 * livingUnit.getLife()) / livingUnit.getMaxLife();
 
   /// если врага можно быстро добить, то боятся его стоит меньше
-  if (enemy.getLife() < EX::magicMissleAttack(self) * 2) {
+  if (livingUnit.getLife() < EX::magicMissleAttack(self) * 2) {
     lifePriority = -500;
   }
 
-  if (EX::isWizard(enemy)) {
+  if (EX::isWizard(livingUnit)) {
     const int veryNearPrior = (distance < constants.getStaffRange() + self.getRadius()) ? 400 : 0;
-    return MAX(1, 300 + lifePriority - EX::minTimeForMagic(EX::asWizard(enemy)) * 5 + veryNearPrior);
-  } else if (EX::isMinion(enemy)) {
+    return 300 + lifePriority - EX::minTimeForMagic(EX::asWizard(livingUnit)) * 5 + veryNearPrior;
+  } else if (EX::isMinion(livingUnit)) {
     if (distance < constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2) {
-      return MAX(1, 800 + lifePriority);
+      return 800 + lifePriority;
     }
-    return MAX(1, 150 + lifePriority);
-  } else if (EX::isBuilding(enemy)) {
-    return MAX(1, 800 + lifePriority);
+    return  150 + lifePriority;
+  } else if (EX::isBuilding(livingUnit)) {
+    return 800 + lifePriority;
   }
 
-  return 1;
+  return 0;
 }
 
 int MovePriorities::defendPoint(const model::Wizard&, const Position&) {

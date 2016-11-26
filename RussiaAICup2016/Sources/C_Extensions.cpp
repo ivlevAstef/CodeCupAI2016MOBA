@@ -2,6 +2,7 @@
 #include "E_Game.h"
 #include "C_Math.h"
 #include "model/ActionType.h"
+#include "model/Projectile.h"
 
 using namespace AICup;
 
@@ -47,6 +48,10 @@ bool EX::isBuilding(const model::Unit& unit) {
 }
 bool EX::isWizard(const model::Unit& unit) {
   return nullptr != dynamic_cast<const model::Wizard*>(&unit);
+}
+
+bool EX::isProjectile(const model::Unit& unit) {
+  return nullptr != dynamic_cast<const model::Projectile*>(&unit);
 }
 
 

@@ -16,7 +16,7 @@ namespace AICup
 
   // ќбъедин€ю в один файл, чтобы легче было настраивать приоритеты
   namespace MovePriorities {
-    int avoidEnemy(const model::Wizard& self, const model::LivingUnit& enemy);
+    int avoidEnemy(const model::Wizard& self, const model::CircularUnit& enemy);
 
     int defendPoint(const model::Wizard& self, const Position& point);
 

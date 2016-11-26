@@ -21,6 +21,8 @@ namespace AICup
 
     void changeLane(const model::Wizard& self);
 
+    const std::vector<MoveCommandPtr> calcAllAroundEnemies(const model::Wizard& self);
+
   private:
     bool isInitialized;
     model::LaneType myLine;

@@ -30,8 +30,7 @@ namespace AICup
   private:
     const long long enemyId;
     MoveCommandPtr moveToPointCommand;
-    double distance;
 
-    const model::LivingUnit* enemy;
+    const model::CircularUnit* enemy;
   };
 }

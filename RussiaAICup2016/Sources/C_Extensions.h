@@ -28,6 +28,7 @@ namespace AICup
     bool isMinion(const model::Unit& unit);
     bool isBuilding(const model::Unit& unit);
     bool isWizard(const model::Unit& unit);
+    bool isProjectile(const model::Unit& unit);
 
     const model::Tree& asTree(const model::Unit& unit);
     const model::Minion& asMinion(const model::Unit& unit);

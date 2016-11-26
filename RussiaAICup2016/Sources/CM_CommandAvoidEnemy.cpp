@@ -21,14 +21,34 @@ CommandAvoidEnemy::CommandAvoidEnemy(Algorithm::PathFinder& finder, const long l
 }
 
 bool CommandAvoidEnemy::check(const model::Wizard& self) {
-  enemy = World::instance().unit(enemyId);
+  enemy = World::instance().unitOrProjectile(enemyId);
   if (nullptr == enemy) {
     moveToPointCommand = nullptr;
     return false;
   }
 
+  const auto selfPos = EX::pos(self);
+  const auto unitPos = EX::pos(*enemy);
+  const auto delta = selfPos - unitPos;
   const auto constants = Game::instance().model();
 
+  if (EX::isProjectile(*enemy)) {
+    const auto maxDistance = self.getRadius() + enemy->getRadius();
+    const auto projectileSpeed = Vector(enemy->getSpeedX(), enemy->getSpeedY());
+    const auto devDistance = Math::distanceToLine(selfPos, unitPos, unitPos + projectileSpeed);
+    /// нахожусь на лиинии удара, снаряд летит в мою сторону, он близко
+    if (devDistance < maxDistance && delta.dot(projectileSpeed) > 0 && delta.length() < 645/*максимально доступная длина*/) {
+    } else {
+      return false;
+    }
+
+    /// противоположная точка, точке где находиться объект
+    const auto pos = selfPos + delta.normal() * 645;
+    moveToPointCommand = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::TURN);
+    return moveToPointCommand->check(self);
+  }
+
+  double distance = 0;
   if (EX::isWizard(*enemy)) {
     const model::Wizard& wizard = EX::asWizard(*enemy);
     const double radius = EX::radiusForGuaranteedHit(wizard);
@@ -37,6 +57,7 @@ bool CommandAvoidEnemy::check(const model::Wizard& self) {
     distance = MIN(distance1, distance2);
 
     distance = MAX(distance, constants.getStaffRange() + self.getRadius());
+
 
   } else if (EX::isMinion(*enemy)) {
     const model::Minion& minion = EX::asMinion(*enemy);
@@ -47,30 +68,27 @@ bool CommandAvoidEnemy::check(const model::Wizard& self) {
       distance = constants.getFetishBlowdartAttackRange() + self.getRadius() + constants.getDartRadius();
     }
 
+
   } else if (EX::isBuilding(*enemy)) {
     const model::Building& build = EX::asBuilding(*enemy);
 
     distance = build.getAttackRange() - build.getRemainingActionCooldownTicks() * constants.getWizardBackwardSpeed() + self.getRadius();
     distance = MAX(distance, build.getRadius() + self.getRadius());
 
+
   } else {
     return false;
   }
 
-
-  const auto selfPos = EX::pos(self);
-  const auto unitPos = EX::pos(*enemy);
-
-  const auto currentDistance = (selfPos - unitPos).length();
+  const auto currentDistance = delta.length();
   if (currentDistance > distance + 1/*чтобы был запас*/) {
     return false;
   }
 
 
   /// противоположная точка, точке где находиться объект
-  const auto pos = selfPos + (selfPos - unitPos).normal() * (distance - currentDistance);
+  const auto pos = selfPos + delta.normal() * (distance - currentDistance);
   moveToPointCommand = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::BACK_TURN);
-
 
   return moveToPointCommand->check(self);
 }

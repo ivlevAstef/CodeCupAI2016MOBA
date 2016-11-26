@@ -27,6 +27,7 @@ void World::update(const model::World& world) {
 
   updateVisionZone();
   updateSupposedData();
+  updateMinions();
 }
 
 const std::vector<model::Tree>& World::trees() const {
@@ -38,7 +39,7 @@ const std::vector<model::Building>& World::buildings() const {
 }
 
 const std::vector<model::Minion>& World::minions() const {
-  return modelWorld->getMinions();
+  return realMinions;
 }
 
 const std::vector<model::Wizard>& World::wizards() const {
@@ -154,11 +155,30 @@ static std::vector<model::Building> updateBuildingTicks(const std::vector<model:
   return result;
 }
 
+void World::updateMinions() {
+  realMinions.clear();
+  const auto& worldMinions = modelWorld->getMinions();
+  realMinions.reserve(worldMinions.size());
+
+  for (const auto& minion : worldMinions) {
+    if (model::FACTION_NEUTRAL == minion.getFaction() && !checkMinionOnNeutral(minion)) {
+      hateNeuralMinions.insert(minion.getId());
+    }
+
+    if (0 != hateNeuralMinions.count(minion.getId())) {
+      realMinions.push_back(Minion(minion, Game::enemyFaction()));
+      continue;
+    }
+
+    realMinions.push_back(minion);
+  }
+
+}
 
 void World::updateSupposedData() {
-  supposedBuilding = updateBuildingTicks(supposedBuilding);
-
   supposedTrees = merge(supposedTrees, updateRadius<model::Tree, Tree>(modelWorld->getTrees()), visionZone);
+
+  supposedBuilding = updateBuildingTicks(supposedBuilding);
   supposedBuilding = merge(supposedBuilding, updateRadius<model::Building, Building>(modelWorld->getBuildings()), visionZone);
 }
 
@@ -327,6 +347,22 @@ const model::LivingUnit* World::unit(long long id) const {
   return nullptr;
 }
 
+
+const model::CircularUnit* World::unitOrProjectile(long long id) const {
+  const auto livingUnit = unit(id);
+  if (nullptr != livingUnit) {
+    return livingUnit;
+  }
+
+  for (const auto& projectile : model().getProjectiles()) {
+    if (projectile.getId() == id) {
+      return &projectile;
+    }
+  }
+
+  return nullptr;
+}
+
 std::vector<const model::LivingUnit*> World::around(const model::Wizard& unit, const model::Faction faction, double radius) const {
   std::vector<const model::LivingUnit*> result;
 
@@ -366,6 +402,30 @@ std::vector<const model::LivingUnit*> World::around(const model::Wizard& unit, c
 
 std::vector<const model::LivingUnit*> World::aroundEnemies(const model::Wizard& unit, const double radius) const {
   return around(unit, Game::reverseFaction(unit.getFaction()), radius);
+}
+
+bool World::checkMinionOnNeutral(const model::Minion& neutral) const {
+  assert(neutral.getFaction() == model::FACTION_NEUTRAL);
+
+  if (0 != neutral.getSpeedX() || 0 != neutral.getSpeedY()) {
+    return false;
+  }
+
+  if (0 != neutral.getRemainingActionCooldownTicks()) {
+    return false;
+  }
+
+  if (neutral.getLife() != neutral.getMaxLife()) {
+    return false;
+  }
+
+  for (const auto& projectile : modelWorld->getProjectiles()) {
+    if (projectile.getOwnerUnitId() == neutral.getId()) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 #ifdef ENABLE_VISUALIZATOR

@@ -48,8 +48,8 @@ namespace AICup
 
   class Minion: public model::Minion {
   public:
-    //копия миньона но с другим расположением, и фракцией
-    Minion(const model::Minion& minion, double x, double y, model::Faction faction);
+    //копия миньона но со смененной фракцией
+    Minion(const model::Minion& minion, model::Faction faction);
 
   };
 

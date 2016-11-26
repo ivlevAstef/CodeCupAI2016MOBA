@@ -1,8 +1,9 @@
-#include "S_FirstStrategy.h"
+п»ї#include "S_FirstStrategy.h"
 #include "E_World.h"
 #include "E_Points.h"
 #include "E_InfluenceMap.h"
 #include "C_Math.h"
+#include "C_Extensions.h"
 
 using namespace AICup;
 
@@ -13,7 +14,7 @@ FirstStrategy::FirstStrategy(const CommandFabric& fabric, const Algorithm::PathF
 }
 
 void FirstStrategy::init(const model::Wizard& self) {
-  // вначале линию выбираем также как в smart game, так как это даст скорей всего наименьшее количество коллизий
+  // РІРЅР°С‡Р°Р»Рµ Р»РёРЅРёСЋ РІС‹Р±РёСЂР°РµРј С‚Р°РєР¶Рµ РєР°Рє РІ smart game, С‚Р°Рє РєР°Рє СЌС‚Рѕ РґР°СЃС‚ СЃРєРѕСЂРµР№ РІСЃРµРіРѕ РЅР°РёРјРµРЅСЊС€РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕР»Р»РёР·РёР№
   switch ((int)self.getId()) {
     case 1:
     case 2:
@@ -39,8 +40,8 @@ void FirstStrategy::init(const model::Wizard& self) {
 void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
   CommandStrategy::clear();
 
-  /// раз в 500 тиков пересматриваю линию,
-  /// 500 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
+  /// СЂР°Р· РІ 500 С‚РёРєРѕРІ РїРµСЂРµСЃРјР°С‚СЂРёРІР°СЋ Р»РёРЅРёСЋ,
+  /// 500 С‚Р°Рє РєР°Рє Сѓ РЅР°СЃ Р±РѕРЅСѓСЃС‹ РїРѕСЏРІР»СЏСЋС‚СЃСЏ РЅР° РєСЂР°С‚РЅС‹С… СЃРµРєСѓРЅРґР°С…, Р° Р·РЅР°С‡РёС‚ РІР·СЏС‚РёРµ Р±РѕРЅСѓСЃР° РјРѕР¶РµС‚ РїСЂРёРІРµСЃС‚Рё Рє СЃРјРµРЅРµ Р»РёРЅРёРё
   if (World::model().getTickIndex() - lastChangeLineTick >= 500) {
     changeLane(self);
     lastChangeLineTick = World::model().getTickIndex();
@@ -51,17 +52,7 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
     isInitialized = true;
   }
 
-  const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + self.getRadius() * 2);
-
-  std::vector<MoveCommandPtr> avoidAroundCommands;
-  avoidAroundCommands.reserve(aroundEnemies.size());
-  for (const auto& enemy : aroundEnemies) {
-    const auto command = fabric.avoidEnemy(enemy->getId());
-    if (command->check(self)) {
-      avoidAroundCommands.push_back(command);
-    }
-  }
-
+  const auto avoidAroundCommands = calcAllAroundEnemies(self);
   if (!avoidAroundCommands.empty()) {
     moveCommands.insert(moveCommands.end(), avoidAroundCommands.begin(), avoidAroundCommands.end());
   }
@@ -102,15 +93,40 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
 
 
   /*
-  как должно быть:
-  1)!! пока нету крипов, иследуем карту и бъем нейтралов, для получения опыта и очков
-  3)!! при моменте появления руны (надо еще написать эту команду), идем к ней в двух случаях:
-     а) это выгодно по xp (руна близко, и тут много не заработаешь)
-     б) идем на ту линию где ситуация не очень
-     с) идем на ту линию где своих меньше (дабы побольше оттяпать)
+  РєР°Рє РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ:
+  1)!! РїРѕРєР° РЅРµС‚Сѓ РєСЂРёРїРѕРІ, РёСЃР»РµРґСѓРµРј РєР°СЂС‚Сѓ Рё Р±СЉРµРј РЅРµР№С‚СЂР°Р»РѕРІ, РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РѕРїС‹С‚Р° Рё РѕС‡РєРѕРІ
+  3)!! РїСЂРё РјРѕРјРµРЅС‚Рµ РїРѕСЏРІР»РµРЅРёСЏ СЂСѓРЅС‹ (РЅР°РґРѕ РµС‰Рµ РЅР°РїРёСЃР°С‚СЊ СЌС‚Сѓ РєРѕРјР°РЅРґСѓ), РёРґРµРј Рє РЅРµР№ РІ РґРІСѓС… СЃР»СѓС‡Р°СЏС…:
+     Р°) СЌС‚Рѕ РІС‹РіРѕРґРЅРѕ РїРѕ xp (СЂСѓРЅР° Р±Р»РёР·РєРѕ, Рё С‚СѓС‚ РјРЅРѕРіРѕ РЅРµ Р·Р°СЂР°Р±РѕС‚Р°РµС€СЊ)
+     Р±) РёРґРµРј РЅР° С‚Сѓ Р»РёРЅРёСЋ РіРґРµ СЃРёС‚СѓР°С†РёСЏ РЅРµ РѕС‡РµРЅСЊ
+     СЃ) РёРґРµРј РЅР° С‚Сѓ Р»РёРЅРёСЋ РіРґРµ СЃРІРѕРёС… РјРµРЅСЊС€Рµ (РґР°Р±С‹ РїРѕР±РѕР»СЊС€Рµ РѕС‚С‚СЏРїР°С‚СЊ)
  */
 
   CommandStrategy::update(self, move);
+}
+
+const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const model::Wizard& self) {
+  const auto selfPos = EX::pos(self);
+
+  const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + self.getRadius() * 2);
+
+  std::vector<MoveCommandPtr> avoidAroundCommands;
+  avoidAroundCommands.reserve(aroundEnemies.size());
+  for (const auto& enemy : aroundEnemies) {
+    const auto command = fabric.avoidEnemy(enemy->getId());
+    if (command->check(self)) {
+      avoidAroundCommands.push_back(command);
+    }
+  }
+
+
+  for (const auto& projectile : World::model().getProjectiles()) {
+    const auto command = fabric.avoidEnemy(projectile.getId());
+    if (command->check(self)) {
+      avoidAroundCommands.push_back(command);
+    }
+  }
+
+  return avoidAroundCommands;
 }
 
 void FirstStrategy::changeLane(const model::Wizard& self) {

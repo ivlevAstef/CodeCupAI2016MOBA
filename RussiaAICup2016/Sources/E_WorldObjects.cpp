@@ -83,9 +83,9 @@ TowerBuilding::TowerBuilding(double x, double y, model::Faction faction):
 
 }
 
-Minion::Minion(const model::Minion& minion, double x, double y, model::Faction faction):
+Minion::Minion(const model::Minion& minion, model::Faction faction):
   model::Minion(minion.getId(),
-    x, y, 0, 0, 0,
+    minion.getX(), minion.getY(), 0, 0, 0,
     faction, minion.getRadius(),
     minion.getMaxLife(), minion.getMaxLife(),
     std::vector<model::Status>(),
