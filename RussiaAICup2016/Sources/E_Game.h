@@ -8,6 +8,7 @@
 
 #include "model\Game.h"
 #include "model\Faction.h"
+#include "model\Wizard.h"
 #include "C_Singleton.h"
 
 namespace AICup
@@ -17,15 +18,24 @@ namespace AICup
     Game() : isInitialized(false) {
     }
 
-    void update(const model::Game& game);
+    void update(const model::Game& game, const model::Wizard& self);
 
     static inline const model::Game& model() {
       return *instance().modelGame;
     }
 
-    model::Faction enemyFaction(const model::Faction faction) const;
+    static model::Faction friendFaction();
+    static model::Faction enemyFaction();
+
+    static model::Faction reverseFaction(model::Faction faction);
 
   private:
+    void setFaction(const model::Wizard& self);
+
+  private:
+    model::Faction friendFactionValue;
+    model::Faction enemyFactionValue;
+
     const model::Game* modelGame;
 
     bool isInitialized;

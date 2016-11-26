@@ -4,6 +4,7 @@
 #include "E_HypotheticalEnemies.h"
 #include "C_Math.h"
 #include "E_Points.h"
+#include <algorithm>
 
 using namespace AICup;
 
@@ -29,11 +30,11 @@ void InfluenceMap::update() {
   updateLinePosition();
 }
 
-const float const* InfluenceMap::getFriendsMap() const {
-  return reinterpret_cast<const float const*>(friends);
+const float* const InfluenceMap::getFriendsMap() const {
+  return reinterpret_cast<const float* const>(friends);
 }
-const float const* InfluenceMap::getEnemiesMap() const {
-  return reinterpret_cast<const float const*>(enemies);
+const float* const InfluenceMap::getEnemiesMap() const {
+  return reinterpret_cast<const float* const>(enemies);
 }
 
 void InfluenceMap::updateLinePosition() {
@@ -107,7 +108,6 @@ const std::vector<Position>& InfluenceMap::getLinePoints(const model::LaneType l
   };
 
 
-  const std::vector<Position>* linePointsPtr = nullptr;
   switch (lane) {
     case model::LANE_TOP:
       return topLinePoints;
@@ -168,7 +168,7 @@ bool InfluenceMap::isFriendZone(const int x, const int y) const {
   return 20 < friendForce - enemyForce;
 }
 
-Position InfluenceMap::pointToForeFront(const int x, const int y, const std::vector<Position>& line, size_t index) const {
+Position InfluenceMap::pointToForeFront(const int x, const int y, const std::vector<Position>& line, const size_t index) const {
   const Position startCentralPosition = InfluenceMapConstants::toReal({x, y}, 0.5, 0.5);
   return Math::point_distanceToSegment(startCentralPosition, line[index - 1], line[index]);
 }
@@ -190,7 +190,7 @@ Position InfluenceMap::offsetForeFront(const Position& foreFront, float offset, 
 
   auto iterPos = foreFront;
   while (offset > 0 && index < line.size()) {
-    const auto& p1 = line[index - 1];
+    //const auto& p1 = line[index - 1];
     const auto& p2 = line[index];
     const double length = (p2 - iterPos).length();
     if (length < offset) {
@@ -253,13 +253,13 @@ double buildDanger(const model::Building& build, const double coef) {
 
 void InfluenceMap::includeFriends() {
   for (const auto& minion : World::instance().minions()) {
-    if (model::FACTION_ACADEMY == minion.getFaction()) {
+    if (Game::friendFaction() == minion.getFaction()) {
       includeFriend(minion, minionRadius(minion), minionDanger(minion));
     }
   }
 
   for (const auto& build : World::instance().buildings()) {
-    if (model::FACTION_ACADEMY == build.getFaction()) {
+    if (Game::friendFaction() == build.getFaction()) {
       for (double c = 0.1; c <= 1.0; c += 0.1) {
         includeFriend(build, buildRadius(build, c), buildDanger(build, 1.0 - c));
       }
@@ -269,13 +269,13 @@ void InfluenceMap::includeFriends() {
 }
 void InfluenceMap::includeEnemies() {
   for (const auto& minion : World::instance().minions()) {
-    if (model::FACTION_RENEGADES == minion.getFaction()) {
+    if (Game::enemyFaction() == minion.getFaction()) {
       includeEnemy(minion, minionRadius(minion), minionDanger(minion));
     }
   }
 
   for (const auto& build : World::instance().buildings()) {
-    if (model::FACTION_RENEGADES == build.getFaction()) {
+    if (Game::enemyFaction() == build.getFaction()) {
       for (double c = 0.1; c <= 1.0; c += 0.1) {
         includeEnemy(build, buildRadius(build, c), buildDanger(build, 1.0 - c));
       }

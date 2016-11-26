@@ -145,7 +145,8 @@ void PathFinder::calculate(const model::CircularUnit& unit) {
 }
 
 void PathFinder::calculatePath(const Position& to, std::shared_ptr<Path>& path) const {
-  path.swap(std::make_shared<Path>(from, to, radius, obstacles));
+  auto newPath = std::make_shared<Path>(from, to, radius, obstacles);
+  path.swap(newPath);
 
   calculatePath(*path.get());
 }
@@ -196,7 +197,6 @@ void PathFinder::calculateWeight(Vector2D<int> to) {
   area[areaBegin].set(to.x, to.y);
   weights[to.x][to.y] = 0;
 
-  double costMult = 1; //специальный чит, чтобы несколько деревьев подрят были не выгоды
   do {
     int newAreaEnd = areaEnd;
     int areaIndex = areaBegin;

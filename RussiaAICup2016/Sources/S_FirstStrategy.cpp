@@ -114,8 +114,6 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
 }
 
 void FirstStrategy::changeLane(const model::Wizard& self) {
-  const auto selfPos = Position(self.getX(), self.getY());
-
   const auto basePosition = Points::point(Points::ACADEMY_BASE);
   const auto topPosition = InfluenceMap::instance().getForeFront(model::LANE_TOP, 0);
   const auto middlePosition = InfluenceMap::instance().getForeFront(model::LANE_MIDDLE, 0);

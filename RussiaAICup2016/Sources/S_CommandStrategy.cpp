@@ -2,6 +2,7 @@
 #include "A_Exec.h"
 #include "C_Math.h"
 #include "C_Extensions.h"
+#include <cassert>
 
 
 using namespace AICup;

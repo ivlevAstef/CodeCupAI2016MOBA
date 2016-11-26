@@ -1,4 +1,5 @@
 #include "E_WorldObjects.h"
+#include <cmath>
 
 using namespace AICup;
 
@@ -14,7 +15,7 @@ static long long calcId() {
 Tree::Tree(const model::Tree& tree, double radius):
   model::Tree(tree.getId(),
     tree.getX(), tree.getY(), 0, 0, 0,
-    model::FACTION_ACADEMY, radius, tree.getLife(), tree.getMaxLife(), std::vector<model::Status>())
+    model::FACTION_OTHER, radius, tree.getLife(), tree.getMaxLife(), std::vector<model::Status>())
 {
 }
 
@@ -31,7 +32,7 @@ int lifeByRadius(double radius) {
 Tree::Tree(double x, double y, double radius):
   model::Tree(calcId(),
     x, y, 0, 0, 0,
-    model::FACTION_ACADEMY, radius, lifeByRadius(radius), lifeByRadius(radius), std::vector<model::Status>())
+    model::FACTION_OTHER, radius, lifeByRadius(radius), lifeByRadius(radius), std::vector<model::Status>())
 {
 }
 

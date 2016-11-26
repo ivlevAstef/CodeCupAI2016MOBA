@@ -25,8 +25,6 @@ double calcMaxSpeed(const model::Wizard& self, const Vector& direction, const do
 
 
 bool Algorithm::execMove(const model::Wizard& self, const TurnStyle style, const Vector& direction, const double speedLimit, model::Move& move) {
-  Vector prespeed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
-
   double maxSpeed = calcMaxSpeed(self, direction, speedLimit);
 
   const auto selfPos = EX::pos(self);
@@ -94,4 +92,6 @@ bool Algorithm::execAttack(const model::Wizard& self, const model::ActionType ac
   move.setMinCastDistance(distance - unit.getRadius());
   move.setMaxCastDistance(distance + unit.getRadius() * 2); // с запасом
   move.setAction(action);
+
+  return true;
 }

@@ -10,6 +10,7 @@
 #include "C_Vector2D.h"
 #include "model\CircularUnit.h"
 #include "model\LaneType.h"
+#include <vector>
 
 #ifdef ENABLE_VISUALIZATOR
 #include "Visualizator.h"
@@ -33,8 +34,8 @@ namespace AICup
 
     void update();
 
-    const float const* getFriendsMap() const;
-    const float const* getEnemiesMap() const;
+    const float* const getFriendsMap() const;
+    const float* const getEnemiesMap() const;
 
     /// Возращает линию фронта на указанной линии
     /// смещение может быть отрицательным (ближе к врагам) и положительным (ближе к своим)
@@ -59,10 +60,9 @@ namespace AICup
     const std::vector<Position>& getLinePoints(const model::LaneType lane) const;
     Position calculateForeFront(const model::LaneType lane) const;
     bool isFriendZone(const int x, const int y) const;
-    Position pointToForeFront(const int x, const int y, const std::vector<Position>& line, size_t index) const;
+    Position pointToForeFront(const int x, const int y, const std::vector<Position>& line, const size_t index) const;
 
     Position offsetForeFront(const Position& foreFront, float offset, const std::vector<Position>& line) const;
-
   private:
     Position topForeFront;
     Position middleForeFront;

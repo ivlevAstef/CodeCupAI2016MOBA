@@ -15,24 +15,6 @@ static Position reverse(Position pos) {
 void HypotheticalEnemies::update() {
   //TODO: потом переделать на волны, ибо такой вариант плох по многим причинам
   hypotheticalMinions.clear();
-
-  /*for (const auto& minion : World::instance().minions()) {
-    if (model::FACTION_ACADEMY == minion.getFaction()) {
-      const auto reversePos = reverse(EX::pos(minion));
-
-      bool canVision = false;
-      for (const auto& vision : World::instance().getVisionZone()) {
-        if ((Position(vision.getX(), vision.getY()) - reversePos).length() < vision.getVisionRange()) {
-          canVision = true;
-          break;
-        }
-      }
-
-      if (!canVision) {
-        hypotheticalMinions.push_back(Minion(minion, reversePos.x, reversePos.y, model::FACTION_RENEGADES));
-      }
-    }
-  }*/
 }
 
 const std::vector<model::Minion>& HypotheticalEnemies::getHypotheticalMinions() const {

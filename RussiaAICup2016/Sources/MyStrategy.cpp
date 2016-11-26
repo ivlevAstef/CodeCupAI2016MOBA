@@ -12,6 +12,7 @@
 #include "C_Logger.h"
 #include "E_HypotheticalEnemies.h"
 #include "S_StrategyManager.h"
+#include "C_Extensions.h"
 
 
 using namespace model;
@@ -24,6 +25,7 @@ MyStrategy::MyStrategy() {
 #endif
 }
 
+#ifdef ENABLE_VISUALIZATOR
 void visualization(const Visualizator& visualizator) {
   AICup::World::instance().visualization(visualizator);
   AICup::Points::instance().visualization(visualizator);
@@ -33,9 +35,10 @@ void visualization(const Visualizator& visualizator) {
 
   AICup::StrategyManager::instance().visualization(visualizator);
 }
+#endif
 
 void MyStrategy::move(const model::Wizard& self, const model::World& world, const model::Game& game, model::Move& move) {
-  AICup::Game::instance().update(game);
+  AICup::Game::instance().update(game, self);
   AICup::World::instance().update(world);
   AICup::HypotheticalEnemies::instance().update();
   AICup::InfluenceMap::instance().update();

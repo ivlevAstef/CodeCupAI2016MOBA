@@ -7,7 +7,6 @@ using namespace AICup;
 
 double speedFactor(const model::LivingUnit& obj) {
   const auto wizard = dynamic_cast<const model::Wizard*>(&obj);
-  const auto minion = dynamic_cast<const model::Minion*>(&obj);
 
   double factor = 1;
 

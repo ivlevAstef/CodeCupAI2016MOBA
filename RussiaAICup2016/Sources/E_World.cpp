@@ -45,17 +45,17 @@ const std::vector<Looking>& World::getVisionZone() const {
 }
 
 void World::initBuildings() {
-  supposedBuilding.push_back(BaseBuilding(3600, 400, model::FACTION_RENEGADES));
+  supposedBuilding.push_back(BaseBuilding(3600, 400, Game::enemyFaction()));
 
   // Top
-  supposedBuilding.push_back(TowerBuilding(3650, 2344, model::FACTION_RENEGADES));
-  supposedBuilding.push_back(TowerBuilding(3950, 1307, model::FACTION_RENEGADES));
+  supposedBuilding.push_back(TowerBuilding(3650, 2344, Game::enemyFaction()));
+  supposedBuilding.push_back(TowerBuilding(3950, 1307, Game::enemyFaction()));
   // Middle
-  supposedBuilding.push_back(TowerBuilding(2071, 1600, model::FACTION_RENEGADES));
-  supposedBuilding.push_back(TowerBuilding(3095, 1232, model::FACTION_RENEGADES));
+  supposedBuilding.push_back(TowerBuilding(2071, 1600, Game::enemyFaction()));
+  supposedBuilding.push_back(TowerBuilding(3095, 1232, Game::enemyFaction()));
   // Bottom
-  supposedBuilding.push_back(TowerBuilding(1688, 50, model::FACTION_RENEGADES));
-  supposedBuilding.push_back(TowerBuilding(2630, 350, model::FACTION_RENEGADES));
+  supposedBuilding.push_back(TowerBuilding(1688, 50, Game::enemyFaction()));
+  supposedBuilding.push_back(TowerBuilding(2630, 350, Game::enemyFaction()));
 }
 
 void World::initTrees() {
@@ -79,19 +79,19 @@ void World::updateVisionZone() {
   visionZone.clear();
 
   for (const auto& wizard : model().getWizards()) {
-    if (model::FACTION_ACADEMY == wizard.getFaction()) {
+    if (Game::friendFaction() == wizard.getFaction()) {
       visionZone.emplace_back(wizard);
     }
   }
 
   for (const auto& minion : model().getMinions()) {
-    if (model::FACTION_ACADEMY == minion.getFaction()) {
+    if (Game::friendFaction() == minion.getFaction()) {
       visionZone.emplace_back(minion);
     }
   }
 
   for (const auto& building : model().getBuildings()) {
-    if (model::FACTION_ACADEMY == building.getFaction()) {
+    if (Game::friendFaction() == building.getFaction()) {
       visionZone.emplace_back(building);
     }
   }
@@ -173,7 +173,7 @@ const model::LaneType World::positionToLine(const double x, const double y) cons
 const int World::wizardCount(model::LaneType line) const {
   int result = 0;
   for (const auto& wizard : model().getWizards()) {
-    if (model::FACTION_ACADEMY == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
+    if (Game::friendFaction() == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
       result++;
     }
   }
@@ -185,7 +185,7 @@ const int World::wizardCount(model::LaneType line, const model::Wizard& excludeW
   int result = 0;
   for (const auto& wizard : model().getWizards()) {
     if (wizard.getId() != excludeWizard.getId()
-      && model::FACTION_ACADEMY == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
+      && Game::friendFaction() == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
       result++;
     }
   }
@@ -360,7 +360,7 @@ std::vector<const model::LivingUnit*> World::around(const model::Wizard& unit, c
 }
 
 std::vector<const model::LivingUnit*> World::aroundEnemies(const model::Wizard& unit, const double radius) const {
-  return around(unit, Game::instance().enemyFaction(unit.getFaction()), radius);
+  return around(unit, Game::reverseFaction(unit.getFaction()), radius);
 }
 
 #ifdef ENABLE_VISUALIZATOR
