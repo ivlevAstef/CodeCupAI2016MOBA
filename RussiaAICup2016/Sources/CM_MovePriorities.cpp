@@ -13,7 +13,7 @@ int MovePriorities::avoidEnemy(const model::Wizard& self, const model::CircularU
   const double distance = (selfPos - enemyPos).length();
 
   if (EX::isProjectile(enemy)) {
-    return 1500;
+    return 2500;
   }
 
   const model::LivingUnit* checkLivingUnit = dynamic_cast<const model::LivingUnit*>(&enemy);
@@ -28,17 +28,26 @@ int MovePriorities::avoidEnemy(const model::Wizard& self, const model::CircularU
 
   /// если врага можно быстро добить, то боятся его стоит меньше
   if (livingUnit.getLife() < EX::magicMissleAttack(self) * 2) {
-    lifePriority = -500;
+    lifePriority = -600;
   }
 
   if (EX::isWizard(livingUnit)) {
-    const int veryNearPrior = (distance < constants.getStaffRange() + self.getRadius()) ? 400 : 0;
-    return 300 + lifePriority - EX::minTimeForMagic(EX::asWizard(livingUnit)) * 5 + veryNearPrior;
+    const model::Wizard& wizard = EX::asWizard(livingUnit);
+    const double timeToAttack = EX::timeToTurnForAttack(self, wizard);
+    const double timeForMagic = EX::minTimeForMagic(EX::asWizard(livingUnit));
+
+    return 300 + lifePriority - timeForMagic * 5 - timeToAttack * 5;
   } else if (EX::isMinion(livingUnit)) {
-    if (distance < constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2) {
-      return 800 + lifePriority;
+    const model::Minion& minion = EX::asMinion(livingUnit);
+
+    if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
+      if (distance < constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2) {
+        return 600 + lifePriority;
+      }
+      return lifePriority;
+    } else {
+      return lifePriority + ((600 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
     }
-    return  150 + lifePriority;
   } else if (EX::isBuilding(livingUnit)) {
     return 800 + lifePriority;
   }
@@ -51,7 +60,7 @@ int MovePriorities::defendPoint(const model::Wizard&, const Position&) {
 }
 
 int MovePriorities::follow(const model::Wizard&, const model::LivingUnit&) {
-  return 400;
+  return 300;
 }
 
 int MovePriorities::getExpirience(const model::Wizard&, const model::LivingUnit&) {
@@ -62,8 +71,8 @@ int MovePriorities::keepDistance(const model::Wizard&, const Position, const dou
   return 500;
 }
 
-int MovePriorities::moveToBonus(const model::Wizard&, const Position&) {
-  return 800;
+int MovePriorities::moveToBonus(const model::Wizard& self, const Position&) {
+  return 50 + 4 * self.getMaxLife();
 }
 
 int MovePriorities::moveToLine(const model::Wizard&, const model::LaneType&) {

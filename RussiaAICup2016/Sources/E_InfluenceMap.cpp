@@ -92,20 +92,20 @@ Position InfluenceMap::getForeFront(const model::LaneType lane, const float offs
 const std::vector<Position>& InfluenceMap::getLinePoints(const model::LaneType lane) const {
   /// Массивы точек, по которым идут крипы
   static const std::vector<Position> topLinePoints = {
-    Points::point(Points::RENEGADES_BASE),
+    Points::point(Points::RENEGADES_BASE_TOP),
     Points::point(Points::TOP_CENTER),
-    Points::point(Points::ACADEMY_BASE)
+    Points::point(Points::ACADEMY_BASE_TOP)
   };
 
   static const std::vector<Position> middleLinePoints = {
-    Points::point(Points::RENEGADES_BASE),
-    Points::point(Points::ACADEMY_BASE)
+    Points::point(Points::RENEGADES_BASE_MIDDLE),
+    Points::point(Points::ACADEMY_BASE_MIDDLE)
   };
 
   static const std::vector<Position> bottomLinePoints = {
-    Points::point(Points::RENEGADES_BASE),
+    Points::point(Points::RENEGADES_BASE_BOTTOM),
     Points::point(Points::BOTTOM_CENTER),
-    Points::point(Points::ACADEMY_BASE)
+    Points::point(Points::ACADEMY_BASE_BOTTOM)
   };
 
 
@@ -159,7 +159,7 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
   }
 
   LogAssertMsg(false, "hmmmmm... not found friend zone? really");
-  return Position(0, 0);
+  return linePoints[linePoints.size()-1];
 }
 
 bool InfluenceMap::isFriendZone(const int x, const int y) const {

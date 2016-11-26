@@ -90,7 +90,7 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
 
 double CommandMoveToBonus::potensialExpirience(const model::Wizard& self) {
   double result = 0;
-  for (const auto& enemy : World::instance().aroundEnemies(self)) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 200)) {
     if (enemy->getLife() < 100) {
       result += enemy->getMaxLife() * 0.25f;
     }
