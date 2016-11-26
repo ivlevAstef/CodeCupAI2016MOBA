@@ -13,6 +13,7 @@
 #include "E_HypotheticalEnemies.h"
 #include "S_StrategyManager.h"
 #include "C_Extensions.h"
+#include "C_Logger.h"
 
 
 using namespace model;

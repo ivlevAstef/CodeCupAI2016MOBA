@@ -15,9 +15,9 @@ int AttackPriorities::attackEnemy(const model::Wizard& self, const model::Living
   double lifePriority = double(enemy.getMaxLife() - enemy.getLife()) / double(enemy.getMaxLife());
 
   /// если хп мало у обычного крипа, то очков мне дадут меньше, пускай другие добивают
-  if (enemy.getLife() < constants.getMagicMissileDirectDamage() && EX::isMinion(enemy)) {
+  /*if (enemy.getLife() < constants.getMagicMissileDirectDamage() && EX::isMinion(enemy)) {
     lifePriority *= 0;
-  }
+  }*/
 
   /// если хп мало у мага, то надо ему помочь умереть
   if (enemy.getLife() <= EX::magicMissleAttack(self) && EX::isWizard(enemy)) {

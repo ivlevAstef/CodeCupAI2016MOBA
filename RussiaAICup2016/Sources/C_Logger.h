@@ -41,12 +41,13 @@ namespace AICup
       AICup::Logger::log("Assert", LogMsg(MSG, ##__VA_ARGS__)); exit(EXIT_FAILURE); \
     }
 
-  #define LogAssert(CONDITION) { LogAssertMsg(CONDITION, #CONDITION" failed."); }
 
 #else
-  #define LogAssertMsg(CONDITION, MSG, ...) {}
-  #define LogAssert(CONDITION) {}
+  #define LogAssertMsg(CONDITION, MSG, ...)  if (!(CONDITION)) { \
+    AICup::Logger::log("Assert", LogMsg(MSG, ##__VA_ARGS__)); \
+  }
 #endif
+#define LogAssert(CONDITION) { LogAssertMsg(CONDITION, #CONDITION" failed."); }
 
 #define LogFatalAssert(CONDITION)  if (!(CONDITION)) { \
     LogFTL(#CONDITION" failed."); \

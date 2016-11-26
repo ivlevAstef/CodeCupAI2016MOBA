@@ -52,7 +52,7 @@ void Logger::log(const char* logLevel, const char* file, int line, const char* m
   logBuffer[logIndex] = 0;
 
   ///print
-  fprintf(stderr, logBuffer);
+  fprintf(stdout, logBuffer);
 }
 
 

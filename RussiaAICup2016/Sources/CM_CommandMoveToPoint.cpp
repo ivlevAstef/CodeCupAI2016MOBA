@@ -21,7 +21,7 @@ CommandMoveToPoint::CommandMoveToPoint(Algorithm::PathFinder& finder, const doub
 }
 
 bool CommandMoveToPoint::check(const model::Wizard& self) {
-  return (EX::pos(self) - point).length() > 20;
+  return (EX::pos(self) - point).length() > EX::maxSpeed(self);
 }
 
 

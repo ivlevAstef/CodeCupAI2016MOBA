@@ -3,6 +3,7 @@
 #include "E_InfluenceMap.h"
 #include "C_Extensions.h"
 #include "C_Math.h"
+#include "C_Logger.h"
 #include <chrono>
 #include <iostream>
 
@@ -136,7 +137,8 @@ void PathFinder::calculate(const model::CircularUnit& unit) {
 
     /// при переходе на новую клетку делаем быстрый пересчет
   } else if (lastByInt != fromByInt) {
-    assert(0 == weights[lastByInt.x][lastByInt.y]);
+    LogAssert(0 == weights[lastByInt.x][lastByInt.y]);
+
 
     weights[fromByInt.x][fromByInt.y] = 0;
     fastCalculateWeight = fastCalculateWeight - 0.005f;
@@ -253,7 +255,7 @@ void PathFinder::calculatePath(Path& path) const {
   path.length = 0;
 
   if (weights[iTo.x][iTo.y] >= PathConstants::maxValue) {
-    assert(false && "can't found path... really?");
+    LogAssertMsg(false, "can't found path... really?");
     return;
   }
 

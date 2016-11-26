@@ -4,6 +4,7 @@
 #include "E_HypotheticalEnemies.h"
 #include "C_Math.h"
 #include "E_Points.h"
+#include "C_Logger.h"
 #include <algorithm>
 
 using namespace AICup;
@@ -157,7 +158,7 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
     }
   }
 
-  assert(false && "hmmmmm... not found friend zone? really");
+  LogAssertMsg(false, "hmmmmm... not found friend zone? really");
   return Position(0, 0);
 }
 
@@ -241,12 +242,12 @@ float buildDps(const model::Building& build) {
 
 double buildRadius(const model::Building& build, const double coef) {
   const double ticks = 1 - ((double)build.getRemainingActionCooldownTicks() / (double)build.getCooldownTicks());
-
   return MAX(build.getRadius(), build.getAttackRange() * ticks * coef);
 }
 
 float buildDanger(const model::Building& build, const double coef) {
-  const float ticks = 1.0f - ((float)build.getRemainingActionCooldownTicks() / (float)build.getCooldownTicks());
+  float ticks = 1.0f - ((float)build.getRemainingActionCooldownTicks() / (float)build.getCooldownTicks());
+  ticks = MAX(0.4f, ticks); /// чтобы совсем в ноль опасность не уходила
   return float(build.getLife()) * float(coef) * 0.08f/*иначе слишком опасная*/ * buildDps(build) * ticks;
 }
 

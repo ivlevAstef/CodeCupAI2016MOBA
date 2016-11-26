@@ -62,7 +62,7 @@ bool CommandAvoidEnemy::check(const model::Wizard& self) {
   const auto unitPos = EX::pos(*enemy);
 
   const auto currentDistance = (selfPos - unitPos).length();
-  if (currentDistance > distance) {
+  if (currentDistance > distance + 1/*чтобы был запас*/) {
     return false;
   }
 

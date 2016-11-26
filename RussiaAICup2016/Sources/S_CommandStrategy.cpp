@@ -2,6 +2,7 @@
 #include "A_Exec.h"
 #include "C_Math.h"
 #include "C_Extensions.h"
+#include "C_Logger.h"
 #include <cassert>
 
 
@@ -12,10 +13,12 @@ CommandStrategy::CommandStrategy(const CommandFabric& fabric, const Algorithm::P
 }
 
 void CommandStrategy::update(const model::Wizard& self, model::Move& finalMove) {
-  if (!moveCommands.empty()) {
-    TurnStyle turnStyle;
+  const auto moveResults = moveCommandsToMoveResult(self);
+
+  if (!moveResults.empty()) {
+    TurnStyle turnStyle = TurnStyle::TURN;
     double speedLimit = -1;
-    const Vector direction = move(self, turnStyle, speedLimit);
+    const Vector direction = move(moveResults, self, turnStyle, speedLimit);
 
     Algorithm::execMove(self, turnStyle, direction, speedLimit, finalMove);
   }
@@ -33,15 +36,26 @@ void CommandStrategy::clear() {
   attackCommands.clear();
 }
 
-const Vector CommandStrategy::move(const model::Wizard& self, TurnStyle& turnStyle, double& speedLimit) {
+std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const model::Wizard& self) const {
   std::vector<MoveCommand::Result> moveResults;
   moveResults.resize(moveCommands.size());
 
   for (size_t index = 0; index < moveCommands.size(); index++) {
     moveCommands[index]->execute(self, moveResults[index]);
-    assert(moveResults[index].priority > 0);
+    LogAssert(moveResults[index].priority > 0);
+  }
+  /// Удаляем вектора, которые очень короткие.
+  for (size_t index = 0; index < moveResults.size(); index++) {
+    const size_t i = moveResults.size() - index - 1;
+    if (moveResults[i].moveDirection.length() < 0.5) {
+      moveResults.erase(moveResults.begin() + i);
+    }
   }
 
+  return moveResults;
+}
+
+const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveResults, const model::Wizard& self, TurnStyle& turnStyle, double& speedLimit) {
   for (const auto& move : moveResults) {
     for (const auto& tree : move.treesForRemove) {
       addTreeForRemove(self, tree);
@@ -68,9 +82,6 @@ const Vector CommandStrategy::move(const model::Wizard& self, TurnStyle& turnSty
 
     double summaryDeviation = 0;
     for (const auto& move : moveResults) {
-      if (move.moveDirection.length() < 0.01) {
-        continue;
-      }
       const double deviation = 1 - move.moveDirection.normal().dot(direction);
       summaryDeviation += deviation * double(move.priority) / 1000.0;
     }
@@ -93,7 +104,7 @@ const Vector CommandStrategy::move(const model::Wizard& self, TurnStyle& turnSty
 }
 
 void CommandStrategy::addTreeForRemove(const model::Wizard& self, const model::LivingUnit* tree) {
-  assert(nullptr != tree);
+  LogAssert(nullptr != tree);
 
   const double distance = self.getDistanceTo(*tree);
   if (distance > self.getVisionRange()) {
@@ -128,7 +139,7 @@ const model::LivingUnit& CommandStrategy::attack(const model::Wizard& self, mode
   }
 
 
-  assert(nullptr != resultUnit);
+  LogAssert(nullptr != resultUnit);
   return *resultUnit;
 }
 
