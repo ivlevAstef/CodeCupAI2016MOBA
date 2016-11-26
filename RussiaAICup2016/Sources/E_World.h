@@ -82,8 +82,11 @@ namespace AICup
     std::vector<Looking> visionZone;
 
     std::vector<model::Tree> supposedTrees;
+    std::vector<model::Tree> allTrees;
+    std::vector<model::Tree> invisibleAreaTrees;
     std::vector<model::Building> supposedBuilding;
     std::vector<model::Minion> realMinions;
+
     std::unordered_set<long long int> hateNeuralMinions;/// дада злые нейтральные миньоны
   };
 }

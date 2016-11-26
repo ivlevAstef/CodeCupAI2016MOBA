@@ -31,7 +31,7 @@ void World::update(const model::World& world) {
 }
 
 const std::vector<model::Tree>& World::trees() const {
-  return supposedTrees;
+  return allTrees;
 }
 
 const std::vector<model::Building>& World::buildings() const {
@@ -79,6 +79,19 @@ void World::initTrees() {
     }
   }
 
+  //специально делаю немножко выпирающими
+  for (int i = 150; i <= size() - 150; i += 100) {
+    invisibleAreaTrees.push_back(Tree(i, -45, 50/*радиус*/));
+    invisibleAreaTrees.push_back(Tree(i, size() + 45, 50/*радиус*/));
+    invisibleAreaTrees.push_back(Tree(-45, i, 50/*радиус*/));
+    invisibleAreaTrees.push_back(Tree(size() + 45, i, 50/*радиус*/));
+  }
+  /// + 4 дерева по углам, сделал так чтобы на углах плавнее был проход
+  invisibleAreaTrees.push_back(Tree(50, 50, 50/*радиус*/));
+  invisibleAreaTrees.push_back(Tree(size() - 50, 50, 50/*радиус*/));
+  invisibleAreaTrees.push_back(Tree(size() - 50, size() - 50, 50/*радиус*/));
+  invisibleAreaTrees.push_back(Tree(50, size() - 50, 50/*радиус*/));
+
 }
 
 void World::updateVisionZone() {
@@ -107,13 +120,14 @@ template<typename Type>
 static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real, const std::vector<Looking> visionZone) {
   //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
   std::vector<Type> result;
+  result.reserve(supposed.size() + real.size());
 
   for (const auto& sIter : supposed) {
     bool found = false;
     for (const auto& vision : visionZone) {
       const double dx = sIter.getX() - vision.getX();
       const double dy = sIter.getY() - vision.getY();
-      if (sqrt(dx*dx + dy*dy) < vision.getVisionRange()) {
+      if (dx*dx + dy*dy < vision.getVisionRange() * vision.getVisionRange()) {
         found = true;
         break;
       }
@@ -178,6 +192,9 @@ void World::updateMinions() {
 void World::updateSupposedData() {
   supposedTrees = merge(supposedTrees, updateRadius<model::Tree, Tree>(modelWorld->getTrees()), visionZone);
 
+  allTrees = supposedTrees;
+  allTrees.insert(allTrees.end(), invisibleAreaTrees.begin(), invisibleAreaTrees.end());
+
   supposedBuilding = updateBuildingTicks(supposedBuilding);
   supposedBuilding = merge(supposedBuilding, updateRadius<model::Building, Building>(modelWorld->getBuildings()), visionZone);
 }
@@ -186,9 +203,9 @@ void World::updateSupposedData() {
 const model::LaneType World::positionToLine(const double x, const double y) const {
   double delta = (size() - x) - y;
 
-  if (delta > size()/3.3) { // top
+  if (delta > size()/8) {
     return model::LANE_TOP;
-  } else if (delta < -size() / 3.3) {
+  } else if (delta < -size() / 8) {
     return model::LANE_BOTTOM;
   }
 

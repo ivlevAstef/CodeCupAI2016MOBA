@@ -105,6 +105,8 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
 }
 
 const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const model::Wizard& self) {
+  /// гдето тут надо будет началь указывать что эти команды могуть иметь больше/меньше приоритет в зависимости от ситуации на карте
+  /// возможно avoidAround обернуть еще в одну ком анду
   const auto selfPos = EX::pos(self);
 
   const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + self.getRadius() * 2);
@@ -142,7 +144,7 @@ void FirstStrategy::changeLane(const model::Wizard& self) {
   pathFinder.calculatePath(middlePosition, path);
   double selfMiddleLength = path->getLength();
   pathFinder.calculatePath(bottomPosition, path);
-  double selfTBottomLength = path->getLength();
+  double selfBottomLength = path->getLength();
 
   double topLength = abs((basePosition - topPosition).x) + abs((basePosition - topPosition).y);
   double middleLength = (basePosition - middlePosition).length();
@@ -150,11 +152,8 @@ void FirstStrategy::changeLane(const model::Wizard& self) {
 
 
   double priorityTop = (8000 - topLength) / selfTopLength;
-  priorityTop *= (topLength < 1200) ? (1200 - topLength) : 1;
-  double priorityMiddle = (6000 - middleLength) / selfMiddleLength;
-  priorityMiddle *= (middleLength < 1200) ? (1200 - middleLength) : 1;
-  double priorityBottom = (8000 - bottomLength) / selfTBottomLength;
-  priorityBottom *= (bottomLength < 1200) ? (1200 - bottomLength) : 1;
+  double priorityMiddle = (5657 - middleLength) / selfMiddleLength;
+  double priorityBottom = (8000 - bottomLength) / selfBottomLength;
 
   priorityTop /= MAX(0.5, World::instance().wizardCount(model::LANE_TOP, self));
   priorityMiddle /= MAX(0.5, World::instance().wizardCount(model::LANE_MIDDLE, self));

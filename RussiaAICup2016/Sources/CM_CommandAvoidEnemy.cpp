@@ -43,7 +43,7 @@ bool CommandAvoidEnemy::check(const model::Wizard& self) {
     }
 
     /// противоположная точка, точке где находиться объект
-    const auto pos = selfPos + delta.normal() * 645;
+    const auto pos = selfPos + delta.normal() * 120/*приблизительно столько со всеми бонусами максиум можно пройти*/;
     moveToPointCommand = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::TURN);
     return moveToPointCommand->check(self);
   }
