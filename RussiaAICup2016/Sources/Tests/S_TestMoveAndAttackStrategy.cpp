@@ -17,7 +17,7 @@ TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric
   allMoveCommands.push_back(fabric.moveToPoint(1600, 2400));
 }
 
-void TestMoveAndAttackStrategy::update(const model::Wizard& self, model::Move& move) {
+void TestMoveAndAttackStrategy::update(const Wizard& self, model::Move& move) {
   CommandStrategy::clear();
 
   if (2.5 * 2.5 > self.getSpeedX()*self.getSpeedX() + self.getSpeedY()*self.getSpeedY()) {

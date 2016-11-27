@@ -14,9 +14,9 @@ CommandObserveMap::CommandObserveMap(Algorithm::PathFinder& finder): MoveCommand
 
 }
 
-bool CommandObserveMap::check(const model::Wizard&) {
+bool CommandObserveMap::check(const Wizard&) {
   return false;
 }
 
-void CommandObserveMap::execute(const model::Wizard&, Result&) {
+void CommandObserveMap::execute(const Wizard&, Result&) {
 }

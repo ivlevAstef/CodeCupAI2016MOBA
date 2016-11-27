@@ -5,7 +5,7 @@
 
 using namespace AICup;
 
-int MovePriorities::avoidEnemy(const model::Wizard& self, const model::CircularUnit& enemy) {
+int MovePriorities::avoidEnemy(const Wizard& self, const model::CircularUnit& enemy) {
   const auto constants = Game::instance().model();
 
   const auto selfPos = EX::pos(self);
@@ -13,7 +13,7 @@ int MovePriorities::avoidEnemy(const model::Wizard& self, const model::CircularU
   const double distance = (selfPos - enemyPos).length();
 
   if (EX::isProjectile(enemy)) {
-    return 2500;
+    return 2500 * self.getRole().getAudacity();
   }
 
   const model::LivingUnit* checkLivingUnit = dynamic_cast<const model::LivingUnit*>(&enemy);
@@ -36,53 +36,53 @@ int MovePriorities::avoidEnemy(const model::Wizard& self, const model::CircularU
     const double timeToAttack = EX::timeToTurnForAttack(self, wizard);
     const double timeForMagic = EX::minTimeForMagic(EX::asWizard(livingUnit));
 
-    return 300 + lifePriority - timeForMagic * 5 - timeToAttack * 5;
+    return (300 + lifePriority - timeForMagic * 5 - timeToAttack * 5) * self.getRole().getAudacity();
   } else if (EX::isMinion(livingUnit)) {
     const model::Minion& minion = EX::asMinion(livingUnit);
 
     if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
       if (distance < constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2) {
-        return 600 + lifePriority;
+        return (600 + lifePriority)  * self.getRole().getAudacity();
       }
-      return lifePriority;
+      return lifePriority  * self.getRole().getAudacity();
     } else {
-      return lifePriority + ((600 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
+      return (lifePriority + ((600 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks())) * self.getRole().getAudacity();
     }
   } else if (EX::isBuilding(livingUnit)) {
-    return 800 + lifePriority;
+    return (800 + lifePriority) * self.getRole().getAudacity();
   }
 
   return 0;
 }
 
-int MovePriorities::defendPoint(const model::Wizard&, const Position&) {
+int MovePriorities::defendPoint(const Wizard&, const Position&) {
   return 0;
 }
 
-int MovePriorities::follow(const model::Wizard&, const model::LivingUnit&) {
+int MovePriorities::follow(const Wizard&, const model::LivingUnit&) {
   return 300;
 }
 
-int MovePriorities::getExpirience(const model::Wizard&, const model::LivingUnit&) {
-  return 200;
+int MovePriorities::getExpirience(const Wizard& wizard, const model::LivingUnit&) {
+  return 100 * wizard.getRole().getImportanceOfXP();
 }
 
-int MovePriorities::keepDistance(const model::Wizard&, const Position, const double, const double) {
+int MovePriorities::keepDistance(const Wizard&, const Position, const double, const double) {
   return 500;
 }
 
-int MovePriorities::moveToBonus(const model::Wizard& self, const Position&) {
-  return 50 + 4 * self.getMaxLife();
+int MovePriorities::moveToBonus(const Wizard& self, const Position&) {
+  return (50 + 4 * self.getMaxLife()) * self.getRole().getImportanceOfBonus();
 }
 
-int MovePriorities::moveToLine(const model::Wizard&, const model::LaneType&) {
-  return 20;
+int MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {
+  return 20 * self.getRole().getImportanceOfXP();
 }
 
-int MovePriorities::moveToPoint(const model::Wizard&, const Position&) {
+int MovePriorities::moveToPoint(const Wizard&, const Position&) {
   return 10;
 }
 
-int MovePriorities::observeMap(const model::Wizard&) {
+int MovePriorities::observeMap(const Wizard&) {
   return 0;
 }

@@ -18,7 +18,7 @@ CommandAttackEnemy::CommandAttackEnemy(long long enemyId): enemyId(enemyId) {
 
 }
 
-bool CommandAttackEnemy::check(const model::Wizard& self) {
+bool CommandAttackEnemy::check(const Wizard& self) {
   const auto enemy = World::instance().unit(enemyId);
   if (nullptr == enemy) {
     return false;
@@ -54,7 +54,7 @@ bool CommandAttackEnemy::check(const model::Wizard& self) {
 }
 
 
-void CommandAttackEnemy::execute(const model::Wizard& self, Result& result) {
+void CommandAttackEnemy::execute(const Wizard& self, Result& result) {
   const auto enemy = World::instance().unit(enemyId);
   assert(nullptr != enemy);
 

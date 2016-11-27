@@ -243,8 +243,6 @@ void PathFinder::calculatePath(Path& path) const {
   // ревертируем точки
   auto iFrom = PathConstants::toInt(path.from);
   auto iTo = PathConstants::toInt(path.to);
-  assert(0 <= iFrom.x && iFrom.x < PathConstants::memorySize);
-  assert(0 <= iTo.x && iTo.x < PathConstants::memorySize);
   /// да в идеале точке не должны выходить за границы, но некоторые алгоритмы могут решить что надо бежать куда подальше...
   iTo.x = MAX(1, MIN(iTo.x, PathConstants::memorySize - 2));
   iTo.y = MAX(1, MIN(iTo.y, PathConstants::memorySize - 2));

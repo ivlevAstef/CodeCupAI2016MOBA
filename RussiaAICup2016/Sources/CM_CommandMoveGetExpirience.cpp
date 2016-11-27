@@ -20,7 +20,7 @@ CommandMoveGetExpirience::CommandMoveGetExpirience(Algorithm::PathFinder& finder
 }
 
 
-bool CommandMoveGetExpirience::check(const model::Wizard& self) {
+bool CommandMoveGetExpirience::check(const Wizard& self) {
   unit = nullptr;
   followCommand = nullptr;
 
@@ -54,7 +54,7 @@ bool CommandMoveGetExpirience::check(const model::Wizard& self) {
   return followCommand->check(self);
 }
 
-void CommandMoveGetExpirience::execute(const model::Wizard& self, Result& result) {
+void CommandMoveGetExpirience::execute(const Wizard& self, Result& result) {
   assert(nullptr != followCommand.get());
   followCommand->execute(self, result);
   result.priority = MovePriorities::getExpirience(self, *unit);

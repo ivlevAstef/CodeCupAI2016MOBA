@@ -19,7 +19,7 @@ CommandKeepDistance::CommandKeepDistance(Algorithm::PathFinder& finder, const do
 }
 
 
-bool CommandKeepDistance::check(const model::Wizard& self) {
+bool CommandKeepDistance::check(const Wizard& self) {
   commandMoveToPoint = nullptr;
 
   const auto selfPos = Position(self.getX(), self.getY());
@@ -42,7 +42,7 @@ bool CommandKeepDistance::check(const model::Wizard& self) {
   return commandMoveToPoint->check(self);
 }
 
-void CommandKeepDistance::execute(const model::Wizard& self, Result& result) {
+void CommandKeepDistance::execute(const Wizard& self, Result& result) {
   assert(nullptr != commandMoveToPoint.get());
   commandMoveToPoint->execute(self, result);
   result.priority = MovePriorities::keepDistance(self, Position(x, y), minDistance, maxDistance);

@@ -21,7 +21,7 @@ CommandMoveToBonus::CommandMoveToBonus(Algorithm::PathFinder& finder):
 
 }
 
-bool CommandMoveToBonus::check(const model::Wizard& self) {
+bool CommandMoveToBonus::check(const Wizard& self) {
   static const double magicCoef = 0.95 ; /// Приблизительный коэфициент на сколько длиннее путь
   const auto selfPos = Position(self.getX(), self.getY());
 
@@ -88,7 +88,7 @@ bool CommandMoveToBonus::check(const model::Wizard& self) {
   return moveToBonus->check(self);
 }
 
-double CommandMoveToBonus::potensialExpirience(const model::Wizard& self) {
+double CommandMoveToBonus::potensialExpirience(const Wizard& self) {
   double result = 0;
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 200)) {
     if (enemy->getLife() < 100) {
@@ -99,7 +99,7 @@ double CommandMoveToBonus::potensialExpirience(const model::Wizard& self) {
   return result;
 }
 
-void CommandMoveToBonus::execute(const model::Wizard& self, Result& result) {
+void CommandMoveToBonus::execute(const Wizard& self, Result& result) {
   assert(nullptr != moveToBonus.get());
   moveToBonus->execute(self, result);
   result.priority = MovePriorities::moveToBonus(self, bonusPos);

@@ -14,9 +14,9 @@ CommandPool::CommandPool(long long) {
 
 }
 
-bool CommandPool::check(const model::Wizard&) {
+bool CommandPool::check(const Wizard&) {
   return false;
 }
 
-void CommandPool::execute(const model::Wizard&, Result&) {
+void CommandPool::execute(const Wizard&, Result&) {
 }

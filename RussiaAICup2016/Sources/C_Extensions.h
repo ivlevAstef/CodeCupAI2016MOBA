@@ -36,18 +36,26 @@ namespace AICup
     const model::Wizard& asWizard(const model::Unit& unit);
 
     double maxSpeed(const model::CircularUnit& obj);
-    double maxStrafeSpeed(const model::Wizard& obj);
-    double maxBackwardSpeed(const model::Wizard& obj);
-
-    double radiusForGuaranteedHit(const model::Wizard& obj);
-
-    std::vector<bool> availableSkills(const model::Wizard& obj);
-    int minTimeForMagic(const model::Wizard& obj);
-
-    double turnSpeed(const model::Wizard& obj);
 
     double timeToTurnForAttack(const model::Unit& attacked, const model::Wizard& attacking);
 
+    ///Wizard
+    double speedFactor(const model::Wizard& obj);
+    double maxSpeed(const model::Wizard& obj);
+    double maxStrafeSpeed(const model::Wizard& obj);
+    double maxBackwardSpeed(const model::Wizard& obj);
+    double turnSpeed(const model::Wizard& obj);
+
+    double attackRadius(const model::Wizard& obj);
     double magicMissleAttack(const model::Wizard& obj);
+    double staffAttack(const model::Wizard& obj);
+    double armor(const model::Wizard& obj);
+
+    std::vector<bool> availableSkills(const model::Wizard& obj);
+
+    //Support
+    double radiusForGuaranteedHit(const model::Wizard& obj);
+    int minTimeForMagic(const model::Wizard& obj);
+
   }
 }

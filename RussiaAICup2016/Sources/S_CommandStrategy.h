@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "model\Wizard.h"
+#include "E_Wizard.h"
 #include "model\Move.h"
 
 #include "CM_MoveCommand.h"
@@ -24,7 +24,7 @@ namespace AICup
   public:
     CommandStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
 
-    virtual void update(const model::Wizard& self, model::Move& move);
+    virtual void update(const Wizard& self, model::Move& move);
 
 #ifdef ENABLE_VISUALIZATOR
     virtual void visualization(const Visualizator& visualizator) const;
@@ -34,12 +34,12 @@ namespace AICup
     void clear();
 
   private:
-    const Vector move(const std::vector<MoveCommand::Result>& moveResults, const model::Wizard& self, TurnStyle& turnStyle, double& speedLimit);
-    const model::LivingUnit& attack(const model::Wizard& self, model::ActionType& action);
+    const Vector move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, TurnStyle& turnStyle, double& speedLimit);
+    const model::LivingUnit& attack(const Wizard& self, model::ActionType& action);
 
-    std::vector<MoveCommand::Result> moveCommandsToMoveResult(const model::Wizard& self) const;
+    std::vector<MoveCommand::Result> moveCommandsToMoveResult(const Wizard& self) const;
 
-    void addTreeForRemove(const model::Wizard& self, const model::LivingUnit* tree);
+    void addTreeForRemove(const Wizard& self, const model::LivingUnit* tree);
 
   protected:
     const CommandFabric& fabric;

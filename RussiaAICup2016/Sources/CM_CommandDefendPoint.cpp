@@ -15,10 +15,10 @@ CommandDefendPoint::CommandDefendPoint(Algorithm::PathFinder& finder, double, do
 
 }
 
-bool CommandDefendPoint::check(const model::Wizard&) {
+bool CommandDefendPoint::check(const Wizard&) {
   return false;
 }
 
-void CommandDefendPoint::execute(const model::Wizard&, Result&) {
+void CommandDefendPoint::execute(const Wizard&, Result&) {
   //result.priority = MovePriorities::defendPoint(self, );
 }

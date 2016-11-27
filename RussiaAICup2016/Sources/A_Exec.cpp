@@ -9,7 +9,7 @@ using namespace AICup;
 
 static std::vector<Position> stackForBugFix;
 
-double calcMaxSpeed(const model::Wizard& self, const Vector& direction, const double speedLimit) {
+double calcMaxSpeed(const Wizard& self, const Vector& direction, const double speedLimit) {
   Vector speed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
 
   double maxSpeed = (speed.x > 0) ? EX::maxSpeed(self) : EX::maxBackwardSpeed(self);
@@ -24,7 +24,7 @@ double calcMaxSpeed(const model::Wizard& self, const Vector& direction, const do
 }
 
 
-bool Algorithm::execMove(const model::Wizard& self, const TurnStyle style, const Vector& direction, const double speedLimit, model::Move& move) {
+bool Algorithm::execMove(const Wizard& self, const TurnStyle style, const Vector& direction, const double speedLimit, model::Move& move) {
   double maxSpeed = calcMaxSpeed(self, direction, speedLimit);
 
   const auto selfPos = EX::pos(self);
@@ -74,7 +74,7 @@ bool Algorithm::execMove(const model::Wizard& self, const TurnStyle style, const
   return true;
 }
 
-bool Algorithm::execAttack(const model::Wizard& self, const model::ActionType action, const model::LivingUnit& unit, model::Move& move) {
+bool Algorithm::execAttack(const Wizard& self, const model::ActionType action, const model::LivingUnit& unit, model::Move& move) {
   const double angleDeviation = self.getAngleTo(unit);
 
   /// в любом случае поворачиваемся к врагу, для упрощения своей жизни

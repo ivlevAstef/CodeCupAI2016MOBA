@@ -5,7 +5,7 @@
 
 using namespace AICup;
 
-int AttackPriorities::attackEnemy(const model::Wizard& self, const model::LivingUnit& enemy) {
+int AttackPriorities::attackEnemy(const Wizard& self, const model::LivingUnit& enemy) {
   const auto constants = Game::model();
 
   const auto selfPos = EX::pos(self);
@@ -74,6 +74,6 @@ int AttackPriorities::attackEnemy(const model::Wizard& self, const model::Living
   return int(1000 * (0.3 * lifePriority + 0.5 * typePriority + 0.2 * statusPriority));
 }
 
-int AttackPriorities::pool(const model::Wizard&, const model::Minion&) {
+int AttackPriorities::pool(const Wizard&, const model::Minion&) {
   return 0;
 }

@@ -15,9 +15,9 @@ namespace AICup
   public:
     CommandFollow(Algorithm::PathFinder& finder, const long long unitId, const double minDistance = 0, const double maxDistance = 10000);
 
-    bool check(const model::Wizard& self) override;
+    bool check(const Wizard& self) override;
 
-    void execute(const model::Wizard& self, Result& result) override;
+    void execute(const Wizard& self, Result& result) override;
 
 
 #ifdef ENABLE_VISUALIZATOR

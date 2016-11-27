@@ -20,12 +20,12 @@ CommandMoveToPoint::CommandMoveToPoint(Algorithm::PathFinder& finder, const doub
 
 }
 
-bool CommandMoveToPoint::check(const model::Wizard& self) {
+bool CommandMoveToPoint::check(const Wizard& self) {
   return (EX::pos(self) - point).length() > EX::maxSpeed(self);
 }
 
 
-void CommandMoveToPoint::execute(const model::Wizard& self, Result& result) {
+void CommandMoveToPoint::execute(const Wizard& self, Result& result) {
   pathFinder.calculatePath(point, path);
   assert(nullptr != path);
 

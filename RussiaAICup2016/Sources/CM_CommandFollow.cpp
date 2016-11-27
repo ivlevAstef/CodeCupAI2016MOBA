@@ -19,7 +19,7 @@ CommandFollow::CommandFollow(Algorithm::PathFinder& finder, const long long unit
 }
 
 
-bool CommandFollow::check(const model::Wizard& self) {
+bool CommandFollow::check(const Wizard& self) {
   unit = World::instance().unit(unitId);
   if (nullptr == unit) {
     commandMoveToPoint = nullptr;
@@ -79,7 +79,7 @@ bool CommandFollow::check(const model::Wizard& self) {
   return commandMoveToPoint->check(self);
 }
 
-void CommandFollow::execute(const model::Wizard& self, Result& result) {
+void CommandFollow::execute(const Wizard& self, Result& result) {
   assert(nullptr != commandMoveToPoint.get());
   commandMoveToPoint->execute(self, result);
   result.priority = MovePriorities::follow(self, *unit);

@@ -12,7 +12,7 @@ CommandStrategy::CommandStrategy(const CommandFabric& fabric, const Algorithm::P
   fabric(fabric), pathFinder(finder) {
 }
 
-void CommandStrategy::update(const model::Wizard& self, model::Move& finalMove) {
+void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
   const auto moveResults = moveCommandsToMoveResult(self);
 
   if (!moveResults.empty()) {
@@ -36,7 +36,7 @@ void CommandStrategy::clear() {
   attackCommands.clear();
 }
 
-std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const model::Wizard& self) const {
+std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const Wizard& self) const {
   std::vector<MoveCommand::Result> moveResults;
   moveResults.resize(moveCommands.size());
 
@@ -54,7 +54,7 @@ std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const
   return moveResults;
 }
 
-const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveResults, const model::Wizard& self, TurnStyle& turnStyle, double& speedLimit) {
+const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, TurnStyle& turnStyle, double& speedLimit) {
   for (const auto& move : moveResults) {
     for (const auto& tree : move.treesForRemove) {
       addTreeForRemove(self, tree);
@@ -102,7 +102,7 @@ const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveR
   return result * speedLimit;
 }
 
-void CommandStrategy::addTreeForRemove(const model::Wizard& self, const model::LivingUnit* tree) {
+void CommandStrategy::addTreeForRemove(const Wizard& self, const model::LivingUnit* tree) {
   LogAssert(nullptr != tree);
 
   const double distance = self.getDistanceTo(*tree);
@@ -116,7 +116,7 @@ void CommandStrategy::addTreeForRemove(const model::Wizard& self, const model::L
   }
 }
 
-const model::LivingUnit& CommandStrategy::attack(const model::Wizard& self, model::ActionType& action) {
+const model::LivingUnit& CommandStrategy::attack(const Wizard& self, model::ActionType& action) {
   std::vector<AttackCommand::Result> attackResults;
   attackResults.resize(attackCommands.size());
 
@@ -143,7 +143,7 @@ const model::LivingUnit& CommandStrategy::attack(const model::Wizard& self, mode
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandStrategy::visualization(const Visualizator & visualizator) const {
+void CommandStrategy::visualization(const Visualizator& visualizator) const {
   for (const auto& command : moveCommands) {
     command->visualization(visualizator);
   }

@@ -13,7 +13,7 @@ FirstStrategy::FirstStrategy(const CommandFabric& fabric, const Algorithm::PathF
   lastChangeLineTick = 0;
 }
 
-void FirstStrategy::init(const model::Wizard& self) {
+void FirstStrategy::init(const Wizard& self) {
   // вначале линию выбираем также как в smart game, так как это даст скорей всего наименьшее количество коллизий
   switch ((int)self.getId()) {
     case 1:
@@ -37,7 +37,7 @@ void FirstStrategy::init(const model::Wizard& self) {
   }
 }
 
-void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
+void FirstStrategy::update(const Wizard& self, model::Move& move) {
   CommandStrategy::clear();
 
   /// раз в 250 тиков пересматриваю линию,
@@ -104,7 +104,7 @@ void FirstStrategy::update(const model::Wizard& self, model::Move& move) {
   CommandStrategy::update(self, move);
 }
 
-const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const model::Wizard& self) {
+const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const Wizard& self) {
   /// гдето тут надо будет началь указывать что эти команды могуть иметь больше/меньше приоритет в зависимости от ситуации на карте
   /// возможно avoidAround обернуть еще в одну ком анду
   const auto selfPos = EX::pos(self);
@@ -131,7 +131,7 @@ const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const mode
   return avoidAroundCommands;
 }
 
-void FirstStrategy::changeLane(const model::Wizard& self) {
+void FirstStrategy::changeLane(const Wizard& self) {
   const auto basePosition = Points::point(Points::ACADEMY_BASE);
   const auto topPosition = InfluenceMap::instance().getForeFront(model::LANE_TOP, 0);
   const auto middlePosition = InfluenceMap::instance().getForeFront(model::LANE_MIDDLE, 0);
@@ -167,6 +167,11 @@ void FirstStrategy::changeLane(const model::Wizard& self) {
   priorityMiddle /= MAX(0.5, World::instance().wizardCount(model::LANE_MIDDLE, self));
   priorityBottom /= MAX(0.5, World::instance().wizardCount(model::LANE_BOTTOM, self));
 
+  const auto minPriority = MIN(priorityTop, MIN(priorityMiddle, priorityBottom));
+  const auto maxPriority = MAX(priorityTop, MAX(priorityMiddle, priorityBottom));
+  if (maxPriority - minPriority < 1000) { // не меняем линию если нет большого перевеса
+    return;
+  }
 
   if (priorityTop > priorityMiddle && priorityTop > priorityBottom) {
     myLine = model::LANE_TOP;

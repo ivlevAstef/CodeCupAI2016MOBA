@@ -21,7 +21,7 @@ namespace AICup
 
   public:
     /// исполнить команду
-    virtual void execute(const model::Wizard& self, Result& result) = 0;
+    virtual void execute(const Wizard& self, Result& result) = 0;
   };
 
   typedef std::shared_ptr<AttackCommand> AttackCommandPtr;

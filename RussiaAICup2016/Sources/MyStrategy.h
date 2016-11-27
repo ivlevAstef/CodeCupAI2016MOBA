@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Strategy.h"
+#include "E_Wizard.h"
 
 class MyStrategy: public Strategy {
 public:

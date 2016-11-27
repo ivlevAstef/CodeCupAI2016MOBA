@@ -6,34 +6,6 @@
 
 using namespace AICup;
 
-double speedFactor(const model::LivingUnit& obj) {
-  const auto wizard = dynamic_cast<const model::Wizard*>(&obj);
-
-  double factor = 1;
-
-  for (const auto& status : obj.getStatuses()) {
-    if (model::STATUS_HASTENED == status.getType()) {
-      factor *= (1.0 + Game::instance().model().getHastenedMovementBonusFactor());
-    }
-  }
-
-  if (nullptr != wizard) {
-    for (const auto& skill : wizard->getSkills()) {
-      if (model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_1 == skill) {
-        factor *= (1.0 + Game::instance().model().getMovementBonusFactorPerSkillLevel());
-      } else if (model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_1 == skill) {
-        factor *= (1.0 + 2 * Game::instance().model().getMovementBonusFactorPerSkillLevel());
-      } else if (model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_2 == skill) {
-        factor *= (1.0 + 3 * Game::instance().model().getMovementBonusFactorPerSkillLevel());
-      } else if (model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_2 == skill) {
-        factor *= (1.0 + 4 * Game::instance().model().getMovementBonusFactorPerSkillLevel());
-      }
-    }
-  }
-
-  return factor;
-}
-
 bool EX::isTree(const model::Unit& unit) {
   return nullptr != dynamic_cast<const model::Tree*>(&unit);
 }
@@ -69,53 +41,140 @@ const model::Wizard& EX::asWizard(const model::Unit& unit) {
 }
 
 double EX::maxSpeed(const model::CircularUnit& obj) {
-  const auto livingObj = dynamic_cast<const model::LivingUnit*>(&obj);
-  if (nullptr == livingObj) {
-    return 0;
-  }
-
   const auto wizard = dynamic_cast<const model::Wizard*>(&obj);
   const auto minion = dynamic_cast<const model::Minion*>(&obj);
 
-  double maxSpeed = 0;
   if (nullptr != wizard) {
-    maxSpeed = Game::instance().model().getWizardForwardSpeed();
+    return maxSpeed(*wizard);
   } else if (nullptr != minion) {
-    maxSpeed = Game::instance().model().getMinionSpeed();
+    return Game::model().getMinionSpeed();
   }
 
-  return maxSpeed * speedFactor(*livingObj);
+  return 0;
 }
 
-double EX::maxStrafeSpeed(const model::Wizard& obj) {
-  double maxSpeed = Game::instance().model().getWizardStrafeSpeed();
-  return maxSpeed *= speedFactor(obj);
+double EX::timeToTurnForAttack(const model::Unit& attacked, const model::Wizard& attacking) {
+  const auto selfPos = Position(attacking.getX(), attacking.getY());
+  const auto enemyPos = Position(attacked.getX(), attacked.getY());
+
+  const auto dir = enemyPos - selfPos;
+  double angleDeviation = Math::angleDiff(dir.angle(), attacking.getAngle());
+  angleDeviation = ABS(angleDeviation);
+
+  const double needTurnAngle = MAX(0, angleDeviation - Game::instance().model().getStaffSector()* 0.5);
+  /// если времени до атаки больше чем времени до разворота, то можно пока не атаковать
+
+  return needTurnAngle / turnSpeed(attacking);
 }
 
-double EX::maxBackwardSpeed(const model::Wizard& obj) {
-  double maxSpeed = Game::instance().model().getWizardBackwardSpeed();
-  return maxSpeed *= speedFactor(obj);
-}
+////////////////// Wizard
 
-double EX::radiusForGuaranteedHit(const model::Wizard& obj) {
-  static const double magicCalcConstant = 8;
-
-  double radius = obj.getCastRange() + magicCalcConstant;
-
+double EX::speedFactor(const model::Wizard& obj) {
+  double factor = 1;
 
   for (const auto& skill : obj.getSkills()) {
-    if (model::SKILL_RANGE_BONUS_PASSIVE_1 == skill) {
-      radius += Game::instance().model().getRangeBonusPerSkillLevel();
-    } else if (model::SKILL_RANGE_BONUS_AURA_1 == skill) {
-      radius += 3 * Game::instance().model().getRangeBonusPerSkillLevel();
-    } else if (model::SKILL_RANGE_BONUS_PASSIVE_2 == skill) {
-      radius += 2 * Game::instance().model().getRangeBonusPerSkillLevel();
-    } else if (model::SKILL_RANGE_BONUS_AURA_2 == skill) {
-      radius += 4 * Game::instance().model().getRangeBonusPerSkillLevel();
+    if (model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_1 == skill
+      || model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_1 == skill
+      || model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_2 == skill
+      || model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_2 == skill) {
+      factor += Game::model().getMovementBonusFactorPerSkillLevel();
+    }
+  }
+
+  for (const auto& status : obj.getStatuses()) {
+    if (model::STATUS_HASTENED == status.getType()) {
+      factor += Game::model().getHastenedMovementBonusFactor();
+    }
+  }
+
+  return factor;
+}
+
+double EX::maxSpeed(const model::Wizard& obj) {
+  return Game::model().getWizardForwardSpeed() * speedFactor(obj);
+}
+double EX::maxStrafeSpeed(const model::Wizard& obj) {
+  return Game::model().getWizardStrafeSpeed() * speedFactor(obj);
+}
+double EX::maxBackwardSpeed(const model::Wizard& obj) {
+  return Game::model().getWizardBackwardSpeed() * speedFactor(obj);
+}
+
+double EX::turnSpeed(const model::Wizard& obj) {
+  double maxTurnSpeed = Game::model().getWizardMaxTurnAngle();
+
+  for (const auto& status : obj.getStatuses()) {
+    if (model::STATUS_HASTENED == status.getType()) {
+      maxTurnSpeed *= (1.0 + Game::model().getHastenedRotationBonusFactor());
+    }
+  }
+
+  return maxTurnSpeed;
+}
+
+double EX::attackRadius(const model::Wizard& obj) {
+  double radius = obj.getCastRange();
+
+  for (const auto& skill : obj.getSkills()) {
+    if (model::SKILL_RANGE_BONUS_PASSIVE_1 == skill
+      || model::SKILL_RANGE_BONUS_AURA_1 == skill
+      || model::SKILL_RANGE_BONUS_PASSIVE_2 == skill
+      || model::SKILL_RANGE_BONUS_AURA_2 == skill) {
+      radius += Game::model().getRangeBonusPerSkillLevel();
     }
   }
 
   return radius;
+}
+
+double EX::magicMissleAttack(const model::Wizard& obj) {
+  double power = Game::model().getMagicMissileDirectDamage();
+
+  for (const auto& skill : obj.getSkills()) {
+    if (model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_1 == skill
+      || model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_1 == skill
+      || model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_2 == skill
+      || model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_2 == skill) {
+      power += Game::model().getMagicalDamageBonusPerSkillLevel();
+    }
+  }
+
+  for (const auto& status : obj.getStatuses()) {
+    if (model::STATUS_EMPOWERED == status.getType()) {
+      power *= Game::model().getEmpoweredDamageFactor();
+    }
+  }
+
+  return power;
+}
+double EX::staffAttack(const model::Wizard& obj) {
+  double damage = Game::model().getStaffDamage();
+
+  for (const auto& skill : obj.getSkills()) {
+    if (model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_1 == skill
+      || model::SKILL_STAFF_DAMAGE_BONUS_AURA_1 == skill
+      || model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_2 == skill
+      || model::SKILL_STAFF_DAMAGE_BONUS_AURA_2 == skill) {
+      damage += Game::model().getStaffDamageBonusPerSkillLevel();
+    }
+  }
+
+  return damage;
+}
+
+double EX::armor(const model::Wizard& obj) {
+  double armor = 0;
+
+  for (const auto& skill : obj.getSkills()) {
+    if (model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_1 == skill
+      || model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_1 == skill
+      || model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_2 == skill
+      || model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_2 == skill) {
+      armor += Game::model().getStaffDamageBonusPerSkillLevel();
+    }
+  }
+
+  return armor;
 }
 
 std::vector<bool> EX::availableSkills(const model::Wizard& obj) {
@@ -140,6 +199,13 @@ std::vector<bool> EX::availableSkills(const model::Wizard& obj) {
   return available;
 }
 
+
+/////////////////////// Support
+double EX::radiusForGuaranteedHit(const model::Wizard& obj) {
+  static const double magicCalcConstant = 8;
+  return attackRadius(obj) + magicCalcConstant;
+}
+
 int EX::minTimeForMagic(const model::Wizard& obj) {
   const auto& actionCooldowns = obj.getRemainingCooldownTicksByAction();
   const auto available = availableSkills(obj);
@@ -155,57 +221,4 @@ int EX::minTimeForMagic(const model::Wizard& obj) {
 
   return MAX(minCooldown, obj.getRemainingActionCooldownTicks());
 
-}
-
-double EX::turnSpeed(const model::Wizard& obj) {
-  double maxTurnSpeed = Game::instance().model().getWizardMaxTurnAngle();
-
-
-  for (const auto& status : obj.getStatuses()) {
-    if (model::STATUS_HASTENED == status.getType()) {
-      maxTurnSpeed *= (1.0 + Game::instance().model().getHastenedRotationBonusFactor());
-    }
-  }
-
-  return maxTurnSpeed;
-}
-
-double EX::timeToTurnForAttack(const model::Unit& attacked, const model::Wizard& attacking) {
-  const auto selfPos = Position(attacking.getX(), attacking.getY());
-  const auto enemyPos = Position(attacked.getX(), attacked.getY());
-
-  const auto dir = enemyPos - selfPos;
-  double angleDeviation = Math::angleDiff(dir.angle(), attacking.getAngle());
-  angleDeviation = ABS(angleDeviation);
-
-  const double needTurnAngle = MAX(0, angleDeviation - Game::instance().model().getStaffSector()* 0.5);
-  /// если времени до атаки больше чем времени до разворота, то можно пока не атаковать
-
-  return needTurnAngle / turnSpeed(attacking);
-}
-
-double EX::magicMissleAttack(const model::Wizard& obj) {
-  double power = Game::instance().model().getMagicMissileDirectDamage();
-
-
-  for (const auto& status : obj.getStatuses()) {
-    if (model::STATUS_EMPOWERED == status.getType()) {
-      power *= Game::instance().model().getEmpoweredDamageFactor();
-    }
-  }
-
-
-  for (const auto& skill : obj.getSkills()) {
-    if (model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_1 == skill) {
-      power += Game::instance().model().getMagicalDamageBonusPerSkillLevel();
-    } else if (model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_1 == skill) {
-      power += 2 * Game::instance().model().getMagicalDamageBonusPerSkillLevel();
-    } else if (model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_2 == skill) {
-      power += 3 * Game::instance().model().getMagicalDamageBonusPerSkillLevel();
-    } else if (model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_2 == skill) {
-      power += 4 * Game::instance().model().getMagicalDamageBonusPerSkillLevel();
-    }
-  }
-
-  return power;
 }

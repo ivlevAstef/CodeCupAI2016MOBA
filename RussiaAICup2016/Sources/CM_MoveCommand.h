@@ -13,9 +13,6 @@
 
 namespace AICup
 {
-  class MoveCommand;
-  typedef std::shared_ptr<MoveCommand> MoveCommandPtr;
-
   class MoveCommand: public Command {
   public:
     struct Result {
@@ -34,10 +31,12 @@ namespace AICup
     }
 
     /// исполнить команду
-    virtual void execute(const model::Wizard& self, Result& result) = 0;
+    virtual void execute(const Wizard& self, Result& result) = 0;
 
   protected:
     Algorithm::PathFinder& pathFinder;
   };
+
+  typedef std::shared_ptr<MoveCommand> MoveCommandPtr;
 }
 

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <memory>
-#include "model\Wizard.h"
+#include "E_Wizard.h"
 
 #ifdef ENABLE_VISUALIZATOR
 #include "Visualizator.h"
@@ -22,7 +22,7 @@ namespace AICup
   public:
 
     /// проверяет возможность исполнения команды
-    virtual bool check(const model::Wizard& self) = 0;
+    virtual bool check(const Wizard& self) = 0;
 
 
 #ifdef ENABLE_VISUALIZATOR

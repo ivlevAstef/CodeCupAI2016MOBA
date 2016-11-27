@@ -19,9 +19,9 @@ namespace AICup
   public:
     CommandMoveToPoint(Algorithm::PathFinder& finder, const double x, const double y, const TurnStyle style = TurnStyle::TURN, const double speedLimit = -1);
 
-    bool check(const model::Wizard& self) override;
+    bool check(const Wizard& self) override;
 
-    void execute(const model::Wizard& self, Result& result) override;
+    void execute(const Wizard& self, Result& result) override;
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;

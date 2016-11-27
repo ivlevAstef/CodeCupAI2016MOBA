@@ -15,9 +15,9 @@ namespace AICup
   public:
     CommandObserveMap(Algorithm::PathFinder& finder);
 
-    bool check(const model::Wizard& self) override;
+    bool check(const Wizard& self) override;
 
-    void execute(const model::Wizard& self, Result& result) override;
+    void execute(const Wizard& self, Result& result) override;
 
   private:
   };

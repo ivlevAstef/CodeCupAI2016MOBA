@@ -14,14 +14,14 @@ namespace AICup
   public:
     FirstStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
 
-    void update(const model::Wizard& self, model::Move& move) override;
+    void update(const Wizard& self, model::Move& move) override;
 
   private:
-    void init(const model::Wizard& self);
+    void init(const Wizard& self);
 
-    void changeLane(const model::Wizard& self);
+    void changeLane(const Wizard& self);
 
-    const std::vector<MoveCommandPtr> calcAllAroundEnemies(const model::Wizard& self);
+    const std::vector<MoveCommandPtr> calcAllAroundEnemies(const Wizard& self);
 
   private:
     bool isInitialized;

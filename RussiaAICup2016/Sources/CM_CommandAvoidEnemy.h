@@ -17,9 +17,9 @@ namespace AICup
   public:
     CommandAvoidEnemy(Algorithm::PathFinder& finder, const long long enemyId);
 
-    bool check(const model::Wizard& self) override;
+    bool check(const Wizard& self) override;
 
-    void execute(const model::Wizard& self, Result& result) override;
+    void execute(const Wizard& self, Result& result) override;
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const override;

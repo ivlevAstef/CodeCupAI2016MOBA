@@ -20,7 +20,7 @@ CommandAvoidEnemy::CommandAvoidEnemy(Algorithm::PathFinder& finder, const long l
 
 }
 
-bool CommandAvoidEnemy::check(const model::Wizard& self) {
+bool CommandAvoidEnemy::check(const Wizard& self) {
   enemy = World::instance().unitOrProjectile(enemyId);
   if (nullptr == enemy) {
     moveToPointCommand = nullptr;
@@ -93,7 +93,7 @@ bool CommandAvoidEnemy::check(const model::Wizard& self) {
   return moveToPointCommand->check(self);
 }
 
-void CommandAvoidEnemy::execute(const model::Wizard& self, Result& result) {
+void CommandAvoidEnemy::execute(const Wizard& self, Result& result) {
   assert(nullptr != moveToPointCommand.get());
   moveToPointCommand->execute(self, result);
   result.priority = MovePriorities::avoidEnemy(self, *enemy);

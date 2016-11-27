@@ -15,9 +15,9 @@ namespace AICup
   public:
     CommandKeepDistance(Algorithm::PathFinder& finder, const double x, const double y, const double minDistance, const double maxDistance);
 
-    bool check(const model::Wizard& self) override;
+    bool check(const Wizard& self) override;
 
-    void execute(const model::Wizard& self, Result& result) override;
+    void execute(const Wizard& self, Result& result) override;
 
 
 #ifdef ENABLE_VISUALIZATOR

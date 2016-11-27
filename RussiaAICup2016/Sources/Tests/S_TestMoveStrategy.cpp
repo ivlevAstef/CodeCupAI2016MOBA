@@ -16,7 +16,7 @@ TestMoveStrategy::TestMoveStrategy(const CommandFabric& fabric, const Algorithm:
   allMoveCommands.push_back(fabric.moveToLine(model::LANE_BOTTOM));
 }
 
-void TestMoveStrategy::update(const model::Wizard& self, model::Move& move) {
+void TestMoveStrategy::update(const Wizard& self, model::Move& move) {
   CommandStrategy::clear();
 
   auto& command = allMoveCommands[currentMoveCommandIndex];

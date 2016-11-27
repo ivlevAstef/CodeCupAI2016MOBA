@@ -14,7 +14,7 @@ namespace AICup
   public:
     TestMoveAndAttackStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
 
-    void update(const model::Wizard& self, model::Move& move) override;
+    void update(const Wizard& self, model::Move& move) override;
 
   private:
     size_t currentMoveCommandIndex;

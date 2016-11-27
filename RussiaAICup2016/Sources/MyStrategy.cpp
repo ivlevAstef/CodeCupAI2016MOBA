@@ -14,9 +14,9 @@
 #include "S_StrategyManager.h"
 #include "C_Extensions.h"
 #include "C_Logger.h"
+#include "E_Wizard.h"
 
 
-using namespace model;
 using namespace AICup;
 
 
@@ -38,16 +38,25 @@ void visualization(const Visualizator& visualizator) {
 }
 #endif
 
-void MyStrategy::move(const model::Wizard& self, const model::World& world, const model::Game& game, model::Move& move) {
-  AICup::Game::instance().update(game, self);
+void MyStrategy::move(const model::Wizard& modelSelf, const model::World& world, const model::Game& game, model::Move& move) {
+  static std::shared_ptr<AICup::Wizard> self = std::make_shared<Wizard>(modelSelf);
+  /// —оздаю экземпл€р своего мага, чтобы дальше с ним работать
+  const auto newSelf = std::make_shared<Wizard>(modelSelf);
+  newSelf->moveInfoFrom(*self);
+  self = newSelf;
+
+  AICup::Game::instance().update(game, modelSelf);
   AICup::World::instance().update(world);
+  /// —читывает сообщени€, мен€ет внутренние атрибуты, короче много чего делает...
+  self->update(move);
+
   AICup::HypotheticalEnemies::instance().update();
   AICup::InfluenceMap::instance().update();
-  AICup::StrategyManager::instance().update(self, move);
+  AICup::StrategyManager::instance().update(*self, move);
 
 #ifdef ENABLE_VISUALIZATOR
   auto& visualizator = Visualizator::instance();
-  visualizator.isReverse = (self.getFaction() == model::FACTION_RENEGADES);
+  visualizator.isReverse = (self->getFaction() == model::FACTION_RENEGADES);
 
   visualizator.beginPre();
   visualization(visualizator);
