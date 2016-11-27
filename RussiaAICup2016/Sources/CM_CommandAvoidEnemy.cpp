@@ -51,7 +51,7 @@ bool CommandAvoidEnemy::check(const Wizard& self) {
   double distance = 0;
   if (EX::isWizard(*enemy)) {
     const model::Wizard& wizard = EX::asWizard(*enemy);
-    const double radius = EX::radiusForGuaranteedHit(wizard);
+    const double radius = EX::radiusForGuaranteedHit(wizard, *enemy);
     const double distance1 = radius - EX::minTimeForMagic(wizard) * constants.getWizardBackwardSpeed()  + self.getRadius();
     const double distance2 = radius - EX::timeToTurnForAttack(self, wizard) * constants.getWizardBackwardSpeed() + self.getRadius();
     distance = MIN(distance1, distance2);

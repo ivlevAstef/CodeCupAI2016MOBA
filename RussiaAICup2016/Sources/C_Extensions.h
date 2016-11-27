@@ -14,6 +14,7 @@
 #include "model/Tree.h"
 #include "model/Building.h"
 #include "model/Wizard.h"
+#include "model/ActionType.h"
 
 namespace AICup
 {
@@ -52,9 +53,14 @@ namespace AICup
     double armor(const model::Wizard& obj);
 
     std::vector<bool> availableSkills(const model::Wizard& obj);
+    bool availableSkill(const model::Wizard& obj, model::ActionType action);
+    int cooldownSkill(const model::Wizard& obj, model::ActionType action);
 
     //Support
-    double radiusForGuaranteedHit(const model::Wizard& obj);
+    double radiusForGuaranteedHit(const model::Wizard& obj, const model::CircularUnit& enemy);
+    double radiusForGuaranteedHitFrostBolt(const model::Wizard& obj, const model::CircularUnit& enemy);
+    double radiusForGuaranteedHitFireBall(const model::Wizard& obj, const model::CircularUnit& enemy);
+
     int minTimeForMagic(const model::Wizard& obj);
 
   }

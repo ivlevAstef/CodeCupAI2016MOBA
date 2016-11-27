@@ -163,9 +163,9 @@ void FirstStrategy::changeLane(const Wizard& self) {
   priorityBottom *= (bottomLength < 1600) ? (1 + cBottom*cBottom) : 1;
 
   // Если много своих то уменьшаем
-  priorityTop /= MAX(0.5, World::instance().wizardCount(model::LANE_TOP, self));
-  priorityMiddle /= MAX(0.5, World::instance().wizardCount(model::LANE_MIDDLE, self));
-  priorityBottom /= MAX(0.5, World::instance().wizardCount(model::LANE_BOTTOM, self));
+  priorityTop /= MAX(0.75, sqrt(World::instance().wizardCount(model::LANE_TOP, self)));
+  priorityMiddle /= MAX(0.75, sqrt(World::instance().wizardCount(model::LANE_MIDDLE, self)));
+  priorityBottom /= MAX(0.75, sqrt(World::instance().wizardCount(model::LANE_BOTTOM, self)));
 
   const auto minPriority = MIN(priorityTop, MIN(priorityMiddle, priorityBottom));
   const auto maxPriority = MAX(priorityTop, MAX(priorityMiddle, priorityBottom));

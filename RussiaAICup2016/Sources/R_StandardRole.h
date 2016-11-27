@@ -13,10 +13,10 @@ namespace AICup
   class StandardRole: public Role {
   public:
     StandardRole() :
-      Role(1, 1, 1, {
-        SkillBranches::moveHast,
+      Role(0.75, 1, 1, {
         SkillBranches::magicalDamageFrostBolt,
         SkillBranches::rangeMagicMissile,
+        SkillBranches::moveHast,
         SkillBranches::armorShield,
         SkillBranches::meleeDamageFireBolt,
       }) {

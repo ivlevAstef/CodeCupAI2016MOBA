@@ -31,12 +31,23 @@ int MovePriorities::avoidEnemy(const Wizard& self, const model::CircularUnit& en
     lifePriority = -600;
   }
 
+  int statusPriority = 0;
+  for (const auto& status : livingUnit.getStatuses()) {
+    if (status.getType() == model::STATUS_EMPOWERED) {
+      statusPriority += 400;
+    }
+
+    if (status.getType() == model::STATUS_FROZEN) {
+      statusPriority -= status.getRemainingDurationTicks() * 15;
+    }
+  }
+
   if (EX::isWizard(livingUnit)) {
     const model::Wizard& wizard = EX::asWizard(livingUnit);
     const double timeToAttack = EX::timeToTurnForAttack(self, wizard);
     const double timeForMagic = EX::minTimeForMagic(EX::asWizard(livingUnit));
 
-    return (300 + lifePriority - timeForMagic * 5 - timeToAttack * 5) * self.getRole().getAudacity();
+    return (300 + statusPriority + lifePriority - timeForMagic * 5 - timeToAttack * 5) * self.getRole().getAudacity();
   } else if (EX::isMinion(livingUnit)) {
     const model::Minion& minion = EX::asMinion(livingUnit);
 
@@ -44,9 +55,9 @@ int MovePriorities::avoidEnemy(const Wizard& self, const model::CircularUnit& en
       if (distance < constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2) {
         return (600 + lifePriority)  * self.getRole().getAudacity();
       }
-      return lifePriority  * self.getRole().getAudacity();
+      return (lifePriority + statusPriority) * self.getRole().getAudacity();
     } else {
-      return (lifePriority + ((600 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks())) * self.getRole().getAudacity();
+      return (lifePriority + statusPriority + ((600 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks())) * self.getRole().getAudacity();
     }
   } else if (EX::isBuilding(livingUnit)) {
     return (800 + lifePriority) * self.getRole().getAudacity();

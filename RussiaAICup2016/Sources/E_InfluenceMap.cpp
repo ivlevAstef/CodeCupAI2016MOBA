@@ -292,6 +292,10 @@ void InfluenceMap::includeEnemies() {
     if (Game::enemyFaction() == minion.getFaction()) {
       includeEnemy(minion, minionRadius(minion), minionDanger(minion));
     }
+
+    if (model::FACTION_NEUTRAL == minion.getFaction()) {
+      includeEnemy(minion, minionRadius(minion), 0.5 * minionDanger(minion));
+    }
   }
 
   for (const auto& build : World::instance().buildings()) {

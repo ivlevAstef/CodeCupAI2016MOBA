@@ -29,7 +29,7 @@ bool CommandAttackEnemy::check(const Wizard& self) {
   const double distance = (selfPos - enemyPos).length();
 
   /// если враг совсем далеко, то атака невозможна
-  if (distance > EX::radiusForGuaranteedHit(self)) {
+  if (distance > EX::radiusForGuaranteedHit(self, *enemy)) {
     return false;
   }
 
@@ -67,6 +67,20 @@ void CommandAttackEnemy::execute(const Wizard& self, Result& result) {
     result.action = model::ACTION_STAFF;
   } else {
     result.action = model::ACTION_MAGIC_MISSILE;
+
+    if (EX::availableSkill(self, model::ACTION_FROST_BOLT)
+      && self.getMana() > Game::model().getFrostBoltManacost()
+      && distance < EX::radiusForGuaranteedHitFrostBolt(self, *enemy)
+      && 0 == EX::cooldownSkill(self, model::ACTION_FROST_BOLT)) {
+      result.action = model::ACTION_FROST_BOLT;
+    }
+
+    if (EX::availableSkill(self, model::ACTION_FIREBALL)
+      && self.getMana() > Game::model().getFireballManacost()
+      && distance < EX::radiusForGuaranteedHitFireBall(self, *enemy)
+      && 0 == EX::cooldownSkill(self, model::ACTION_FIREBALL)) {
+      result.action = model::ACTION_FIREBALL;
+    }
   }
 }
 

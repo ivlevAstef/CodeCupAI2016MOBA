@@ -157,7 +157,7 @@ void PathFinder::calculateCost() {
   for (const auto& obstacle : obstacles) {
     float life = 1;
     if (EX::isTree(*obstacle)) {
-      life = 2.0f * (float(obstacle->getLife()) / 12.0f); /// дерево
+      life = 2.5f * (float(obstacle->getLife()) / 12.0f); /// дерево
     } else if (EX::isNeutral(*obstacle)) {
       life = 1000.0f; /// нейтрал очень дорогое удовольствие
     } else {

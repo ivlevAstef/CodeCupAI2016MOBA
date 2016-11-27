@@ -161,10 +161,10 @@ double EX::attackRadius(const model::Wizard& obj) {
     model::SKILL_RANGE_BONUS_PASSIVE_2
 
   const auto perLevel = Game::model().getRangeBonusPerSkillLevel();
-  const int radius1 = sumSkills<int>(obj, {auraSkills}, perLevel);
-  const int radius2 = maxSkills<int>(obj, {auraSkills}, perLevel);
-  int radius = MAX(radius1, radius2);
-  radius += sumSkills<int>(obj, {passiVeSkills}, perLevel);
+  const double radius1 = sumSkills<double>(obj, {auraSkills}, perLevel);
+  const double radius2 = maxSkills<double>(obj, {auraSkills}, perLevel);
+  double radius = MAX(radius1, radius2);
+  radius += sumSkills<double>(obj, {passiVeSkills}, perLevel);
 
   return Game::model().getWizardCastRange() + radius;
 
@@ -184,9 +184,9 @@ double EX::magicMissleAttack(const model::Wizard& obj) {
   const auto perLevel = Game::model().getMagicalDamageBonusPerSkillLevel();
   const int damage1 = sumSkills<int>(obj, {auraSkills}, perLevel);
   const int damage2 = maxSkills<int>(obj, {auraSkills}, perLevel);
-  int damage = MAX(damage1, damage2);
-  damage += sumSkills<int>(obj, {passiVeSkills}, perLevel);
-  damage += Game::model().getMagicMissileDirectDamage();
+  double damage = (double)MAX(damage1, damage2);
+  damage += (double)sumSkills<int>(obj, {passiVeSkills}, perLevel);
+  damage += (double)Game::model().getMagicMissileDirectDamage();
 
   for (const auto& status : obj.getStatuses()) {
     if (model::STATUS_EMPOWERED == status.getType()) {
@@ -212,9 +212,9 @@ double EX::staffAttack(const model::Wizard& obj) {
   const auto perLevel = Game::model().getStaffDamageBonusPerSkillLevel();
   const int damage1 = sumSkills<int>(obj, {auraSkills}, perLevel);
   const int damage2 = maxSkills<int>(obj, {auraSkills}, perLevel);
-  int damage = MAX(damage1, damage2);
-  damage += sumSkills<int>(obj, {passiVeSkills}, perLevel);
-  damage += Game::model().getStaffDamage();
+  double damage = (double)MAX(damage1, damage2);
+  damage += (double)sumSkills<int>(obj, {passiVeSkills}, perLevel);
+  damage += (double)Game::model().getStaffDamage();
 
   for (const auto& status : obj.getStatuses()) {
     if (model::STATUS_EMPOWERED == status.getType()) {
@@ -271,11 +271,43 @@ std::vector<bool> EX::availableSkills(const model::Wizard& obj) {
   return available;
 }
 
+bool EX::availableSkill(const model::Wizard& obj, model::ActionType action) {
+  return availableSkills(obj)[action];
+}
+
+int EX::cooldownSkill(const model::Wizard& obj, model::ActionType action) {
+  return obj.getRemainingCooldownTicksByAction()[action];
+}
 
 /////////////////////// Support
-double EX::radiusForGuaranteedHit(const model::Wizard& obj) {
-  static const double magicCalcConstant = 8;
-  return attackRadius(obj) + magicCalcConstant;
+double EX::radiusForGuaranteedHit(const model::Wizard& obj, const model::CircularUnit& enemy) {
+  //TODO: надо учитывать врага
+  if (isWizard(enemy)) {
+    return 508; /// сложно попасть с дальше дистанции
+  }
+  if (isMinion(enemy)) {
+    return attackRadius(obj);
+  }
+  return attackRadius(obj) + enemy.getRadius();
+}
+
+double EX::radiusForGuaranteedHitFrostBolt(const model::Wizard& obj, const model::CircularUnit& enemy) {
+  //TODO: надо учитывать врага
+  if (isWizard(enemy)) {
+    return 440; /// сложно попасть с дальше дистанции
+  }
+  return 0;
+}
+
+double EX::radiusForGuaranteedHitFireBall(const model::Wizard& obj, const model::CircularUnit& enemy) {
+  //TODO: надо учитывать врага
+  if (isWizard(enemy)) {
+    return 420; /// сложно попасть с дальше дистанции
+  }
+  if (isMinion(enemy)) {
+    return attackRadius(obj);
+  }
+  return 0;
 }
 
 int EX::minTimeForMagic(const model::Wizard& obj) {
