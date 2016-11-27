@@ -66,7 +66,9 @@ void Role::update(const model::Wizard& self, model::Move& move) {
     currentLevel++;
   }
 
-  printf("Speed: %f\n", Vector(self.getSpeedX(), self.getSpeedY()).length());
-  printf("%d %f   %f\n", self.getLevel(), EX::maxSpeed(self));
-
+  printf("Speed: %f\n", EX::maxSpeed(self));
+  printf("Magic Attack: %f\n", EX::magicMissleAttack(self));
+  printf("Staff Attack: %f\n", EX::staffAttack(self));
+  printf("Armor: %f\n", EX::armor(self));
+  printf("Radius: %f\n", EX::attackRadius(self));
 }

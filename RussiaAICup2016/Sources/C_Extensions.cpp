@@ -1,8 +1,10 @@
 #include "C_Extensions.h"
 #include "E_Game.h"
+#include "E_World.h"
 #include "C_Math.h"
 #include "model/ActionType.h"
 #include "model/Projectile.h"
+#include <unordered_set>
 
 using namespace AICup;
 
@@ -69,27 +71,6 @@ double EX::timeToTurnForAttack(const model::Unit& attacked, const model::Wizard&
 
 ////////////////// Wizard
 
-double EX::speedFactor(const model::Wizard& obj) {
-  double factor = 1;
-
-  for (const auto& skill : obj.getSkills()) {
-    if (model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_1 == skill
-      || model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_1 == skill
-      || model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_2 == skill
-      || model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_2 == skill) {
-      factor += Game::model().getMovementBonusFactorPerSkillLevel();
-    }
-  }
-
-  for (const auto& status : obj.getStatuses()) {
-    if (model::STATUS_HASTENED == status.getType()) {
-      factor += Game::model().getHastenedMovementBonusFactor();
-    }
-  }
-
-  return factor;
-}
-
 double EX::maxSpeed(const model::Wizard& obj) {
   return Game::model().getWizardForwardSpeed() * speedFactor(obj);
 }
@@ -112,69 +93,160 @@ double EX::turnSpeed(const model::Wizard& obj) {
   return maxTurnSpeed;
 }
 
-double EX::attackRadius(const model::Wizard& obj) {
-  double radius = obj.getCastRange();
+template<typename Type>
+Type sumSkills(const model::Wizard& obj, const std::unordered_set<model::SkillType> skills, Type valuePerLevel) {
+  Type result = 0;
+  for (const auto& skill: obj.getSkills()) {
+    if (0 != skills.count(skill)) {
+      result += valuePerLevel;
+    }
+  }
+  return result;
+}
 
-  for (const auto& skill : obj.getSkills()) {
-    if (model::SKILL_RANGE_BONUS_PASSIVE_1 == skill
-      || model::SKILL_RANGE_BONUS_AURA_1 == skill
-      || model::SKILL_RANGE_BONUS_PASSIVE_2 == skill
-      || model::SKILL_RANGE_BONUS_AURA_2 == skill) {
-      radius += Game::model().getRangeBonusPerSkillLevel();
+
+template<typename Type>
+Type maxSkills(const model::Wizard& obj, const std::vector<model::SkillType> skills, Type valuePerLevel) {
+  const auto wizards = World::instance().aroundAuraWizards(obj);
+
+  Type mult = 0;
+  for (const auto& wizard : wizards) {
+    for (const auto& skill : wizard->getSkills()) {
+      for (size_t i = 0; i < skills.size(); i++) {
+        if (skills[i] == skill) {
+          mult = MAX(mult, (Type)(i + 1));
+        }
+      }
     }
   }
 
-  return radius;
+  return valuePerLevel * mult;
+}
+
+/// Skills
+double EX::speedFactor(const model::Wizard& obj) {
+  #define auraSkills \
+    model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_1, \
+    model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_2
+  #define passiVeSkills \
+    model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_1, \
+    model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_2
+
+  const auto perLevel = Game::model().getMovementBonusFactorPerSkillLevel();
+  const double factor1 = sumSkills<double>(obj, {auraSkills}, perLevel);
+  const double factor2 = maxSkills<double>(obj, {auraSkills}, perLevel);
+  double factor = MAX(factor1, factor2);
+  factor += sumSkills<double>(obj, {passiVeSkills}, perLevel);
+
+  for (const auto& status : obj.getStatuses()) {
+    if (model::STATUS_HASTENED == status.getType()) {
+      factor += Game::model().getHastenedMovementBonusFactor();
+      break;
+    }
+  }
+
+  return 1 + factor;
+
+  #undef auraSkills
+  #undef passiVeSkills
+}
+
+
+double EX::attackRadius(const model::Wizard& obj) {
+  #define auraSkills \
+    model::SKILL_RANGE_BONUS_AURA_1, \
+    model::SKILL_RANGE_BONUS_AURA_2
+  #define passiVeSkills \
+    model::SKILL_RANGE_BONUS_PASSIVE_1, \
+    model::SKILL_RANGE_BONUS_PASSIVE_2
+
+  const auto perLevel = Game::model().getRangeBonusPerSkillLevel();
+  const int radius1 = sumSkills<int>(obj, {auraSkills}, perLevel);
+  const int radius2 = maxSkills<int>(obj, {auraSkills}, perLevel);
+  int radius = MAX(radius1, radius2);
+  radius += sumSkills<int>(obj, {passiVeSkills}, perLevel);
+
+  return Game::model().getWizardCastRange() + radius;
+
+  #undef auraSkills
+  #undef passiVeSkills
 }
 
 double EX::magicMissleAttack(const model::Wizard& obj) {
-  double power = Game::model().getMagicMissileDirectDamage();
+  #define auraSkills \
+    model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_1, \
+    model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_2
+  #define passiVeSkills \
+    model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_1, \
+    model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_2
 
-  for (const auto& skill : obj.getSkills()) {
-    if (model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_1 == skill
-      || model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_1 == skill
-      || model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_2 == skill
-      || model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_2 == skill) {
-      power += Game::model().getMagicalDamageBonusPerSkillLevel();
-    }
-  }
+
+  const auto perLevel = Game::model().getMagicalDamageBonusPerSkillLevel();
+  const int damage1 = sumSkills<int>(obj, {auraSkills}, perLevel);
+  const int damage2 = maxSkills<int>(obj, {auraSkills}, perLevel);
+  int damage = MAX(damage1, damage2);
+  damage += sumSkills<int>(obj, {passiVeSkills}, perLevel);
+  damage += Game::model().getMagicMissileDirectDamage();
 
   for (const auto& status : obj.getStatuses()) {
     if (model::STATUS_EMPOWERED == status.getType()) {
-      power *= Game::model().getEmpoweredDamageFactor();
-    }
-  }
-
-  return power;
-}
-double EX::staffAttack(const model::Wizard& obj) {
-  double damage = Game::model().getStaffDamage();
-
-  for (const auto& skill : obj.getSkills()) {
-    if (model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_1 == skill
-      || model::SKILL_STAFF_DAMAGE_BONUS_AURA_1 == skill
-      || model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_2 == skill
-      || model::SKILL_STAFF_DAMAGE_BONUS_AURA_2 == skill) {
-      damage += Game::model().getStaffDamageBonusPerSkillLevel();
+      damage *= Game::model().getEmpoweredDamageFactor();
     }
   }
 
   return damage;
+
+  #undef auraSkills
+  #undef passiVeSkills
 }
 
-double EX::armor(const model::Wizard& obj) {
-  double armor = 0;
+double EX::staffAttack(const model::Wizard& obj) {
+  #define auraSkills \
+    model::SKILL_STAFF_DAMAGE_BONUS_AURA_1, \
+    model::SKILL_STAFF_DAMAGE_BONUS_AURA_2
+  #define passiVeSkills \
+    model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_1, \
+    model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_2
 
-  for (const auto& skill : obj.getSkills()) {
-    if (model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_1 == skill
-      || model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_1 == skill
-      || model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_2 == skill
-      || model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_2 == skill) {
-      armor += Game::model().getStaffDamageBonusPerSkillLevel();
+
+  const auto perLevel = Game::model().getStaffDamageBonusPerSkillLevel();
+  const int damage1 = sumSkills<int>(obj, {auraSkills}, perLevel);
+  const int damage2 = maxSkills<int>(obj, {auraSkills}, perLevel);
+  int damage = MAX(damage1, damage2);
+  damage += sumSkills<int>(obj, {passiVeSkills}, perLevel);
+  damage += Game::model().getStaffDamage();
+
+  for (const auto& status : obj.getStatuses()) {
+    if (model::STATUS_EMPOWERED == status.getType()) {
+      damage *= Game::model().getEmpoweredDamageFactor();
     }
   }
 
+  return damage;
+
+  #undef auraSkills
+  #undef passiVeSkills
+}
+
+double EX::armor(const model::Wizard& obj) {
+  #define auraSkills \
+    model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_1, \
+    model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_2,
+  #define passiVeSkills \
+    model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_1, \
+    model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_2
+
+
+  const auto perLevel = Game::model().getMagicalDamageAbsorptionPerSkillLevel();
+  const int armor1 = sumSkills<int>(obj, {auraSkills}, perLevel);
+  const int armor2 = maxSkills<int>(obj, {auraSkills}, perLevel);
+  int armor = MAX(armor1, armor2);
+  armor += sumSkills<int>(obj, {passiVeSkills}, perLevel);
+
   return armor;
+
+  #undef auraSkills
+  #undef passiVeSkills
 }
 
 std::vector<bool> EX::availableSkills(const model::Wizard& obj) {

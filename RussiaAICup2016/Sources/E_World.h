@@ -54,6 +54,8 @@ namespace AICup
     std::vector<const model::LivingUnit*> around(const model::Wizard& unit, const model::Faction faction, double radius = -1) const;
     std::vector<const model::LivingUnit*> aroundEnemies(const model::Wizard& unit, const double radius = -1) const;
 
+    const std::vector<const model::Wizard*> aroundAuraWizards(const model::Wizard& unit);
+
     const int wizardCount(model::LaneType line) const;
     const int wizardCount(model::LaneType line, const model::Wizard& excludeWizard) const;
     const model::LaneType positionToLine(const double x, const double y) const;

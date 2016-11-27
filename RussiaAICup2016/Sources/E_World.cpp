@@ -245,6 +245,19 @@ const int World::wizardCount(model::LaneType line, const model::Wizard& excludeW
   return result;
 }
 
+const std::vector<const model::Wizard*> World::aroundAuraWizards(const model::Wizard& unit) {
+  std::vector<const model::Wizard*> result;
+
+  for (const auto& wizard : model().getWizards()) {
+    if (wizard.getId() != unit.getId() && unit.getFaction() == wizard.getFaction()
+      && unit.getDistanceTo(wizard) < Game::model().getAuraSkillRange()) {
+      result.push_back(&wizard);
+    }
+  }
+
+  return result;
+}
+
 Obstacles World::allObstacles(const model::CircularUnit& unit, const bool onlyStatic) const {
   Obstacles obstacles;
   obstacles.reserve(500); // Приблизительно сколько объектов в среднем
