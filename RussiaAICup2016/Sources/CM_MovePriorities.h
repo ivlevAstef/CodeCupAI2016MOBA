@@ -26,6 +26,7 @@ namespace AICup
 
     double defendPoint(const Wizard& self, const Position& point);
 
+    double attackFollow(const Wizard& self, const model::Wizard& wizard);
     double follow(const Wizard& self, const model::LivingUnit& unit);
     double getExpirience(const Wizard& self, const model::LivingUnit& unit);
     double keepDistance(const Wizard& self, const Position point, const double min, const double max);

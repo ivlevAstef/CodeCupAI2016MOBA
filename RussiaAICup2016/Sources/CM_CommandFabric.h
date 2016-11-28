@@ -41,6 +41,8 @@ namespace AICup
     MoveCommandPtr observeMap() const;
 
 /// #pragma mark - атака
+    MoveCommandPtr followAttack(const model::Wizard& wizard) const;
+
     /// атаковать врага
     AttackCommandPtr attack(const model::LivingUnit& unit) const;
 

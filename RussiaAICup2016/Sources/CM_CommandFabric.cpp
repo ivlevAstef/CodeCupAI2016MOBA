@@ -21,6 +21,7 @@
 #include "CM_CommandAttackFrostbolt.h"
 #include "CM_CommandAttackFireball.h"
 #include "CM_CommandPool.h"
+#include "CM_CommandFollowAttackEnemy.h"
 
 #include "CM_CommandDefendPoint.h"
 #include "CM_CommandAvoidWizard.h"
@@ -29,6 +30,7 @@
 #include "CM_CommandAvoidProjectile.h"
 
 #include "C_Extensions.h"
+#include <cassert>
 
 using namespace AICup;
 
@@ -56,6 +58,10 @@ MoveCommandPtr CommandFabric::moveToBonus() const {
 
 MoveCommandPtr CommandFabric::follow(const long long unitId, const double minDistance, const double maxDistance) const {
   return std::make_shared<CommandFollow>(finder, unitId, minDistance, maxDistance);
+}
+
+MoveCommandPtr CommandFabric::followAttack(const model::Wizard& wizard) const {
+  return std::make_shared<CommandFollowAttack>(finder, wizard);
 }
 
 MoveCommandPtr CommandFabric::moveGetExpirience() const {

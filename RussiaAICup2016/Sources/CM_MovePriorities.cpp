@@ -6,9 +6,10 @@
 
 using namespace AICup;
 
+///слегка выше
 double MovePriorities::avoidBuild(const Wizard& self, const model::Building& build) {
   const int lifePriority = (300 * build.getLife()) / build.getMaxLife();
-  return 700 + lifePriority;
+  return 900 + lifePriority;
 }
 
 double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& minion) {
@@ -24,15 +25,16 @@ double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& mini
     if (distance < mc.getOrcWoodcutterAttackRange() + self.getRadius() + 50/*небольшой запас*/) {
       return 700 + lifePriority;
     }
-    return lifePriority;
+    return 250 + lifePriority;
   } else {
-    return lifePriority + ((200 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
+    return lifePriority + ((400 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
   }
 }
 
 double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wizard) {
   const double timeToTurnAttack = Algorithm::timeToTurnForAttack(self, wizard);
   const double timeForMagic = EX::minTimeForMagic(wizard);
+  const double timeForUnforzend = EX::frozenTime(wizard);
 
   /// если мага можно быстро добить, то его не стоит бояться
   if (wizard.getLife() + 2/*так как есть регенерация*/ < EX::magicMissleAttack(self)) {
@@ -50,7 +52,11 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
     }
   }
 
-  return MAX(1000, 200 + statusPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 25);
+  return MAX(1000, 500 + statusPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 25 - timeForUnforzend * 50);
+}
+
+double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {
+  return 450;
 }
 
 /// Это очень важно, поэтому завышено значение от нормы

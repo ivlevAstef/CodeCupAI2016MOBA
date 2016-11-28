@@ -24,13 +24,18 @@ bool CommandAvoidMinion::check(const Wizard& self) {
   if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
     distance = mc.getOrcWoodcutterAttackRange() + self.getRadius() + 50/*на всякий случай*/;
   } else {
-    distance = mc.getFetishBlowdartAttackRange() + self.getRadius();
+    distance = mc.getFetishBlowdartAttackRange() + self.getRadius() + mc.getDartRadius();
+    distance -= minion.getRemainingActionCooldownTicks() * self.maxBackwardSpeed();
   }
 
   if (delta.length() > distance) {
     return false;
   }
 
+  /// если на пути дерево, то тоже бояться не стоит
+  if (Algorithm::checkIntersectedTree(selfPos, unitPos, Game::model().getDartRadius())) {
+    return false;
+  }
 
   /// точка где безопасно
   const auto pos = unitPos + delta.normal() * distance;

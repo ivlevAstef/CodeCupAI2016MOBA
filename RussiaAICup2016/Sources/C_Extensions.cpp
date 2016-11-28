@@ -343,3 +343,12 @@ int EX::minTimeForMagic(const model::Wizard& obj) {
   return MAX(minCooldown, obj.getRemainingActionCooldownTicks());
 
 }
+
+int EX::frozenTime(const model::Wizard& obj) {
+  for (const auto& status : obj.getStatuses()) {
+    if (model::STATUS_FROZEN == status.getType()) {
+      return status.getRemainingDurationTicks();
+    }
+  }
+  return 0;
+}

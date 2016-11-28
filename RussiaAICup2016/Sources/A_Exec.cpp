@@ -69,12 +69,7 @@ bool Algorithm::execMove(const Wizard& self, const TurnStyle style, const Vector
     auto perDirection = turnDirection.perpendicular();
     auto diff = Math::angleDiff(turnDirection.angle(), self.getAngle());
     /// если уол близок к одному смещению, то выбираем направление чтобы идти в центр, дабы при отклонениях не упереться в сторону карты
-    if (ABS(diff) < self.maxTurnSpeed()) {
-      if (perDirection.dot(Position(2000, 2000) - EX::pos(self)) < 0) {
-        perDirection *= -1;
-      }
-
-    } else if (perDirection.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
+    if (perDirection.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
     /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикуляров
       perDirection *= -1;
     }

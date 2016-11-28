@@ -57,6 +57,16 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     moveCommands.insert(moveCommands.end(), avoidAroundCommands.begin(), avoidAroundCommands.end());
   }
 
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange())) {
+    if (EX::isWizard(*enemy)) {
+      const auto& wizard = EX::asWizard(*enemy);
+      const auto command = fabric.followAttack(wizard);
+      if (command->check(self)) {
+        moveCommands.push_back(command);
+      }
+    }
+  }
+
   ///
 
   if (nullptr == moveToBonus.get()) {
@@ -161,9 +171,9 @@ void FirstStrategy::changeLane(const Wizard& self) {
   double bottomLength = abs((basePosition - bottomPosition).x) + abs((basePosition - bottomPosition).y);
 
 
-  double priorityTop = (8000 - topLength) - selfTopLength;
-  double priorityMiddle = (sqrt(2) * (5657 - middleLength)) - selfMiddleLength;
-  double priorityBottom = (8000 - bottomLength) - selfBottomLength;
+  double priorityTop = (8000 - topLength) - 2 * selfTopLength;
+  double priorityMiddle = (sqrt(2) * (5657 - middleLength)) - 2 * selfMiddleLength;
+  double priorityBottom = (8000 - bottomLength) - 2 * selfBottomLength;
   /// если очень близко к базе то увеличиваем
   const double cTop = (1600 - topLength) / 250.0;
   const double cMiddle = (1600 - middleLength) / 250.0;
@@ -179,7 +189,7 @@ void FirstStrategy::changeLane(const Wizard& self) {
 
   const auto minPriority = MIN(priorityTop, MIN(priorityMiddle, priorityBottom));
   const auto maxPriority = MAX(priorityTop, MAX(priorityMiddle, priorityBottom));
-  if (maxPriority - minPriority < 1000) { // не меняем линию если нет большого перевеса
+  if (maxPriority - minPriority < 1200) { // не меняем линию если нет большого перевеса
     return;
   }
 

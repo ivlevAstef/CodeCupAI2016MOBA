@@ -67,5 +67,7 @@ namespace AICup
 
     int minTimeForMagic(const model::Wizard& obj);
 
+    int frozenTime(const model::Wizard& obj);
+
   }
 }

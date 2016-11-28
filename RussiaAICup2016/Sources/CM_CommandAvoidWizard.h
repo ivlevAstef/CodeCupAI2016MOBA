@@ -30,5 +30,6 @@ namespace AICup
     const model::Wizard& wizard;
 
     MoveCommandPtr moveToPointCommand;
+    bool needAvoidProjectile;
   };
 }
