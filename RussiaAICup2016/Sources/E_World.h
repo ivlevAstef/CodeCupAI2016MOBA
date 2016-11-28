@@ -51,8 +51,8 @@ namespace AICup
     const model::LivingUnit* unit(long long id) const;
     const model::CircularUnit* unitOrProjectile(long long id) const;
 
-    std::vector<const model::LivingUnit*> around(const model::Wizard& unit, const model::Faction faction, double radius = -1) const;
-    std::vector<const model::LivingUnit*> aroundEnemies(const model::Wizard& unit, const double radius = -1) const;
+    std::vector<const model::LivingUnit*> around(const model::LivingUnit& unit, const model::Faction faction, double radius) const;
+    std::vector<const model::LivingUnit*> aroundEnemies(const model::LivingUnit& unit, const double radius) const;
 
     const std::vector<const model::Wizard*> aroundAuraWizards(const model::Wizard& unit);
 

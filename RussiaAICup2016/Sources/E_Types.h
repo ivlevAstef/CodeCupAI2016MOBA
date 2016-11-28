@@ -17,8 +17,9 @@ namespace AICup
   typedef std::vector<Obstacles> ObstaclesGroups;
 
   enum class TurnStyle {
-    TURN,
     NO_TURN,
-    BACK_TURN
+    TURN,
+    BACK_TURN,
+    SIDE_TURN
   };
 };

@@ -15,10 +15,10 @@ namespace AICup
     StandardRole() :
       Role(0.75, 1, 1, {
         SkillBranches::magicalDamageFrostBolt,
+        SkillBranches::meleeDamageFireBolt,
         SkillBranches::rangeMagicMissile,
         SkillBranches::moveHast,
         SkillBranches::armorShield,
-        SkillBranches::meleeDamageFireBolt,
       }) {
 
     }

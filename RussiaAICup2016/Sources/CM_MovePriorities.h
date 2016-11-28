@@ -8,6 +8,9 @@
 
 #include "E_Wizard.h"
 #include "model\LaneType.h"
+#include "model\Building.h"
+#include "model\Minion.h"
+#include "model\Projectile.h"
 #include "C_Vector2D.h"
 
 
@@ -16,21 +19,24 @@ namespace AICup
 
   // ќбъедин€ю в один файл, чтобы легче было настраивать приоритеты
   namespace MovePriorities {
-    int avoidEnemy(const Wizard& self, const model::CircularUnit& enemy);
+    double avoidBuild(const Wizard& self, const model::Building& build);
+    double avoidMinion(const Wizard& self, const model::Minion& minion);
+    double avoidWizard(const Wizard& self, const model::Wizard& wizard);
+    double avoidProjectile(const Wizard& self, const model::Projectile& projectile);
 
-    int defendPoint(const Wizard& self, const Position& point);
+    double defendPoint(const Wizard& self, const Position& point);
 
-    int follow(const Wizard& self, const model::LivingUnit& unit);
-    int getExpirience(const Wizard& self, const model::LivingUnit& unit);
-    int keepDistance(const Wizard& self, const Position point, const double min, const double max);
+    double follow(const Wizard& self, const model::LivingUnit& unit);
+    double getExpirience(const Wizard& self, const model::LivingUnit& unit);
+    double keepDistance(const Wizard& self, const Position point, const double min, const double max);
 
-    int moveToBonus(const Wizard& self, const Position& bonusPos);
+    double moveToBonus(const Wizard& self, const Position& bonusPos);
 
-    int moveToLine(const Wizard& self, const model::LaneType& lane);
+    double moveToLine(const Wizard& self, const model::LaneType& lane);
 
-    int moveToPoint(const Wizard& self, const Position& point);
+    double moveToPoint(const Wizard& self, const Position& point);
 
-    int observeMap(const Wizard& self);
+    double observeMap(const Wizard& self);
 
   };
 }

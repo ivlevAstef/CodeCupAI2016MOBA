@@ -251,6 +251,7 @@ void PathFinder::calculatePath(Path& path) const {
 
   path.count = 0;
   path.length = 0;
+  path.realLength = 0;
 
   if (weights[iTo.x][iTo.y] >= PathConstants::maxValue) {
     LogAssertMsg(false, "can't found path... really?");
@@ -259,6 +260,7 @@ void PathFinder::calculatePath(Path& path) const {
 
 
   Vector2D<int> iter = iTo;
+  Position iterpolateLastPos = path.to;
   Position lastPos = path.to;
   do {
     const Vector2D<int> pos = iter;
@@ -276,7 +278,15 @@ void PathFinder::calculatePath(Path& path) const {
     const auto realPos = PathConstants::toReal(iter, 0.5, 0.5);
     path.path[path.count++] = realPos;
     path.length += (realPos - lastPos).length();
+    /// изгибы всегда короче чем прямые
+    if ((realPos - iterpolateLastPos).normal() == (realPos - lastPos).normal()) {
+      path.realLength += (realPos - iterpolateLastPos).length() * 0.5;
+    } else {
+      path.realLength += (realPos - iterpolateLastPos).length() * 0.4;
+    }
 
+
+    iterpolateLastPos = lastPos;
     lastPos = realPos;
   } while (iter != iFrom);
 }

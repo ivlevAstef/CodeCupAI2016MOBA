@@ -34,8 +34,8 @@ namespace AICup
     void clear();
 
   private:
-    const Vector move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, TurnStyle& turnStyle, double& speedLimit);
-    const model::LivingUnit& attack(const Wizard& self, model::ActionType& action);
+    const Vector move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, TurnStyle& turnStyle, Vector& turnDirection, double& speedLimit, bool& deactivateOtherTurn);
+    const model::LivingUnit* attack(const Wizard& self, model::ActionType& action);
 
     std::vector<MoveCommand::Result> moveCommandsToMoveResult(const Wizard& self) const;
 

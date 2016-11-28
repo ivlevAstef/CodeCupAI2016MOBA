@@ -9,7 +9,7 @@
 using namespace AICup;
 
 double calcMaxSpeed(const Wizard& self, const Vector& direction, const double speedLimit) {
-  Vector speed = Algorithm::maxSpeed(self, direction);
+  Vector speed = Algorithm::maxSpeed(self, self.getAngle(), direction);
 
   const double maxSpeed = speed.length();
   const double dirLength = direction.length();
@@ -21,7 +21,7 @@ double calcMaxSpeed(const Wizard& self, const Vector& direction, const double sp
 }
 
 
-bool Algorithm::execMove(const Wizard& self, const TurnStyle style, const Vector& direction, const double speedLimit, model::Move& move) {
+bool Algorithm::execMove(const Wizard& self, const TurnStyle style, const Vector& turnDirection, const Vector& direction, const double speedLimit, model::Move& move) {
   double maxSpeed = calcMaxSpeed(self, direction, speedLimit);
 
   const auto selfPos = EX::pos(self);
@@ -55,15 +55,33 @@ bool Algorithm::execMove(const Wizard& self, const TurnStyle style, const Vector
   move.setSpeed(speed.x);
   move.setStrafeSpeed(speed.y);
 
+
   switch (style) {
   case TurnStyle::TURN:
-    move.setTurn(self.getAngleTo(self.getX() + direction.x, self.getY() + direction.y));
+    move.setTurn(self.getAngleTo(self.getX() + turnDirection.x, self.getY() + turnDirection.y));
     break;
   case TurnStyle::NO_TURN:
     break;
   case TurnStyle::BACK_TURN:
-    move.setTurn(self.getAngleTo(self.getX() - direction.x, self.getY() - direction.y));
+    move.setTurn(self.getAngleTo(self.getX() - turnDirection.x, self.getY() - turnDirection.y));
     break;
+  case TurnStyle::SIDE_TURN: {
+    auto perDirection = turnDirection.perpendicular();
+    auto diff = Math::angleDiff(turnDirection.angle(), self.getAngle());
+    /// если уол близок к одному смещению, то выбираем направление чтобы идти в центр, дабы при отклонениях не упереться в сторону карты
+    if (ABS(diff) < self.maxTurnSpeed()) {
+      if (perDirection.dot(Position(2000, 2000) - EX::pos(self)) < 0) {
+        perDirection *= -1;
+      }
+
+    } else if (perDirection.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
+    /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикуляров
+      perDirection *= -1;
+    }
+
+    move.setTurn(self.getAngleTo(self.getX() + perDirection.x, self.getY() + perDirection.y));
+    break;
+  }
   default:
     assert(false && "incorrect turn style");
   }

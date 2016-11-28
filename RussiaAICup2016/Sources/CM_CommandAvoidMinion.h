@@ -1,21 +1,20 @@
 //
-//File: CM_CommandAttackMinion.h
+//File: CM_CommandAvoidMinion.h
 //Author: Ivlev Alexander. Stef
-//Created: 28/11/2016
+//Created: 29/11/2016
 //
 
 
 #pragma once
 
-#include "CM_AttackCommand.h"
+#include "CM_MoveCommand.h"
 #include "model\Minion.h"
 
 namespace AICup
 {
-  /// Не сохраняемый между тиками
-  class CommandAttackMinion: public AttackCommand {
+  class CommandAvoidMinion: public MoveCommand {
   public:
-    CommandAttackMinion(const model::Minion& minion);
+    CommandAvoidMinion(Algorithm::PathFinder& finder, const model::Minion& minion);
 
     bool check(const Wizard& self) override;
 
@@ -29,5 +28,7 @@ namespace AICup
 
   private:
     const model::Minion& minion;
+
+    MoveCommandPtr moveToPointCommand;
   };
 }

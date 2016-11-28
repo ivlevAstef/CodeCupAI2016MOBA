@@ -24,7 +24,7 @@ void TestMoveAndAttackStrategy::update(const Wizard& self, model::Move& move) {
     printf("Small Speed: %f %f\n", self.getSpeedX(), self.getSpeedY());
   }
 
-  for (const auto& enemy : World::instance().aroundEnemies(self)) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange())) {
     const auto attackCommand = fabric.attack(*enemy);
     if (attackCommand->check(self)) {
       attackCommands.push_back(attackCommand);

@@ -40,13 +40,16 @@ void CommandAttackBuild::execute(const Wizard& self, Result& result) {
   const double distance = self.getDistanceTo(build);
 
   result.unit = &build;
-  result.priority = self.getRole().getBuildPriority() * AttackPriorities::attackBuild(self, build);
 
   if (Algorithm::isMelee(self, build) && !self.isCooldown(model::ACTION_STAFF)) {
     result.action = model::ACTION_STAFF;
   } else {
     result.action = model::ACTION_MAGIC_MISSILE;
   }
+}
+
+double CommandAttackBuild::priority(const Wizard& self) {
+  return self.getRole().getBuildPriority() * AttackPriorities::attackBuild(self, build);
 }
 
 #ifdef ENABLE_VISUALIZATOR

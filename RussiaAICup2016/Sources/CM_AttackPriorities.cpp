@@ -82,6 +82,13 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   return MAX(lifePriority + statusPriority + distancePriority, 1000);
 }
 
+double AttackPriorities::attackFrostbolt(const Wizard& self) {
+  return 1000;
+}
+double AttackPriorities::attackFireball(const Wizard& self) {
+  return 900;
+}
+
 double AttackPriorities::pool(const Wizard&, const model::Minion&) {
   return 0;
 }

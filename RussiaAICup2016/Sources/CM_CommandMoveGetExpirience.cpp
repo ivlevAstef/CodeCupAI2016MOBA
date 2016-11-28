@@ -11,6 +11,7 @@
 #include "A_Move.h"
 #include "E_Game.h"
 #include "CM_MovePriorities.h"
+#include "CM_TurnPriority.h"
 #include "C_Extensions.h"
 
 using namespace AICup;
@@ -57,7 +58,11 @@ bool CommandMoveGetExpirience::check(const Wizard& self) {
 void CommandMoveGetExpirience::execute(const Wizard& self, Result& result) {
   assert(nullptr != followCommand.get());
   followCommand->execute(self, result);
-  result.priority = MovePriorities::getExpirience(self, *unit);
+  result.turnPriority = TurnPriority::getExpirience;
+}
+
+double CommandMoveGetExpirience::priority(const Wizard& self) {
+  return MovePriorities::getExpirience(self, *unit);
 }
 
 #ifdef ENABLE_VISUALIZATOR

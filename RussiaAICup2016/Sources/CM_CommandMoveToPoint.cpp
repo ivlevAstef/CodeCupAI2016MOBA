@@ -10,6 +10,7 @@
 #include "E_World.h"
 #include "C_Extensions.h"
 #include "CM_MovePriorities.h"
+#include "CM_TurnPriority.h"
 #include "C_Math.h"
 
 using namespace AICup;
@@ -21,6 +22,7 @@ CommandMoveToPoint::CommandMoveToPoint(Algorithm::PathFinder& finder, const doub
 }
 
 bool CommandMoveToPoint::check(const Wizard& self) {
+  path = nullptr;
   return (EX::pos(self) - point).length() > EX::maxSpeed(self);
 }
 
@@ -38,22 +40,28 @@ void CommandMoveToPoint::execute(const Wizard& self, Result& result) {
 
   result.moveDirection = Algorithm::move(self, preEndPoint, obstaclesGroups, self.getVisionRange());
   result.turnStyle = style;
-  result.priority = MovePriorities::moveToPoint(self, point);
   result.speedLimit = speedLimit;
+  result.turnPriority = TurnPriority::moveToPoint;
+  result.deactivateOtherTurn = false;
 
   endPoint = path->getFrom() + result.moveDirection;
 }
 
+double CommandMoveToPoint::priority(const Wizard& self) {
+  return MovePriorities::moveToPoint(self, point);
+}
+
 #ifdef ENABLE_VISUALIZATOR
 void CommandMoveToPoint::visualization(const model::Wizard&, const Visualizator& visualizator) const {
-  assert(nullptr != path);
-  path->visualization(visualizator);
+  if (nullptr != path) {
+    path->visualization(visualizator);
 
-  if (Visualizator::POST == visualizator.getStyle()) {
-    const auto& from = path->getFrom();
+    if (Visualizator::POST == visualizator.getStyle()) {
+      const auto& from = path->getFrom();
 
-    visualizator.line(from.x, from.y, endPoint.x, endPoint.y, 0xff00ff);
-    visualizator.line(from.x, from.y, preEndPoint.x, preEndPoint.y, 0xff0000);
+      visualizator.line(from.x, from.y, endPoint.x, endPoint.y, 0xff00ff);
+      visualizator.line(from.x, from.y, preEndPoint.x, preEndPoint.y, 0xff0000);
+    }
   }
 }
 #endif // ENABLE_VISUALIZATOR

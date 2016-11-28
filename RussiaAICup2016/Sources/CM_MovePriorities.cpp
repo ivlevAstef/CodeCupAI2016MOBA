@@ -6,95 +6,87 @@
 
 using namespace AICup;
 
-int MovePriorities::avoidEnemy(const Wizard& self, const model::CircularUnit& enemy) {
-  const auto constants = Game::instance().model();
+double MovePriorities::avoidBuild(const Wizard& self, const model::Building& build) {
+  const int lifePriority = (300 * build.getLife()) / build.getMaxLife();
+  return 700 + lifePriority;
+}
+
+double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& minion) {
+  const auto mc = Game::model();
 
   const auto selfPos = EX::pos(self);
-  const auto enemyPos = EX::pos(enemy);
+  const auto enemyPos = EX::pos(minion);
   const double distance = (selfPos - enemyPos).length();
 
-  if (EX::isProjectile(enemy)) {
-    return 2500 * self.getRole().getAudacity();
-  }
+  const double lifePriority = (300 * minion.getLife()) / minion.getMaxLife();
 
-  const model::LivingUnit* checkLivingUnit = dynamic_cast<const model::LivingUnit*>(&enemy);
-  assert(nullptr != checkLivingUnit);
-  if (nullptr == checkLivingUnit) {
+  if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
+    if (distance < mc.getOrcWoodcutterAttackRange() + self.getRadius() + 50/*небольшой запас*/) {
+      return 700 + lifePriority;
+    }
+    return lifePriority;
+  } else {
+    return lifePriority + ((200 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
+  }
+}
+
+double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wizard) {
+  const double timeToTurnAttack = Algorithm::timeToTurnForAttack(self, wizard);
+  const double timeForMagic = EX::minTimeForMagic(wizard);
+
+  /// если мага можно быстро добить, то его не стоит бояться
+  if (wizard.getLife() + 2/*так как есть регенерация*/ < EX::magicMissleAttack(self)) {
     return 0;
   }
 
-  const model::LivingUnit& livingUnit = *checkLivingUnit;
-
-  int lifePriority = (200 * livingUnit.getLife()) / livingUnit.getMaxLife();
-
-  /// если врага можно быстро добить, то боятся его стоит меньше
-  if (livingUnit.getLife() < EX::magicMissleAttack(self) * 2) {
-    lifePriority = -600;
-  }
+  const int lifePriority = (600 * wizard.getLife()) / wizard.getMaxLife();
 
   int statusPriority = 0;
-  for (const auto& status : livingUnit.getStatuses()) {
-    if (status.getType() == model::STATUS_EMPOWERED) {
+  for (const auto& status : wizard.getStatuses()) {
+    if (model::STATUS_EMPOWERED == status.getType()) {
       statusPriority += 400;
-    }
-
-    if (status.getType() == model::STATUS_FROZEN) {
+    } else if (model::STATUS_FROZEN == status.getType()) {
       statusPriority -= status.getRemainingDurationTicks() * 15;
     }
   }
 
-  if (EX::isWizard(livingUnit)) {
-    const model::Wizard& wizard = EX::asWizard(livingUnit);
-    const double timeToAttack = Algorithm::timeToTurnForAttack(self, wizard);
-    const double timeForMagic = EX::minTimeForMagic(EX::asWizard(livingUnit));
+  return MAX(1000, 200 + statusPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 25);
+}
 
-    return (300 + statusPriority + lifePriority - timeForMagic * 5 - timeToAttack * 5) * self.getRole().getAudacity();
-  } else if (EX::isMinion(livingUnit)) {
-    const model::Minion& minion = EX::asMinion(livingUnit);
+/// Это очень важно, поэтому завышено значение от нормы
+/// Вариативность нужна чтобы каждый тик, выбирался один и тотже projectile из доступных, а не случайный
+double MovePriorities::avoidProjectile(const Wizard& self, const model::Projectile& projectile) {
+  return 15000 - self.getDistanceTo(projectile);
+}
 
-    if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
-      if (distance < constants.getOrcWoodcutterAttackRange() + self.getRadius() * 2) {
-        return (600 + lifePriority)  * self.getRole().getAudacity();
-      }
-      return (lifePriority + statusPriority) * self.getRole().getAudacity();
-    } else {
-      return (lifePriority + statusPriority + ((600 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks())) * self.getRole().getAudacity();
-    }
-  } else if (EX::isBuilding(livingUnit)) {
-    return (800 + lifePriority) * self.getRole().getAudacity();
-  }
-
+double MovePriorities::defendPoint(const Wizard&, const Position&) {
   return 0;
 }
 
-int MovePriorities::defendPoint(const Wizard&, const Position&) {
-  return 0;
-}
-
-int MovePriorities::follow(const Wizard&, const model::LivingUnit&) {
+double MovePriorities::follow(const Wizard&, const model::LivingUnit&) {
   return 300;
 }
 
-int MovePriorities::getExpirience(const Wizard& wizard, const model::LivingUnit&) {
+double MovePriorities::getExpirience(const Wizard& wizard, const model::LivingUnit&) {
   return 100 * wizard.getRole().getImportanceOfXP();
 }
 
-int MovePriorities::keepDistance(const Wizard&, const Position, const double, const double) {
+double MovePriorities::keepDistance(const Wizard&, const Position, const double, const double) {
   return 500;
 }
 
-int MovePriorities::moveToBonus(const Wizard& self, const Position&) {
+double MovePriorities::moveToBonus(const Wizard& self, const Position&) {
   return (50 + 4 * self.getMaxLife()) * self.getRole().getImportanceOfBonus();
 }
 
-int MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {
+double MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {
   return 20 * self.getRole().getImportanceOfXP();
 }
 
-int MovePriorities::moveToPoint(const Wizard&, const Position&) {
+double MovePriorities::moveToPoint(const Wizard&, const Position&) {
   return 10;
 }
 
-int MovePriorities::observeMap(const Wizard&) {
+double MovePriorities::observeMap(const Wizard&) {
   return 0;
 }

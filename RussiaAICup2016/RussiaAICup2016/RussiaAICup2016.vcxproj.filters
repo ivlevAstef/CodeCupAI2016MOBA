@@ -84,9 +84,6 @@
     <ClCompile Include="..\Sources\Visualizator\Visualizator.cpp">
       <Filter>Sources\Visualizator</Filter>
     </ClCompile>
-    <ClCompile Include="..\Sources\CM_CommandAvoidEnemy.cpp">
-      <Filter>Sources\Command\Commands\defend</Filter>
-    </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandKeepDistance.cpp">
       <Filter>Sources\Command\Commands\move</Filter>
     </ClCompile>
@@ -177,6 +174,18 @@
     <ClCompile Include="..\Sources\CM_CommandAttackFrostbolt.cpp">
       <Filter>Sources\Command\Commands\attack</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAvoidMinion.cpp">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAvoidBuild.cpp">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAvoidWizard.cpp">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAvoidProjectile.cpp">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -229,9 +238,6 @@
     </ClInclude>
     <ClInclude Include="..\Sources\Visualizator\Visualizator.h">
       <Filter>Sources\Visualizator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\CM_CommandAvoidEnemy.h">
-      <Filter>Sources\Command\Commands\defend</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandKeepDistance.h">
       <Filter>Sources\Command\Commands\move</Filter>
@@ -328,6 +334,21 @@
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandAttackFrostbolt.h">
       <Filter>Sources\Command\Commands\attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAvoidMinion.h">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAvoidBuild.h">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAvoidWizard.h">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAvoidProjectile.h">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_TurnPriority.h">
+      <Filter>Sources\Command\Commands</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

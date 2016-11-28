@@ -1,36 +1,34 @@
 //
-//File: CM_CommandAvoidEnemy.h
+//File: CM_CommandAvoidWizard.h
 //Author: Ivlev Alexander. Stef
-//Created: 14/11/2016
+//Created: 29/11/2016
 //
 
 
 #pragma once
 
 #include "CM_MoveCommand.h"
-#include "model\Minion.h"
-#include "model\Building.h"
+#include "model\Wizard.h"
 
 namespace AICup
 {
-  class CommandAvoidEnemy: public MoveCommand {
+  class CommandAvoidWizard: public MoveCommand {
   public:
-    CommandAvoidEnemy(Algorithm::PathFinder& finder, const long long enemyId);
+    CommandAvoidWizard(Algorithm::PathFinder& finder, const model::Wizard& wizard);
 
     bool check(const Wizard& self) override;
 
     void execute(const Wizard& self, Result& result) override;
 
+    double priority(const Wizard& self) override;
+
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const model::Wizard& self, const Visualizator& visualizator) const override;
 #endif // ENABLE_VISUALIZATOR
 
-    friend class CommandAvoidAround;
-
   private:
-    const long long enemyId;
-    MoveCommandPtr moveToPointCommand;
+    const model::Wizard& wizard;
 
-    const model::CircularUnit* enemy;
+    MoveCommandPtr moveToPointCommand;
   };
 }

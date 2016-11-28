@@ -26,6 +26,8 @@ namespace AICup
     double attackBuild(const Wizard& self, const model::Building& build);
     double attackTree(const Wizard& self, const model::Tree& tree);
 
+    double attackFrostbolt(const Wizard& self);
+    double attackFireball(const Wizard& self);
 
     double pool(const Wizard& self, const model::Minion& neutral);
 

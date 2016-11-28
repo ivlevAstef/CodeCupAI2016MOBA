@@ -13,6 +13,7 @@
 #include "E_Game.h"
 #include "C_Math.h"
 #include "CM_MovePriorities.h"
+#include "CM_TurnPriority.h"
 
 using namespace AICup;
 
@@ -22,7 +23,6 @@ CommandMoveToBonus::CommandMoveToBonus(Algorithm::PathFinder& finder):
 }
 
 bool CommandMoveToBonus::check(const Wizard& self) {
-  static const double magicCoef = 0.95 ; /// Приблизительный коэфициент на сколько длиннее путь
   const auto selfPos = Position(self.getX(), self.getY());
 
   /// если есть бонусы рядом
@@ -43,10 +43,10 @@ bool CommandMoveToBonus::check(const Wizard& self) {
   std::shared_ptr<Algorithm::Path> path;
 
   pathFinder.calculatePath(topBonusPos, path);
-  double ticksToTop = magicCoef * (path->getLength() - fullRadius) / Game::model().getWizardForwardSpeed();
+  double ticksToTop = (path->getRealLength() - fullRadius) / Game::model().getWizardForwardSpeed();
 
   pathFinder.calculatePath(bottomBonusPos, path);
-  double ticksToBottom = magicCoef * (path->getLength() - fullRadius) / Game::model().getWizardForwardSpeed();
+  double ticksToBottom = (path->getRealLength() - fullRadius) / Game::model().getWizardForwardSpeed();
 
   int maxTicksToBonus = Game::model().getBonusAppearanceIntervalTicks();
   int ticksToBonus = maxTicksToBonus - World::model().getTickIndex() % maxTicksToBonus;
@@ -102,8 +102,13 @@ double CommandMoveToBonus::potensialExpirience(const Wizard& self) {
 void CommandMoveToBonus::execute(const Wizard& self, Result& result) {
   assert(nullptr != moveToBonus.get());
   moveToBonus->execute(self, result);
-  result.priority = MovePriorities::moveToBonus(self, bonusPos);
+  result.turnPriority = TurnPriority::moveToBonus;
 }
+
+double CommandMoveToBonus::priority(const Wizard& self) {
+  return MovePriorities::moveToBonus(self, bonusPos);
+}
+
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandMoveToBonus::visualization(const model::Wizard& self, const Visualizator& visualizator) const {

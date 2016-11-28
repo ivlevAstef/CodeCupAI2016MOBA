@@ -10,6 +10,7 @@
 #include "CM_AttackCommand.h"
 #include "E_Types.h"
 #include "model\LaneType.h"
+#include "model\Projectile.h"
 
 namespace AICup
 {
@@ -43,6 +44,9 @@ namespace AICup
     /// атаковать врага
     AttackCommandPtr attack(const model::LivingUnit& unit) const;
 
+    AttackCommandPtr attackUseFrostbolt() const;
+    AttackCommandPtr attackUseFireball() const;
+
     /// пул нейтральных крипов
     AttackCommandPtr pool(const long long neutralUnitId) const;
 
@@ -52,7 +56,10 @@ namespace AICup
     MoveCommandPtr defend(const double x, const double y) const;
 
     /// держаться на безопасном расстоянии от юнита
-    MoveCommandPtr avoidEnemy(const long long unitId) const;
+    MoveCommandPtr avoidEnemy(const model::LivingUnit& unit) const;
+
+    // /уворот от снаряда
+    MoveCommandPtr avoidProjectile(const model::Projectile& projectile) const;
 
   private:
     Algorithm::PathFinder& finder;

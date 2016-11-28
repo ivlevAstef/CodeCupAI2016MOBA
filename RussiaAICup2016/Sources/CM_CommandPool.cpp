@@ -20,3 +20,7 @@ bool CommandPool::check(const Wizard&) {
 
 void CommandPool::execute(const Wizard&, Result&) {
 }
+
+double CommandPool::priority(const Wizard& self) {
+  return 0;
+}

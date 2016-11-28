@@ -15,11 +15,11 @@ bool CommandAttackMinion::check(const Wizard& self) {
   const auto selfPos = EX::pos(self);
   const auto minionPos = EX::pos(minion);
   const auto minionSpeed = Vector(minion.getSpeedX(), minion.getSpeedY());
-  const auto futureMinionPos = EX::pos(minion) + minionSpeed.normal() * minion.getRadius();
+  const auto futureMinionPos = EX::pos(minion) + minionSpeed.normal() * minion.getRadius() * 0.75;
   const auto delta = selfPos - futureMinionPos;
 
   /// миньон далеко или будет далеко
-  if (delta.length() > self.getCastRange() + minion.getRadius()) {
+  if (delta.length() > self.getCastRange()) {
     return false;
   }
 
@@ -42,13 +42,16 @@ void CommandAttackMinion::execute(const Wizard& self, Result& result) {
   const double distance = self.getDistanceTo(minion);
 
   result.unit = &minion;
-  result.priority = self.getRole().getBuildPriority() * AttackPriorities::attackMinion(self, minion);
 
   if (Algorithm::isMelee(self, minion) && !self.isCooldown(model::ACTION_STAFF)) {
     result.action = model::ACTION_STAFF;
   } else {
     result.action = model::ACTION_MAGIC_MISSILE;
   }
+}
+
+double CommandAttackMinion::priority(const Wizard& self) {
+  return self.getRole().getBuildPriority() * AttackPriorities::attackMinion(self, minion);
 }
 
 #ifdef ENABLE_VISUALIZATOR

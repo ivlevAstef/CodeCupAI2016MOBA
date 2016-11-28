@@ -15,19 +15,28 @@ CommandStrategy::CommandStrategy(const CommandFabric& fabric, const Algorithm::P
 void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
   const auto moveResults = moveCommandsToMoveResult(self);
 
+  bool deactivateOtherTurn = false;
   if (!moveResults.empty()) {
-    TurnStyle turnStyle = TurnStyle::TURN;
+    TurnStyle turnStyle = TurnStyle::NO_TURN;
+    Vector turnDirection = Vector(1, 0);
     double speedLimit = -1;
-    const Vector direction = move(moveResults, self, turnStyle, speedLimit);
+    const Vector direction = move(moveResults, self, turnStyle, turnDirection, speedLimit, deactivateOtherTurn);
 
-    Algorithm::execMove(self, turnStyle, direction, speedLimit, finalMove);
+    Algorithm::execMove(self, turnStyle, turnDirection, direction, speedLimit, finalMove);
   }
+
+  double turnSave = finalMove.getTurn();
 
   if (!attackCommands.empty()) {
     model::ActionType action;
-    const model::LivingUnit& unit = attack(self, action);
+    const model::LivingUnit* unit = attack(self, action);
+    if (nullptr != unit) {
+      Algorithm::execAttack(self, action, *unit, finalMove);
+    }
+  }
 
-    Algorithm::execAttack(self, action, unit, finalMove);
+  if (deactivateOtherTurn) {
+    finalMove.setTurn(turnSave);
   }
 }
 
@@ -41,9 +50,14 @@ std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const
   moveResults.resize(moveCommands.size());
 
   for (size_t index = 0; index < moveCommands.size(); index++) {
-    moveCommands[index]->execute(self, moveResults[index]);
+    moveResults[index].priority = moveCommands[index]->priority(self);
+
+    if (moveResults[index].priority >= 1) {
+      moveCommands[index]->execute(self, moveResults[index]);
+    }
   }
-  /// ”дал€ем вектора, которые очень короткие.
+
+  /// ”дал€ем вектора, которые очень короткие, или не приоритетные
   for (size_t index = 0; index < moveResults.size(); index++) {
     const size_t i = moveResults.size() - index - 1;
     if (moveResults[i].priority < 1 || moveResults[i].moveDirection.length() < 0.5) {
@@ -54,7 +68,7 @@ std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const
   return moveResults;
 }
 
-const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, TurnStyle& turnStyle, double& speedLimit) {
+const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, TurnStyle& turnStyle, Vector& turnDirection, double& speedLimit, bool& deactivateOtherTurn) {
   for (const auto& move : moveResults) {
     for (const auto& tree : move.treesForRemove) {
       addTreeForRemove(self, tree);
@@ -62,12 +76,24 @@ const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveR
   }
 
 
-  int maxPriority = -10000;
+  /// выбираем самый предпочтительный вид поворота
+  int turnPriority = 0;
+  double normalPriority = 0;
   for (const auto& move : moveResults) {
-    if (move.priority > maxPriority) {
-      turnStyle = move.turnStyle;
-      maxPriority = move.priority;
+    if (move.turnPriority < turnPriority) {
+      continue;
     }
+    if (move.turnPriority > turnPriority) {
+      turnPriority = move.turnPriority;
+    } else if (move.priority < normalPriority) { //equals
+      continue;
+    }
+
+    normalPriority = move.priority;
+
+    turnStyle = move.turnStyle;
+    turnDirection = move.moveDirection;
+    deactivateOtherTurn = move.deactivateOtherTurn;
   }
 
 
@@ -116,30 +142,27 @@ void CommandStrategy::addTreeForRemove(const Wizard& self, const model::LivingUn
   }
 }
 
-const model::LivingUnit& CommandStrategy::attack(const Wizard& self, model::ActionType& action) {
-  std::vector<AttackCommand::Result> attackResults;
-  attackResults.resize(attackCommands.size());
+const model::LivingUnit* CommandStrategy::attack(const Wizard& self, model::ActionType& action) {
+  AttackCommandPtr maxPriorityAttack = nullptr;
+  double maxPriority = 0;
 
-  for (size_t index = 0; index < attackCommands.size(); index++) {
-    attackCommands[index]->execute(self, attackResults[index]);
-  }
-
-  const model::LivingUnit* resultUnit = nullptr;
-
-  double maxPriority = -10000;
-  //TODO: тут как миниум нужно еще учитывать тип действи€
-  for (const auto& result : attackResults) {
-    if (result.priority > maxPriority) {
-      maxPriority = result.priority;
-
-      action = result.action;
-      resultUnit = result.unit;
+  for (const auto& attackCommand: attackCommands) {
+    const double priority = attackCommand->priority(self);
+    if (priority > maxPriority) {
+      maxPriority = priority;
+      maxPriorityAttack = attackCommand;
     }
   }
 
+  if (nullptr == maxPriorityAttack) {
+    return nullptr;
+  }
 
-  LogAssert(nullptr != resultUnit);
-  return *resultUnit;
+  AttackCommand::Result result;
+  maxPriorityAttack->execute(self, result);
+
+  action = result.action;
+  return result.unit;
 }
 
 #ifdef ENABLE_VISUALIZATOR

@@ -41,48 +41,47 @@ double Algorithm::timeToTurnForAttack(const model::Unit& attacked, const model::
   const auto enemyPos = Position(attacked.getX(), attacked.getY());
 
   const auto dir = enemyPos - selfPos;
-  double angleDeviation = Math::angleDiff(dir.angle(), attacking.getAngle());
+  return timeToTurn(attacking, dir.angle());
+}
+
+double Algorithm::timeToTurn(const model::Wizard& wizard, const double angle) {
+  double angleDeviation = Math::angleDiff(angle, wizard.getAngle());
   angleDeviation = ABS(angleDeviation);
 
   const double needTurnAngle = MAX(0, angleDeviation - Game::instance().model().getStaffSector()* 0.5);
   /// если времени до атаки больше чем времени до разворота, то можно пока не атаковать
 
-  return needTurnAngle / EX::turnSpeed(attacking);
+  return needTurnAngle / EX::turnSpeed(wizard);
 }
 
-bool Algorithm::canEscape(const model::Wizard& attacking, const model::Wizard& prey, const double bulletSpeed, const double bulletRadius) {
-  const auto attackingPos = EX::pos(attacking);
-  const auto preyForwardSpeed = EX::maxSpeed(prey);
-  const auto preyStrafeSpeed = EX::maxStrafeSpeed(prey);
-
+bool canEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius, const double sign) {
   auto preyPos = EX::pos(prey);
   auto preyAngle = prey.getAngle();
   auto preyTurnSpeed = EX::turnSpeed(prey);
 
-  const Vector bulletSpeedVec = (preyPos - attackingPos).normal() * bulletSpeed;
-
-  auto preyEndAngleVec = bulletSpeedVec.perpendicular().normal();
+  auto preyEndAngleVec = bulletSpeed.perpendicular().normal();
   /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикуляров
   if (preyEndAngleVec.dot(Vector(1, 0).rotate(preyAngle)) < 0) {
     preyEndAngleVec *= -1;
   }
+  preyEndAngleVec *= sign;
   const double preyEndAngle = preyEndAngleVec.angle();
 
   Position bulletPos = attackingPos;
-  const size_t maxIteration = (size_t)ceil(attacking.getCastRange() / bulletSpeed);
+  const size_t maxIteration = (size_t)ceil(castRange / bulletSpeed.length());
 
   for (size_t iter = 0; iter <= maxIteration; iter++) {
-    if ((bulletPos - attackingPos).length() > attacking.getCastRange()) {
-      bulletPos = bulletSpeedVec.normal() * attacking.getCastRange();
+    if ((bulletPos - attackingPos).length() > castRange) {
+      bulletPos = bulletSpeed.normal() * castRange;
     }
 
     if ((bulletPos - preyPos).length() < bulletRadius + prey.getRadius()) {
       return false;
     }
 
-    bulletPos += bulletSpeedVec;
+    bulletPos += bulletSpeed;
 
-    const auto speed = Algorithm::maxSpeed(prey, preyEndAngleVec);
+    const auto speed = Algorithm::maxSpeed(prey, preyAngle, preyEndAngleVec);
     preyPos += preyEndAngleVec * speed.length();
 
 
@@ -95,4 +94,12 @@ bool Algorithm::canEscape(const model::Wizard& attacking, const model::Wizard& p
   }
 
   return true;
+}
+
+bool Algorithm::canForwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius) {
+  return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, 1);
+}
+
+bool Algorithm::canBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius) {
+  return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, -1);
 }

@@ -6,11 +6,12 @@
 
 using namespace AICup;
 
-Vector Algorithm::maxSpeed(const model::Wizard& self, const Vector& direction) {
-  Vector speed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
+Vector Algorithm::maxSpeed(const model::Wizard& wizard, const double wizardAngle, const Vector& direction) {
+  Vector speed = Vector(direction.x, -direction.y).normal().rotated(wizardAngle);
+  speed.y *= -1;
 
-  const double maxXSpeed = (speed.x > 0) ? EX::maxSpeed(self) : EX::maxBackwardSpeed(self);
-  const double maxYSpeed = EX::maxStrafeSpeed(self);
+  const double maxXSpeed = (speed.x > 0) ? EX::maxSpeed(wizard) : EX::maxBackwardSpeed(wizard);
+  const double maxYSpeed = EX::maxStrafeSpeed(wizard);
 
   speed.x *= maxXSpeed;
   speed.y *= maxYSpeed;

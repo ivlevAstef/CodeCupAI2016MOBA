@@ -58,6 +58,10 @@ Role::Role(const float audacity,
   minionPriority = 1;
   treePriority = 1;
   wizardPriority = 1;
+
+  audacityBuild = 1;
+  audacityMinion = 1;
+  audacityWizard = 1;
 }
 
 void Role::update(const model::Wizard& self, model::Move& move) {

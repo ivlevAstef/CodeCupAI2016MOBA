@@ -67,8 +67,19 @@ namespace AICup
       return wizardPriority;
     }
 
+    /// дерзость по типам
+    inline const float& getAudacityBuild() const {
+      return audacityBuild;
+    }
+    inline const float& getAudacityMinion() const {
+      return audacityMinion;
+    }
+    inline const float& getAudacityWizard() const {
+      return audacityWizard;
+    }
+
   protected:
-    float audacity; // дерзость. 0 не дерзкий, 1 - нормальная
+    float audacity; // дерзость. 0 не дерзкий, 1 - нормальная, влияет на расположение на линии
     float importanceOfXP; // Важность получения XP.  0 - не нужен, 1 - нормальная
     float importanceOfBonus; // Важность взятия бонуса. 0 - не нужен, 1 - нормальная
 
@@ -77,6 +88,11 @@ namespace AICup
     float minionPriority;
     float treePriority;
     float wizardPriority;
+
+    /// насколько приоритетно избегание объектов
+    float audacityBuild;
+    float audacityMinion;
+    float audacityWizard;
 
 
     SkillBuild skillBuild; // Последовательность изучения скилов

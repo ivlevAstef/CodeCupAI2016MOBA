@@ -84,11 +84,21 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     }
   }
 
-  for (const auto& enemy : World::instance().aroundEnemies(self)) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange())) {
     const auto attackCommand = fabric.attack(*enemy);
     if (nullptr != attackCommand && attackCommand->check(self)) {
       attackCommands.push_back(attackCommand);
     }
+  }
+
+  const auto attackFrostboltCommand = fabric.attackUseFrostbolt();
+  if (nullptr != attackFrostboltCommand && attackFrostboltCommand->check(self)) {
+    attackCommands.push_back(attackFrostboltCommand);
+  }
+
+  const auto attackFireballCommand = fabric.attackUseFireball();
+  if (nullptr != attackFireballCommand && attackFireballCommand->check(self)) {
+    attackCommands.push_back(attackFireballCommand);
   }
 
 
@@ -114,7 +124,7 @@ const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const Wiza
   std::vector<MoveCommandPtr> avoidAroundCommands;
   avoidAroundCommands.reserve(aroundEnemies.size());
   for (const auto& enemy : aroundEnemies) {
-    const auto command = fabric.avoidEnemy(enemy->getId());
+    const auto command = fabric.avoidEnemy(*enemy);
     if (command->check(self)) {
       avoidAroundCommands.push_back(command);
     }
@@ -122,7 +132,7 @@ const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const Wiza
 
 
   for (const auto& projectile : World::model().getProjectiles()) {
-    const auto command = fabric.avoidEnemy(projectile.getId());
+    const auto command = fabric.avoidProjectile(projectile);
     if (command->check(self)) {
       avoidAroundCommands.push_back(command);
     }
@@ -140,11 +150,11 @@ void FirstStrategy::changeLane(const Wizard& self) {
   std::shared_ptr<Algorithm::Path> path;
 
   pathFinder.calculatePath(topPosition, path);
-  double selfTopLength = path->getLength();
+  double selfTopLength = path->getRealLength();
   pathFinder.calculatePath(middlePosition, path);
-  double selfMiddleLength = path->getLength();
+  double selfMiddleLength = path->getRealLength();
   pathFinder.calculatePath(bottomPosition, path);
-  double selfBottomLength = path->getLength();
+  double selfBottomLength = path->getRealLength();
 
   double topLength = abs((basePosition - topPosition).x) + abs((basePosition - topPosition).y);
   double middleLength = (basePosition - middlePosition).length();
@@ -152,7 +162,7 @@ void FirstStrategy::changeLane(const Wizard& self) {
 
 
   double priorityTop = (8000 - topLength) - selfTopLength;
-  double priorityMiddle = (5657 - middleLength) - selfMiddleLength;
+  double priorityMiddle = (sqrt(2) * (5657 - middleLength)) - selfMiddleLength;
   double priorityBottom = (8000 - bottomLength) - selfBottomLength;
   /// если очень близко к базе то увеличиваем
   const double cTop = (1600 - topLength) / 250.0;

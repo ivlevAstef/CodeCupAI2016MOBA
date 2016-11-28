@@ -14,7 +14,7 @@ CommandAttackWizard::CommandAttackWizard(const model::Wizard& wizard) : wizard(w
 bool CommandAttackWizard::check(const Wizard& self) {
   const auto selfPos = EX::pos(self);
   const auto wizardPos = EX::pos(wizard);
-  const auto delta = selfPos - wizardPos;
+  const auto delta = wizardPos - selfPos;
 
   /// маг далеко
   if (delta.length() > self.getCastRange()) {
@@ -31,10 +31,21 @@ bool CommandAttackWizard::check(const Wizard& self) {
     return false;
   }
 
-  /// если маг может уклонится, то не будем в него стрелять
-  if (Algorithm::canEscape(self, wizard, Game::model().getMagicMissileSpeed(), Game::model().getMagicMissileRadius())) {
+  /// если враг очень близко, и мы можем бить посохом, то надо ударить
+  if (Algorithm::isMelee(self, wizard) && !self.isCooldown(model::ACTION_STAFF)) {
+    return true;
+  }
+
+  /// если маг может уклонится от снаряда, то не будем в него стрелять
+  const auto bulletSpeed = delta.normal() * Game::model().getMagicMissileSpeed();
+  if (Algorithm::canForwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, Game::model().getMagicMissileRadius())) {
     return false;
   }
+
+  /// второй вариант уклонения, пока никто не реализовывал, поэтому закоменчен
+  /*if (Algorithm::canBackwardEscape(selfPos, self.getCastRange(), wizard, Game::model().getMagicMissileSpeed(), Game::model().getMagicMissileRadius())) {
+    return false;
+  }*/
 
   /// во всех остальных случаях возможна или атака, или поворот к дереву для атаки
   return true;
@@ -45,13 +56,16 @@ void CommandAttackWizard::execute(const Wizard& self, Result& result) {
   const double distance = self.getDistanceTo(wizard);
 
   result.unit = &wizard;
-  result.priority = self.getRole().getWizardPriority() * AttackPriorities::attackWizard(self, wizard);
 
   if (Algorithm::isMelee(self, wizard) && !self.isCooldown(model::ACTION_STAFF)) {
     result.action = model::ACTION_STAFF;
   } else {
     result.action = model::ACTION_MAGIC_MISSILE;
   }
+}
+
+double CommandAttackWizard::priority(const Wizard& self) {
+  return self.getRole().getWizardPriority() * AttackPriorities::attackWizard(self, wizard);
 }
 
 #ifdef ENABLE_VISUALIZATOR

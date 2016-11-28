@@ -11,6 +11,7 @@
 #include "A_Move.h"
 #include "C_Math.h"
 #include "CM_MovePriorities.h"
+#include "CM_TurnPriority.h"
 
 using namespace AICup;
 
@@ -45,8 +46,13 @@ bool CommandKeepDistance::check(const Wizard& self) {
 void CommandKeepDistance::execute(const Wizard& self, Result& result) {
   assert(nullptr != commandMoveToPoint.get());
   commandMoveToPoint->execute(self, result);
-  result.priority = MovePriorities::keepDistance(self, Position(x, y), minDistance, maxDistance);
+  result.turnPriority = TurnPriority::keepDistance;
 }
+
+double CommandKeepDistance::priority(const Wizard& self) {
+  return MovePriorities::keepDistance(self, Position(x, y), minDistance, maxDistance);
+}
+
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandKeepDistance::visualization(const model::Wizard& self, const Visualizator& visualizator) const {

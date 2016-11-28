@@ -18,10 +18,11 @@ namespace AICup
     struct Result {
       Vector moveDirection; /// вместе с длиной
       TurnStyle turnStyle;
+      int turnPriority;
+      bool deactivateOtherTurn;
 
       double speedLimit;
-
-      int priority;
+      double priority; /// просто тут его удобно хранить, чем создавать потом обертку, но при этом оно не инициализуется!
 
       Obstacles treesForRemove;
     };

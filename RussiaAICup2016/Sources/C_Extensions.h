@@ -56,11 +56,14 @@ namespace AICup
     std::vector<bool> availableSkills(const model::Wizard& obj);
     bool availableSkill(const model::Wizard& obj, model::ActionType action);
     int cooldownSkill(const model::Wizard& obj, model::ActionType action);
+    int cooldownMaxSkill(const model::Wizard& obj, model::ActionType action);
 
     //Support
-    double radiusForGuaranteedHit(const model::Wizard& obj, const model::CircularUnit& enemy);
-    double radiusForGuaranteedHitFrostBolt(const model::Wizard& obj, const model::CircularUnit& enemy);
-    double radiusForGuaranteedHitFireBall(const model::Wizard& obj, const model::CircularUnit& enemy);
+
+    ///радиус с которого мой маг предположительно может уклониться от заклинаний вражеского мага
+    double radiusForGuaranteedDodge(const model::Wizard& self);
+    double radiusForGuaranteedDodgeFrostBolt(const model::Wizard& self);
+    double radiusForGuaranteedDodgeFireBall(const model::Wizard& self);
 
     int minTimeForMagic(const model::Wizard& obj);
 

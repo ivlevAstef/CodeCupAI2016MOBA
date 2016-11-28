@@ -18,10 +18,15 @@
 #include "CM_CommandAttackMinion.h"
 #include "CM_CommandAttackWizard.h"
 #include "CM_CommandAttackTree.h"
+#include "CM_CommandAttackFrostbolt.h"
+#include "CM_CommandAttackFireball.h"
 #include "CM_CommandPool.h"
 
 #include "CM_CommandDefendPoint.h"
-#include "CM_CommandAvoidEnemy.h"
+#include "CM_CommandAvoidWizard.h"
+#include "CM_CommandAvoidBuild.h"
+#include "CM_CommandAvoidMinion.h"
+#include "CM_CommandAvoidProjectile.h"
 
 #include "C_Extensions.h"
 
@@ -75,6 +80,13 @@ AttackCommandPtr CommandFabric::attack(const model::LivingUnit& unit) const {
   return nullptr;
 }
 
+AttackCommandPtr CommandFabric::attackUseFrostbolt() const {
+  return std::make_shared<CommandAttackFrostbolt>();
+}
+AttackCommandPtr CommandFabric::attackUseFireball() const {
+  return std::make_shared<CommandAttackFireball>();
+}
+
 AttackCommandPtr CommandFabric::pool(const long long neutralUnitId) const {
   return std::make_shared<CommandPool>(neutralUnitId);
 }
@@ -83,6 +95,19 @@ MoveCommandPtr CommandFabric::defend(const double x, const double y) const {
   return std::make_shared<CommandDefendPoint>(finder, x, y);
 }
 
-MoveCommandPtr CommandFabric::avoidEnemy(const long long unitId) const {
-  return std::make_shared<CommandAvoidEnemy>(finder, unitId);
+MoveCommandPtr CommandFabric::avoidEnemy(const model::LivingUnit& unit) const {
+  if (EX::isMinion(unit)) {
+    return std::make_shared<CommandAvoidMinion>(finder, EX::asMinion(unit));
+  } if (EX::isWizard(unit)) {
+    return std::make_shared<CommandAvoidWizard>(finder, EX::asWizard(unit));
+  } if (EX::isBuilding(unit)) {
+    return std::make_shared<CommandAvoidBuild>(finder, EX::asBuilding(unit));
+  }
+  assert(false && "incorrect unit type");
+  return nullptr;
+}
+
+// /уворот от снаряда
+MoveCommandPtr CommandFabric::avoidProjectile(const model::Projectile& projectile) const {
+  return std::make_shared<CommandAvoidProjectile>(finder, projectile);
 }

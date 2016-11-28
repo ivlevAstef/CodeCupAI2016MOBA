@@ -41,6 +41,7 @@ namespace AICup
       Position calculateNearestCurvaturePoint(const double visionRange) const;
 
       double getLength() const { return length; }
+      double getRealLength() const { return realLength; }
       const Position& getFrom() const { return from; }
       const Position& getTo() const { return to; }
 
@@ -65,6 +66,7 @@ namespace AICup
       Position path[PathConstants::maxPath];
 
       double length;
+      double realLength;
     };
 
 

@@ -37,7 +37,7 @@ int Wizard::cooldown(const model::ActionType action) const {
   if (!availableAction(action)) {
     return 9999999;
   }
-  return this->getRemainingCooldownTicksByAction()[action];
+  return MAX(this->getRemainingCooldownTicksByAction()[action], this->getRemainingActionCooldownTicks());
 }
 
 int Wizard::minAttackCooldown() const {
@@ -47,7 +47,7 @@ int Wizard::minAttackCooldown() const {
   const int cooldown4 = cooldown(model::ACTION_FIREBALL);
   const int minCooldown = MIN(MIN(MIN(cooldown1, cooldown2), cooldown3), cooldown4);
 
-  return MAX(minCooldown, this->getRemainingActionCooldownTicks());
+  return minCooldown;
 }
 
 int Wizard::minStaffOrMissileCooldown() const {
@@ -55,11 +55,19 @@ int Wizard::minStaffOrMissileCooldown() const {
   const int cooldown2 = cooldown(model::ACTION_MAGIC_MISSILE);
   const int minCooldown = MIN(cooldown1, cooldown2);
 
-  return MAX(minCooldown, this->getRemainingActionCooldownTicks());
+  return minCooldown;
 }
 
 double Wizard::maxSpeed() const {
   return EX::maxSpeed(*this);
+}
+
+double Wizard::maxBackwardSpeed() const {
+  return EX::maxBackwardSpeed(*this);
+}
+
+double Wizard::maxTurnSpeed() const {
+  return EX::turnSpeed(*this);
 }
 
 double Wizard::damage(const model::ActionType action) const {

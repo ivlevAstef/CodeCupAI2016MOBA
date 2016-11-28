@@ -9,6 +9,7 @@
 #include "CM_CommandMoveToPoint.h"
 #include "E_InfluenceMap.h"
 #include "CM_MovePriorities.h"
+#include "CM_TurnPriority.h"
 
 using namespace AICup;
 
@@ -30,7 +31,11 @@ bool CommandMoveToLine::check(const Wizard& self) {
 void CommandMoveToLine::execute(const Wizard& self, Result& result) {
   assert(nullptr != commandMoveToPoint.get());
   commandMoveToPoint->execute(self, result);
-  result.priority = MovePriorities::moveToLine(self, line);
+  result.turnPriority = TurnPriority::moveToLine;
+}
+
+double CommandMoveToLine::priority(const Wizard& self) {
+  return MovePriorities::moveToLine(self, line);
 }
 
 #ifdef ENABLE_VISUALIZATOR
