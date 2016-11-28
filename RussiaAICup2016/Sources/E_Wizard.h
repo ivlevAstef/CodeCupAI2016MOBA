@@ -22,6 +22,15 @@ namespace AICup
     /// читает message, и кидает обновление под классам
     void update(model::Move& move);
 
+    bool availableAction(const model::ActionType action) const;
+    int minAttackCooldown() const;
+    int minStaffOrMissileCooldown() const;
+    int cooldown(const model::ActionType action) const;
+    bool isCooldown(const model::ActionType action) const;
+    double maxSpeed() const;
+    double damage(const model::ActionType action) const;
+    double dps(const model::ActionType action) const;
+
     inline const Role& getRole() const {
       return *role.get();
     }

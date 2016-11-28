@@ -1,26 +1,23 @@
 #include "A_Exec.h"
 #include "C_Extensions.h"
 #include "C_Math.h"
+#include "A_Move.h"
 
 #include "E_Game.h"
 #include "E_World.h"
 
 using namespace AICup;
 
-static std::vector<Position> stackForBugFix;
-
 double calcMaxSpeed(const Wizard& self, const Vector& direction, const double speedLimit) {
-  Vector speed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
+  Vector speed = Algorithm::maxSpeed(self, direction);
 
-  double maxSpeed = (speed.x > 0) ? EX::maxSpeed(self) : EX::maxBackwardSpeed(self);
-  const double sx = abs(speed.x);
-  const double sy = abs(speed.y);
-  maxSpeed = (maxSpeed * sx + EX::maxStrafeSpeed(self) * sy) / (sx + sy);
+  const double maxSpeed = speed.length();
+  const double dirLength = direction.length();
 
   if (speedLimit < 0) {
-    return MIN(maxSpeed, direction.length());
+    return MIN(maxSpeed, dirLength);
   }
-  return MIN(maxSpeed, MIN(speedLimit, direction.length()));
+  return MIN(maxSpeed, MIN(speedLimit, dirLength));
 }
 
 

@@ -41,7 +41,7 @@ namespace AICup
 
 /// #pragma mark - атака
     /// атаковать врага
-    AttackCommandPtr attack(const long long enemyId) const;
+    AttackCommandPtr attack(const model::LivingUnit& unit) const;
 
     /// пул нейтральных крипов
     AttackCommandPtr pool(const long long neutralUnitId) const;

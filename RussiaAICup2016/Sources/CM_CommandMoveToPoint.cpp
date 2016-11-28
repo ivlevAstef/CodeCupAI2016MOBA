@@ -45,7 +45,7 @@ void CommandMoveToPoint::execute(const Wizard& self, Result& result) {
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandMoveToPoint::visualization(const Visualizator& visualizator) const {
+void CommandMoveToPoint::visualization(const model::Wizard&, const Visualizator& visualizator) const {
   assert(nullptr != path);
   path->visualization(visualizator);
 

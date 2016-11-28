@@ -53,6 +53,11 @@ Role::Role(const float audacity,
   skillBuild(skillBuild)
   {
   currentLevel = 0;
+
+  buildPriority = 1;
+  minionPriority = 1;
+  treePriority = 1;
+  wizardPriority = 1;
 }
 
 void Role::update(const model::Wizard& self, model::Move& move) {

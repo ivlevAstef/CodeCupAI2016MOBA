@@ -12,6 +12,7 @@
 #include "C_Math.h"
 #include "C_Extensions.h"
 #include "CM_MovePriorities.h"
+#include "A_Attack.h"
 
 using namespace AICup;
 
@@ -53,7 +54,7 @@ bool CommandAvoidEnemy::check(const Wizard& self) {
     const model::Wizard& wizard = EX::asWizard(*enemy);
     const double radius = EX::radiusForGuaranteedHit(wizard, *enemy);
     const double distance1 = radius - EX::minTimeForMagic(wizard) * constants.getWizardBackwardSpeed()  + self.getRadius();
-    const double distance2 = radius - EX::timeToTurnForAttack(self, wizard) * constants.getWizardBackwardSpeed() + self.getRadius();
+    const double distance2 = radius - Algorithm::timeToTurnForAttack(self, wizard) * constants.getWizardBackwardSpeed() + self.getRadius();
     distance = MIN(distance1, distance2);
 
     distance = MAX(distance, constants.getStaffRange() + self.getRadius());
@@ -100,8 +101,8 @@ void CommandAvoidEnemy::execute(const Wizard& self, Result& result) {
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandAvoidEnemy::visualization(const Visualizator& visualizator) const {
+void CommandAvoidEnemy::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
   assert(nullptr != moveToPointCommand.get());
-  moveToPointCommand->visualization(visualizator);
+  moveToPointCommand->visualization(self, visualizator);
 }
 #endif // ENABLE_VISUALIZATOR

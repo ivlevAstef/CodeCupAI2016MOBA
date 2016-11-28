@@ -106,8 +106,8 @@ void CommandMoveToBonus::execute(const Wizard& self, Result& result) {
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandMoveToBonus::visualization(const Visualizator& visualizator) const {
+void CommandMoveToBonus::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
   assert(nullptr != moveToBonus.get());
-  moveToBonus->visualization(visualizator);
+  moveToBonus->visualization(self, visualizator);
 }
 #endif // ENABLE_VISUALIZATOR

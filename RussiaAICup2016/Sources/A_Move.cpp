@@ -6,6 +6,25 @@
 
 using namespace AICup;
 
+Vector Algorithm::maxSpeed(const model::Wizard& self, const Vector& direction) {
+  Vector speed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
+
+  const double maxXSpeed = (speed.x > 0) ? EX::maxSpeed(self) : EX::maxBackwardSpeed(self);
+  const double maxYSpeed = EX::maxStrafeSpeed(self);
+
+  speed.x *= maxXSpeed;
+  speed.y *= maxYSpeed;
+
+  double factor = sqrt(((speed.x*speed.x) / (maxXSpeed*maxXSpeed)) + ((speed.y*speed.y) / (maxYSpeed*maxYSpeed)));
+
+  if (factor > 1) {
+    speed.x /= factor;
+    speed.y /= factor;
+  }
+
+  return speed;
+}
+
 
 /// находит ближайшую группу, с которой пересекаеться вектор движения юнита.
 const Obstacles* findNearestGroup(const Position& from, const double radius, const Position& to, const ObstaclesGroups& obstacles, double& minDistance) {

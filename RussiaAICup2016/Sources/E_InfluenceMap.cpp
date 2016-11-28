@@ -294,7 +294,7 @@ void InfluenceMap::includeEnemies() {
     }
 
     if (model::FACTION_NEUTRAL == minion.getFaction()) {
-      includeEnemy(minion, minionRadius(minion), 0.5 * minionDanger(minion));
+      includeEnemy(minion, minionRadius(minion), 0.5f * minionDanger(minion));
     }
   }
 

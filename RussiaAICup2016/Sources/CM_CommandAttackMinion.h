@@ -1,20 +1,21 @@
 //
-//File: CM_CommandMoveToLine.h
+//File: CM_CommandAttackMinion.h
 //Author: Ivlev Alexander. Stef
-//Created: 07/11/2016
+//Created: 28/11/2016
 //
 
 
 #pragma once
 
-#include "CM_MoveCommand.h"
-#include "model\LaneType.h"
+#include "CM_AttackCommand.h"
+#include "model\Minion.h"
 
 namespace AICup
 {
-  class CommandMoveToLine: public MoveCommand {
+  /// Не сохраняемый между тиками
+  class CommandAttackMinion: public AttackCommand {
   public:
-    CommandMoveToLine(Algorithm::PathFinder& finder, model::LaneType line);
+    CommandAttackMinion(const model::Minion& minion);
 
     bool check(const Wizard& self) override;
 
@@ -25,8 +26,6 @@ namespace AICup
 #endif // ENABLE_VISUALIZATOR
 
   private:
-    const model::LaneType line;
-
-    MoveCommandPtr commandMoveToPoint;
+    const model::Minion& minion;
   };
 }

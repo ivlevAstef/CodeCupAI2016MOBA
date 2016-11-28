@@ -61,7 +61,7 @@ void CommandMoveGetExpirience::execute(const Wizard& self, Result& result) {
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandMoveGetExpirience::visualization(const Visualizator& visualizator) const {
+void CommandMoveGetExpirience::visualization(const model::Wizard&, const Visualizator& visualizator) const {
   assert(nullptr != followCommand.get());
 
   if (Visualizator::POST == visualizator.getStyle()) {

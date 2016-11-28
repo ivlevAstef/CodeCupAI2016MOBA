@@ -27,14 +27,14 @@ MyStrategy::MyStrategy() {
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void visualization(const Visualizator& visualizator) {
+void visualization(const model::Wizard& self, const Visualizator& visualizator) {
   AICup::World::instance().visualization(visualizator);
   AICup::Points::instance().visualization(visualizator);
   AICup::HypotheticalEnemies::instance().visualization(visualizator);
 
   AICup::InfluenceMap::instance().visualization(visualizator);
 
-  AICup::StrategyManager::instance().visualization(visualizator);
+  AICup::StrategyManager::instance().visualization(self, visualizator);
 }
 #endif
 
@@ -59,15 +59,15 @@ void MyStrategy::move(const model::Wizard& modelSelf, const model::World& world,
   visualizator.isReverse = (self->getFaction() == model::FACTION_RENEGADES);
 
   visualizator.beginPre();
-  visualization(visualizator);
+  visualization(*self, visualizator);
   visualizator.endPre();
 
   visualizator.beginPost();
-  visualization(visualizator);
+  visualization(*self, visualizator);
   visualizator.endPost();
 
   visualizator.beginAbs();
-  visualization(visualizator);
+  visualization(*self, visualizator);
   visualizator.endAbs();
 
 #endif

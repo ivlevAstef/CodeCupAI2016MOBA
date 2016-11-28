@@ -53,14 +53,36 @@ namespace AICup
       return skillBuild;
     }
 
+    /// приоритеты атаки
+    inline const float& getBuildPriority() const {
+      return buildPriority;
+    }
+    inline const float& getMinionPriority() const {
+      return minionPriority;
+    }
+    inline const float& getTreePriority() const {
+      return treePriority;
+    }
+    inline const float& getWizardPriority() const {
+      return wizardPriority;
+    }
+
   protected:
     float audacity; // дерзость. 0 не дерзкий, 1 - нормальна€
     float importanceOfXP; // ¬ажность получени€ XP.  0 - не нужен, 1 - нормальна€
     float importanceOfBonus; // ¬ажность вз€ти€ бонуса. 0 - не нужен, 1 - нормальна€
+
+    /// приоритеты атаки. 0 не будет бить никогда, 1 - нормальна€
+    float buildPriority;
+    float minionPriority;
+    float treePriority;
+    float wizardPriority;
+
+
     SkillBuild skillBuild; // ѕоследовательность изучени€ скилов
 
   private:
-    size_t currentLevel;
+    int currentLevel;
   };
 }
 

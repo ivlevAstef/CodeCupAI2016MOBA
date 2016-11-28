@@ -22,11 +22,11 @@ namespace AICup
   public:
 
     /// проверяет возможность исполнения команды
-    virtual bool check(const Wizard& self) = 0;
+    virtual bool check(const Wizard&) = 0;
 
 
 #ifdef ENABLE_VISUALIZATOR
-    virtual void visualization(const Visualizator&) const { }
+    virtual void visualization(const model::Wizard&, const Visualizator&) const { }
 #endif // ENABLE_VISUALIZATOR
   };
 }

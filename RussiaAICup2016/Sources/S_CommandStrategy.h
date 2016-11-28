@@ -27,7 +27,7 @@ namespace AICup
     virtual void update(const Wizard& self, model::Move& move);
 
 #ifdef ENABLE_VISUALIZATOR
-    virtual void visualization(const Visualizator& visualizator) const;
+    virtual void visualization(const model::Wizard& self, const Visualizator& visualizator) const;
 #endif // ENABLE_VISUALIZATOR
 
   protected:

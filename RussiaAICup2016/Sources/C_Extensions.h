@@ -38,8 +38,6 @@ namespace AICup
 
     double maxSpeed(const model::CircularUnit& obj);
 
-    double timeToTurnForAttack(const model::Unit& attacked, const model::Wizard& attacking);
-
     ///Wizard
     double speedFactor(const model::Wizard& obj);
     double maxSpeed(const model::Wizard& obj);
@@ -51,6 +49,9 @@ namespace AICup
     double magicMissleAttack(const model::Wizard& obj);
     double staffAttack(const model::Wizard& obj);
     double armor(const model::Wizard& obj);
+
+    double damage(const model::Wizard& obj, const model::ActionType action);
+    double dps(const model::Wizard& obj, const model::ActionType action);
 
     std::vector<bool> availableSkills(const model::Wizard& obj);
     bool availableSkill(const model::Wizard& obj, model::ActionType action);

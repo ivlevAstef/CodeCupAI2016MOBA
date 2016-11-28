@@ -55,20 +55,6 @@ double EX::maxSpeed(const model::CircularUnit& obj) {
   return 0;
 }
 
-double EX::timeToTurnForAttack(const model::Unit& attacked, const model::Wizard& attacking) {
-  const auto selfPos = Position(attacking.getX(), attacking.getY());
-  const auto enemyPos = Position(attacked.getX(), attacked.getY());
-
-  const auto dir = enemyPos - selfPos;
-  double angleDeviation = Math::angleDiff(dir.angle(), attacking.getAngle());
-  angleDeviation = ABS(angleDeviation);
-
-  const double needTurnAngle = MAX(0, angleDeviation - Game::instance().model().getStaffSector()* 0.5);
-  /// если времени до атаки больше чем времени до разворота, то можно пока не атаковать
-
-  return needTurnAngle / turnSpeed(attacking);
-}
-
 ////////////////// Wizard
 
 double EX::maxSpeed(const model::Wizard& obj) {
@@ -249,6 +235,37 @@ double EX::armor(const model::Wizard& obj) {
   #undef passiVeSkills
 }
 
+double EX::damage(const model::Wizard& obj, const model::ActionType action) {
+  if (model::ACTION_STAFF == action) {
+    return staffAttack(obj);
+  } else if (model::ACTION_MAGIC_MISSILE == action) {
+    return magicMissleAttack(obj);
+  } else if (model::ACTION_FROST_BOLT == action) {
+    return Game::model().getFrostBoltDirectDamage();
+  } else if (model::ACTION_FIREBALL == action) {
+    return Game::model().getFireballExplosionMaxDamage();
+  }
+  return 0;
+}
+
+double EX::dps(const model::Wizard& obj, const model::ActionType action) {
+  if (model::ACTION_STAFF == action) {
+    return staffAttack(obj) / Game::model().getStaffCooldownTicks();
+  } else if (model::ACTION_MAGIC_MISSILE == action) {
+    for (const auto& skill : obj.getSkills()) {
+      if (skill == model::SKILL_ADVANCED_MAGIC_MISSILE) {
+        return magicMissleAttack(obj) / Game::model().getWizardActionCooldownTicks();
+      }
+    }
+    return magicMissleAttack(obj) / Game::model().getMagicMissileCooldownTicks();
+  } else if (model::ACTION_FROST_BOLT == action) {
+    return Game::model().getFrostBoltDirectDamage() / Game::model().getFrostBoltCooldownTicks();
+  } else if (model::ACTION_FIREBALL == action) {
+    return Game::model().getFireballExplosionMaxDamage() / Game::model().getFireballCooldownTicks();
+  }
+  return 0;
+}
+
 std::vector<bool> EX::availableSkills(const model::Wizard& obj) {
   std::vector<bool> available;
   available.resize(7);
@@ -291,7 +308,7 @@ double EX::radiusForGuaranteedHit(const model::Wizard& obj, const model::Circula
   return attackRadius(obj) + enemy.getRadius();
 }
 
-double EX::radiusForGuaranteedHitFrostBolt(const model::Wizard& obj, const model::CircularUnit& enemy) {
+double EX::radiusForGuaranteedHitFrostBolt(const model::Wizard&, const model::CircularUnit& enemy) {
   //TODO: надо учитывать врага
   if (isWizard(enemy)) {
     return 440; /// сложно попасть с дальше дистанции

@@ -16,7 +16,7 @@ namespace AICup
     struct Result {
       const model::LivingUnit* unit;
       model::ActionType action;
-      int priority;
+      double priority;
     };
 
   public:

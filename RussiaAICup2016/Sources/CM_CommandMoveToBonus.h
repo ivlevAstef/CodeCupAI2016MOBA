@@ -20,7 +20,7 @@ namespace AICup
     void execute(const Wizard& self, Result& result) override;
 
 #ifdef ENABLE_VISUALIZATOR
-    void visualization(const Visualizator& visualizator) const override;
+    void visualization(const model::Wizard& self, const Visualizator& visualizator) const override;
 #endif // ENABLE_VISUALIZATOR
 
 

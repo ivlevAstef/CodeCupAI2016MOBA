@@ -85,8 +85,8 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
   }
 
   for (const auto& enemy : World::instance().aroundEnemies(self)) {
-    const auto attackCommand = fabric.attack(enemy->getId());
-    if (attackCommand->check(self)) {
+    const auto attackCommand = fabric.attack(*enemy);
+    if (nullptr != attackCommand && attackCommand->check(self)) {
       attackCommands.push_back(attackCommand);
     }
   }

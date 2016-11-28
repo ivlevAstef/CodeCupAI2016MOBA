@@ -1,20 +1,21 @@
 //
-//File: CM_CommandMoveToLine.h
+//File: CM_CommandAttackWizard.h
 //Author: Ivlev Alexander. Stef
-//Created: 07/11/2016
+//Created: 28/11/2016
 //
 
 
 #pragma once
 
-#include "CM_MoveCommand.h"
-#include "model\LaneType.h"
+#include "CM_AttackCommand.h"
+#include "model\Wizard.h"
 
 namespace AICup
 {
-  class CommandMoveToLine: public MoveCommand {
+  /// Не сохраняемый между тиками
+  class CommandAttackWizard: public AttackCommand {
   public:
-    CommandMoveToLine(Algorithm::PathFinder& finder, model::LaneType line);
+    CommandAttackWizard(const model::Wizard& wizard);
 
     bool check(const Wizard& self) override;
 
@@ -25,8 +26,6 @@ namespace AICup
 #endif // ENABLE_VISUALIZATOR
 
   private:
-    const model::LaneType line;
-
-    MoveCommandPtr commandMoveToPoint;
+    const model::Wizard& wizard;
   };
 }

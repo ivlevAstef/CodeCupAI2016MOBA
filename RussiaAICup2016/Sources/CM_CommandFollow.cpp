@@ -86,8 +86,8 @@ void CommandFollow::execute(const Wizard& self, Result& result) {
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandFollow::visualization(const Visualizator& visualizator) const {
+void CommandFollow::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
   assert(nullptr != commandMoveToPoint.get());
-  commandMoveToPoint->visualization(visualizator);
+  commandMoveToPoint->visualization(self, visualizator);
 }
 #endif // ENABLE_VISUALIZATOR

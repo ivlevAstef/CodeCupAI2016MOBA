@@ -49,9 +49,9 @@ void CommandKeepDistance::execute(const Wizard& self, Result& result) {
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandKeepDistance::visualization(const Visualizator& visualizator) const {
+void CommandKeepDistance::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
   assert(nullptr != commandMoveToPoint.get());
-  commandMoveToPoint->visualization(visualizator);
+  commandMoveToPoint->visualization(self, visualizator);
 
   if (Visualizator::POST == visualizator.getStyle()) {
     visualizator.fillCircle(x, y, 10, 0x00ffff);

@@ -14,11 +14,16 @@
 #include "CM_CommandMoveToBonus.h"
 #include "CM_CommandObserveMap.h"
 
-#include "CM_CommandAttackEnemy.h"
+#include "CM_CommandAttackBuild.h"
+#include "CM_CommandAttackMinion.h"
+#include "CM_CommandAttackWizard.h"
+#include "CM_CommandAttackTree.h"
 #include "CM_CommandPool.h"
 
 #include "CM_CommandDefendPoint.h"
 #include "CM_CommandAvoidEnemy.h"
+
+#include "C_Extensions.h"
 
 using namespace AICup;
 
@@ -56,8 +61,18 @@ MoveCommandPtr CommandFabric::observeMap() const {
   return std::make_shared<CommandObserveMap>(finder);
 }
 
-AttackCommandPtr CommandFabric::attack(const long long enemyId) const {
-  return std::make_shared<CommandAttackEnemy>(enemyId);
+AttackCommandPtr CommandFabric::attack(const model::LivingUnit& unit) const {
+  if (EX::isMinion(unit)) {
+    return std::make_shared<CommandAttackMinion>(EX::asMinion(unit));
+  } if (EX::isWizard(unit)) {
+    return std::make_shared<CommandAttackWizard>(EX::asWizard(unit));
+  } if (EX::isTree(unit)) {
+    return std::make_shared<CommandAttackTree>(EX::asTree(unit));
+  } if (EX::isBuilding(unit)) {
+    return std::make_shared<CommandAttackBuild>(EX::asBuilding(unit));
+  }
+  assert(false && "incorrect unit type");
+  return nullptr;
 }
 
 AttackCommandPtr CommandFabric::pool(const long long neutralUnitId) const {

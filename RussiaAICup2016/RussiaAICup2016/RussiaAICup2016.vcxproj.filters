@@ -69,9 +69,6 @@
     <ClCompile Include="..\Sources\CM_CommandObserveMap.cpp">
       <Filter>Sources\Command\Commands\move</Filter>
     </ClCompile>
-    <ClCompile Include="..\Sources\CM_CommandAttackEnemy.cpp">
-      <Filter>Sources\Command\Commands\attack</Filter>
-    </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandPool.cpp">
       <Filter>Sources\Command\Commands\attack</Filter>
     </ClCompile>
@@ -162,6 +159,24 @@
     <ClCompile Include="..\Sources\CM_CommandFollowAttackEnemy.cpp">
       <Filter>Sources\Command\Commands\attack</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAttackWizard.cpp">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAttackMinion.cpp">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAttackBuild.cpp">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAttackTree.cpp">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAttackFireball.cpp">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandAttackFrostbolt.cpp">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -196,9 +211,6 @@
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandObserveMap.h">
       <Filter>Sources\Command\Commands\move</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\CM_CommandAttackEnemy.h">
-      <Filter>Sources\Command\Commands\attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandPool.h">
       <Filter>Sources\Command\Commands\attack</Filter>
@@ -298,6 +310,24 @@
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandChangeLine.h">
       <Filter>Sources\Command\Commands\move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAttackWizard.h">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAttackMinion.h">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAttackBuild.h">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAttackTree.h">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAttackFireball.h">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandAttackFrostbolt.h">
+      <Filter>Sources\Command\Commands\attack</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

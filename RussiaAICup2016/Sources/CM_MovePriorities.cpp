@@ -2,6 +2,7 @@
 #include "E_Game.h"
 #include "C_Extensions.h"
 #include "C_Math.h"
+#include "A_Attack.h"
 
 using namespace AICup;
 
@@ -44,7 +45,7 @@ int MovePriorities::avoidEnemy(const Wizard& self, const model::CircularUnit& en
 
   if (EX::isWizard(livingUnit)) {
     const model::Wizard& wizard = EX::asWizard(livingUnit);
-    const double timeToAttack = EX::timeToTurnForAttack(self, wizard);
+    const double timeToAttack = Algorithm::timeToTurnForAttack(self, wizard);
     const double timeForMagic = EX::minTimeForMagic(EX::asWizard(livingUnit));
 
     return (300 + statusPriority + lifePriority - timeForMagic * 5 - timeToAttack * 5) * self.getRole().getAudacity();

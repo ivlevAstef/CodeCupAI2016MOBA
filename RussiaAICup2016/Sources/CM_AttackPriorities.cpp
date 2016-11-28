@@ -2,78 +2,86 @@
 #include "E_Game.h"
 #include "C_Extensions.h"
 #include "C_Math.h"
+#include "A_Attack.h"
 
 using namespace AICup;
 
-int AttackPriorities::attackEnemy(const Wizard& self, const model::LivingUnit& enemy) {
-  const auto constants = Game::model();
+/// все функции возращают значение от 0 до 1000
+/// на самом деле могут быть меньше нуля, ничего страшного в этом нету - все что меньше 1 отсекается
 
-  const auto selfPos = EX::pos(self);
-  const auto enemyPos = EX::pos(enemy);
-  const double distance = (selfPos - enemyPos).length();
-
-  double lifePriority = double(enemy.getMaxLife() - enemy.getLife()) / double(enemy.getMaxLife());
-
-  /// если хп мало у обычного крипа, то очков мне дадут меньше, пускай другие добивают
-  /*if (enemy.getLife() < constants.getMagicMissileDirectDamage() && EX::isMinion(enemy)) {
-    lifePriority *= 0;
-  }*/
-
-  /// если хп мало у мага, то надо ему помочь умереть
-  if (enemy.getLife() <= EX::magicMissleAttack(self) && EX::isWizard(enemy)) {
-    lifePriority *= 6;
-  }
-
-  double typePriority = 0;
-  if (EX::isWizard(enemy)) {
-    typePriority = 1;
-  } else if (EX::isMinion(enemy)) {
-    const double range = constants.getOrcWoodcutterAttackRange() + self.getRadius();
-
-    switch (EX::asMinion(enemy).getType()) {
-      case model::MINION_ORC_WOODCUTTER:
-        typePriority = 0.2 + 0.7 * (range*range / (distance*distance));
-        break;
-      case model::MINION_FETISH_BLOWDART:
-        typePriority = 0.5;
-        break;
-      default:
-        break;
-    }
-  } else if (EX::isBuilding(enemy)) {
-    typePriority = 0.2 + lifePriority * 0.7;
-  } else if (EX::isTree(enemy)) {
-    typePriority = 2 * (1 - distance / self.getVisionRange());
-  }
-
-  double statusPriority = 0.5;
-  for (const auto& status : enemy.getStatuses()) {
-    switch (status.getType()) {
-      case model::STATUS_BURNING:
-        statusPriority += 0.1;
-        break;
-      case model::STATUS_EMPOWERED:
-        statusPriority += 0.2;
-        break;
-      case model::STATUS_FROZEN:
-        statusPriority += 1.0;
-        break;
-      case model::STATUS_HASTENED:
-        statusPriority -= 0.3;
-        break;
-      case model::STATUS_SHIELDED:
-        statusPriority -= 1.0;
-        break;
-      default:
-        break;
-    }
-  }
-  statusPriority = MAX(-1, MIN(statusPriority, 1));
-
-
-  return int(1000 * (0.3 * lifePriority + 0.5 * typePriority + 0.2 * statusPriority));
+double AttackPriorities::attackBuild(const Wizard& self, const model::Building& build) {
+  const double lifePriority = 800 * (build.getMaxLife() - build.getLife()) / build.getMaxLife();
+  const double turnPriority = 50 * Algorithm::timeToTurnForAttack(build, self);
+  return 200 + lifePriority - turnPriority;
 }
 
-int AttackPriorities::pool(const Wizard&, const model::Minion&) {
+double AttackPriorities::attackMinion(const Wizard& self, const model::Minion& minion) {
+  const double lifePriority = 500 * (minion.getMaxLife() - minion.getLife()) / minion.getMaxLife();
+  if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
+    const double range = Game::model().getOrcWoodcutterAttackRange() + self.getRadius();
+    const double distance = self.getDistanceTo(minion);
+    const double nDistance = MAX(distance, range);
+
+    return 100 + lifePriority + 400 * ((range * range) / (nDistance * nDistance));
+  } else if (model::MINION_FETISH_BLOWDART == minion.getType()) {
+    return 500 + lifePriority;
+  }
+  assert(false && "Incorrect minion type...");
+  return 0;
+}
+
+double AttackPriorities::attackTree(const Wizard& self, const model::Tree& tree) {
+  if (Algorithm::isMelee(self, tree)) {
+    return 1000;
+  }
+
+  const double ticksToMove = self.getDistanceTo(tree) / self.maxSpeed();
+  const double ticksToRemove = tree.getLife() / self.dps(model::ACTION_MAGIC_MISSILE);
+  return MAX(100 * (ticksToRemove - ticksToMove), 1000);
+}
+
+double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& wizard) {
+  if (Algorithm::isMelee(self, wizard)) {
+    return 1000;
+  }
+
+  /// если хп (с запасом если немного востановится) меньше атаки, то надо добивать
+  if (wizard.getLife() + 1 < self.damage(model::ACTION_MAGIC_MISSILE)) {
+    return 1000;
+  }
+
+  const double lifePriority = 500 * (100 - MIN(100, wizard.getLife())) / 100;
+
+  double statusPriority = 0;
+  for (const auto& status : wizard.getStatuses()) {
+    switch (status.getType()) {
+      case model::STATUS_BURNING:
+        statusPriority += 150;
+        break;
+      case model::STATUS_EMPOWERED:
+        statusPriority += 100;
+        break;
+      case model::STATUS_FROZEN:
+        statusPriority += 500;
+        break;
+      case model::STATUS_HASTENED:
+        statusPriority -= 50;
+        break;
+      case model::STATUS_SHIELDED:
+        statusPriority -= 300;
+        break;
+      default:
+        break;
+    }
+  }
+
+  const double distance = self.getDistanceTo(wizard);
+  const double distancePriority = 75 * ((500 * 500) / (distance * distance));
+
+
+  return MAX(lifePriority + statusPriority + distancePriority, 1000);
+}
+
+double AttackPriorities::pool(const Wizard&, const model::Minion&) {
   return 0;
 }

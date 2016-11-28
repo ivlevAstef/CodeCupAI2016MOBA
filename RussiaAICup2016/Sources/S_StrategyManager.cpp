@@ -29,9 +29,9 @@ void StrategyManager::update(const Wizard& self, model::Move& move) {
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void StrategyManager::visualization(const Visualizator& visualizator) const {
+void StrategyManager::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
   if (nullptr != currentStrategy.get()) {
-    currentStrategy->visualization(visualizator);
+    currentStrategy->visualization(self, visualizator);
   }
 
   pathFinder.visualization(visualizator);

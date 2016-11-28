@@ -110,7 +110,7 @@ void CommandStrategy::addTreeForRemove(const Wizard& self, const model::LivingUn
     return;
   }
 
-  const auto attack = fabric.attack(tree->getId());
+  const auto attack = fabric.attack(*tree);
   if (attack->check(self)) {
     attackCommands.push_back(attack);
   }
@@ -126,7 +126,7 @@ const model::LivingUnit& CommandStrategy::attack(const Wizard& self, model::Acti
 
   const model::LivingUnit* resultUnit = nullptr;
 
-  int maxPriority = -10000;
+  double maxPriority = -10000;
   //TODO: тут как миниум нужно еще учитывать тип действия
   for (const auto& result : attackResults) {
     if (result.priority > maxPriority) {
@@ -143,13 +143,13 @@ const model::LivingUnit& CommandStrategy::attack(const Wizard& self, model::Acti
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandStrategy::visualization(const Visualizator& visualizator) const {
+void CommandStrategy::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
   for (const auto& command : moveCommands) {
-    command->visualization(visualizator);
+    command->visualization(self, visualizator);
   }
 
   for (const auto& command : attackCommands) {
-    command->visualization(visualizator);
+    command->visualization(self, visualizator);
   }
 }
 #endif
