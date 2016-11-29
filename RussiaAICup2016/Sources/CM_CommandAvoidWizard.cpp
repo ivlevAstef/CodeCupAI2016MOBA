@@ -11,7 +11,7 @@ using namespace AICup;
 
 CommandAvoidWizard::CommandAvoidWizard(Algorithm::PathFinder& finder, const model::Wizard& wizard) :
   MoveCommand(finder), wizard(wizard) {
-
+  distance = 0;
 }
 
 bool CommandAvoidWizard::check(const Wizard& self) {
@@ -21,7 +21,6 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   const auto wizardPos = EX::pos(wizard);
   const auto delta = selfPos - wizardPos;
 
-  needAvoidProjectile = false;
   //// для сокращения расчетов
   if (delta.length() > 650) {
     return false;
@@ -91,41 +90,31 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     return false;
   }
 
+  distance = finalDistance;
+
+  return false;
+}
+
+void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
+  const auto selfPos = EX::pos(self);
+  const auto wizardPos = EX::pos(wizard);
+  const auto delta = selfPos - wizardPos;
+
+  const auto pos = wizardPos + delta.normal() * distance;
+
+  result.moveDirection = pos - selfPos;
+  result.speedLimit = -1;
+  result.turnStyle = TurnStyle::SIDE_TURN;
+  result.turnPriority = TurnPriority::avoidWizard + int(delta.length()/2);
+  result.deactivateOtherTurn = false;
+
   auto direction = delta.perpendicular().normal();
   /// если угол больше 90 градусов то выбран не оптимальный из двух возможных перпендикуляров
   if (direction.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
     direction *= -1;
   }
 
-  if (delta.length() < finalDistance + Algorithm::timeToTurn(self, direction.angle()) * self.maxBackwardSpeed()) {
-    needAvoidProjectile = true;
-  }
-
-
-  /// точка где безопасно
-  const auto pos = wizardPos + delta.normal() * finalDistance;
-  moveToPointCommand = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::SIDE_TURN);
-
-  return moveToPointCommand->check(self);
-}
-
-void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
-  assert(nullptr != moveToPointCommand.get());
-  moveToPointCommand->execute(self, result);
-  /// Воспользуемся свойством системы, чтобы всегда уворочиваться используя одного из магов, а не разных...
-  result.turnPriority = TurnPriority::avoidWizard + wizard.getId();
-
-  if (needAvoidProjectile) {
-    const auto selfPos = EX::pos(self);
-    const auto wizardPos = EX::pos(wizard);
-    const auto delta = selfPos - wizardPos;
-
-    auto direction = delta.perpendicular().normal();
-    /// если угол больше 90 градусов то выбран не оптимальный из двух возможных перпендикуляров
-    if (direction.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
-      direction *= -1;
-    }
-
+  if (delta.length() < distance + Algorithm::timeToTurn(self, direction.angle()) * self.maxBackwardSpeed()) {
     const auto minTimeForMagic = EX::minTimeForMagic(wizard);
     const auto minTimeForRotate = Algorithm::timeToTurnForAttack(self, wizard);
     const auto miTimeForUnFrozen = EX::frozenTime(wizard);
@@ -133,9 +122,7 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
     const auto minTime = MAX(minTimeForMagic, MAX(minTimeForRotate, miTimeForUnFrozen));
 
     const auto ticksToRotate = Algorithm::timeToTurn(self, direction.angle());
-    if (minTime < ticksToRotate) {
-      result.deactivateOtherTurn = true;
-    }
+    result.deactivateOtherTurn = minTime < ticksToRotate;
   }
 }
 
@@ -145,7 +132,5 @@ double CommandAvoidWizard::priority(const Wizard& self) {
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandAvoidWizard::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
-  assert(nullptr != moveToPointCommand.get());
-  moveToPointCommand->visualization(self, visualizator);
 }
 #endif // ENABLE_VISUALIZATOR

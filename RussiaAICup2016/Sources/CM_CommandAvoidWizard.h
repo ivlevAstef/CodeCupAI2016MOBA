@@ -29,7 +29,6 @@ namespace AICup
   private:
     const model::Wizard& wizard;
 
-    MoveCommandPtr moveToPointCommand;
-    bool needAvoidProjectile;
+    double distance;
   };
 }
