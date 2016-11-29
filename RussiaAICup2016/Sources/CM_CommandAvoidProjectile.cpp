@@ -39,7 +39,7 @@ bool CommandAvoidProjectile::check(const Wizard& self) {
   /// если могу уклониться идя вперед и в бок от полета то хорошо
   if (Algorithm::canForwardEscape(projectilePos, 600, self, speed, projectile.getRadius())) {
     /// точка где безопасно
-    const auto pos = selfPos + direction.normal() * (distanceMoved + self.maxSpeed());
+    const auto pos = selfPos + direction.normal() * (distanceMoved + 2 * self.maxSpeed());
 
     moveToPointCommand = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::TURN);
 
@@ -49,7 +49,7 @@ bool CommandAvoidProjectile::check(const Wizard& self) {
   /// если могу уклониться идя назад и в бок от полета то хорошо
   if (Algorithm::canBackwardEscape(projectilePos, 600, self, speed, projectile.getRadius())) {
     /// точка где безопасно
-    const auto pos = selfPos - direction.normal() * (distanceMoved + self.maxBackwardSpeed());
+    const auto pos = selfPos - direction.normal() * (distanceMoved + 2 * self.maxBackwardSpeed());
 
     moveToPointCommand = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::BACK_TURN);
 

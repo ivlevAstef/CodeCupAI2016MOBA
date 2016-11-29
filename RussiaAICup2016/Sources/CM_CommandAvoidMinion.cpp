@@ -25,7 +25,6 @@ bool CommandAvoidMinion::check(const Wizard& self) {
     distance = mc.getOrcWoodcutterAttackRange() + self.getRadius() + 50/*на всякий случай*/;
   } else {
     distance = mc.getFetishBlowdartAttackRange() + self.getRadius() + mc.getDartRadius();
-    distance -= minion.getRemainingActionCooldownTicks() * self.maxBackwardSpeed();
   }
 
   if (delta.length() > distance) {

@@ -20,15 +20,15 @@ namespace AICup
         SkillBranches::moveHast,
         SkillBranches::armorShield,
       }) {
-      audacityBuild = 1;
-      audacityMinion = 0.5;
-      audacityWizard = 0.75;
+      audacityBuild = 2;
+      audacityMinion = 0.9;
+      audacityWizard = 1.5;
     }
 
     void update(const model::Wizard& self, model::Move& move) override {
       Role::update(self, move);
 
-      audacity = self.getLife() / self.getMaxLife();
+      audacity = 0.75 * self.getLife() / self.getMaxLife();
     }
   };
 }

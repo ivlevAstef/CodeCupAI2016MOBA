@@ -27,32 +27,32 @@ double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& mini
     }
     return 250 + lifePriority;
   } else {
-    return lifePriority + ((400 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
+    return 2*lifePriority + ((400 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
   }
 }
 
 double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wizard) {
   const double timeToTurnAttack = Algorithm::timeToTurnForAttack(self, wizard);
   const double timeForMagic = EX::minTimeForMagic(wizard);
-  const double timeForUnforzend = EX::frozenTime(wizard);
 
   /// если мага можно быстро добить, то его не стоит бояться
-  if (wizard.getLife() + 2/*так как есть регенерация*/ < EX::magicMissleAttack(self)) {
-    return 0;
+  int lifePriority = (600 * wizard.getLife()) / wizard.getMaxLife();
+
+  if (wizard.getLife() + 2/*так как есть регенерация*/ < 2 * EX::magicMissleAttack(self)) {
+    lifePriority -= 200 * EX::magicMissleAttack(self);
   }
 
-  const int lifePriority = (600 * wizard.getLife()) / wizard.getMaxLife();
 
   int statusPriority = 0;
   for (const auto& status : wizard.getStatuses()) {
     if (model::STATUS_EMPOWERED == status.getType()) {
       statusPriority += 400;
     } else if (model::STATUS_FROZEN == status.getType()) {
-      statusPriority -= status.getRemainingDurationTicks() * 15;
+      statusPriority -= status.getRemainingDurationTicks() * 100;
     }
   }
 
-  return MAX(1000, 500 + statusPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 25 - timeForUnforzend * 50);
+  return MAX(1000, 500 + statusPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 25);
 }
 
 double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {

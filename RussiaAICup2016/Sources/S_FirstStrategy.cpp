@@ -94,7 +94,7 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     }
   }
 
-  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange())) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange()+100)) {
     const auto attackCommand = fabric.attack(*enemy);
     if (nullptr != attackCommand && attackCommand->check(self)) {
       attackCommands.push_back(attackCommand);

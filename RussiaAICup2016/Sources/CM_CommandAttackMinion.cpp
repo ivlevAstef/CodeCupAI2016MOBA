@@ -15,7 +15,7 @@ bool CommandAttackMinion::check(const Wizard& self) {
   const auto selfPos = EX::pos(self);
   const auto minionPos = EX::pos(minion);
   const auto minionSpeed = Vector(minion.getSpeedX(), minion.getSpeedY());
-  const auto futureMinionPos = EX::pos(minion) + minionSpeed.normal() * minion.getRadius() * 0.75;
+  const auto futureMinionPos = EX::pos(minion) + ((minionSpeed.length() > 0.1) ? (minionSpeed.normal() * minion.getRadius() * 0.75) : Vector());
   const auto delta = selfPos - futureMinionPos;
 
   /// миньон далеко или будет далеко
