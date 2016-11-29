@@ -157,7 +157,7 @@ void PathFinder::calculateCost() {
   for (const auto& obstacle : obstacles) {
     float life = 1;
     if (EX::isTree(*obstacle)) {
-      life = 2.5f * (float(obstacle->getLife()) / 12.0f); /// дерево
+      life = 1.5f * (float(obstacle->getLife()) / 12.0f); /// дерево
     } else if (EX::isNeutral(*obstacle)) {
       life = 1000.0f; /// нейтрал очень дорогое удовольствие
     } else {
@@ -280,9 +280,9 @@ void PathFinder::calculatePath(Path& path) const {
     path.length += (realPos - lastPos).length();
     /// изгибы всегда короче чем прямые
     if ((realPos - iterpolateLastPos).normal() == (realPos - lastPos).normal()) {
-      path.realLength += (realPos - iterpolateLastPos).length() * 0.5;
+      path.realLength += (realPos - lastPos).length();
     } else {
-      path.realLength += (realPos - iterpolateLastPos).length() * 0.4;
+      path.realLength += (realPos - iterpolateLastPos).length() * 0.45;
     }
 
 

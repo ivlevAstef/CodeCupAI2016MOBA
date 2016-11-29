@@ -320,7 +320,7 @@ double EX::radiusForGuaranteedDodgeFrostBolt(const model::Wizard& self) {
 }
 
 double EX::radiusForGuaranteedDodgeFireBall(const model::Wizard& self) {
-  const auto radius = self.getRadius() + Game::model().getFireballRadius() + Game::model().getFireballExplosionMinDamageRange();
+  const auto radius = self.getRadius() + Game::model().getFireballRadius();
   ///такая скорость, ибо наврятли я буду стоять идеально боком
   const auto speed = (maxSpeed(self) + maxStrafeSpeed(self)) * 0.5;
 

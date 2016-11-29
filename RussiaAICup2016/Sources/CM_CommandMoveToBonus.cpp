@@ -43,10 +43,10 @@ bool CommandMoveToBonus::check(const Wizard& self) {
   std::shared_ptr<Algorithm::Path> path;
 
   pathFinder.calculatePath(topBonusPos, path);
-  double ticksToTop = (path->getRealLength() - fullRadius) / Game::model().getWizardForwardSpeed();
+  double ticksToTop = (path->getRealLength() - fullRadius) / self.maxSpeed();
 
   pathFinder.calculatePath(bottomBonusPos, path);
-  double ticksToBottom = (path->getRealLength() - fullRadius) / Game::model().getWizardForwardSpeed();
+  double ticksToBottom = (path->getRealLength() - fullRadius) / self.maxSpeed();
 
   int maxTicksToBonus = Game::model().getBonusAppearanceIntervalTicks();
   int ticksToBonus = maxTicksToBonus - World::model().getTickIndex() % maxTicksToBonus;
@@ -70,7 +70,7 @@ bool CommandMoveToBonus::check(const Wizard& self) {
   }
 
   /// если опыт на линии + тот опыт который может еще прийти, больше того что дают за бонус, то он не нужен
-  if (potensialExpirience(self) + minMoveTicks * 0.1  > Game::model().getBonusScoreAmount()) {
+  if (potensialExpirience(self) + minMoveTicks * 0.2  > Game::model().getBonusScoreAmount()) {
     return false;
   }
 
@@ -91,7 +91,7 @@ bool CommandMoveToBonus::check(const Wizard& self) {
 double CommandMoveToBonus::potensialExpirience(const Wizard& self) {
   double result = 0;
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 200)) {
-    if (enemy->getLife() < 100) {
+    if (enemy->getLife() < 150) {
       result += enemy->getMaxLife() * 0.25f;
     }
   }

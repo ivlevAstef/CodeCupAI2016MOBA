@@ -86,7 +86,7 @@ double MovePriorities::moveToBonus(const Wizard& self, const Position&) {
 }
 
 double MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {
-  return 20 * self.getRole().getImportanceOfXP();
+  return 20 * self.getRole().getImportanceOfXP() + 10 * (self.getMaxLife() - self.getLife());
 }
 
 double MovePriorities::moveToPoint(const Wizard&, const Position&) {

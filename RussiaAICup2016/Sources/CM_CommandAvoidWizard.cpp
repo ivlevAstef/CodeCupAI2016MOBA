@@ -97,7 +97,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     direction *= -1;
   }
 
-  if (delta.length() < finalDistance + self.maxSpeed()) {
+  if (delta.length() < finalDistance + Algorithm::timeToTurn(self, direction.angle()) * self.maxBackwardSpeed()) {
     needAvoidProjectile = true;
   }
 
@@ -112,7 +112,8 @@ bool CommandAvoidWizard::check(const Wizard& self) {
 void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   assert(nullptr != moveToPointCommand.get());
   moveToPointCommand->execute(self, result);
-  result.turnPriority = TurnPriority::avoidWizard;
+  /// Воспользуемся свойством системы, чтобы всегда уворочиваться используя одного из магов, а не разных...
+  result.turnPriority = TurnPriority::avoidWizard + wizard.getId();
 
   if (needAvoidProjectile) {
     const auto selfPos = EX::pos(self);

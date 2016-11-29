@@ -21,10 +21,10 @@ namespace AICup
   class TurnPriority
   {
   public:
-    static const int avoidBuild = 2;
-    static const int avoidMinion = 3;
-    static const int avoidWizard = 5;
-    static const int avoidProjectile = 10;
+    static const int avoidBuild = 100;
+    static const int avoidMinion = 50;
+    static const int avoidWizard = 500;
+    static const int avoidProjectile = 1000;
 
     static const int defendPoint = 1;
 
