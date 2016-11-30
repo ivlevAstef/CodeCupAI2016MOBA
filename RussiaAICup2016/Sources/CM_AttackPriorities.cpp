@@ -10,9 +10,9 @@ using namespace AICup;
 /// на самом деле могут быть меньше нуля, ничего страшного в этом нету - все что меньше 1 отсекается
 
 double AttackPriorities::attackBuild(const Wizard& self, const model::Building& build) {
-  const double lifePriority = 800 * (build.getMaxLife() - build.getLife()) / build.getMaxLife();
-  const double turnPriority = 50 * Algorithm::timeToTurnForAttack(build, self);
-  return 200 + lifePriority - turnPriority;
+  const double lifePriority = 500 * (build.getMaxLife() - build.getLife()) / build.getMaxLife();
+  const double turnPriority = 15 * Algorithm::timeToTurnForAttack(build, self);
+  return 300 + lifePriority - turnPriority;
 }
 
 double AttackPriorities::attackMinion(const Wizard& self, const model::Minion& minion) {
@@ -83,10 +83,10 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
 }
 
 double AttackPriorities::attackFrostbolt(const Wizard& self) {
-  return 1000;
+  return 2000;
 }
 double AttackPriorities::attackFireball(const Wizard& self) {
-  return 900;
+  return 1500;
 }
 
 double AttackPriorities::pool(const Wizard&, const model::Minion&) {

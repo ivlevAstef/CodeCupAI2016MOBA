@@ -43,25 +43,28 @@ const std::vector<model::SkillType> SkillBranches::armorShield = {
   model::SKILL_SHIELD
 };
 
-Role::Role(const float audacity,
-  const float importanceOfXP,
-  const float importanceOfBonus,
-  const SkillBuild& skillBuild):
-  audacity(audacity),
-  importanceOfXP(importanceOfXP),
-  importanceOfBonus(importanceOfBonus),
-  skillBuild(skillBuild)
-  {
+Role::Role(const SkillBuild& skillBuild): skillBuild(skillBuild) {
+  audacity = 1;
+  importanceOfXP = 1;
+  importanceOfBonus = 1;
+
   currentLevel = 0;
 
   buildPriority = 1;
   minionPriority = 1;
   treePriority = 1;
   wizardPriority = 1;
+  attackSkillPriority = 1;
 
   audacityBuild = 1;
   audacityMinion = 1;
   audacityWizard = 1;
+
+  desireChangeLine = 1;
+  changeLinePathLengthPriority = 1;
+  changeLineWizardCountPriority = 1;
+  changeLineTowerBalancePriority = 1;
+  changeLineLaneStrengthPriority = 1;
 }
 
 void Role::update(const model::Wizard& self, model::Move& move) {

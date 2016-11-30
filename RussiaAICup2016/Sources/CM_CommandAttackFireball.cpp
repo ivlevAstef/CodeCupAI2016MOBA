@@ -16,11 +16,11 @@ double calcPriority(const model::LivingUnit& unit) {
 
   for (const auto& enemy : World::instance().around(unit, unit.getFaction(), Game::model().getFireballExplosionMinDamageRange())) {
     if (EX::isWizard(*enemy)) {
-      priority += 50;
+      priority += 20;
     } else if (EX::isMinion(*enemy)) {
       priority += enemy->getLife() / 10;
     } else if (EX::isBuilding(*enemy)) {
-      priority += 40;
+      priority += 12;
     }
   }
   return priority;
@@ -39,7 +39,7 @@ bool CommandAttackFireball::check(const Wizard& self) {
   }
 
   // нет маны
-  if (self.getMana() < Game::model().getFrostBoltManacost()) {
+  if (self.getMana() < Game::model().getFireballManacost()) {
     return false;
   }
 
@@ -54,7 +54,7 @@ bool CommandAttackFireball::check(const Wizard& self) {
     const auto delta = selfPos - unitPos;
 
     /// если слишком близко то плохо
-    if (delta.length() < self.getRadius() + Game::model().getFireballExplosionMinDamageRange()) {
+    if (delta.length() < self.getRadius() + Game::model().getFireballExplosionMinDamageRange() + unit.getRadius()) {
       continue;
     }
 
@@ -67,13 +67,14 @@ bool CommandAttackFireball::check(const Wizard& self) {
       const auto& wizard = EX::asWizard(unit);
 
       const auto fireballSpeed = delta.normal() * Game::model().getFireballSpeed();
+      const auto fireballRadius = Game::model().getFireballRadius() + (Game::model().getFireballExplosionMaxDamageRange() + Game::model().getFireballExplosionMinDamageRange()) * 0.5;
       /// если маг может уклонится от снаряда, то не будем в него стрелять
-      if (Algorithm::canForwardEscape(selfPos, self.getCastRange(), wizard, fireballSpeed, Game::model().getFireballRadius())) {
+      if (Algorithm::canForwardEscape(selfPos, self.getCastRange(), wizard, fireballSpeed, fireballRadius)) {
         continue;
       }
 
       /// второй вариант уклонения
-      if (Algorithm::canBackwardEscape(selfPos, self.getCastRange(), wizard, fireballSpeed, Game::model().getFireballRadius())) {
+      if (Algorithm::canBackwardEscape(selfPos, self.getCastRange(), wizard, fireballSpeed, fireballRadius)) {
         continue;
       }
     }
@@ -83,6 +84,11 @@ bool CommandAttackFireball::check(const Wizard& self) {
       target = &unit;
       maxPriority = priority;
     }
+  }
+
+  /// если уж совсем некого бить, то не бьем
+  if (maxPriority < 20) {
+    return false;
   }
 
   return nullptr != target;
@@ -96,7 +102,7 @@ void CommandAttackFireball::execute(const Wizard& self, Result& result) {
 }
 
 double CommandAttackFireball::priority(const Wizard& self) {
-  return AttackPriorities::attackFireball(self);
+  return AttackPriorities::attackFireball(self) * self.getRole().getAttackSkillPriority();
 }
 
 #ifdef ENABLE_VISUALIZATOR

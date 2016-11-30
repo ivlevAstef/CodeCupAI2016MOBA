@@ -23,9 +23,9 @@ double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& mini
 
   if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
     if (distance < mc.getOrcWoodcutterAttackRange() + self.getRadius() + 50/*небольшой запас*/) {
-      return 700 + lifePriority;
+      return 900 + lifePriority;
     }
-    return 250 + lifePriority;
+    return 450 + lifePriority;
   } else {
     return 2*lifePriority + ((400 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
   }
@@ -52,7 +52,17 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
     }
   }
 
-  return MAX(1000, 500 + statusPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 25);
+  int skillPriority = 0;
+  if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
+    skillPriority = 3 * (Game::model().getFireballCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL));
+  }
+
+  if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
+    skillPriority = 5 * (Game::model().getFrostBoltCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT));
+  }
+
+
+  return MAX(1000, 500 + statusPriority + skillPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 25);
 }
 
 double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {
@@ -74,7 +84,7 @@ double MovePriorities::follow(const Wizard&, const model::LivingUnit&) {
 }
 
 double MovePriorities::getExpirience(const Wizard& wizard, const model::LivingUnit&) {
-  return 100 * wizard.getRole().getImportanceOfXP();
+  return 450 * wizard.getRole().getImportanceOfXP();
 }
 
 double MovePriorities::keepDistance(const Wizard&, const Position, const double, const double) {
@@ -82,11 +92,11 @@ double MovePriorities::keepDistance(const Wizard&, const Position, const double,
 }
 
 double MovePriorities::moveToBonus(const Wizard& self, const Position&) {
-  return (50 + 4 * self.getMaxLife()) * self.getRole().getImportanceOfBonus();
+  return (50 + 2 * self.getLife()) * self.getRole().getImportanceOfBonus();
 }
 
 double MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {
-  return 100 * self.getRole().getImportanceOfXP() + 10 * (self.getMaxLife() - self.getLife());
+  return (250 + 500 * (self.getMaxLife() - self.getLife())) * self.getRole().getImportanceOfXP();
 }
 
 double MovePriorities::moveToPoint(const Wizard&, const Position&) {

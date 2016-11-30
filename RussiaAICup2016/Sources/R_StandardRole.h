@@ -13,13 +13,15 @@ namespace AICup
   class StandardRole: public Role {
   public:
     StandardRole() :
-      Role(0.75, 1, 1, {
+      Role({
         SkillBranches::magicalDamageFrostBolt,
         SkillBranches::rangeMagicMissile,
         SkillBranches::moveHast,
         SkillBranches::meleeDamageFireBolt,
         SkillBranches::armorShield,
       }) {
+      audacity = 0;
+
       audacityBuild = 2;
       audacityMinion = 0.9;
       audacityWizard = 1.5;
@@ -28,7 +30,7 @@ namespace AICup
     void update(const model::Wizard& self, model::Move& move) override {
       Role::update(self, move);
 
-      audacity = 1.75 * self.getLife() / self.getMaxLife() - 1;
+      audacity = - (1 - (self.getLife() / self.getMaxLife()));
     }
   };
 }

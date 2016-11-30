@@ -32,19 +32,11 @@ namespace AICup
 
     //копия строения но c уменьшенным временем удара
     Building(const model::Building& building, int ticks);
+
+    /// для создания вражеских невидимых строений
+    Building(double x, double y, model::Faction faction, const model::Building& build);
   };
 
-  class BaseBuilding: public model::Building {
-  public:
-    //свое строение, дабы чтобы было в неизвестных зонах
-    BaseBuilding(double x, double y, model::Faction faction);
-  };
-
-  class TowerBuilding: public model::Building {
-  public:
-    //свое строение, дабы чтобы было в неизвестных зонах
-    TowerBuilding(double x, double y, model::Faction faction);
-  };
 
   class Minion: public model::Minion {
   public:

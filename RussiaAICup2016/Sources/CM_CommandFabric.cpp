@@ -29,6 +29,9 @@
 #include "CM_CommandAvoidMinion.h"
 #include "CM_CommandAvoidProjectile.h"
 
+#include "CM_CommandCastHast.h"
+#include "CM_CommandCastShield.h"
+
 #include "C_Extensions.h"
 #include <cassert>
 
@@ -116,4 +119,11 @@ MoveCommandPtr CommandFabric::avoidEnemy(const model::LivingUnit& unit) const {
 // /уворот от снаряда
 MoveCommandPtr CommandFabric::avoidProjectile(const model::Projectile& projectile) const {
   return std::make_shared<CommandAvoidProjectile>(finder, projectile);
+}
+
+CastCommandPtr CommandFabric::haste() const {
+  return std::make_shared<CommandCastHast>();
+}
+CastCommandPtr CommandFabric::shield() const {
+  return std::make_shared<CommandCastShield>();
 }

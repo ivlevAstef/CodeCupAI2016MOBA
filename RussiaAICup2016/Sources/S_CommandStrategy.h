@@ -36,6 +36,7 @@ namespace AICup
   private:
     const Vector move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, TurnStyle& turnStyle, Vector& turnDirection, double& speedLimit, bool& deactivateOtherTurn);
     const model::LivingUnit* attack(const Wizard& self, model::ActionType& action);
+    const long long int cast(const Wizard& self, model::ActionType& action);
 
     std::vector<MoveCommand::Result> moveCommandsToMoveResult(const Wizard& self) const;
 
@@ -47,6 +48,7 @@ namespace AICup
 
     std::vector<MoveCommandPtr> moveCommands;
     std::vector<AttackCommandPtr> attackCommands;
+    std::vector<CastCommandPtr> castCommands;
   };
 
   typedef std::shared_ptr<CommandStrategy> CommandStrategyPtr;

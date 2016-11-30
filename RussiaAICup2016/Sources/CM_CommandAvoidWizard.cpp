@@ -12,6 +12,7 @@ using namespace AICup;
 CommandAvoidWizard::CommandAvoidWizard(Algorithm::PathFinder& finder, const model::Wizard& wizard) :
   MoveCommand(finder), wizard(wizard) {
   distance = 0;
+  checkDistance = 0;
 }
 
 bool CommandAvoidWizard::check(const Wizard& self) {
@@ -39,7 +40,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     const double distance1 = EX::cooldownMaxSkill(wizard, model::ACTION_MAGIC_MISSILE) * self.maxBackwardSpeed();
     const double maxDistance = MAX(distance1, MAX(distance2, distance3));
     const double mDistance = mRadius - maxDistance;
-    const double mCheckDistance = castRange - maxDistance;
+    const double mCheckDistance = castRange - maxDistance + Game::model().getMagicMissileRadius();
 
     finalDistance = MAX(finalDistance, mDistance);
     finalCheckDistance = MAX(finalCheckDistance, mCheckDistance);
@@ -51,19 +52,19 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     const double distance1 = EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL) * self.maxBackwardSpeed();
     const double maxDistance = MAX(distance1, MAX(distance2, distance3));
     const double fDistance = fRadius - maxDistance;
-    const double fCheckDistance = castRange - maxDistance;
+    const double fCheckDistance = castRange - maxDistance + Game::model().getFireballRadius();
 
     finalDistance = MAX(finalDistance, fDistance);
     finalCheckDistance = MAX(finalCheckDistance, fCheckDistance);
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
-    const double fRadius = EX::radiusForGuaranteedDodgeFrostBolt(self);
+    const double fRadius = 50/*экстра радиус ибо попасться на это это очень плохо*/ + EX::radiusForGuaranteedDodgeFrostBolt(self);
 
     const double distance1 = EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT) * self.maxBackwardSpeed();
     const double maxDistance = MAX(distance1, MAX(distance2, distance3));
     const double fDistance = fRadius - maxDistance;
-    const double fCheckDistance = castRange - maxDistance;
+    const double fCheckDistance = castRange - maxDistance + Game::model().getFrostBoltRadius();
 
     finalDistance = MAX(finalDistance, fDistance);
     finalCheckDistance = MAX(finalCheckDistance, fCheckDistance);
@@ -81,7 +82,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   }
 
   /// если далеко, то бояться его не стоит
-  if (delta.length() > MAX(finalDistance, finalCheckDistance) + self.maxSpeed()) {
+  if (delta.length() > MAX(finalCheckDistance, finalDistance) + self.maxSpeed()) {
     return false;
   }
 
@@ -91,8 +92,9 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   }
 
   distance = finalDistance;
+  checkDistance = finalCheckDistance;
 
-  return false;
+  return true;
 }
 
 void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
@@ -100,13 +102,22 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   const auto wizardPos = EX::pos(wizard);
   const auto delta = selfPos - wizardPos;
 
-  const auto pos = wizardPos + delta.normal() * distance;
+  const auto pos = wizardPos + delta.normal() * MIN(distance, checkDistance);
+  if (delta.length() < MIN(distance, checkDistance)) {
+    result.turnStyle = TurnStyle::BACK_TURN;
+  } else {
+    result.turnStyle = TurnStyle::TURN;
+  }
 
   result.moveDirection = pos - selfPos;
   result.speedLimit = -1;
-  result.turnStyle = TurnStyle::SIDE_TURN;
   result.turnPriority = TurnPriority::avoidWizard + int(delta.length()/2);
   result.deactivateOtherTurn = false;
+
+  // если я совсем далеко то поворачиватся не нужно
+  if (delta.length() > distance && delta.length() > checkDistance) {
+    return;
+  }
 
   auto direction = delta.perpendicular().normal();
   /// если угол больше 90 градусов то выбран не оптимальный из двух возможных перпендикуляров
@@ -114,20 +125,19 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
     direction *= -1;
   }
 
-  if (delta.length() < distance + Algorithm::timeToTurn(self, direction.angle()) * self.maxBackwardSpeed()) {
-    const auto minTimeForMagic = EX::minTimeForMagic(wizard);
-    const auto minTimeForRotate = Algorithm::timeToTurnForAttack(self, wizard);
-    const auto miTimeForUnFrozen = EX::frozenTime(wizard);
+  const auto timeToTurn = Algorithm::timeToTurn(self, direction.angle());
 
-    const auto minTime = MAX(minTimeForMagic, MAX(minTimeForRotate, miTimeForUnFrozen));
-
-    const auto ticksToRotate = Algorithm::timeToTurn(self, direction.angle());
-    result.deactivateOtherTurn = minTime < ticksToRotate;
+  /// Если враг на подходе, то поворачиваемся в обязательном порядке
+  if (timeToTurn * EX::maxSpeed(wizard) + distance > delta.length()) {
+    result.turnStyle = TurnStyle::SIDE_TURN;
+    if (self.getLife() < 50) {
+      result.deactivateOtherTurn = true;
+    }
   }
 }
 
 double CommandAvoidWizard::priority(const Wizard& self) {
-  return MovePriorities::avoidWizard(self, wizard) * self.getRole().getWizardPriority();
+  return MovePriorities::avoidWizard(self, wizard) * self.getRole().getAudacityWizard();
 }
 
 #ifdef ENABLE_VISUALIZATOR

@@ -25,7 +25,7 @@ bool CommandMoveGetExpirience::check(const Wizard& self) {
   unit = nullptr;
   followCommand = nullptr;
 
-  static const double expirienceRadius = 600 - 10/*на всякий случай*/;
+  static const double expirienceRadius = 550;
   double minLive = 100000;
 
   const auto selfPos = Position(self.getX(), self.getY());

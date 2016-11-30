@@ -32,7 +32,7 @@ double CommandFollowAttack::priority(const Wizard& self) {
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandAttackWizard::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
+void CommandFollowAttack::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
   if (Visualizator::PRE == visualizator.getStyle()) {
     visualizator.line(self.getX(), self.getY(), wizard.getX(), wizard.getY(), 0xaaffaa);
   }

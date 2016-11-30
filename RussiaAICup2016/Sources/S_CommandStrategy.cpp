@@ -35,6 +35,15 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
     }
   }
 
+  if (!castCommands.empty()) {
+    model::ActionType action;
+    long long int id = cast(self, action);
+    if (id > 0) {
+      finalMove.setStatusTargetId(id);
+      finalMove.setAction(action);
+    }
+  }
+
   if (deactivateOtherTurn) {
     finalMove.setTurn(turnSave);
   }
@@ -164,6 +173,32 @@ const model::LivingUnit* CommandStrategy::attack(const Wizard& self, model::Acti
   action = result.action;
   return result.unit;
 }
+
+const long long int CommandStrategy::cast(const Wizard& self, model::ActionType& action) {
+  double maxPriority = 0;
+  CastCommandPtr maxCastCommand = nullptr;
+
+  for (const auto& castCommand: castCommands) {
+    const double priority = castCommand->priority(self);
+    if (priority > maxPriority) {
+      maxPriority = priority;
+      maxCastCommand = castCommand;
+    }
+  }
+
+  if (nullptr == maxCastCommand) {
+    return -1;
+  }
+
+
+  long long int id = -1;
+  CastCommand::Result result;
+  maxCastCommand->execute(self, result);
+
+  action = result.action;
+  return result.id;
+}
+
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandStrategy::visualization(const model::Wizard& self, const Visualizator& visualizator) const {

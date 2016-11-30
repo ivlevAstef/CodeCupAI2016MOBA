@@ -41,16 +41,18 @@ double Algorithm::timeToTurnForAttack(const model::Unit& attacked, const model::
   const auto enemyPos = Position(attacked.getX(), attacked.getY());
 
   const auto dir = enemyPos - selfPos;
-  return timeToTurn(attacking, dir.angle());
+  double angleDeviation = Math::angleDiff(dir.angle(), attacking.getAngle());
+  angleDeviation = ABS(angleDeviation);
+
+  const double needTurnAngle = MAX(0, angleDeviation - Game::instance().model().getStaffSector() * 0.5);
+  return needTurnAngle / EX::turnSpeed(attacking);
 }
 
 double Algorithm::timeToTurn(const model::Wizard& wizard, const double angle) {
   double angleDeviation = Math::angleDiff(angle, wizard.getAngle());
   angleDeviation = ABS(angleDeviation);
 
-  const double needTurnAngle = MAX(0, angleDeviation - Game::instance().model().getStaffSector()* 0.5);
-  /// если времени до атаки больше чем времени до разворота, то можно пока не атаковать
-
+  const double needTurnAngle = MAX(0, angleDeviation);
   return needTurnAngle / EX::turnSpeed(wizard);
 }
 

@@ -19,8 +19,7 @@ CommandMoveToLine::CommandMoveToLine(Algorithm::PathFinder& finder, model::LaneT
 }
 
 bool CommandMoveToLine::check(const Wizard& self) {
-  /// Чем больше хп, тем больше можно наглеть и идти вперед
-  const auto offset = 200 * ((1-self.getRole().getAudacity()) - (self.getLife() / self.getMaxLife()));
+  const auto offset = -100 * self.getRole().getAudacity();
   auto position = InfluenceMap::instance().getForeFront(line, float(offset));
   commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, position.x, position.y);
 

@@ -228,16 +228,20 @@ void PathFinder::calculateWeight(Vector2D<int> to) {
   } while (areaBegin != areaEnd); // пока не посчитаем всю карту
 }
 
+struct PathNeighbors {
+  Vector2D<int> n;
+  float mult;
+};
 void PathFinder::calculatePath(Path& path) const {
-  static const Vector2D<int> neighbors[8] = {
-    Vector2D<int>(-1,  0),
-    Vector2D<int>(0, -1),
-    Vector2D<int>(1,  0),
-    Vector2D<int>(0,  1),
-    Vector2D<int>(1,  1),
-    Vector2D<int>(1, -1),
-    Vector2D<int>(-1, -1),
-    Vector2D<int>(-1,  1)
+  static const PathNeighbors neighbors[8] = {
+    {Vector2D<int>(-1,  0), 1},
+    {Vector2D<int>(0, -1), 1},
+    {Vector2D<int>(1,  0), 1},
+    {Vector2D<int>(0,  1), 1},
+    {Vector2D<int>(1,  1), sqrt(2)},
+    {Vector2D<int>(1, -1), sqrt(2)},
+    {Vector2D<int>(-1, -1), sqrt(2)},
+    {Vector2D<int>(-1,  1), sqrt(2)}
   };
 
   // ревертируем точки
@@ -267,10 +271,11 @@ void PathFinder::calculatePath(Path& path) const {
     float minWeight = weights[pos.x][pos.y];
 
     for (const auto& neighbor : neighbors) {
-      const int nX = pos.x + neighbor.x;
-      const int nY = pos.y + neighbor.y;
-      if (weights[nX][nY] < minWeight) {
-        minWeight = weights[nX][nY];
+      const int nX = pos.x + neighbor.n.x;
+      const int nY = pos.y + neighbor.n.y;
+      const double weight = weights[pos.x][pos.y] + (weights[nX][nY] - weights[pos.x][pos.y])* neighbor.mult;
+      if (weight < minWeight) {
+        minWeight = weight;
         iter.set(nX, nY);
       }
     }

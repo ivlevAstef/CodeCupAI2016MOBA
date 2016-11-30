@@ -20,7 +20,7 @@ namespace AICup
 {
   class InfluenceMapConstants {
   public:
-    static const size_t step = 200;
+    static const size_t step = 100;
     static const size_t memorySize = 4000 / step;
     static const int neutral = 0;
 
@@ -42,6 +42,9 @@ namespace AICup
     /// Линия фронта - точка где находиться край своих (юнитов, зданий). за частую он совпадает с краем врагов, но не обязательно
     Position getForeFront(const model::LaneType lane, const float offset = 0) const;
 
+    /// положительный наших больше, отрицательный наших меньше
+    float getLineStrength(const model::LaneType lane) const;
+
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const;
 #endif // ENABLE_VISUALIZATOR
@@ -60,10 +63,13 @@ namespace AICup
     const std::vector<Position>& getLinePoints(const model::LaneType lane) const;
     Position calculateForeFront(const model::LaneType lane) const;
     bool isFriendZone(const int x, const int y) const;
+    float zonePriority(const int x, const int y) const;
     Position pointToForeFront(const int x, const int y, const std::vector<Position>& line, const size_t index) const;
 
     Position offsetForeFront(const Position& foreFront, float offset, const std::vector<Position>& line) const;
   private:
+    int lastCalculateTick;
+
     Position topForeFront;
     Position middleForeFront;
     Position bottomForeFront;

@@ -8,6 +8,7 @@
 
 #include "CM_MoveCommand.h"
 #include "CM_AttackCommand.h"
+#include "CM_CastCommand.h"
 #include "E_Types.h"
 #include "model\LaneType.h"
 #include "model\Projectile.h"
@@ -62,6 +63,10 @@ namespace AICup
 
     // /уворот от снаряда
     MoveCommandPtr avoidProjectile(const model::Projectile& projectile) const;
+
+/// #pragma mark - cast
+    CastCommandPtr haste() const;
+    CastCommandPtr shield() const;
 
   private:
     Algorithm::PathFinder& finder;

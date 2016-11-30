@@ -4,6 +4,7 @@
 #include "E_InfluenceMap.h"
 #include "C_Math.h"
 #include "C_Extensions.h"
+#include "A_ChangeLine.h"
 
 using namespace AICup;
 
@@ -40,16 +41,19 @@ void FirstStrategy::init(const Wizard& self) {
 void FirstStrategy::update(const Wizard& self, model::Move& move) {
   CommandStrategy::clear();
 
-  /// раз в 250 тиков пересматриваю линию,
-  /// 250 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
-  if (World::model().getTickIndex() - lastChangeLineTick >= 250) {
-    changeLane(self);
-    lastChangeLineTick = World::model().getTickIndex();
-  }
-
   if (!isInitialized) {
     init(self);
     isInitialized = true;
+  }
+
+  /// раз в 250 тиков пересматриваю линию,
+  /// 250 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
+  if (World::model().getTickIndex() - lastChangeLineTick >= 250) {
+    model::LaneType lane;
+    if (Algorithm::checkChangeLine(pathFinder, self, lane)) {
+      myLine = lane;
+    }
+    lastChangeLineTick = World::model().getTickIndex();
   }
 
   const auto avoidAroundCommands = calcAllAroundEnemies(self);
@@ -112,6 +116,18 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
   }
 
 
+  const auto castHasteCommand = fabric.haste();
+  if (nullptr != castHasteCommand && castHasteCommand->check(self)) {
+    castCommands.push_back(castHasteCommand);
+  }
+
+  const auto castShieldCommand = fabric.shield();
+  if (nullptr != castShieldCommand && castShieldCommand->check(self)) {
+    castCommands.push_back(castShieldCommand);
+  }
+
+
+
   /*
   как должно быть:
   1)!! пока нету крипов, иследуем карту и бъем нейтралов, для получения опыта и очков
@@ -149,55 +165,4 @@ const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const Wiza
   }
 
   return avoidAroundCommands;
-}
-
-void FirstStrategy::changeLane(const Wizard& self) {
-  const auto basePosition = Points::point(Points::ACADEMY_BASE);
-  const auto topPosition = InfluenceMap::instance().getForeFront(model::LANE_TOP, 0);
-  const auto middlePosition = InfluenceMap::instance().getForeFront(model::LANE_MIDDLE, 0);
-  const auto bottomPosition = InfluenceMap::instance().getForeFront(model::LANE_BOTTOM, 0);
-
-  std::shared_ptr<Algorithm::Path> path;
-
-  pathFinder.calculatePath(topPosition, path);
-  double selfTopLength = path->getRealLength();
-  pathFinder.calculatePath(middlePosition, path);
-  double selfMiddleLength = path->getRealLength();
-  pathFinder.calculatePath(bottomPosition, path);
-  double selfBottomLength = path->getRealLength();
-
-  double topLength = abs((basePosition - topPosition).x) + abs((basePosition - topPosition).y);
-  double middleLength = (basePosition - middlePosition).length();
-  double bottomLength = abs((basePosition - bottomPosition).x) + abs((basePosition - bottomPosition).y);
-
-
-  double priorityTop = (8000 - topLength) - 2 * selfTopLength;
-  double priorityMiddle = (sqrt(2) * (5657 - middleLength)) - 2 * selfMiddleLength;
-  double priorityBottom = (8000 - bottomLength) - 2 * selfBottomLength;
-  /// если очень близко к базе то увеличиваем
-  const double cTop = (1600 - topLength) / 250.0;
-  const double cMiddle = (1600 - middleLength) / 250.0;
-  const double cBottom = (1600 - bottomLength) / 250.0;
-  priorityTop *= (topLength < 1600) ? (1 + cTop*cTop) : 1;
-  priorityMiddle *= (middleLength < 1600) ? (1 + cMiddle*cMiddle) : 1;
-  priorityBottom *= (bottomLength < 1600) ? (1 + cBottom*cBottom) : 1;
-
-  // Если много своих то уменьшаем
-  priorityTop /= MAX(0.75, sqrt(World::instance().wizardCount(model::LANE_TOP, self)));
-  priorityMiddle /= MAX(0.75, sqrt(World::instance().wizardCount(model::LANE_MIDDLE, self)));
-  priorityBottom /= MAX(0.75, sqrt(World::instance().wizardCount(model::LANE_BOTTOM, self)));
-
-  const auto minPriority = MIN(priorityTop, MIN(priorityMiddle, priorityBottom));
-  const auto maxPriority = MAX(priorityTop, MAX(priorityMiddle, priorityBottom));
-  if (maxPriority - minPriority < 1200) { // не меняем линию если нет большого перевеса
-    return;
-  }
-
-  if (priorityTop > priorityMiddle && priorityTop > priorityBottom) {
-    myLine = model::LANE_TOP;
-  } else if (priorityMiddle > priorityTop && priorityMiddle > priorityBottom) {
-    myLine = model::LANE_MIDDLE;
-  } else {
-    myLine = model::LANE_BOTTOM;
-  }
 }

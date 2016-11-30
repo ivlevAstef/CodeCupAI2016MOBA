@@ -20,13 +20,18 @@ InfluenceMap::InfluenceMap() {
   topForeFront = Points::point(Points::TOP_CENTER);
   middleForeFront = Points::point(Points::MIDDLE_CENTER);
   bottomForeFront = Points::point(Points::BOTTOM_CENTER);
+  lastCalculateTick = -10000;
 }
 
 void InfluenceMap::update() {
-  clean();
-  includeFriends();
-  includeEnemies();
-  includeHypotheticalEnemies();
+  if (lastCalculateTick + 30 < World::model().getTickIndex()) {
+    clean();
+    includeFriends();
+    includeEnemies();
+    includeHypotheticalEnemies();
+
+    lastCalculateTick = World::model().getTickIndex();
+  }
 
   updateLinePosition();
 }
@@ -92,23 +97,58 @@ Position InfluenceMap::getForeFront(const model::LaneType lane, const float offs
   return Position(0,0);
 }
 
+float InfluenceMap::getLineStrength(const model::LaneType lane) const {
+  const std::vector<Position>& linePoints = getLinePoints(lane);
+
+  float strength = 0;
+  /// идем по всем точкам, если зона дружественная, значит это линия фронта так как начинаем идти от врагов
+  for (size_t i = 1; i < linePoints.size(); i++) {
+    auto p1 = InfluenceMapConstants::toInt(linePoints[i - 1]);
+    auto p2 = InfluenceMapConstants::toInt(linePoints[i]);
+
+    /// ограничивыем точки дабы не выйти за границу в цикле
+    p1.x = MAX(2, MIN(p1.x, InfluenceMapConstants::memorySize - 1 - 2));
+    p1.y = MAX(2, MIN(p1.y, InfluenceMapConstants::memorySize - 1 - 2));
+    p2.x = MAX(2, MIN(p2.x, InfluenceMapConstants::memorySize - 1 - 2));
+    p2.y = MAX(2, MIN(p2.y, InfluenceMapConstants::memorySize - 1 - 2));
+
+    const auto delta = p2 - p1;
+
+    if (abs(delta.x) > abs(delta.y)) {
+      int sign = SIGN(p2.x - p1.x);
+      for (int x = p1.x; x != p2.x + sign; x += sign) {
+        const int y = p1.y + ((x - p1.x) * delta.y) / delta.x;
+        strength += zonePriority(x, y);
+      }
+    } else {
+      int sign = SIGN(p2.y - p1.y);
+      for (int y = p1.y; y != p2.y + sign; y += sign) {
+        const int x = p1.x + ((y - p1.y) * delta.x) / delta.y;
+        strength += zonePriority(x, y);
+      }
+    }
+  }
+
+  return strength;
+}
+
 const std::vector<Position>& InfluenceMap::getLinePoints(const model::LaneType lane) const {
   /// Массивы точек, по которым идут крипы
   static const std::vector<Position> topLinePoints = {
-    Points::point(Points::RENEGADES_BASE_TOP),
+    Points::point(Points::RENEGADES_BASE),
     Points::point(Points::TOP_CENTER),
-    Points::point(Points::ACADEMY_BASE_TOP)
+    Points::point(Points::ACADEMY_BASE)
   };
 
   static const std::vector<Position> middleLinePoints = {
-    Points::point(Points::RENEGADES_BASE_MIDDLE),
-    Points::point(Points::ACADEMY_BASE_MIDDLE)
+    Points::point(Points::RENEGADES_BASE),
+    Points::point(Points::ACADEMY_BASE)
   };
 
   static const std::vector<Position> bottomLinePoints = {
-    Points::point(Points::RENEGADES_BASE_BOTTOM),
+    Points::point(Points::RENEGADES_BASE),
     Points::point(Points::BOTTOM_CENTER),
-    Points::point(Points::ACADEMY_BASE_BOTTOM)
+    Points::point(Points::ACADEMY_BASE)
   };
 
 
@@ -135,10 +175,10 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
     auto p2 = InfluenceMapConstants::toInt(linePoints[i]);
 
     /// ограничивыем точки дабы не выйти за границу в цикле
-    p1.x = MAX(1, MIN(p1.x, InfluenceMapConstants::memorySize - 2));
-    p1.y = MAX(1, MIN(p1.y, InfluenceMapConstants::memorySize - 2));
-    p2.x = MAX(1, MIN(p2.x, InfluenceMapConstants::memorySize - 2));
-    p2.y = MAX(1, MIN(p2.y, InfluenceMapConstants::memorySize - 2));
+    p1.x = MAX(2, MIN(p1.x, InfluenceMapConstants::memorySize - 1 - 2));
+    p1.y = MAX(2, MIN(p1.y, InfluenceMapConstants::memorySize - 1 - 2));
+    p2.x = MAX(2, MIN(p2.x, InfluenceMapConstants::memorySize - 1 - 2));
+    p2.y = MAX(2, MIN(p2.y, InfluenceMapConstants::memorySize - 1 - 2));
 
     const auto delta = p2 - p1;
 
@@ -166,27 +206,22 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
   return linePoints[linePoints.size()-1];
 }
 
-bool InfluenceMap::isFriendZone(const int x, const int y) const {
-  static const Vector2D<int> neighbors[8] = {
-    Vector2D<int>(-1,  0),
-    Vector2D<int>(0, -1),
-    Vector2D<int>(1,  0),
-    Vector2D<int>(0,  1),
-    Vector2D<int>(1,  1),
-    Vector2D<int>(1, -1),
-    Vector2D<int>(-1, -1),
-    Vector2D<int>(-1,  1)
-  };
-
-  auto friendForce = friends[x][y];
-  auto enemyForce = enemies[x][y];
-  for (const auto& n : neighbors) {
-    friendForce += friends[x + n.x][y + n.y];
-    enemyForce += enemies[x + n.x][y + n.y];
+float InfluenceMap::zonePriority(const int x, const int y) const {
+  float friendForce = 0;
+  float enemyForce = 0;
+  for (int nx = -2; nx <= 2; nx++) {
+    for (int ny = -2; ny <= 2; ny++) {
+      friendForce += friends[x + nx][y + ny];
+      enemyForce += enemies[x + nx][y + ny];
+    }
   }
 
+  return friendForce - enemyForce;
+}
+
+bool InfluenceMap::isFriendZone(const int x, const int y) const {
   ///если в округе силы сильнее на одного юнита чем у врага, то значит подходит
-  return 20 < friendForce - enemyForce;
+  return 40 < zonePriority(x, y);
 }
 
 Position InfluenceMap::pointToForeFront(const int x, const int y, const std::vector<Position>& line, const size_t index) const {
@@ -253,7 +288,7 @@ double minionRadius(const model::Minion& minion) {
 }
 
 float minionDanger(const model::Minion& minion) {
-  return minion.getLife() * minionDps(minion);
+  return minion.getLife() * minionDps(minion) * 0.5f;
 }
 
 float buildDps(const model::Building& build) {
@@ -261,14 +296,13 @@ float buildDps(const model::Building& build) {
 }
 
 double buildRadius(const model::Building& build, const double coef) {
-  const double ticks = 1 - ((double)build.getRemainingActionCooldownTicks() / (double)build.getCooldownTicks());
+  double ticks = 1 - ((double)build.getRemainingActionCooldownTicks() / (double)build.getCooldownTicks());
+  ticks = MAX(0.5, ticks); /// чтобы совсем в ноль радиус не уходил не уходила
   return MAX(build.getRadius(), build.getAttackRange() * ticks * coef);
 }
 
 float buildDanger(const model::Building& build, const double coef) {
-  float ticks = 1.0f - ((float)build.getRemainingActionCooldownTicks() / (float)build.getCooldownTicks());
-  ticks = MAX(0.4f, ticks); /// чтобы совсем в ноль опасность не уходила
-  return float(build.getLife()) * float(coef) * 0.08f/*иначе слишком опасная*/ * buildDps(build) * ticks;
+  return float(build.getLife()) * float(coef) * 0.1f/*иначе слишком опасная*/ * buildDps(build);
 }
 
 void InfluenceMap::includeFriends() {

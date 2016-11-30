@@ -80,7 +80,7 @@ void CommandAttackFrostbolt::execute(const Wizard& self, Result& result) {
 }
 
 double CommandAttackFrostbolt::priority(const Wizard& self) {
-  return AttackPriorities::attackFrostbolt(self);
+  return AttackPriorities::attackFrostbolt(self) * self.getRole().getAttackSkillPriority();
 }
 
 #ifdef ENABLE_VISUALIZATOR

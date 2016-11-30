@@ -28,10 +28,7 @@ namespace AICup
 
   class Role {
   public:
-    Role(const float audacity,
-      const float importanceOfXP,
-      const float importanceOfBonus,
-      const SkillBuild& skillBuild);
+    Role(const SkillBuild& skillBuild);
 
     /// устанавливает скилы
     virtual void update(const model::Wizard& self, model::Move& move);
@@ -67,6 +64,10 @@ namespace AICup
       return wizardPriority;
     }
 
+    inline const float& getAttackSkillPriority() const {
+      return attackSkillPriority;
+    }
+
     /// дерзость по типам
     inline const float& getAudacityBuild() const {
       return audacityBuild;
@@ -78,9 +79,26 @@ namespace AICup
       return audacityWizard;
     }
 
+    // смена линии
+    inline const float& getDesireChangeLine() const {
+      return desireChangeLine;
+    }
+    inline const float& getChangeLinePathLengthPriority() const {
+      return changeLinePathLengthPriority;
+    }
+    inline const float& getChangeLineWizardCountPriority() const {
+      return changeLineWizardCountPriority;
+    }
+    inline const float& getChangeLineTowerBalancePriority() const {
+      return changeLineTowerBalancePriority;
+    }
+    inline const float& getChangeLineLaneStrengthPriority() const {
+      return changeLineLaneStrengthPriority;
+    }
+
   protected:
-    float audacity; // дерзость. 0 не дерзкий, 1 - нормальная, влияет на расположение на линии
-    float importanceOfXP; // Важность получения XP.  0 - не нужен, 1 - нормальная
+    float audacity; // дерзость. влияет на расположение на линии, каждая +1 увеличивает близость к врагу на 100, -1 увеличивает на 100
+    float importanceOfXP; // Важность получения XP.  0 - не нужен, 1 - нормальная. влияет насколько сильно тянет к линии героя, и насколько сильно он приследует умирающие цели
     float importanceOfBonus; // Важность взятия бонуса. 0 - не нужен, 1 - нормальная
 
     /// приоритеты атаки. 0 не будет бить никогда, 1 - нормальная
@@ -88,12 +106,20 @@ namespace AICup
     float minionPriority;
     float treePriority;
     float wizardPriority;
+    float attackSkillPriority;
 
     /// насколько приоритетно избегание объектов
     float audacityBuild;
     float audacityMinion;
     float audacityWizard;
 
+
+    /// смена линии
+    float desireChangeLine; /// насколько сильно бот будет хотеть менять линию - 0 никогда.
+    float changeLinePathLengthPriority; /// насколько сильно влияет длина пути которую надо пройти до линии
+    float changeLineWizardCountPriority; /// насколько сильно влияет количество своих магов на линии
+    float changeLineTowerBalancePriority; /// насколько сильно влияет количество вышек на линии (свои - вражеские)
+    float changeLineLaneStrengthPriority; /// насколько сильно влияет дизбаланс сил
 
     SkillBuild skillBuild; // Последовательность изучения скилов
 

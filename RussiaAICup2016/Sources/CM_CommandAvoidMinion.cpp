@@ -22,7 +22,7 @@ bool CommandAvoidMinion::check(const Wizard& self) {
 
   double distance = 0;
   if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
-    distance = mc.getOrcWoodcutterAttackRange() + self.getRadius() + 50/*на всякий случай*/;
+    distance = mc.getOrcWoodcutterAttackRange() + self.getRadius() + 150/*на всякий случай*/;
   } else {
     distance = mc.getFetishBlowdartAttackRange() + self.getRadius() + mc.getDartRadius();
   }
@@ -51,7 +51,7 @@ void CommandAvoidMinion::execute(const Wizard& self, Result& result) {
 }
 
 double CommandAvoidMinion::priority(const Wizard& self) {
-  return MovePriorities::avoidMinion(self, minion) * self.getRole().getMinionPriority();
+  return MovePriorities::avoidMinion(self, minion) * self.getRole().getAudacityMinion();
 }
 
 #ifdef ENABLE_VISUALIZATOR

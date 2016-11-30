@@ -43,6 +43,9 @@
     <Filter Include="Sources\Roles">
       <UniqueIdentifier>{9e3f5b50-366d-4ac0-8dbb-0909b396c6ce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Command\Commands\Cast">
+      <UniqueIdentifier>{9c594fb6-9ec6-44ed-aee2-b7c3c7892ef9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Sources\MyStrategy.cpp">
@@ -147,9 +150,6 @@
     <ClCompile Include="..\Sources\CM_AttackPriorities.cpp">
       <Filter>Sources\Command\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="..\Sources\R_Role.cpp">
-      <Filter>Sources\Roles</Filter>
-    </ClCompile>
     <ClCompile Include="..\Sources\E_Wizard.cpp">
       <Filter>Sources\Environment</Filter>
     </ClCompile>
@@ -185,6 +185,18 @@
     </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandAvoidProjectile.cpp">
       <Filter>Sources\Command\Commands\defend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\A_ChangeLine.cpp">
+      <Filter>Sources\Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\R_Role.cpp">
+      <Filter>Sources\Roles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandCastHast.cpp">
+      <Filter>Sources\Command\Commands\Cast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandCastShield.cpp">
+      <Filter>Sources\Command\Commands\Cast</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -314,9 +326,6 @@
     <ClInclude Include="..\Sources\CM_CommandFollowAttackEnemy.h">
       <Filter>Sources\Command\Commands\attack</Filter>
     </ClInclude>
-    <ClInclude Include="..\Sources\CM_CommandChangeLine.h">
-      <Filter>Sources\Command\Commands\move</Filter>
-    </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandAttackWizard.h">
       <Filter>Sources\Command\Commands\attack</Filter>
     </ClInclude>
@@ -349,6 +358,21 @@
     </ClInclude>
     <ClInclude Include="..\Sources\CM_TurnPriority.h">
       <Filter>Sources\Command\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\R_RolePusher.h">
+      <Filter>Sources\Roles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\A_ChangeLine.h">
+      <Filter>Sources\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandCastHast.h">
+      <Filter>Sources\Command\Commands\Cast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CastCommand.h">
+      <Filter>Sources\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandCastShield.h">
+      <Filter>Sources\Command\Commands\Cast</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

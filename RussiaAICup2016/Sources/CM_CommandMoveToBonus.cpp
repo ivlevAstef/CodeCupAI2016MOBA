@@ -65,7 +65,7 @@ bool CommandMoveToBonus::check(const Wizard& self) {
 
 
   /// если бежать далеко, то оно того не стоит
-  if (minMoveTicks > 300) {
+  if (minMoveTicks > 500) {
     return false;
   }
 

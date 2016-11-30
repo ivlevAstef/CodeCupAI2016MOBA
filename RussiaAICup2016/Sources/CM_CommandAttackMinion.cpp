@@ -51,7 +51,7 @@ void CommandAttackMinion::execute(const Wizard& self, Result& result) {
 }
 
 double CommandAttackMinion::priority(const Wizard& self) {
-  return self.getRole().getBuildPriority() * AttackPriorities::attackMinion(self, minion);
+  return self.getRole().getMinionPriority() * AttackPriorities::attackMinion(self, minion);
 }
 
 #ifdef ENABLE_VISUALIZATOR

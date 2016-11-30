@@ -306,7 +306,7 @@ int EX::cooldownMaxSkill(const model::Wizard& obj, model::ActionType action) {
 double EX::radiusForGuaranteedDodge(const model::Wizard& self) {
   const auto radius = self.getRadius() + Game::model().getMagicMissileRadius();
   ///такая скорость, ибо наврятли я буду стоять идеально боком
-  const auto speed = (maxSpeed(self) + maxStrafeSpeed(self)) * 0.5;
+  const auto speed = maxSpeed(self) * 0.25 + maxStrafeSpeed(self) * 0.75;
 
   return Game::model().getMagicMissileSpeed() * radius / speed;
 }
@@ -314,7 +314,7 @@ double EX::radiusForGuaranteedDodge(const model::Wizard& self) {
 double EX::radiusForGuaranteedDodgeFrostBolt(const model::Wizard& self) {
   const auto radius = self.getRadius() + Game::model().getFrostBoltRadius();
   ///такая скорость, ибо наврятли я буду стоять идеально боком
-  const auto speed = maxSpeed(self) * 0.75 + maxStrafeSpeed(self) * 0.25;
+  const auto speed = maxSpeed(self) * 0.25 + maxStrafeSpeed(self) * 0.75;
 
   return Game::model().getFrostBoltSpeed() * radius / speed;
 }
@@ -322,7 +322,7 @@ double EX::radiusForGuaranteedDodgeFrostBolt(const model::Wizard& self) {
 double EX::radiusForGuaranteedDodgeFireBall(const model::Wizard& self) {
   const auto radius = self.getRadius() + Game::model().getFireballRadius();
   ///такая скорость, ибо наврятли я буду стоять идеально боком
-  const auto speed = (maxSpeed(self) + maxStrafeSpeed(self)) * 0.5;
+  const auto speed = maxSpeed(self) * 0.25 + maxStrafeSpeed(self) * 0.75;
 
   return Game::model().getFireballSpeed() * radius / speed;
 }

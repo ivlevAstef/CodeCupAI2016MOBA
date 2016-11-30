@@ -56,6 +56,7 @@ namespace AICup
 
     const std::vector<const model::Wizard*> aroundAuraWizards(const model::Wizard& unit);
 
+    const int towerCount(model::LaneType line, model::Faction faction) const;
     const int wizardCount(model::LaneType line) const;
     const int wizardCount(model::LaneType line, const model::Wizard& excludeWizard) const;
     const model::LaneType positionToLine(const double x, const double y) const;
@@ -78,6 +79,7 @@ namespace AICup
 
   private:
     bool isInitial;
+    int lastUpdateTick;
 
     const model::World* modelWorld;
 

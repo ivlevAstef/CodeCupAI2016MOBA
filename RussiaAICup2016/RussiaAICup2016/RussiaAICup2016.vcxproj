@@ -162,6 +162,7 @@ powershell start-process local-runner.bat</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Sources\A_Attack.cpp" />
+    <ClCompile Include="..\Sources\A_ChangeLine.cpp" />
     <ClCompile Include="..\Sources\A_Exec.cpp" />
     <ClCompile Include="..\Sources\A_PathFinder.cpp" />
     <ClCompile Include="..\Sources\CM_AttackCommand.h" />
@@ -176,6 +177,8 @@ powershell start-process local-runner.bat</Command>
     <ClCompile Include="..\Sources\CM_CommandAvoidMinion.cpp" />
     <ClCompile Include="..\Sources\CM_CommandAvoidProjectile.cpp" />
     <ClCompile Include="..\Sources\CM_CommandAvoidWizard.cpp" />
+    <ClCompile Include="..\Sources\CM_CommandCastHast.cpp" />
+    <ClCompile Include="..\Sources\CM_CommandCastShield.cpp" />
     <ClCompile Include="..\Sources\CM_CommandDefendPoint.cpp" />
     <ClCompile Include="..\Sources\CM_CommandFabric.cpp" />
     <ClCompile Include="..\Sources\CM_CommandFollow.cpp" />
@@ -211,6 +214,7 @@ powershell start-process local-runner.bat</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\A_Attack.h" />
+    <ClInclude Include="..\Sources\A_ChangeLine.h" />
     <ClInclude Include="..\Sources\A_Exec.h" />
     <ClInclude Include="..\Sources\A_PathFinder.h" />
     <ClInclude Include="..\Sources\CM_AttackPriorities.h" />
@@ -225,7 +229,9 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\CM_CommandAvoidMinion.h" />
     <ClInclude Include="..\Sources\CM_CommandAvoidProjectile.h" />
     <ClInclude Include="..\Sources\CM_CommandAvoidWizard.h" />
-    <ClInclude Include="..\Sources\CM_CommandChangeLine.h" />
+    <ClInclude Include="..\Sources\CM_CastCommand.h" />
+    <ClInclude Include="..\Sources\CM_CommandCastHast.h" />
+    <ClInclude Include="..\Sources\CM_CommandCastShield.h" />
     <ClInclude Include="..\Sources\CM_CommandDefendPoint.h" />
     <ClInclude Include="..\Sources\CM_CommandFabric.h" />
     <ClInclude Include="..\Sources\CM_CommandFollow.h" />
@@ -236,6 +242,7 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\CM_TurnPriority.h" />
     <ClInclude Include="..\Sources\E_InfluenceMap.h" />
     <ClInclude Include="..\Sources\E_HypotheticalEnemies.h" />
+    <ClInclude Include="..\Sources\R_RolePusher.h" />
     <ClInclude Include="..\Sources\R_StandardRole.h" />
     <ClInclude Include="..\Sources\E_Wizard.h" />
     <ClInclude Include="..\Sources\E_WorldObjects.h" />

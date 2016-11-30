@@ -1,5 +1,6 @@
 #include "E_Wizard.h"
 #include "R_StandardRole.h"
+#include "R_RolePusher.h"
 #include "C_Extensions.h"
 #include "C_Math.h"
 
@@ -15,7 +16,7 @@ Wizard::Wizard(const model::Wizard& wizard):
     wizard.getRemainingActionCooldownTicks(), wizard.getRemainingCooldownTicksByAction(),
     wizard.isMaster(), wizard.getMessages())
 {
-  role = std::make_shared<StandardRole>();
+  role = std::make_shared<RolePusher>();
 }
 
 void Wizard::update(model::Move& move) {

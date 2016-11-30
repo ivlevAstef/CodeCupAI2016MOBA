@@ -28,6 +28,8 @@ void World::update(const model::World& world) {
   updateVisionZone();
   updateSupposedData();
   updateMinions();
+
+  lastUpdateTick = world.getTickIndex();
 }
 
 const std::vector<model::Tree>& World::trees() const {
@@ -55,11 +57,7 @@ void World::initBuildings() {
     if (build.getFaction() == Game::friendFaction()) {
       const Position pos = Position(size() - build.getX(), size() - build.getY());
 
-      if (build.getType() == model::BUILDING_FACTION_BASE) {
-        supposedBuilding.push_back(BaseBuilding(pos.x, pos.y, Game::enemyFaction()));
-      } else {
-        supposedBuilding.push_back(TowerBuilding(pos.x, pos.y, Game::enemyFaction()));
-      }
+      supposedBuilding.push_back(Building(pos.x, pos.y, Game::enemyFaction(), build));
     }
   }
 }
@@ -158,12 +156,12 @@ static std::vector<Type> updateRadius(const std::vector<Type>& real) {
   return result;
 }
 
-static std::vector<model::Building> updateBuildingTicks(const std::vector<model::Building>& real) {
+static std::vector<model::Building> updateBuildingTicks(const std::vector<model::Building>& real, int tickDt) {
   std::vector<model::Building> result;
   result.reserve(real.size());
 
   for (const auto& obj : real) {
-    result.push_back(Building(obj, MAX(0, obj.getRemainingActionCooldownTicks() - 1)));
+    result.push_back(Building(obj, MAX(0, obj.getRemainingActionCooldownTicks() - tickDt)));
   }
 
   return result;
@@ -195,7 +193,7 @@ void World::updateSupposedData() {
   allTrees = supposedTrees;
   allTrees.insert(allTrees.end(), invisibleAreaTrees.begin(), invisibleAreaTrees.end());
 
-  supposedBuilding = updateBuildingTicks(supposedBuilding);
+  supposedBuilding = updateBuildingTicks(supposedBuilding, model().getTickIndex() - lastUpdateTick);
   supposedBuilding = merge(supposedBuilding, updateRadius<model::Building, Building>(modelWorld->getBuildings()), visionZone);
 }
 
@@ -220,6 +218,18 @@ const model::LaneType World::positionToLine(const double x, const double y) cons
   }
 
   return model::LANE_MIDDLE;
+}
+
+const int World::towerCount(model::LaneType lane, model::Faction faction) const {
+  int count = 0;
+  for (const auto& build : buildings()) {
+    if (faction == build.getFaction()
+      && model::BUILDING_GUARDIAN_TOWER == build.getType()
+      && lane == positionToLine(build.getX(), build.getY())) {
+      count++;
+    }
+  }
+  return count;
 }
 
 const int World::wizardCount(model::LaneType line) const {
