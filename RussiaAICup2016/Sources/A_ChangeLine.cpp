@@ -25,11 +25,11 @@ double Algorithm::calculateLinePrioirty(const Algorithm::PathFinder& finder, con
     case model::LANE_TOP:
     case model::LANE_BOTTOM:
       baseLength = abs((basePosition - position).x) + abs((basePosition - position).y);
-      baseReverseLength = 8000 - baseLength;
+      baseReverseLength = 7200 - baseLength;
       break;
     case model::LANE_MIDDLE:
       baseLength = sqrt(2) * (basePosition - position).length();
-      baseReverseLength = 8000 - baseLength;
+      baseReverseLength = 7200 - baseLength;
       break;
     default:
       break;
@@ -47,11 +47,15 @@ double Algorithm::calculateLinePrioirty(const Algorithm::PathFinder& finder, con
   double laneStrength = InfluenceMap::instance().getLineStrength(lane);
 
   /// все значения от 0 до 1000
-  double lengthPriority = (baseReverseLength * baseReverseLength) / (16 * 4000);
+  double lengthPriority = (baseReverseLength * baseReverseLength) / (14.4 * 3600);
   double distancePriority = 1000 - selfLength / 8;// будем предполагать что максимальная длина пути 8000
   double wizardPriority = 1000 - 200 * wizardCount;
   double towerPriority = 500 - 250 * towerBalance;// если своих башен нет то приоритет 1000
   double laneStrengthPriority = 500 - (MAX(-10000, MIN(laneStrength, 10000)) / 20);
+
+  if (laneStrength > 3000 && 0 == World::instance().towerCount(lane, Game::enemyFaction()) && baseReverseLength < 1200) {
+    return 10000; /// идем на ту линию где скоро снесут базу
+  }
 
   return lengthPriority
     + distancePriority * self.getRole().getChangeLinePathLengthPriority()

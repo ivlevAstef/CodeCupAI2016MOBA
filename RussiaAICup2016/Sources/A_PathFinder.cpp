@@ -327,13 +327,13 @@ void Path::visualization(const Visualizator& visualizator) const {
 
 
 void PathFinder::visualization(const Visualizator& visualizator) const {
- /* if (Visualizator::ABS == visualizator.getStyle()) {
+  /*if (Visualizator::ABS == visualizator.getStyle()) {
     for (int x = 0; x < PathConstants::memorySize; x++) {
       for (int y = 0; y < PathConstants::memorySize; y++) {
 
         const double weight = weights[x][y] / 200;
         int color = 255 - MIN(255, (int)(weight * 255));
-        visualizator.line(x, y, x, y, color << 8);
+        visualizator.fillRect(x*2, y*2, (x+1)*2, (y+1)*2, color << 8);
       }
     }
   }*/

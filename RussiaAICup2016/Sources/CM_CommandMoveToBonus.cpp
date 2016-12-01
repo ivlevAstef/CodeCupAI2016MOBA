@@ -65,12 +65,12 @@ bool CommandMoveToBonus::check(const Wizard& self) {
 
 
   /// если бежать далеко, то оно того не стоит
-  if (minMoveTicks > 500) {
+  if (minMoveTicks > 300) {
     return false;
   }
 
   /// если опыт на линии + тот опыт который может еще прийти, больше того что дают за бонус, то он не нужен
-  if (potensialExpirience(self) + minMoveTicks * 0.2  > Game::model().getBonusScoreAmount()) {
+  if (potensialExpirience(self) + minMoveTicks * 0.5  > Game::model().getBonusScoreAmount()) {
     return false;
   }
 

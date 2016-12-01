@@ -8,17 +8,17 @@ CommandCastShield::CommandCastShield() {
 
 bool CommandCastShield::check(const Wizard& self) {
   /// скил недоступен
-  if (!self.availableAction(model::ACTION_HASTE)) {
+  if (!self.availableAction(model::ACTION_SHIELD)) {
     return false;
   }
 
   /// скилл в кулдауне
-  if (self.cooldown(model::ACTION_HASTE) > 0) {
+  if (self.cooldown(model::ACTION_SHIELD) > 0) {
     return false;
   }
 
   // нет маны
-  if (self.getMana() < Game::model().getHasteManacost()) {
+  if (self.getMana() < Game::model().getShieldManacost()) {
     return false;
   }
 
@@ -35,7 +35,7 @@ bool CommandCastShield::check(const Wizard& self) {
 
 void CommandCastShield::execute(const Wizard& self, Result& result) {
   result.id = self.getId();
-  result.action = model::ACTION_HASTE;
+  result.action = model::ACTION_SHIELD;
 }
 
 double CommandCastShield::priority(const Wizard& self) {

@@ -84,7 +84,7 @@ double MovePriorities::follow(const Wizard&, const model::LivingUnit&) {
 }
 
 double MovePriorities::getExpirience(const Wizard& wizard, const model::LivingUnit&) {
-  return 450 * wizard.getRole().getImportanceOfXP();
+  return 350 * wizard.getRole().getImportanceOfXP();
 }
 
 double MovePriorities::keepDistance(const Wizard&, const Position, const double, const double) {
@@ -96,7 +96,7 @@ double MovePriorities::moveToBonus(const Wizard& self, const Position&) {
 }
 
 double MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {
-  return (250 + 500 * (self.getMaxLife() - self.getLife())) * self.getRole().getImportanceOfXP();
+  return (250 + 250 * (self.getMaxLife() - self.getLife())) * self.getRole().getImportanceOfXP();
 }
 
 double MovePriorities::moveToPoint(const Wizard&, const Position&) {

@@ -14,13 +14,13 @@ namespace AICup
   public:
     RolePusher() :
       Role({
-        SkillBranches::meleeDamageFireBolt,
+        SkillBranches::magicalDamageFrostBolt,
         SkillBranches::moveHast,
         SkillBranches::rangeMagicMissile,
-        SkillBranches::magicalDamageFrostBolt,
+        SkillBranches::meleeDamageFireBolt,
         SkillBranches::armorShield,
       }) {
-      audacity = -1.5;
+      audacity = -1.0;
 
       importanceOfXP = 1.5;
       importanceOfBonus = 0.5;
@@ -46,7 +46,10 @@ namespace AICup
     void update(const model::Wizard& self, model::Move& move) override {
       Role::update(self, move);
 
-      audacity = -1.5 - 5 * (1 - (float(self.getLife()) / float(self.getMaxLife())));
+      audacity = -1.0 - 5 * (1 - (float(self.getLife()) / float(self.getMaxLife())));
+      if (self.getLife() < 24) {
+        audacity -= 2;
+      }
     }
   };
 }

@@ -16,7 +16,11 @@ double AttackPriorities::attackBuild(const Wizard& self, const model::Building& 
 }
 
 double AttackPriorities::attackMinion(const Wizard& self, const model::Minion& minion) {
-  const double lifePriority = 500 * (minion.getMaxLife() - minion.getLife()) / minion.getMaxLife();
+  double lifePriority = 500 * (minion.getMaxLife() - minion.getLife()) / minion.getMaxLife();
+  if (self.damage(model::ACTION_MAGIC_MISSILE) < minion.getLife()) {
+    lifePriority = 0;
+  }
+
   if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
     const double range = Game::model().getOrcWoodcutterAttackRange() + self.getRadius();
     const double distance = self.getDistanceTo(minion);

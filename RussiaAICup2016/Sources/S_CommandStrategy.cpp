@@ -52,6 +52,7 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
 void CommandStrategy::clear() {
   moveCommands.clear();
   attackCommands.clear();
+  castCommands.clear();
 }
 
 std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const Wizard& self) const {
