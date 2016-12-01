@@ -22,6 +22,7 @@ namespace AICup
 
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#define INTERVAL(a,b,c) (MAX(a,MIN(b,c)))
 #define ABS(a) (((a) > 0) ? (a) : -(a))
 #define SIGN(a) (((a) < 0) ? -1 : 1)
 

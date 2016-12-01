@@ -46,7 +46,7 @@ bool CommandAttackFrostbolt::check(const Wizard& self) {
 
       /// если маг может уклонится от снаряда, то не будем в него стрелять
       const auto frostBoltSpeed = delta.normal() * Game::model().getFrostBoltSpeed();
-      if (Algorithm::canForwardEscape(selfPos, self.getCastRange(), wizard, frostBoltSpeed, 1.5 * Game::model().getFrostBoltRadius())) {
+      if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, frostBoltSpeed, 1.5 * Game::model().getFrostBoltRadius())) {
         continue;
       }
 
@@ -73,7 +73,7 @@ bool CommandAttackFrostbolt::check(const Wizard& self) {
 }
 
 
-void CommandAttackFrostbolt::execute(const Wizard& self, Result& result) {
+void CommandAttackFrostbolt::execute(const Wizard&, Result& result) {
   assert(nullptr != target);
   result.unit = target;
   result.action = model::ACTION_FROST_BOLT;

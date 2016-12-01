@@ -3,6 +3,9 @@
 #include "C_Math.h"
 #include "C_Extensions.h"
 #include "C_Logger.h"
+
+#include "E_World.h"
+#include "A_Move.h"
 #include <cassert>
 
 
@@ -18,9 +21,15 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
   bool deactivateOtherTurn = false;
   if (!moveResults.empty()) {
     TurnStyle turnStyle = TurnStyle::NO_TURN;
-    Vector turnDirection = Vector(1, 0);
+    Vector turnDirection = turn(moveResults, turnStyle, deactivateOtherTurn);
+
     double speedLimit = -1;
-    const Vector direction = move(moveResults, self, turnStyle, turnDirection, speedLimit, deactivateOtherTurn);
+    const Vector direction = move(moveResults, self, speedLimit);
+
+    /// нужно для уворота, и там очень важно, чтобы был правильный стиль уворота
+    if (TurnStyle::SIDE_TURN != turnStyle) {
+      turnDirection = direction;
+    }
 
     Algorithm::execMove(self, turnStyle, turnDirection, direction, speedLimit, finalMove);
   }
@@ -78,13 +87,8 @@ std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const
   return moveResults;
 }
 
-const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, TurnStyle& turnStyle, Vector& turnDirection, double& speedLimit, bool& deactivateOtherTurn) {
-  for (const auto& move : moveResults) {
-    for (const auto& tree : move.treesForRemove) {
-      addTreeForRemove(self, tree);
-    }
-  }
-
+const Vector CommandStrategy::turn(const std::vector<MoveCommand::Result>& moveResults, TurnStyle& turnStyle, bool& deactivateOtherTurn) {
+  Vector result = Vector(0, 0);
 
   /// выбираем самый предпочтительный вид поворота
   int turnPriority = 0;
@@ -102,11 +106,13 @@ const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveR
     normalPriority = move.priority;
 
     turnStyle = move.turnStyle;
-    turnDirection = move.moveDirection;
+    result = move.moveDirection;
     deactivateOtherTurn = move.deactivateOtherTurn;
   }
+  return result;
+}
 
-
+const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit) {
   double minDeviation = 9999999;
   Vector result = Vector(0, 0);
   //Проходим по углам, и высчитываем какой вариант даст наименьшое отклонение
@@ -135,8 +141,29 @@ const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveR
     }
   }
 
-  return result * speedLimit;
+  return calculateCollisions(self, EX::pos(self) + result * 300/*просматриваем припятствия на 300*/, speedLimit);
 }
+
+const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Position& endPoint, const double speedLimit) {
+  std::shared_ptr<Algorithm::Path> path;
+  pathFinder.calculatePath(endPoint, path);
+  assert(nullptr != path);
+
+  const Position preEndPoint = path->calculateNearestCurvaturePoint(self.getVisionRange() / 2);
+
+  /// need remove obstacles
+  auto obstacles = World::instance().obstacles(self, self.getVisionRange());
+  const auto treesForRemove = path->removeObstacles(obstacles);
+  const auto obstaclesGroups = World::instance().createGroup(obstacles, self.getRadius());
+
+
+  for (const auto& tree : treesForRemove) {
+    addTreeForRemove(self, tree);
+  }
+
+  return Algorithm::move(self, preEndPoint, obstaclesGroups, self.getVisionRange()) * speedLimit;
+}
+
 
 void CommandStrategy::addTreeForRemove(const Wizard& self, const model::LivingUnit* tree) {
   LogAssert(nullptr != tree);
@@ -192,7 +219,6 @@ const long long int CommandStrategy::cast(const Wizard& self, model::ActionType&
   }
 
 
-  long long int id = -1;
   CastCommand::Result result;
   maxCastCommand->execute(self, result);
 

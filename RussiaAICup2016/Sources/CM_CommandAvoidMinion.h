@@ -14,7 +14,7 @@ namespace AICup
 {
   class CommandAvoidMinion: public MoveCommand {
   public:
-    CommandAvoidMinion(Algorithm::PathFinder& finder, const model::Minion& minion);
+    CommandAvoidMinion(const model::Minion& minion);
 
     bool check(const Wizard& self) override;
 
@@ -29,6 +29,7 @@ namespace AICup
   private:
     const model::Minion& minion;
 
-    MoveCommandPtr moveToPointCommand;
+    double distance;
+    Position position;
   };
 }

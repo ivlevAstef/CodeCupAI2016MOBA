@@ -14,7 +14,7 @@ namespace AICup
 {
   class CommandAvoidProjectile: public MoveCommand {
   public:
-    CommandAvoidProjectile(Algorithm::PathFinder& finder, const model::Projectile& projectile);
+    CommandAvoidProjectile(const model::Projectile& projectile);
 
     bool check(const Wizard& self) override;
 
@@ -29,6 +29,7 @@ namespace AICup
   private:
     const model::Projectile& projectile;
 
-    MoveCommandPtr moveToPointCommand;
+    TurnStyle turnStyle;
+    Position position;
   };
 }

@@ -69,12 +69,12 @@ bool CommandAttackFireball::check(const Wizard& self) {
       const auto fireballSpeed = delta.normal() * Game::model().getFireballSpeed();
       const auto fireballRadius = Game::model().getFireballRadius() + (Game::model().getFireballExplosionMaxDamageRange() + Game::model().getFireballExplosionMinDamageRange()) * 0.5;
       /// если маг может уклонится от снаряда, то не будем в него стрелять
-      if (Algorithm::canForwardEscape(selfPos, self.getCastRange(), wizard, fireballSpeed, fireballRadius)) {
+      if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, fireballSpeed, fireballRadius)) {
         continue;
       }
 
       /// второй вариант уклонения
-      if (Algorithm::canBackwardEscape(selfPos, self.getCastRange(), wizard, fireballSpeed, fireballRadius)) {
+      if (Algorithm::canSideBackwardEscape(selfPos, self.getCastRange(), wizard, fireballSpeed, fireballRadius)) {
         continue;
       }
     }
@@ -95,7 +95,7 @@ bool CommandAttackFireball::check(const Wizard& self) {
 }
 
 
-void CommandAttackFireball::execute(const Wizard& self, Result& result) {
+void CommandAttackFireball::execute(const Wizard&, Result& result) {
   assert(nullptr != target);
   result.unit = target;
   result.action = model::ACTION_FIREBALL;

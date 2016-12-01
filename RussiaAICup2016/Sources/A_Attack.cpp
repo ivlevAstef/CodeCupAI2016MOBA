@@ -56,18 +56,10 @@ double Algorithm::timeToTurn(const model::Wizard& wizard, const double angle) {
   return needTurnAngle / EX::turnSpeed(wizard);
 }
 
-bool canEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius, const double sign) {
+bool canEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius, const Vector preyEndVec, const double preyEndAngle) {
   auto preyPos = EX::pos(prey);
   auto preyAngle = prey.getAngle();
   auto preyTurnSpeed = EX::turnSpeed(prey);
-
-  auto preyEndAngleVec = bulletSpeed.perpendicular().normal();
-  /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикул€ров
-  if (preyEndAngleVec.dot(Vector(1, 0).rotate(preyAngle)) < 0) {
-    preyEndAngleVec *= -1;
-  }
-  preyEndAngleVec *= sign;
-  const double preyEndAngle = preyEndAngleVec.angle();
 
   Position bulletPos = attackingPos;
   const size_t maxIteration = (size_t)ceil(castRange / bulletSpeed.length());
@@ -83,8 +75,8 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
 
     bulletPos += bulletSpeed;
 
-    const auto speed = Algorithm::maxSpeed(prey, preyAngle, preyEndAngleVec);
-    preyPos += preyEndAngleVec * speed.length();
+    const auto speed = Algorithm::maxSpeed(prey, preyAngle, preyEndVec);
+    preyPos += preyEndVec * speed.length();
 
 
     double angleDiff = Math::angleDiff(preyEndAngle, preyAngle);
@@ -98,10 +90,44 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
   return true;
 }
 
-bool Algorithm::canForwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius) {
-  return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, 1);
+bool Algorithm::canSideForwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius) {
+  auto endAngleVec = bulletSpeed.perpendicular().normal();
+  /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикул€ров
+  if (endAngleVec.dot(Vector(1, 0).rotate(prey.getAngle())) < 0) {
+    endAngleVec *= -1;
+  }
+
+  const double preyEndAngle = endAngleVec.angle();
+  return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, endAngleVec, preyEndAngle);
+}
+bool Algorithm::canSideBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius) {
+  auto endAngleVec = bulletSpeed.perpendicular().normal();
+  /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикул€ров
+  if (endAngleVec.dot(Vector(1, 0).rotate(prey.getAngle())) < 0) {
+    endAngleVec *= -1;
+  }
+
+  const double preyEndAngle = endAngleVec.angle();
+  return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, -endAngleVec, preyEndAngle);
 }
 
-bool Algorithm::canBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius) {
-  return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, -1);
+bool Algorithm::canBackForwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius) {
+  auto endAngleVec = bulletSpeed.normal();
+  /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикул€ров
+  if (endAngleVec.dot(Vector(1, 0).rotate(prey.getAngle())) < 0) {
+    endAngleVec *= -1;
+  }
+
+  const double preyEndAngle = endAngleVec.angle();
+  return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, endAngleVec, preyEndAngle);
+}
+bool Algorithm::canBackBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius) {
+  auto endAngleVec = bulletSpeed.normal();
+  /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикул€ров
+  if (endAngleVec.dot(Vector(1, 0).rotate(prey.getAngle())) < 0) {
+    endAngleVec *= -1;
+  }
+
+  const double preyEndAngle = endAngleVec.angle();
+  return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, -endAngleVec, preyEndAngle);
 }

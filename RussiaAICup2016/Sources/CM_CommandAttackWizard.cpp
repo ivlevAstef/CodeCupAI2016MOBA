@@ -38,7 +38,7 @@ bool CommandAttackWizard::check(const Wizard& self) {
 
   /// если маг может уклонится от снаряда, то не будем в него стрелять, но так как никто не идеален, то условие стоил слегка ослабить
   const auto bulletSpeed = delta.normal() * Game::model().getMagicMissileSpeed();
-  if (Algorithm::canForwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, 2 * Game::model().getMagicMissileRadius())) {
+  if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, 2 * Game::model().getMagicMissileRadius())) {
     return false;
   }
 

@@ -179,11 +179,11 @@ powershell start-process local-runner.bat</Command>
     <ClCompile Include="..\Sources\CM_CommandAvoidWizard.cpp" />
     <ClCompile Include="..\Sources\CM_CommandCastHast.cpp" />
     <ClCompile Include="..\Sources\CM_CommandCastShield.cpp" />
-    <ClCompile Include="..\Sources\CM_CommandDefendPoint.cpp" />
     <ClCompile Include="..\Sources\CM_CommandFabric.cpp" />
     <ClCompile Include="..\Sources\CM_CommandFollow.cpp" />
     <ClCompile Include="..\Sources\CM_CommandFollowAttackEnemy.cpp" />
     <ClCompile Include="..\Sources\CM_CommandKeepDistance.cpp" />
+    <ClCompile Include="..\Sources\CM_MoveCommand.cpp" />
     <ClCompile Include="..\Sources\CM_MovePriorities.cpp" />
     <ClCompile Include="..\Sources\E_InfluenceMap.cpp" />
     <ClCompile Include="..\Sources\E_HypotheticalEnemies.cpp" />
@@ -232,7 +232,6 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\CM_CastCommand.h" />
     <ClInclude Include="..\Sources\CM_CommandCastHast.h" />
     <ClInclude Include="..\Sources\CM_CommandCastShield.h" />
-    <ClInclude Include="..\Sources\CM_CommandDefendPoint.h" />
     <ClInclude Include="..\Sources\CM_CommandFabric.h" />
     <ClInclude Include="..\Sources\CM_CommandFollow.h" />
     <ClInclude Include="..\Sources\CM_CommandFollowAttackEnemy.h" />

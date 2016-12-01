@@ -16,14 +16,12 @@
 
 using namespace AICup;
 
-CommandMoveGetExpirience::CommandMoveGetExpirience(Algorithm::PathFinder& finder):
-  MoveCommand(finder) {
+CommandMoveGetExpirience::CommandMoveGetExpirience() {
 }
 
 
 bool CommandMoveGetExpirience::check(const Wizard& self) {
-  unit = nullptr;
-  followCommand = nullptr;
+  target = nullptr;
 
   static const double expirienceRadius = 550;
   double minLive = 100000;
@@ -36,41 +34,45 @@ bool CommandMoveGetExpirience::check(const Wizard& self) {
       const auto enemyPos = Position(enemy->getX(), enemy->getY());
       const double distance = (selfPos - enemyPos).length();
       if (distance > expirienceRadius) {
-        unit = enemy;
+        target = enemy;
         minLive = enemy->getLife();
       }
     }
   }
 
-  if (nullptr == unit) {
+  if (nullptr == target) {
     return false;
   }
 
-  if (unit->getLife() > 24) {
+  if (target->getLife() > 24) {
     return false;
   }
 
 
-  followCommand = std::make_shared<CommandFollow>(pathFinder, unit->getId(), 0, expirienceRadius);
-  return followCommand->check(self);
+  return true;
 }
 
 void CommandMoveGetExpirience::execute(const Wizard& self, Result& result) {
-  assert(nullptr != followCommand.get());
-  followCommand->execute(self, result);
+  assert(nullptr != target);
+
+  result.set(EX::pos(*target), self);
+  result.turnStyle = TurnStyle::TURN;
   result.turnPriority = TurnPriority::getExpirience;
 }
 
 double CommandMoveGetExpirience::priority(const Wizard& self) {
-  return MovePriorities::getExpirience(self, *unit);
+  return MovePriorities::getExpirience(self, *target);
 }
 
 #ifdef ENABLE_VISUALIZATOR
-void CommandMoveGetExpirience::visualization(const model::Wizard&, const Visualizator& visualizator) const {
-  assert(nullptr != followCommand.get());
+void CommandMoveGetExpirience::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
+  assert(nullptr != target);
 
   if (Visualizator::POST == visualizator.getStyle()) {
-    const auto pos = EX::pos(*unit);
+    const auto from = EX::pos(self);
+    const auto pos = EX::pos(*target);
+
+    visualizator.line(from.x, from.y, pos.x, pos.y, 0xffff00);
     visualizator.fillCircle(pos.x, pos.y, 10, 0xffff00);
   }
 }

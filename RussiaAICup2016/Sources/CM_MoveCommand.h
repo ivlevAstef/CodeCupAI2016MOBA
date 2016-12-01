@@ -24,18 +24,12 @@ namespace AICup
       double speedLimit;
       double priority; /// просто тут его удобно хранить, чем создавать потом обертку, но при этом оно не инициализуется!
 
-      Obstacles treesForRemove;
+      void set(const Position& position, const Wizard& self);
     };
 
   public:
-    MoveCommand(Algorithm::PathFinder& finder) : pathFinder(finder) {
-    }
-
     /// исполнить команду
     virtual void execute(const Wizard& self, Result& result) = 0;
-
-  protected:
-    Algorithm::PathFinder& pathFinder;
   };
 
   typedef std::shared_ptr<MoveCommand> MoveCommandPtr;

@@ -11,7 +11,7 @@
 
 using namespace AICup;
 
-CommandObserveMap::CommandObserveMap(Algorithm::PathFinder& finder): MoveCommand(finder) {
+CommandObserveMap::CommandObserveMap() {
 
 }
 

@@ -6,30 +6,28 @@
 
 
 #include "CM_CommandMoveToLine.h"
-#include "CM_CommandMoveToPoint.h"
 #include "E_InfluenceMap.h"
 #include "CM_MovePriorities.h"
 #include "CM_TurnPriority.h"
+#include "C_Extensions.h"
 
 using namespace AICup;
 
-CommandMoveToLine::CommandMoveToLine(Algorithm::PathFinder& finder, model::LaneType line):
-  MoveCommand(finder), line(line) {
+CommandMoveToLine::CommandMoveToLine(model::LaneType line): line(line) {
 
 }
 
-bool CommandMoveToLine::check(const Wizard& self) {
-  const auto offset = -100 * self.getRole().getAudacity();
-  auto position = InfluenceMap::instance().getForeFront(line, float(offset));
-  commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, position.x, position.y);
-
-  return commandMoveToPoint->check(self);
+bool CommandMoveToLine::check(const Wizard&) {
+  return true;
 }
 
 
 void CommandMoveToLine::execute(const Wizard& self, Result& result) {
-  assert(nullptr != commandMoveToPoint.get());
-  commandMoveToPoint->execute(self, result);
+  const auto offset = -100 * self.getRole().getAudacity();
+  toPoint = InfluenceMap::instance().getForeFront(line, float(offset));
+
+  result.set(toPoint, self);
+  result.turnStyle = TurnStyle::TURN;
   result.turnPriority = TurnPriority::moveToLine;
 }
 
@@ -39,7 +37,10 @@ double CommandMoveToLine::priority(const Wizard& self) {
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandMoveToLine::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
-  assert(nullptr != commandMoveToPoint.get());
-  commandMoveToPoint->visualization(self, visualizator);
+  if (Visualizator::POST == visualizator.getStyle()) {
+    const auto from = EX::pos(self);
+
+    visualizator.line(from.x, from.y, toPoint.x, toPoint.y, 0x00ff00);
+  }
 }
 #endif // ENABLE_VISUALIZATOR

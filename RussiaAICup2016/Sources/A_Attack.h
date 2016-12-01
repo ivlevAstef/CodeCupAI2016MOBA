@@ -21,10 +21,11 @@ namespace AICup
     bool isMelee(const model::Wizard& wizard, const model::LivingUnit& unit);
 
     /// происходит эмул€ци€ движени€, которое должно давать наилучший способ уклонени€
-    bool canForwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
-
-    /// происходит эмул€ци€ движени€, которое должно давать наилучший способ уклонени€
-    bool canBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
+    /// да прост€т мен€ другие программист, за эти 4! функции (а не одну...)
+    bool canSideForwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
+    bool canSideBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
+    bool canBackForwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
+    bool canBackBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
 
     double timeToTurnForAttack(const model::Unit& attacked, const model::Wizard& attacking);
     double timeToTurn(const model::Wizard& wizard, const double angle);

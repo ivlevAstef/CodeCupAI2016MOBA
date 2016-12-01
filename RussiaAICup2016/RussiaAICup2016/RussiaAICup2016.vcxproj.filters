@@ -43,7 +43,7 @@
     <Filter Include="Sources\Roles">
       <UniqueIdentifier>{9e3f5b50-366d-4ac0-8dbb-0909b396c6ce}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\Command\Commands\Cast">
+    <Filter Include="Sources\Command\Commands\cast">
       <UniqueIdentifier>{9c594fb6-9ec6-44ed-aee2-b7c3c7892ef9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -74,9 +74,6 @@
     </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandPool.cpp">
       <Filter>Sources\Command\Commands\attack</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Sources\CM_CommandDefendPoint.cpp">
-      <Filter>Sources\Command\Commands\defend</Filter>
     </ClCompile>
     <ClCompile Include="..\Sources\E_Game.cpp">
       <Filter>Sources\Environment</Filter>
@@ -193,10 +190,13 @@
       <Filter>Sources\Roles</Filter>
     </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandCastHast.cpp">
-      <Filter>Sources\Command\Commands\Cast</Filter>
+      <Filter>Sources\Command\Commands\cast</Filter>
     </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandCastShield.cpp">
-      <Filter>Sources\Command\Commands\Cast</Filter>
+      <Filter>Sources\Command\Commands\cast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\CM_MoveCommand.cpp">
+      <Filter>Sources\Command</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -235,9 +235,6 @@
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandPool.h">
       <Filter>Sources\Command\Commands\attack</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\CM_CommandDefendPoint.h">
-      <Filter>Sources\Command\Commands\defend</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\E_Game.h">
       <Filter>Sources\Environment</Filter>
@@ -366,13 +363,13 @@
       <Filter>Sources\Algorithms</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandCastHast.h">
-      <Filter>Sources\Command\Commands\Cast</Filter>
+      <Filter>Sources\Command\Commands\cast</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CastCommand.h">
       <Filter>Sources\Command</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandCastShield.h">
-      <Filter>Sources\Command\Commands\Cast</Filter>
+      <Filter>Sources\Command\Commands\cast</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

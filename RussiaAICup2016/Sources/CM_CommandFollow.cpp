@@ -8,91 +8,86 @@
 #include "CM_CommandFollow.h"
 #include "CM_CommandMoveToPoint.h"
 #include "E_World.h"
-#include "A_Move.h"
-#include "C_Math.h"
+#include "C_Extensions.h"
 #include "CM_MovePriorities.h"
 #include "CM_TurnPriority.h"
+#include "C_Math.h"
 
 using namespace AICup;
 
-CommandFollow::CommandFollow(Algorithm::PathFinder& finder, const long long unitId, const double minDistance, const double maxDistance):
-  MoveCommand(finder), unitId(unitId), minDistance(minDistance), maxDistance(maxDistance) {
+CommandFollow::CommandFollow(const long long unitId, const double minDistance, const double maxDistance):
+  unitId(unitId), minDistance(minDistance), maxDistance(maxDistance) {
 }
 
 
-bool CommandFollow::check(const Wizard& self) {
-  unit = World::instance().unit(unitId);
-  if (nullptr == unit) {
-    commandMoveToPoint = nullptr;
-    return false;
-  }
+bool CommandFollow::check(const Wizard&) {
+  target = World::instance().unit(unitId);
+  return nullptr != target;
+}
 
+void CommandFollow::execute(const Wizard& self, Result& result) {
+  assert(nullptr != target);
 
-  const auto selfPos = Position(self.getX(), self.getY());
-  const auto unitPos = Position(unit->getX(), unit->getY());
+  const auto selfPos = EX::pos(self);
+  const auto unitPos = EX::pos(*target);
   const double distance = (selfPos - unitPos).length();
 
+  TurnStyle turnStyle = TurnStyle::TURN;
+  double speedLimit = -1;
   if (distance < minDistance) {
     /// противоположная точка, точке где находиться объект, и длиной = радиусу обзора
-    const auto pos = selfPos + (selfPos - unitPos).normal() * self.getVisionRange();
-
-    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::BACK_TURN);
+    position = selfPos + (selfPos - unitPos).normal() * self.getVisionRange();
+    result.turnStyle = TurnStyle::BACK_TURN;
   } else if (distance > maxDistance) {
-    const auto pos = unitPos;
-
-    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y);
+    position = unitPos;
   } else {
     const auto currentBackVec = (selfPos - unitPos).normal();
 
-    /// если это здание
-    if (nullptr != dynamic_cast<const model::Building*>(unit)) {
+    /// если это здание - у него нет угла поворота
+    if (EX::isBuilding(*target)) {
       // двигаться назад в центр дистанции
-      const auto pos = unitPos + currentBackVec * (minDistance + (maxDistance - minDistance) * 0.5);
+      position = unitPos + currentBackVec * (minDistance + (maxDistance - minDistance) * 0.5);
 
-      commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y);
     } else {
-      const auto backVec = Vector(1, 0).rotate(unit->getAngle() + AICUP_PI);
+      const auto backVec = Vector(1, 0).rotate(target->getAngle() + AICUP_PI);
 
       /// находимся за спиной
       if (backVec.dot(currentBackVec) > cos(AICUP_PI / 18)) {
+        const auto speed = Vector(target->getSpeedX(), target->getSpeedY());
 
-        const auto speed = Vector(unit->getSpeedX(), unit->getSpeedY());
-
-        auto pos = unitPos; /// двигаемся к нему но с его предположительной скоростью (по факту разворачиваемся)
+        position = unitPos; /// двигаемся к нему но с его предположительной скоростью (по факту разворачиваемся)
                             /// если скорость противоположна углу куда смотрим юнит, значит он двигаеться задом
-        if (abs(Math::angleDiff(speed.angle(), unit->getAngle())) > AICUP_PI) {
+        if (abs(Math::angleDiff(speed.angle(), target->getAngle())) > AICUP_PI) {
           /// двигаемся от него
-          pos = selfPos + (selfPos - unitPos).normal() * self.getVisionRange();
+          position = selfPos + (selfPos - unitPos).normal() * self.getVisionRange();
         }
 
-
-        commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::TURN, speed.length());
+        speedLimit = speed.length();
       } else {
         // двигаться за спину объекта в центр дистанции
-        const auto pos = unitPos + backVec * (minDistance + (maxDistance - minDistance) * 0.5);
-
-        commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y);
+        position = unitPos + backVec * (minDistance + (maxDistance - minDistance) * 0.5);
       }
     }
   }
 
-
-  return commandMoveToPoint->check(self);
-}
-
-void CommandFollow::execute(const Wizard& self, Result& result) {
-  assert(nullptr != commandMoveToPoint.get());
-  commandMoveToPoint->execute(self, result);
+  result.set(position, self);
+  result.turnStyle = turnStyle;
   result.turnPriority = TurnPriority::follow;
+  result.speedLimit = speedLimit;
 }
 
 double CommandFollow::priority(const Wizard& self) {
-  return MovePriorities::follow(self, *unit);
+  return MovePriorities::follow(self, *target);
 }
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandFollow::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
-  assert(nullptr != commandMoveToPoint.get());
-  commandMoveToPoint->visualization(self, visualizator);
+  assert(nullptr != target);
+  if (Visualizator::POST == visualizator.getStyle()) {
+    const auto from = EX::pos(self);
+    const auto to = EX::pos(*target);
+
+    visualizator.line(from.x, from.y, to.x, to.y, 0x00ff00);
+  }
 }
 #endif // ENABLE_VISUALIZATOR

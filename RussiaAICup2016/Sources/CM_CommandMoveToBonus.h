@@ -30,7 +30,8 @@ namespace AICup
     double potensialExpirience(const Wizard& self);
 
   private:
+    Algorithm::PathFinder& pathFinder;
+
     Position bonusPos;
-    MoveCommandPtr moveToBonus;
   };
 }

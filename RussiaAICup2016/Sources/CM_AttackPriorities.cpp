@@ -16,6 +16,10 @@ double AttackPriorities::attackBuild(const Wizard& self, const model::Building& 
 }
 
 double AttackPriorities::attackMinion(const Wizard& self, const model::Minion& minion) {
+  if (Algorithm::isMelee(self, minion)) {
+    return 1000;
+  }
+
   double lifePriority = 500 * (minion.getMaxLife() - minion.getLife()) / minion.getMaxLife();
   if (self.damage(model::ACTION_MAGIC_MISSILE) < minion.getLife()) {
     lifePriority = 0;
@@ -36,7 +40,7 @@ double AttackPriorities::attackMinion(const Wizard& self, const model::Minion& m
 
 double AttackPriorities::attackTree(const Wizard& self, const model::Tree& tree) {
   if (Algorithm::isMelee(self, tree)) {
-    return 1000;
+    return 1200;
   }
 
   const double ticksToMove = self.getDistanceTo(tree) / self.maxSpeed();

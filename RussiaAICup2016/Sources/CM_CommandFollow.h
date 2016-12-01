@@ -13,7 +13,7 @@ namespace AICup
 {
   class CommandFollow: public MoveCommand {
   public:
-    CommandFollow(Algorithm::PathFinder& finder, const long long unitId, const double minDistance = 0, const double maxDistance = 10000);
+    CommandFollow(const long long unitId, const double minDistance = 0, const double maxDistance = 10000);
 
     bool check(const Wizard& self) override;
 
@@ -31,7 +31,7 @@ namespace AICup
     const double minDistance;
     const double maxDistance;
 
-    const model::LivingUnit* unit;
-    MoveCommandPtr commandMoveToPoint;
+    const model::LivingUnit* target;
+    Position position;
   };
 }

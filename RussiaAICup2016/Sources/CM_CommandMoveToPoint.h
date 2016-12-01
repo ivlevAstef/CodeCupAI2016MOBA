@@ -17,7 +17,7 @@ namespace AICup
 {
   class CommandMoveToPoint: public MoveCommand {
   public:
-    CommandMoveToPoint(Algorithm::PathFinder& finder, const double x, const double y, const TurnStyle style = TurnStyle::TURN, const double speedLimit = -1);
+    CommandMoveToPoint(const double x, const double y, const TurnStyle style = TurnStyle::TURN, const double speedLimit = -1);
 
     bool check(const Wizard& self) override;
 
@@ -33,9 +33,5 @@ namespace AICup
     const Position point;
     const TurnStyle style;
     const double speedLimit;
-
-    std::shared_ptr<Algorithm::Path> path;
-    Position preEndPoint;
-    Position endPoint;
   };
 }

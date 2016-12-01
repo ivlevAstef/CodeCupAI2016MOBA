@@ -13,7 +13,7 @@ namespace AICup
 {
   class CommandObserveMap: public MoveCommand {
   public:
-    CommandObserveMap(Algorithm::PathFinder& finder);
+    CommandObserveMap();
 
     bool check(const Wizard& self) override;
 

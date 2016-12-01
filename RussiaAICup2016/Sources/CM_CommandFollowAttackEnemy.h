@@ -15,7 +15,7 @@ namespace AICup
   /// Не сохраняемый между тиками
   class CommandFollowAttack: public MoveCommand {
   public:
-    CommandFollowAttack(Algorithm::PathFinder& finder, const model::Wizard& wizard);
+    CommandFollowAttack(const model::Wizard& wizard);
 
     bool check(const Wizard& self) override;
 

@@ -55,9 +55,6 @@ namespace AICup
 
 
 /// #pragma mark - защита
-    /// защищать позицию
-    MoveCommandPtr defend(const double x, const double y) const;
-
     /// держаться на безопасном расстоянии от юнита
     MoveCommandPtr avoidEnemy(const model::LivingUnit& unit) const;
 

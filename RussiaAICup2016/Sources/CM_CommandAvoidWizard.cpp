@@ -9,8 +9,7 @@
 
 using namespace AICup;
 
-CommandAvoidWizard::CommandAvoidWizard(Algorithm::PathFinder& finder, const model::Wizard& wizard) :
-  MoveCommand(finder), wizard(wizard) {
+CommandAvoidWizard::CommandAvoidWizard(const model::Wizard& wizard): wizard(wizard) {
   distance = 0;
   checkDistance = 0;
 }
@@ -127,10 +126,10 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
 
   const auto timeToTurn = Algorithm::timeToTurn(self, direction.angle());
 
-  /// Если враг на подходе, то поворачиваемся в обязательном порядке
+  /// Если враг на подходе, то стоит повернуться боком
   if (timeToTurn * EX::maxSpeed(wizard) + distance > delta.length()) {
     result.turnStyle = TurnStyle::SIDE_TURN;
-    if (self.getLife() < 50) {
+    if (self.getLife() < 50) { /// если мало хп поворачиваемся в обязательном порядке
       result.deactivateOtherTurn = true;
     }
   }

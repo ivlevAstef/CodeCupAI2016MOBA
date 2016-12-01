@@ -9,7 +9,7 @@
 
 using namespace AICup;
 
-CommandFollowAttack::CommandFollowAttack(Algorithm::PathFinder& finder, const model::Wizard& wizard): MoveCommand(finder), wizard(wizard) {
+CommandFollowAttack::CommandFollowAttack(const model::Wizard& wizard): wizard(wizard) {
 }
 
 bool CommandFollowAttack::check(const Wizard& self) {

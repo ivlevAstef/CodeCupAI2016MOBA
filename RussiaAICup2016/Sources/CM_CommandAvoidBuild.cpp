@@ -8,8 +8,7 @@
 
 using namespace AICup;
 
-CommandAvoidBuild::CommandAvoidBuild(Algorithm::PathFinder& finder, const model::Building& build) :
-  MoveCommand(finder), build(build) {
+CommandAvoidBuild::CommandAvoidBuild(const model::Building& build): build(build) {
 }
 
 bool CommandAvoidBuild::check(const Wizard& self) {
@@ -17,23 +16,22 @@ bool CommandAvoidBuild::check(const Wizard& self) {
   const auto buildPos = EX::pos(build);
   const auto delta = selfPos - buildPos;
 
-  double distance = build.getAttackRange() - build.getRemainingActionCooldownTicks() * self.maxBackwardSpeed() + self.getRadius();
-  distance += self.maxBackwardSpeed(); /// небольшой запасец
+  distance = build.getAttackRange() - build.getRemainingActionCooldownTicks() * self.maxBackwardSpeed();
+  distance += self.maxSpeed() + self.getRadius(); /// небольшой запасец, ибо есть погрешность с позиционированием, да и невсегда все идет идеально когда уходишь от башни
 
-  if (delta.length() > distance) {
-    return false;
-  }
-
-  /// ближайшая точка, где безопасно
-  const auto pos = buildPos + delta.normal() * distance;
-  moveToPointCommand = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::BACK_TURN);
-
-  return moveToPointCommand->check(self);
+  return delta.length() < distance;
 }
 
 void CommandAvoidBuild::execute(const Wizard& self, Result& result) {
-  assert(nullptr != moveToPointCommand.get());
-  moveToPointCommand->execute(self, result);
+  const auto selfPos = EX::pos(self);
+  const auto buildPos = EX::pos(build);
+  const auto delta = selfPos - buildPos;
+
+  position = buildPos + delta.normal() * distance;
+
+
+  result.set(position, self);
+  result.turnStyle = TurnStyle::TURN;
   result.turnPriority = TurnPriority::avoidBuild;
 }
 
@@ -43,7 +41,10 @@ double CommandAvoidBuild::priority(const Wizard& self) {
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandAvoidBuild::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
-  assert(nullptr != moveToPointCommand.get());
-  moveToPointCommand->visualization(self, visualizator);
+  if (Visualizator::POST == visualizator.getStyle()) {
+    const auto from = EX::pos(self);
+
+    visualizator.line(from.x, from.y, position.x, position.y, 0xff00ff);
+  }
 }
 #endif // ENABLE_VISUALIZATOR

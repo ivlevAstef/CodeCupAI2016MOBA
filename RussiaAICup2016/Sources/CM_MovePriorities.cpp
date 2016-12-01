@@ -9,7 +9,7 @@ using namespace AICup;
 ///слегка выше
 double MovePriorities::avoidBuild(const Wizard& self, const model::Building& build) {
   const int lifePriority = (300 * build.getLife()) / build.getMaxLife();
-  return 900 + lifePriority;
+  return 800 + lifePriority;
 }
 
 double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& minion) {
@@ -96,7 +96,8 @@ double MovePriorities::moveToBonus(const Wizard& self, const Position&) {
 }
 
 double MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {
-  return (250 + 250 * (self.getMaxLife() - self.getLife())) * self.getRole().getImportanceOfXP();
+  const auto lifeC = (self.getMaxLife() - self.getLife()) / self.getMaxLife();
+  return (250 + 250 * lifeC) * self.getRole().getImportanceOfXP();
 }
 
 double MovePriorities::moveToPoint(const Wizard&, const Position&) {

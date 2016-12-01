@@ -28,10 +28,10 @@ namespace AICup
 
       buildPriority = 3.0;
       minionPriority = 1.0;
-      treePriority = 1.5;
+      treePriority = 2.5;
       wizardPriority = 1.5;
 
-      audacityBuild = 1.5;
+      audacityBuild = 3.0;
       audacityMinion = 1.0;
       audacityWizard = 1.25;
       attackSkillPriority = 1.5;
@@ -46,7 +46,7 @@ namespace AICup
     void update(const model::Wizard& self, model::Move& move) override {
       Role::update(self, move);
 
-      audacity = -1.0 - 5 * (1 - (float(self.getLife()) / float(self.getMaxLife())));
+      audacity = 0 - 4 * (1 - (float(self.getLife()) / float(self.getMaxLife())));
       if (self.getLife() < 24) {
         audacity -= 2;
       }

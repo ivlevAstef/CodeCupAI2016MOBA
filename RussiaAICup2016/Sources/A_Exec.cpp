@@ -27,27 +27,8 @@ bool Algorithm::execMove(const Wizard& self, const TurnStyle style, const Vector
   const auto selfPos = EX::pos(self);
   const auto toPos = selfPos + direction.normal() * maxSpeed;
 
-
-  Vector fixDirection = direction;
-  for (const auto& obstacle : World::instance().obstacles(self, self.getRadius() + maxSpeed + 100/*максимальный радиус в игре*/)) {
-    const auto oPos = EX::pos(*obstacle);
-    /// если мы пересекаемся за этот тик с препятствием, то меняем направление
-    if (Math::distanceToSegment(oPos, selfPos, toPos) < self.getRadius() + obstacle->getRadius()) {
-      const auto tangents = Math::tangetsForTwoCircle(selfPos, self.getRadius(), oPos, obstacle->getRadius());
-      /// чем меньше значение тем больше угол отклонения
-      if (tangents[0].dot(direction.normal()) < tangents[1].dot(direction.normal())) {
-        fixDirection = tangents[1];
-      } else {
-        fixDirection = tangents[0];
-      }
-
-      break; /// с двумя объекта за тик пересечься нереально
-    }
-  }
-
-
   ///вообще я так и не понял как эта магия работает, но без двух минусов не пашет
-  Vector speed = Vector(fixDirection.x, -fixDirection.y).normal().rotated(self.getAngle());
+  Vector speed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
   speed.y *= -1;
   speed *= maxSpeed;
 

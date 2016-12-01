@@ -13,7 +13,7 @@ namespace AICup
 {
   class CommandDefendPoint: public MoveCommand {
   public:
-    CommandDefendPoint(Algorithm::PathFinder& finder, double x, double y);
+    CommandDefendPoint(double x, double y);
 
     bool check(const Wizard& self) override;
 

@@ -14,7 +14,7 @@ namespace AICup
 {
   class CommandAvoidBuild: public MoveCommand {
   public:
-    CommandAvoidBuild(Algorithm::PathFinder& finder, const model::Building& build);
+    CommandAvoidBuild(const model::Building& build);
 
     bool check(const Wizard& self) override;
 
@@ -29,6 +29,7 @@ namespace AICup
   private:
     const model::Building& build;
 
-    MoveCommandPtr moveToPointCommand;
+    double distance;
+    Position position;
   };
 }

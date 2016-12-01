@@ -14,23 +14,22 @@
 #include "C_Math.h"
 #include "CM_MovePriorities.h"
 #include "CM_TurnPriority.h"
+#include "C_Extensions.h"
 
 using namespace AICup;
 
-CommandMoveToBonus::CommandMoveToBonus(Algorithm::PathFinder& finder):
-  MoveCommand(finder) {
-
+CommandMoveToBonus::CommandMoveToBonus(Algorithm::PathFinder& finder): pathFinder(finder) {
 }
 
 bool CommandMoveToBonus::check(const Wizard& self) {
-  const auto selfPos = Position(self.getX(), self.getY());
+  const auto selfPos = EX::pos(self);
 
   /// если есть бонусы рядом
   for (const auto& bonus : World::instance().model().getBonuses()) {
-    const auto cBonusPos = Position(bonus.getX(), bonus.getY());
+    const auto cBonusPos = EX::pos(bonus);
     if ((selfPos - cBonusPos).length() < self.getVisionRange()) {
-      moveToBonus = std::make_shared<CommandMoveToPoint>(pathFinder, cBonusPos.x, cBonusPos.y);
-      return moveToBonus->check(self);
+      bonusPos = cBonusPos;
+      return true;
     }
   }
 
@@ -74,18 +73,17 @@ bool CommandMoveToBonus::check(const Wizard& self) {
     return false;
   }
 
-  const double minDistance = self.getRadius() + Game::model().getBonusRadius();
-  const double maxDistance = minDistance + self.getRadius();
-
   if (ticksToTop < ticksToBottom) {
     bonusPos = topBonusPos;
   } else {
     bonusPos = bottomBonusPos;
   }
 
-  moveToBonus = std::make_shared<CommandKeepDistance>(pathFinder, bonusPos.x, bonusPos.y, minDistance, maxDistance);
+  const double minDistance = self.getRadius() + Game::model().getBonusRadius();
+  const auto delta = selfPos - bonusPos;
+  bonusPos = selfPos + delta.normal() * (delta.length() - minDistance);
 
-  return moveToBonus->check(self);
+  return true;
 }
 
 double CommandMoveToBonus::potensialExpirience(const Wizard& self) {
@@ -100,8 +98,8 @@ double CommandMoveToBonus::potensialExpirience(const Wizard& self) {
 }
 
 void CommandMoveToBonus::execute(const Wizard& self, Result& result) {
-  assert(nullptr != moveToBonus.get());
-  moveToBonus->execute(self, result);
+  result.set(bonusPos, self);
+  result.turnStyle = TurnStyle::TURN;
   result.turnPriority = TurnPriority::moveToBonus;
 }
 
@@ -112,7 +110,10 @@ double CommandMoveToBonus::priority(const Wizard& self) {
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandMoveToBonus::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
-  assert(nullptr != moveToBonus.get());
-  moveToBonus->visualization(self, visualizator);
+  if (Visualizator::POST == visualizator.getStyle()) {
+    const auto from = EX::pos(self);
+
+    visualizator.line(from.x, from.y, bonusPos.x, bonusPos.y, 0x00ff77);
+  }
 }
 #endif // ENABLE_VISUALIZATOR

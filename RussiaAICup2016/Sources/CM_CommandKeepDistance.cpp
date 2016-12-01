@@ -12,40 +12,49 @@
 #include "C_Math.h"
 #include "CM_MovePriorities.h"
 #include "CM_TurnPriority.h"
+#include "C_Extensions.h"
 
 using namespace AICup;
 
-CommandKeepDistance::CommandKeepDistance(Algorithm::PathFinder& finder, const double x, const double y, const double minDistance, const double maxDistance) :
-  MoveCommand(finder), x(x), y(y), minDistance(minDistance), maxDistance(maxDistance) {
+CommandKeepDistance::CommandKeepDistance(const double x, const double y, const double minDistance, const double maxDistance) :
+  x(x), y(y), minDistance(minDistance), maxDistance(maxDistance) {
 }
 
 
 bool CommandKeepDistance::check(const Wizard& self) {
-  commandMoveToPoint = nullptr;
-
-  const auto selfPos = Position(self.getX(), self.getY());
+  const auto selfPos = EX::pos(self);
   const auto pointPos = Position(x, y);
   const double distance = (selfPos - pointPos).length();
 
   if (distance < minDistance + (maxDistance - minDistance) * 0.5) {
-    /// противоположная точка, точке где находиться объект, и длиной = радиусу обзора
-    const auto pos = selfPos + (selfPos - pointPos).normal() * self.getVisionRange();
-
-    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y, TurnStyle::BACK_TURN);
+    return true;
   } else if (distance > maxDistance) {
-    const auto pos = pointPos;
-
-    commandMoveToPoint = std::make_shared<CommandMoveToPoint>(pathFinder, pos.x, pos.y);
-  } else {
-    return false;
+    return true;
   }
 
-  return commandMoveToPoint->check(self);
+  return false;
 }
 
 void CommandKeepDistance::execute(const Wizard& self, Result& result) {
-  assert(nullptr != commandMoveToPoint.get());
-  commandMoveToPoint->execute(self, result);
+  const auto selfPos = EX::pos(self);
+  const auto pointPos = Position(x, y);
+  const double distance = (selfPos - pointPos).length();
+
+
+  auto turnStyle = TurnStyle::TURN;
+  if (distance < minDistance + (maxDistance - minDistance) * 0.5) {
+    /// противоположная точка, точке где находиться объект, и длиной = радиусу обзора
+    position = selfPos + (selfPos - pointPos).normal() * self.getVisionRange();
+    turnStyle = TurnStyle::BACK_TURN;
+  } else if (distance > maxDistance) {
+    position = pointPos;
+  } else {
+    result.priority = -1000; /// чтото явно пошло не так
+    return;
+  }
+
+  result.set(position, self);
+  result.turnStyle = turnStyle;
   result.turnPriority = TurnPriority::keepDistance;
 }
 
@@ -56,11 +65,10 @@ double CommandKeepDistance::priority(const Wizard& self) {
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandKeepDistance::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
-  assert(nullptr != commandMoveToPoint.get());
-  commandMoveToPoint->visualization(self, visualizator);
-
   if (Visualizator::POST == visualizator.getStyle()) {
-    visualizator.fillCircle(x, y, 10, 0x00ffff);
+    const auto from = EX::pos(self);
+
+    visualizator.line(from.x, from.y, position.x, position.y, 0x0000ff);
   }
 }
 #endif // ENABLE_VISUALIZATOR

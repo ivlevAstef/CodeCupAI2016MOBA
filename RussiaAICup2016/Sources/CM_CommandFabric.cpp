@@ -23,7 +23,6 @@
 #include "CM_CommandPool.h"
 #include "CM_CommandFollowAttackEnemy.h"
 
-#include "CM_CommandDefendPoint.h"
 #include "CM_CommandAvoidWizard.h"
 #include "CM_CommandAvoidBuild.h"
 #include "CM_CommandAvoidMinion.h"
@@ -43,15 +42,15 @@ CommandFabric::CommandFabric(Algorithm::PathFinder& finder):
 }
 
 MoveCommandPtr CommandFabric::keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const {
-  return std::make_shared<CommandKeepDistance>(finder, x, y, minDistance, maxDistance);
+  return std::make_shared<CommandKeepDistance>(x, y, minDistance, maxDistance);
 }
 
 MoveCommandPtr CommandFabric::moveToPoint(const double x, const double y, const TurnStyle style, const double speedLimit) const {
-  return std::make_shared<CommandMoveToPoint>(finder, x, y, style, speedLimit);
+  return std::make_shared<CommandMoveToPoint>(x, y, style, speedLimit);
 }
 
 MoveCommandPtr CommandFabric::moveToLine(const model::LaneType line) const {
-  return std::make_shared<CommandMoveToLine>(finder, line);
+  return std::make_shared<CommandMoveToLine>(line);
 }
 
 /// подойти чтобы взять руну
@@ -60,19 +59,19 @@ MoveCommandPtr CommandFabric::moveToBonus() const {
 }
 
 MoveCommandPtr CommandFabric::follow(const long long unitId, const double minDistance, const double maxDistance) const {
-  return std::make_shared<CommandFollow>(finder, unitId, minDistance, maxDistance);
+  return std::make_shared<CommandFollow>(unitId, minDistance, maxDistance);
 }
 
 MoveCommandPtr CommandFabric::followAttack(const model::Wizard& wizard) const {
-  return std::make_shared<CommandFollowAttack>(finder, wizard);
+  return std::make_shared<CommandFollowAttack>(wizard);
 }
 
 MoveCommandPtr CommandFabric::moveGetExpirience() const {
-  return std::make_shared<CommandMoveGetExpirience>(finder);
+  return std::make_shared<CommandMoveGetExpirience>();
 }
 
 MoveCommandPtr CommandFabric::observeMap() const {
-  return std::make_shared<CommandObserveMap>(finder);
+  return std::make_shared<CommandObserveMap>();
 }
 
 AttackCommandPtr CommandFabric::attack(const model::LivingUnit& unit) const {
@@ -100,17 +99,13 @@ AttackCommandPtr CommandFabric::pool(const long long neutralUnitId) const {
   return std::make_shared<CommandPool>(neutralUnitId);
 }
 
-MoveCommandPtr CommandFabric::defend(const double x, const double y) const {
-  return std::make_shared<CommandDefendPoint>(finder, x, y);
-}
-
 MoveCommandPtr CommandFabric::avoidEnemy(const model::LivingUnit& unit) const {
   if (EX::isMinion(unit)) {
-    return std::make_shared<CommandAvoidMinion>(finder, EX::asMinion(unit));
+    return std::make_shared<CommandAvoidMinion>(EX::asMinion(unit));
   } if (EX::isWizard(unit)) {
-    return std::make_shared<CommandAvoidWizard>(finder, EX::asWizard(unit));
+    return std::make_shared<CommandAvoidWizard>(EX::asWizard(unit));
   } if (EX::isBuilding(unit)) {
-    return std::make_shared<CommandAvoidBuild>(finder, EX::asBuilding(unit));
+    return std::make_shared<CommandAvoidBuild>(EX::asBuilding(unit));
   }
   assert(false && "incorrect unit type");
   return nullptr;
@@ -118,7 +113,7 @@ MoveCommandPtr CommandFabric::avoidEnemy(const model::LivingUnit& unit) const {
 
 // /уворот от снаряда
 MoveCommandPtr CommandFabric::avoidProjectile(const model::Projectile& projectile) const {
-  return std::make_shared<CommandAvoidProjectile>(finder, projectile);
+  return std::make_shared<CommandAvoidProjectile>(projectile);
 }
 
 CastCommandPtr CommandFabric::haste() const {

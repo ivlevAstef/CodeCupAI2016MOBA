@@ -13,7 +13,7 @@ namespace AICup
 {
   class CommandKeepDistance: public MoveCommand {
   public:
-    CommandKeepDistance(Algorithm::PathFinder& finder, const double x, const double y, const double minDistance, const double maxDistance);
+    CommandKeepDistance(const double x, const double y, const double minDistance, const double maxDistance);
 
     bool check(const Wizard& self) override;
 
@@ -32,6 +32,7 @@ namespace AICup
     const double minDistance;
     const double maxDistance;
 
-    MoveCommandPtr commandMoveToPoint;
+    Position position;
+
   };
 }
