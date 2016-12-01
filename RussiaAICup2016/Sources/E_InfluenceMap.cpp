@@ -44,7 +44,7 @@ const float* const InfluenceMap::getEnemiesMap() const {
 }
 
 void InfluenceMap::updateLinePosition() {
-  const float maxSpeed = 25;
+  const float maxSpeed = 10;
   /// ƒа мне было не лень копировать этот код ниже...
   auto newTopForeFront = calculateForeFront(model::LANE_TOP);
   auto newMiddleForeFront = calculateForeFront(model::LANE_MIDDLE);
@@ -221,7 +221,7 @@ float InfluenceMap::zonePriority(const int x, const int y) const {
 
 bool InfluenceMap::isFriendZone(const int x, const int y) const {
   ///если в округе силы сильнее на одного юнита чем у врага, то значит подходит
-  return 40 < zonePriority(x, y);
+  return 90 < zonePriority(x, y);
 }
 
 Position InfluenceMap::pointToForeFront(const int x, const int y, const std::vector<Position>& line, const size_t index) const {
@@ -363,7 +363,7 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
         const double eWeight = 100 + (enemies[x][y] * 5);
         int32_t colorRed = MAX(100, MIN((int)(eWeight), 255));
         int32_t colorGreen = MAX(100, MIN((int)(fWeight), 255));
-        visualizator.fillRect(x*5, y*5, (x+1)*5, (y+1)*5 , (colorRed << 16) | (colorGreen << 8) | (100));
+        visualizator.fillRect(x*3, y*3, (x+1)*3, (y+1)*3 , (colorRed << 16) | (colorGreen << 8) | (100));
       }
     }
   }*/

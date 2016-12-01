@@ -79,10 +79,10 @@ void World::initTrees() {
 
   //специально делаю немножко выпирающими
   for (int i = 150; i <= size() - 150; i += 100) {
-    invisibleAreaTrees.push_back(Tree(i, -45, 50/*радиус*/));
-    invisibleAreaTrees.push_back(Tree(i, size() + 45, 50/*радиус*/));
-    invisibleAreaTrees.push_back(Tree(-45, i, 50/*радиус*/));
-    invisibleAreaTrees.push_back(Tree(size() + 45, i, 50/*радиус*/));
+    invisibleAreaTrees.push_back(Tree(i, -50, 50/*радиус*/));
+    invisibleAreaTrees.push_back(Tree(i, size() + 50, 50/*радиус*/));
+    invisibleAreaTrees.push_back(Tree(-50, i, 50/*радиус*/));
+    invisibleAreaTrees.push_back(Tree(size() + 50, i, 50/*радиус*/));
   }
   /// + 4 дерева по углам, сделал так чтобы на углах плавнее был проход
   invisibleAreaTrees.push_back(Tree(50, 50, 50/*радиус*/));

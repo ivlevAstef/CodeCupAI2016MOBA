@@ -66,6 +66,8 @@ void MyStrategy::move(const model::Wizard& modelSelf, const model::World& world,
   visualization(*self, visualizator);
   visualizator.endPost();
 
+
+  visualizator.isReverse = false;
   visualizator.beginAbs();
   visualization(*self, visualizator);
   visualizator.endAbs();
