@@ -113,6 +113,11 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   result.turnPriority = TurnPriority::avoidWizard + int(delta.length()/2);
   result.deactivateOtherTurn = false;
 
+  /// если хп много то подготовку к увороту не делаем
+  if (self.getLife() > self.getMaxLife()/2) {
+    return;
+  }
+
   // если я совсем далеко то поворачиватся не нужно
   if (delta.length() > distance && delta.length() > checkDistance) {
     return;
@@ -127,11 +132,9 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   const auto timeToTurn = Algorithm::timeToTurn(self, direction.angle());
 
   /// Если враг на подходе, то стоит повернуться боком
-  if (timeToTurn * EX::maxSpeed(wizard) + distance > delta.length()) {
+  if (timeToTurn * EX::maxSpeed(wizard) + distance+15/*небольшой запас*/ > delta.length()) {
     result.turnStyle = TurnStyle::SIDE_TURN;
-    if (self.getLife() < 50) { /// если мало хп поворачиваемся в обязательном порядке
-      result.deactivateOtherTurn = true;
-    }
+    result.deactivateOtherTurn = true;
   }
 }
 

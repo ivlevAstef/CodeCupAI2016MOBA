@@ -45,7 +45,7 @@ double AttackPriorities::attackTree(const Wizard& self, const model::Tree& tree)
 
   const double ticksToMove = self.getDistanceTo(tree) / self.maxSpeed();
   const double ticksToRemove = tree.getLife() / self.dps(model::ACTION_MAGIC_MISSILE);
-  return MAX(100 * (ticksToRemove - ticksToMove), 1000);
+  return INTERVAL(0, 10 * (ticksToRemove - ticksToMove), 1000);
 }
 
 double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& wizard) {

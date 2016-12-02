@@ -23,7 +23,7 @@ namespace AICup
       audacity = -1.0;
 
       importanceOfXP = 1.5;
-      importanceOfBonus = 0.5;
+      importanceOfBonus = 0.9;
 
 
       buildPriority = 10.0;
@@ -46,7 +46,7 @@ namespace AICup
     void update(const model::Wizard& self, model::Move& move) override {
       Role::update(self, move);
 
-      audacity = -1 - 4 * (1 - (float(self.getLife()) / float(self.getMaxLife())));
+      audacity = 0 - 4 * (1 - (float(self.getLife()) / float(self.getMaxLife())));
       if (self.getLife() < 32) {
         audacity -= 2;
       }

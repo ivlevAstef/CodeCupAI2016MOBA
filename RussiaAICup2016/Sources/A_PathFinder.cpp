@@ -34,7 +34,7 @@ bool Path::checkRemoved(const Obstacles& obstacles, const model::LivingUnit* obs
   size_t neightborsCount[2] = {0, 0};
 
   for (const auto& obstacle : obstacles) {
-    const auto fullRadius = obstacleForRemove->getRadius() + 2 * radius + obstacle->getRadius();
+    const auto fullRadius = 1/*перестраховка*/ + obstacleForRemove->getRadius() + 2 * radius + obstacle->getRadius();
 
     /// находим близкие объекты
     if ( obstacle->getId() != obstacleForRemove->getId()
@@ -131,7 +131,7 @@ void PathFinder::calculate(const model::CircularUnit& unit) {
     clean();
 
     obstacles = World::instance().allObstacles(unit, true);
-    calculateCost();
+    calculateCost(fromByInt, 400/*ширина линии*/ / PathConstants::step);
     /// расчитываем все веса из точки где мы находимся
     calculateWeight(fromByInt);
 
@@ -153,7 +153,7 @@ void PathFinder::calculatePath(const Position& to, std::shared_ptr<Path>& path) 
   calculatePath(*path.get());
 }
 
-void PathFinder::calculateCost() {
+void PathFinder::calculateCost(Vector2D<int> ignoreCenter, int ignoreRadius) {
   for (const auto& obstacle : obstacles) {
     float life = 1;
     if (EX::isTree(*obstacle)) {
@@ -173,7 +173,14 @@ void PathFinder::calculateCost() {
 
   const float* enemiesMap = InfluenceMap::instance().getEnemiesMap();
   for (size_t x = 0; x < PathConstants::memorySize; x++) {
+    if (ignoreCenter.x - ignoreRadius < int(x) && int(x) < ignoreCenter.x + ignoreRadius) {
+      continue;
+    }
     for (size_t y = 0; y < PathConstants::memorySize; y++) {
+      if (ignoreCenter.y - ignoreRadius < int(y) && int(y) < ignoreCenter.y + ignoreRadius) {
+        continue;
+      }
+
       const size_t mapX = size_t((x * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const size_t mapY = size_t((y * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const float value = enemiesMap[mapX * InfluenceMapConstants::memorySize + mapY];

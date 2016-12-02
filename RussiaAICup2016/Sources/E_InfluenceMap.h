@@ -20,7 +20,7 @@ namespace AICup
 {
   class InfluenceMapConstants {
   public:
-    static const size_t step = 100;
+    static const size_t step = 50;
     static const size_t memorySize = 4000 / step;
     static const int neutral = 0;
 

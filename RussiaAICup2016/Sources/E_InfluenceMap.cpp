@@ -5,6 +5,7 @@
 #include "C_Math.h"
 #include "E_Points.h"
 #include "C_Logger.h"
+#include "C_Extensions.h"
 #include <algorithm>
 
 using namespace AICup;
@@ -24,7 +25,7 @@ InfluenceMap::InfluenceMap() {
 }
 
 void InfluenceMap::update() {
-  if (lastCalculateTick + 30 < World::model().getTickIndex()) {
+  if (lastCalculateTick + 15 < World::model().getTickIndex()) {
     clean();
     includeFriends();
     includeEnemies();
@@ -44,7 +45,7 @@ const float* const InfluenceMap::getEnemiesMap() const {
 }
 
 void InfluenceMap::updateLinePosition() {
-  const float maxSpeed = 10;
+  const float maxSpeed = 25;
   /// Да мне было не лень копировать этот код ниже...
   auto newTopForeFront = calculateForeFront(model::LANE_TOP);
   auto newMiddleForeFront = calculateForeFront(model::LANE_MIDDLE);
@@ -209,8 +210,8 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
 float InfluenceMap::zonePriority(const int x, const int y) const {
   float friendForce = 0;
   float enemyForce = 0;
-  for (int nx = -2; nx <= 2; nx++) {
-    for (int ny = -2; ny <= 2; ny++) {
+  for (int nx = -3; nx <= 3; nx++) {
+    for (int ny = -3; ny <= 3; ny++) {
       friendForce += friends[x + nx][y + ny];
       enemyForce += enemies[x + nx][y + ny];
     }
@@ -220,8 +221,8 @@ float InfluenceMap::zonePriority(const int x, const int y) const {
 }
 
 bool InfluenceMap::isFriendZone(const int x, const int y) const {
-  ///если в округе силы сильнее на одного юнита чем у врага, то значит подходит
-  return 90 < zonePriority(x, y);
+  ///если в округе силы сильнее на двух полных юнитов чем у врага, то значит подходит
+  return 20 * 2 * 4/*магический коэффициент*/ < zonePriority(x, y);
 }
 
 Position InfluenceMap::pointToForeFront(const int x, const int y, const std::vector<Position>& line, const size_t index) const {
@@ -284,7 +285,7 @@ double minionRadius(const model::Minion& minion) {
   if (model::MINION_FETISH_BLOWDART == minion.getType()) {
     return Game::model().getFetishBlowdartAttackRange();
   }
-  return Game::model().getOrcWoodcutterAttackRange() + minion.getRadius();/*а то совсем маленький*/
+  return Game::model().getOrcWoodcutterAttackRange();
 }
 
 float minionDanger(const model::Minion& minion) {
@@ -295,14 +296,36 @@ float buildDps(const model::Building& build) {
   return float(build.getDamage()) / float(build.getCooldownTicks());
 }
 
-double buildRadius(const model::Building& build, const double coef) {
+double buildRadius(const model::Building& build) {
   double ticks = 1 - ((double)build.getRemainingActionCooldownTicks() / (double)build.getCooldownTicks());
   ticks = MAX(0.5, ticks); /// чтобы совсем в ноль радиус не уходил не уходила
-  return MAX(build.getRadius(), build.getAttackRange() * ticks * coef);
+  return MAX(build.getRadius(), build.getAttackRange() * ticks);
 }
 
-float buildDanger(const model::Building& build, const double coef) {
-  return float(build.getLife()) * float(coef) * 0.1f/*иначе слишком опасная*/ * buildDps(build);
+float buildDanger(const model::Building& build) {
+  return float(MIN(100, build.getLife())) * buildDps(build);
+}
+
+double baseRadius(const model::Building& build) {
+  double ticks = 1 - ((double)build.getRemainingActionCooldownTicks() / (double)build.getCooldownTicks());
+  return MAX(build.getRadius(), build.getAttackRange() * ticks);
+}
+
+float baseDanger(const model::Building& build) {
+  return 0.25f * float(MIN(200, build.getLife())) * buildDps(build);
+}
+
+float wizardDps(const model::Wizard& wizard) {
+  return float(EX::magicMissleAttack(wizard)) / float(Game::model().getWizardActionCooldownTicks());
+}
+
+double wizardRadius(const model::Wizard& wizard) {
+  return EX::attackRadius(wizard);
+}
+
+/// маги не должны сильно влиять на линию фронта
+float wizardDanger(const model::Wizard& wizard) {
+  return 0.05f * float(wizard.getLife()) * wizardDps(wizard);
 }
 
 void InfluenceMap::includeFriends() {
@@ -312,11 +335,17 @@ void InfluenceMap::includeFriends() {
     }
   }
 
+  /// своим магам доверять, себе дороже
+  for (const auto& wizard : World::instance().wizards()) {
+    if (Game::friendFaction() == wizard.getFaction()) {
+      includeFriend(wizard, 0.5 * wizardRadius(wizard), wizardDanger(wizard));
+
+    }
+  }
+
   for (const auto& build : World::instance().buildings()) {
     if (Game::friendFaction() == build.getFaction()) {
-      for (double c = 0.1; c <= 1.0; c += 0.1) {
-        includeFriend(build, buildRadius(build, c), buildDanger(build, 1.0 - c));
-      }
+      includeFriend(build, buildRadius(build), buildDanger(build));
     }
   }
 
@@ -325,17 +354,25 @@ void InfluenceMap::includeEnemies() {
   for (const auto& minion : World::instance().minions()) {
     if (Game::enemyFaction() == minion.getFaction()) {
       includeEnemy(minion, minionRadius(minion), minionDanger(minion));
-    }
 
-    if (model::FACTION_NEUTRAL == minion.getFaction()) {
+    } else if (model::FACTION_NEUTRAL == minion.getFaction()) {
       includeEnemy(minion, minionRadius(minion), 0.5f * minionDanger(minion));
+    }
+  }
+
+  for (const auto& wizard : World::instance().wizards()) {
+    if (Game::enemyFaction() == wizard.getFaction()) {
+      includeEnemy(wizard, wizardRadius(wizard), wizardDanger(wizard));
+
     }
   }
 
   for (const auto& build : World::instance().buildings()) {
     if (Game::enemyFaction() == build.getFaction()) {
-      for (double c = 0.1; c <= 1.0; c += 0.1) {
-        includeEnemy(build, buildRadius(build, c), buildDanger(build, 1.0 - c));
+      if (build.getType() == model::BUILDING_GUARDIAN_TOWER) {
+        includeEnemy(build, buildRadius(build), buildDanger(build));
+      } else { /// вражеская база
+        includeEnemy(build, baseRadius(build), baseDanger(build));
       }
     }
   }
@@ -363,7 +400,22 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
         const double eWeight = 100 + (enemies[x][y] * 5);
         int32_t colorRed = MAX(100, MIN((int)(eWeight), 255));
         int32_t colorGreen = MAX(100, MIN((int)(fWeight), 255));
-        visualizator.fillRect(x*3, y*3, (x+1)*3, (y+1)*3 , (colorRed << 16) | (colorGreen << 8) | (100));
+        visualizator.fillRect(x*3, y*3, (x+1)*3, (y+1)*3, (colorRed << 16) | (colorGreen << 8) | (100));
+      }
+    }
+  }*/
+
+  /*if (Visualizator::PRE == visualizator.getStyle()) {
+    for (int x = 0; x < InfluenceMapConstants::memorySize; x++) {
+      for (int y = 0; y < InfluenceMapConstants::memorySize; y++) {
+        const auto p1 = InfluenceMapConstants::toReal(Vector2D<int>(x, y));
+        const auto p2 = InfluenceMapConstants::toReal(Vector2D<int>(x, y), 1, 1);
+
+        const double fWeight = 100 + (friends[x][y] * 5);
+        const double eWeight = 100 + (enemies[x][y] * 5);
+        int32_t colorRed = MAX(100, MIN((int)(eWeight), 255));
+        int32_t colorGreen = MAX(100, MIN((int)(fWeight), 255));
+        visualizator.fillRect(p1.x, p1.y, p2.x, p2.y, (colorRed << 16) | (colorGreen << 8) | (100));
       }
     }
   }*/

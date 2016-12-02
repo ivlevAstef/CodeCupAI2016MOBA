@@ -64,12 +64,12 @@ bool CommandMoveToBonus::check(const Wizard& self) {
 
 
   /// если бежать далеко, то оно того не стоит
-  if (minMoveTicks > 300) {
+  if (minMoveTicks > 325) {
     return false;
   }
 
   /// если опыт на линии + тот опыт который может еще прийти, больше того что дают за бонус, то он не нужен
-  if (potensialExpirience(self) + minMoveTicks * 0.5  > Game::model().getBonusScoreAmount()) {
+  if (potensialExpirience(self) + minMoveTicks * 0.1  > Game::model().getBonusScoreAmount()) {
     return false;
   }
 
@@ -80,7 +80,7 @@ bool CommandMoveToBonus::check(const Wizard& self) {
   }
 
   const double minDistance = self.getRadius() + Game::model().getBonusRadius();
-  const auto delta = selfPos - bonusPos;
+  const auto delta = bonusPos - selfPos;
   bonusPos = selfPos + delta.normal() * (delta.length() - minDistance);
 
   return true;

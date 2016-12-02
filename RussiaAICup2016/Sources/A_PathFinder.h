@@ -86,7 +86,7 @@ namespace AICup
 #endif // ENABLE_VISUALIZATOR
 
     private:
-      void calculateCost();
+      void calculateCost(Vector2D<int> ignoreCenter, int ignoreRadius);
       void calculateWeight(Vector2D<int> to);
       void calculatePath(Path& path) const;
 

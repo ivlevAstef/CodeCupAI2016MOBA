@@ -92,7 +92,7 @@ double MovePriorities::keepDistance(const Wizard&, const Position, const double,
 }
 
 double MovePriorities::moveToBonus(const Wizard& self, const Position&) {
-  return (50 + 2 * self.getLife()) * self.getRole().getImportanceOfBonus();
+  return (350 + 5 * self.getLife()) * self.getRole().getImportanceOfBonus();
 }
 
 double MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {

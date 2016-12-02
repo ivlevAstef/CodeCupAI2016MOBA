@@ -151,17 +151,16 @@ void Math::fillGrid(float* grid, const double xReal, const double yReal, const d
   const size_t minY = (size_t)floor(minRealY);
   const size_t maxY = (size_t)ceil(maxRealY);
 
+  const float radius2 = radius* radius;
+
   for (size_t x = minX; x < maxX; x++) {
-    const float sxMin = 1.0f - MAX(0.0f, minRealX - float(x));
-    const float sxMax = 1.0f - MAX(0.0f, float(x + 1) - maxRealX);
+    const float dx = ((float(x) + 0.5f) * step) - xReal;
+
     for (size_t y = minY; y < maxY; y++) {
-      const float syMin = 1.0f - MAX(0.0f, minRealY - float(y));
-      const float syMax = 1.0f - MAX(0.0f, float(y + 1) - maxRealY);
+      const float dy = ((float(y) + 0.5f) * step) - yReal;
 
-      const float dx = sxMin + sxMax - 1.0f;
-      const float dy = syMin + syMax - 1.0f;
-
-      grid[x * size + y] += dx*dy * value;
+      const float coef = (dx*dx + dy*dy) / radius2;
+      grid[x * size + y] += (1.0f - MIN(1.0f, coef)) * value;
     }
   }
 }
