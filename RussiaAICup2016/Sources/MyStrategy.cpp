@@ -53,7 +53,7 @@ void MyStrategy::move(const model::Wizard& modelSelf, const model::World& world,
   self->update(move);
 
   AICup::HypotheticalEnemies::instance().update();
-  AICup::InfluenceMap::instance().update();
+  AICup::InfluenceMap::instance().update(*self);
   AICup::StrategyManager::instance().update(*self, move);
 
 #ifdef ENABLE_VISUALIZATOR

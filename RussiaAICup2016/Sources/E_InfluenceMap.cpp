@@ -26,8 +26,8 @@ InfluenceMap::InfluenceMap() {
   clean();
 }
 
-void InfluenceMap::update() {
-  if (lastCalculateTick + 15 < World::model().getTickIndex()) {
+void InfluenceMap::update(const model::Wizard& self) {
+  if (lastCalculateTick + 5 < World::model().getTickIndex()) {
     clean();
     includeFriends();
     includeEnemies();
@@ -36,7 +36,7 @@ void InfluenceMap::update() {
     lastCalculateTick = World::model().getTickIndex();
   }
 
-  updateLinePosition();
+  updateLinePosition(self);
 }
 
 const float* const InfluenceMap::getFriendsMap() const {
@@ -46,12 +46,12 @@ const float* const InfluenceMap::getEnemiesMap() const {
   return reinterpret_cast<const float* const>(enemies);
 }
 
-void InfluenceMap::updateLinePosition() {
+void InfluenceMap::updateLinePosition(const model::Wizard& self) {
   const float maxSpeed = 25;
   /// ƒа мне было не лень копировать этот код ниже...
-  auto newTopForeFront = calculateForeFront(model::LANE_TOP);
-  auto newMiddleForeFront = calculateForeFront(model::LANE_MIDDLE);
-  auto newBottomForeFront = calculateForeFront(model::LANE_BOTTOM);
+  auto newTopForeFront = calculateForeFront(self, model::LANE_TOP);
+  auto newMiddleForeFront = calculateForeFront(self, model::LANE_MIDDLE);
+  auto newBottomForeFront = calculateForeFront(self, model::LANE_BOTTOM);
 
   float topDistance = (float)(newTopForeFront - topForeFront).length();
   float middleDistance = (float)(newMiddleForeFront - middleForeFront).length();
@@ -139,7 +139,8 @@ const std::vector<Position>& InfluenceMap::getLinePoints(const model::LaneType l
   /// ћассивы точек, по которым идут крипы
   static const std::vector<Position> topLinePoints = {
     Points::point(Points::RENEGADES_BASE),
-    Points::point(Points::TOP_CENTER),
+    Points::point(Points::RENEGADES_TOP_CENTER),
+    Points::point(Points::ACADEMY_TOP_CENTER),
     Points::point(Points::ACADEMY_BASE)
   };
 
@@ -150,7 +151,8 @@ const std::vector<Position>& InfluenceMap::getLinePoints(const model::LaneType l
 
   static const std::vector<Position> bottomLinePoints = {
     Points::point(Points::RENEGADES_BASE),
-    Points::point(Points::BOTTOM_CENTER),
+    Points::point(Points::RENEGADES_BOTTOM_CENTER),
+    Points::point(Points::ACADEMY_BOTTOM_CENTER),
     Points::point(Points::ACADEMY_BASE)
   };
 
@@ -169,7 +171,7 @@ const std::vector<Position>& InfluenceMap::getLinePoints(const model::LaneType l
   return middleLinePoints;
 }
 
-Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
+Position InfluenceMap::calculateForeFront(const model::Wizard& self, const model::LaneType lane) const {
   const std::vector<Position>& linePoints = getLinePoints(lane);
 
   /// идем по всем точкам, если зона дружественна€, значит это лини€ фронта так как начинаем идти от врагов
@@ -190,7 +192,7 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
       for (int x = p1.x; x != p2.x+sign; x += sign) {
         const int y = p1.y + ((x - p1.x) * delta.y) / delta.x;
         if (isFriendZone(x, y)) {
-          return pointToForeFront(x, y, linePoints, i);
+          return pointToForeFront(self, x, y, linePoints, i);
         }
       }
     } else {
@@ -198,7 +200,7 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
       for (int y = p1.y; y != p2.y+sign; y += sign) {
         const int x = p1.x + ((y - p1.y) * delta.x) / delta.y;
         if (isFriendZone(x, y)) {
-          return pointToForeFront(x, y, linePoints, i);
+          return pointToForeFront(self, x, y, linePoints, i);
         }
       }
     }
@@ -208,6 +210,7 @@ Position InfluenceMap::calculateForeFront(const model::LaneType lane) const {
   // ¬озможно только если крипы на нашей базе
   return linePoints[linePoints.size()-1];
 }
+
 
 float InfluenceMap::zonePriority(const int x, const int y) const {
   float friendForce = 0;
@@ -223,14 +226,34 @@ float InfluenceMap::zonePriority(const int x, const int y) const {
 }
 
 bool InfluenceMap::isFriendZone(const int x, const int y) const {
-  ///если в округе силы сильнее на двух полных юнитов чем у врага, то значит подходит
-  return 20 * 2 * 4/*магический коэффициент*/ < zonePriority(x, y);
+  return zonePriority(x, y) > 0;
 }
 
-Position InfluenceMap::pointToForeFront(const int x, const int y, const std::vector<Position>& line, const size_t index) const {
+Position InfluenceMap::pointToForeFront(const model::Wizard& self, const int x, const int y, const std::vector<Position>& line, const size_t index) const {
   const Position startCentralPosition = InfluenceMapConstants::toReal({x, y}, 0.5, 0.5);
-  return Math::point_distanceToSegment(startCentralPosition, line[index - 1], line[index]);
+  auto foreFront = Math::point_distanceToSegment(startCentralPosition, line[index - 1], line[index]);
+
+  for (const auto& minion : World::instance().minions()) {
+    if (minion.getFaction() != self.getFaction()) {
+      continue;
+    }
+
+    const auto minionPos = EX::pos(minion);
+    const auto minionForeFront = Math::point_distanceToSegment(minionPos, line[index - 1], line[index]);
+    /// миньон с другой линии
+    if ((minionPos - minionForeFront).length() > 400) {
+      continue;
+    }
+
+    /// если миньон ближе к противникам то выбираем его позицию
+    if ((minionForeFront - line[index - 1]).length2() < (foreFront - line[index - 1]).length2()) {
+      foreFront = minionForeFront;
+    }
+  }
+
+  return foreFront;
 }
+
 
 
 Position InfluenceMap::offsetForeFront(const Position& foreFront, float offset, const std::vector<Position>& line) const {
@@ -283,11 +306,16 @@ float minionDps(const model::Minion& minion) {
   return Game::model().getOrcWoodcutterDamage() / float(minion.getCooldownTicks());
 }
 
+/// причина, то что дружественный дальний миньон не должен смещать линию фронта вперед, ибо он будет стрел€ть, а не подойдет близко
+double friendMinionRadius(const model::Minion& minion) {
+  return 4 * Game::model().getOrcWoodcutterAttackRange();
+}
+
 double minionRadius(const model::Minion& minion) {
   if (model::MINION_FETISH_BLOWDART == minion.getType()) {
     return Game::model().getFetishBlowdartAttackRange();
   }
-  return Game::model().getOrcWoodcutterAttackRange();
+  return 2 * Game::model().getOrcWoodcutterAttackRange();
 }
 
 float minionDanger(const model::Minion& minion) {
@@ -318,7 +346,18 @@ float baseDanger(const model::Building& build) {
 }
 
 float wizardDps(const model::Wizard& wizard) {
-  return float(EX::magicMissleAttack(wizard)) / float(Game::model().getWizardActionCooldownTicks());
+  float mmDps = EX::magicMissleAttack(wizard) / float(Game::model().getWizardActionCooldownTicks());
+  float ffDps = 0;
+  if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
+    ffDps = 1.5f * float(Game::model().getFireballExplosionMinDamage()) / float(Game::model().getFireballCooldownTicks());
+  }
+
+  float fbDps = 0;
+  if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
+    fbDps = 1.5f * float(Game::model().getFrostBoltDirectDamage()) / float(Game::model().getFrostBoltCooldownTicks());
+  }
+
+  return mmDps + ffDps + fbDps;
 }
 
 double wizardRadius(const model::Wizard& wizard) {
@@ -327,13 +366,16 @@ double wizardRadius(const model::Wizard& wizard) {
 
 /// маги не должны сильно вли€ть на линию фронта
 float wizardDanger(const model::Wizard& wizard) {
-  return 0.05f * float(wizard.getLife()) * wizardDps(wizard);
+  float ticks = 1.0f - (EX::minTimeForMagic(wizard) / float(Game::model().getWizardActionCooldownTicks()));
+  ticks = MAX(0.5f, ticks);
+
+  return 25.0f * float(wizard.getLife())/float(wizard.getMaxLife()) * wizardDps(wizard) * ticks;
 }
 
 void InfluenceMap::includeFriends() {
   for (const auto& minion : World::instance().minions()) {
     if (Game::friendFaction() == minion.getFaction()) {
-      includeFriend(minion, minionRadius(minion), minionDanger(minion));
+      includeFriend(minion, friendMinionRadius(minion), minionDanger(minion));
     }
   }
 
@@ -347,7 +389,7 @@ void InfluenceMap::includeFriends() {
 
   for (const auto& build : World::instance().buildings()) {
     if (Game::friendFaction() == build.getFaction()) {
-      includeFriend(build, buildRadius(build), buildDanger(build));
+      includeFriend(build, 0.5 * buildRadius(build), buildDanger(build));
     }
   }
 
@@ -358,7 +400,7 @@ void InfluenceMap::includeEnemies() {
       includeEnemy(minion, minionRadius(minion), minionDanger(minion));
 
     } else if (model::FACTION_NEUTRAL == minion.getFaction()) {
-      includeEnemy(minion, minionRadius(minion), 0.5f * minionDanger(minion));
+      includeEnemy(minion, minionRadius(minion), minionDanger(minion));
     }
   }
 
@@ -407,9 +449,10 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
     }
   }*/
 
-  /*if (Visualizator::PRE == visualizator.getStyle()) {
-    for (int x = 0; x < InfluenceMapConstants::memorySize; x++) {
-      for (int y = 0; y < InfluenceMapConstants::memorySize; y++) {
+  if (Visualizator::PRE == visualizator.getStyle()) {
+    const auto size = 24; // InfluenceMapConstants::memorySize;
+    for (int x = 0; x < size; x++) {
+      for (int y = 0; y < size; y++) {
         const auto p1 = InfluenceMapConstants::toReal(Vector2D<int>(x, y));
         const auto p2 = InfluenceMapConstants::toReal(Vector2D<int>(x, y), 1, 1);
 
@@ -420,7 +463,7 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
         visualizator.fillRect(p1.x, p1.y, p2.x, p2.y, (colorRed << 16) | (colorGreen << 8) | (100));
       }
     }
-  }*/
+  }
 
   if (Visualizator::PRE == visualizator.getStyle()) {
     const auto topLine    = getForeFront(model::LANE_TOP, 0);
@@ -435,17 +478,17 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
     const auto middleEnemyLine = getForeFront(model::LANE_MIDDLE, -200);
     const auto bottomEnemyLine = getForeFront(model::LANE_BOTTOM, -200);
 
-    visualizator.fillCircle(topFriendLine.x, topFriendLine.y, 150, 0xaaffaa);
-    visualizator.fillCircle(middleFriendLine.x, middleFriendLine.y, 150, 0xaaffaa);
-    visualizator.fillCircle(bottomFriendLine.x, bottomFriendLine.y, 150, 0xaaffaa);
+    visualizator.fillCircle(topFriendLine.x, topFriendLine.y, 50, 0xaaffaa);
+    visualizator.fillCircle(middleFriendLine.x, middleFriendLine.y, 50, 0xaaffaa);
+    visualizator.fillCircle(bottomFriendLine.x, bottomFriendLine.y, 50, 0xaaffaa);
 
-    visualizator.fillCircle(topEnemyLine.x, topEnemyLine.y, 150, 0xffaaaa);
-    visualizator.fillCircle(middleEnemyLine.x, middleEnemyLine.y, 150, 0xffaaaa);
-    visualizator.fillCircle(bottomEnemyLine.x, bottomEnemyLine.y, 150, 0xffaaaa);
+    visualizator.fillCircle(topEnemyLine.x, topEnemyLine.y, 50, 0xffaaaa);
+    visualizator.fillCircle(middleEnemyLine.x, middleEnemyLine.y, 50, 0xffaaaa);
+    visualizator.fillCircle(bottomEnemyLine.x, bottomEnemyLine.y, 50, 0xffaaaa);
 
-    visualizator.fillCircle(topLine.x, topLine.y, 150, 0xffffaa);
-    visualizator.fillCircle(middleLine.x, middleLine.y, 150, 0xffffaa);
-    visualizator.fillCircle(bottomLine.x, bottomLine.y, 150, 0xffffaa);
+    visualizator.fillCircle(topLine.x, topLine.y, 50, 0xffffaa);
+    visualizator.fillCircle(middleLine.x, middleLine.y, 50, 0xffffaa);
+    visualizator.fillCircle(bottomLine.x, bottomLine.y, 50, 0xffffaa);
   }
 }
 #endif // ENABLE_VISUALIZATOR

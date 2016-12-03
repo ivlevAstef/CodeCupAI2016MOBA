@@ -7,6 +7,7 @@
 #include "E_World.h"
 #include "A_Move.h"
 #include <cassert>
+#include <algorithm>
 
 
 using namespace AICup;
@@ -113,46 +114,39 @@ const Vector CommandStrategy::turn(const std::vector<MoveCommand::Result>& moveR
 }
 
 const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit) {
-  double minDeviation = 9999999;
-  Vector result = Vector(0, 0);
-  //Проходим по углам, и высчитываем какой вариант даст наименьшое отклонение
-  for (size_t alphaI = 0; alphaI < 360; alphaI++) {
-    const double alpha = AICUP_PI * double(alphaI) / 180.0;
-
-    const auto direction = Vector(1, 0).rotate(alpha);
-
-    double summaryDeviation = 0;
-    for (const auto& move : moveResults) {
-      const double deviation = 1 - move.moveDirection.normal().dot(direction);
-      summaryDeviation += deviation * double(move.priority) / 1000.0;
-    }
-
-    if (summaryDeviation < minDeviation) {
-      minDeviation = summaryDeviation;
-      result = direction;
-    }
-  }
-
+  assert(0 != moveResults.size());
 
   speedLimit = EX::maxSpeed(self);
-  for (const auto& move : moveResults) {
-    if (move.speedLimit > 0 && move.speedLimit < speedLimit) {
-      speedLimit = move.speedLimit;
+  double maxPriority = 0;
+  Vector result = Vector(0, 0);
+  for (const auto& moveIter : moveResults) {
+    const auto direction = moveIter.moveDirection.normal();
+
+    double sumPriority = 0;
+    for (const auto& move : moveResults) {
+      sumPriority += move.moveDirection.normal().dot(direction) * move.priority;
+    }
+
+    if (sumPriority > maxPriority) {
+      sumPriority = maxPriority;
+      result = moveIter.moveDirection;
+      speedLimit = moveIter.speedLimit < 0 ? speedLimit : moveIter.speedLimit;
     }
   }
 
-  return calculateCollisions(self, EX::pos(self) + result * 300/*просматриваем припятствия на 300*/, speedLimit);
+  //
+  return calculateCollisions(self, EX::pos(self) + result/*куда ищем путь*/, speedLimit);
 }
 
 const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Position& endPoint, const double speedLimit) {
-  std::shared_ptr<Algorithm::Path> path;
+  movePosition = endPoint;
   pathFinder.calculatePath(endPoint, path);
   assert(nullptr != path);
 
   const Position preEndPoint = path->calculateNearestCurvaturePoint(self.getVisionRange() / 2);
 
   /// need remove obstacles
-  auto obstacles = World::instance().obstacles(self, self.getVisionRange());
+  auto obstacles = World::instance().obstacles(self, self.getVisionRange(), preEndPoint - EX::pos(self));
   const auto treesForRemove = path->removeObstacles(obstacles);
   const auto obstaclesGroups = World::instance().createGroup(obstacles, self.getRadius());
 
@@ -161,7 +155,12 @@ const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Posi
     addTreeForRemove(self, tree);
   }
 
-  return Algorithm::move(self, preEndPoint, obstaclesGroups, self.getVisionRange()) * speedLimit;
+  const auto result = Algorithm::move(self, preEndPoint, obstaclesGroups, self.getVisionRange()) * speedLimit;
+  /// если мы в окружении, значит все плохо... или алгоритм глюканул
+  if (result.length() < 0.01) {
+    return (preEndPoint - EX::pos(self)).normal() * speedLimit;
+  }
+  return result;
 }
 
 
@@ -229,12 +228,26 @@ const long long int CommandStrategy::cast(const Wizard& self, model::ActionType&
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandStrategy::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
-  for (const auto& command : moveCommands) {
+  /*for (const auto& command : moveCommands) {
     command->visualization(self, visualizator);
+  }*/
+
+  if (Visualizator::PRE == visualizator.getStyle()) {
+    for (const auto& move : moveCommandsToMoveResult(self)) {
+      visualizator.line(self.getX(), self.getY(), self.getX() + move.moveDirection.x, self.getY() + move.moveDirection.y, 0xff0000);
+    }
   }
 
   for (const auto& command : attackCommands) {
     command->visualization(self, visualizator);
+  }
+
+  if (Visualizator::POST == visualizator.getStyle()) {
+    if (nullptr != path) {
+      path->visualization(visualizator);
+
+      visualizator.line(self.getX(), self.getY(), movePosition.x, movePosition.y, 0x000000);
+    }
   }
 }
 #endif

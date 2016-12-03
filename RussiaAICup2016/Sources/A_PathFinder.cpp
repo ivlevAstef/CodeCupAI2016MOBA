@@ -19,11 +19,16 @@ Vector2D<int> PathConstants::toInt(Position point) {
 }
 
 
-
+Position normalize(const Position& from, const Position& pos) {
+  const double x = INTERVAL(PathConstants::step, pos.x, World::size() - PathConstants::step);
+  const double y = INTERVAL(PathConstants::step, pos.y, World::size() - PathConstants::step);
+  const double length = sqrt((from.x - x)*(from.x - x) + (from.y - y)*(from.y - y));
+  return from + (pos - from).normal() * length;
+}
 
 
 Path::Path(Position from, Position to, const double radius):
-  from(from), to(to), radius(radius) {
+  from(from), to(normalize(from, to)), radius(radius) {
   length = 0;
   realLength = 0;
   count = 0;
@@ -35,7 +40,7 @@ bool Path::checkRemoved(const Obstacles& obstacles, const model::LivingUnit* obs
   size_t neightborsCount[2] = {0, 0};
 
   for (const auto& obstacle : obstacles) {
-    const auto fullRadius = 1/*перестраховка*/ + obstacleForRemove->getRadius() + 2 * radius + obstacle->getRadius();
+    const auto fullRadius = 5/*перестраховка*/ + obstacleForRemove->getRadius() + 2 * radius + obstacle->getRadius();
 
     /// находим близкие объекты
     if ( obstacle->getId() != obstacleForRemove->getId()
@@ -162,7 +167,7 @@ void PathFinder::calculateCost(Vector2D<int> ignoreCenter, int ignoreRadius) {
   for (const auto& obstacle : obstacles) {
     float life = 1;
     if (EX::isTree(*obstacle)) {
-      life = 1.5f * (float(obstacle->getLife()) / 12.0f); /// дерево
+      life = float(obstacle->getLife() * obstacle->getLife()) / 10.0f; /// дерево
     } else if (EX::isNeutral(*obstacle)) {
       life = 1000.0f; /// нейтрал очень дорогое удовольствие
     } else {

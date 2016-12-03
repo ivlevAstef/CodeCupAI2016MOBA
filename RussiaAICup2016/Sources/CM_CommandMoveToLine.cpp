@@ -10,6 +10,7 @@
 #include "CM_MovePriorities.h"
 #include "CM_TurnPriority.h"
 #include "C_Extensions.h"
+#include "C_Math.h"
 
 using namespace AICup;
 
@@ -32,7 +33,8 @@ void CommandMoveToLine::execute(const Wizard& self, Result& result) {
 }
 
 double CommandMoveToLine::priority(const Wizard& self) {
-  return MovePriorities::moveToLine(self, line);
+  const double length = (toPoint - EX::pos(self)).length();
+  return MovePriorities::moveToLine(self, line) * MAX(1, sqrt(length/100.0));
 }
 
 #ifdef ENABLE_VISUALIZATOR

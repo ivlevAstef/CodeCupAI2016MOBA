@@ -283,7 +283,7 @@ Obstacles World::allObstacles(const model::CircularUnit& unit, const bool onlySt
   }
 
   for (const auto& minion : model().getMinions()) {
-    if (unit.getId() != minion.getId() && (!onlyStatic || model::FACTION_NEUTRAL == minion.getFaction())) {
+    if (unit.getId() != minion.getId() && (!onlyStatic || model::FACTION_NEUTRAL == minion.getFaction() || Game::enemyFaction() == minion.getFaction())) {
       obstacles.push_back(&minion);
     }
   }
@@ -299,30 +299,53 @@ Obstacles World::allObstacles(const model::CircularUnit& unit, const bool onlySt
   return obstacles;
 }
 
-Obstacles World::obstacles(const model::CircularUnit& unit, const double range) const {
+bool checkObstacle(const model::CircularUnit& unit, const model::CircularUnit& obstacle, const double range, const Vector direction) {
+  const auto unitPos = Position(unit.getX(), unit.getY());
+  const auto obstaclePos = Position(obstacle.getX(), obstacle.getY());
+  const auto delta = obstaclePos - unitPos;
+
+  if ((obstaclePos - unitPos).length2() > range * range) {
+    return false;
+  }
+
+  if (direction.length2() > 0.01) {
+    /// спина юнита
+    const auto unitBackPos = unitPos - direction.normal() * (unit.getRadius() + obstacle.getRadius());
+    const auto delta = obstaclePos - unitBackPos;
+
+    ///объект за спиной
+    if (delta.dot(direction) < 0) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+Obstacles World::obstacles(const model::CircularUnit& unit, const double range, const Vector direction) const {
   Obstacles aroundObstacles;
   aroundObstacles.reserve(64); // Приблизительно сколько объектов в среднем
 
   for (const auto& tree : trees()) {
-    if (unit.getDistanceTo(tree) < range) {
+    if (checkObstacle(unit, tree, range, direction)) {
       aroundObstacles.push_back(&tree);
     }
   }
 
   for (const auto& build : buildings()) {
-    if (unit.getDistanceTo(build) < range) {
+    if (checkObstacle(unit, build, range, direction)) {
       aroundObstacles.push_back(&build);
     }
   }
 
   for (const auto& minion : model().getMinions()) {
-    if (unit.getId() != minion.getId() && unit.getDistanceTo(minion) < range) {
+    if (unit.getId() != minion.getId() && checkObstacle(unit, minion, range, direction)) {
       aroundObstacles.push_back(&minion);
     }
   }
 
   for (const auto& wizard : model().getWizards()) {
-    if (unit.getId() != wizard.getId() && unit.getDistanceTo(wizard) < range) {
+    if (unit.getId() != wizard.getId() && checkObstacle(unit, wizard, range, direction)) {
       aroundObstacles.push_back(&wizard);
     }
   }

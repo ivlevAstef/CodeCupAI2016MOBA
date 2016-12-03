@@ -20,7 +20,7 @@ namespace AICup
         SkillBranches::meleeDamageFireBolt,
         SkillBranches::armorShield,
       }) {
-      audacity = -1.0;
+      audacity = -1.5;
 
       importanceOfXP = 1.5;
       importanceOfBonus = 0.9;
@@ -36,20 +36,17 @@ namespace AICup
       audacityWizard = 1.25;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 0.5;
-      changeLinePathLengthPriority = 0.5;
-      changeLineWizardCountPriority = 2;
-      changeLineTowerBalancePriority = 2;
-      changeLineLaneStrengthPriority = 2.5;
+      desireChangeLine = 0.75;
+      changeLinePathLengthPriority = 2.5;
+      changeLineWizardCountPriority = 1;
+      changeLineTowerBalancePriority = 1;
+      changeLineLaneStrengthPriority = 1.5;
     }
 
     void update(const model::Wizard& self, model::Move& move) override {
       Role::update(self, move);
 
-      audacity = 0 - 4 * (1 - (float(self.getLife()) / float(self.getMaxLife())));
-      if (self.getLife() < 32) {
-        audacity -= 2;
-      }
+      audacity = -1.5 - 5.5 * (1 - (float(self.getLife()) / float(self.getMaxLife())));
     }
   };
 }

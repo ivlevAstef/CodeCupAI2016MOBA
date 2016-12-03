@@ -6,6 +6,10 @@
 
 using namespace AICup;
 
+double MovePriorities::pushOffMinion(const Wizard& self, const model::Minion& minion) {
+  return 500;
+}
+
 ///слегка выше
 double MovePriorities::avoidBuild(const Wizard& self, const model::Building& build) {
   const int lifePriority = (300 * build.getLife()) / build.getMaxLife();
@@ -66,7 +70,8 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
 }
 
 double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {
-  return 450;
+  /*сочетается с get expirience*/
+  return 250 * double(self.getLife())/double(self.getMaxLife());
 }
 
 /// Это очень важно, поэтому завышено значение от нормы

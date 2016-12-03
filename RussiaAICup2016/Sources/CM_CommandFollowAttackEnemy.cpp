@@ -22,7 +22,7 @@ void CommandFollowAttack::execute(const Wizard& self, Result& result) {
   const auto wizardPos = EX::pos(wizard);
   const auto delta = wizardPos - selfPos;
 
-  result.moveDirection = delta;
+  result.set(wizardPos, self);
   result.turnStyle = TurnStyle::TURN;
   result.turnPriority = TurnPriority::follow;
 }

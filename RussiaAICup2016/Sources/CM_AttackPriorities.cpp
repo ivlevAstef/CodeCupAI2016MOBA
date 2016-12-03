@@ -39,13 +39,21 @@ double AttackPriorities::attackMinion(const Wizard& self, const model::Minion& m
 }
 
 double AttackPriorities::attackTree(const Wizard& self, const model::Tree& tree) {
+  /// если дерево вблизи, то бить его обязательно
   if (Algorithm::isMelee(self, tree)) {
     return 1200;
   }
 
+  const double ticksToRotate = Algorithm::timeToTurnForAttack(tree, self);
+  const double ticksToAttack = self.minStaffOrMissileCooldown();
   const double ticksToMove = self.getDistanceTo(tree) / self.maxSpeed();
-  const double ticksToRemove = tree.getLife() / self.dps(model::ACTION_MAGIC_MISSILE);
-  return INTERVAL(0, 10 * (ticksToRemove - ticksToMove), 1000);
+
+  /// если бежать до дерева, по времени меньше чем нужно чтобы к нему развернуться или чтобы можно было его атаковать то надо его бить
+  if (ticksToMove <= MAX(ticksToAttack, ticksToRotate)) {
+    return 1000;
+  }
+
+  return 0;
 }
 
 double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& wizard) {
@@ -55,7 +63,7 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
 
   /// если хп (с запасом если немного востановится) меньше атаки, то надо добивать
   if (wizard.getLife() + 1 < self.damage(model::ACTION_MAGIC_MISSILE)) {
-    return 1000;
+    return 2500;
   }
 
   const double lifePriority = 500 * (100 - MIN(100, wizard.getLife())) / 100;

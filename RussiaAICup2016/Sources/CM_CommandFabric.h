@@ -12,6 +12,7 @@
 #include "E_Types.h"
 #include "model\LaneType.h"
 #include "model\Projectile.h"
+#include "model\Minion.h"
 
 namespace AICup
 {
@@ -55,6 +56,8 @@ namespace AICup
 
 
 /// #pragma mark - защита
+    MoveCommandPtr pushOffMinion(const model::Minion& minion) const;
+
     /// держаться на безопасном расстоянии от юнита
     MoveCommandPtr avoidEnemy(const model::LivingUnit& unit) const;
 

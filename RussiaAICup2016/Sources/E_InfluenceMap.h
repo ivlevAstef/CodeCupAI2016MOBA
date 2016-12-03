@@ -10,6 +10,7 @@
 #include "C_Vector2D.h"
 #include "model\CircularUnit.h"
 #include "model\LaneType.h"
+#include "model\Wizard.h"
 #include <vector>
 
 #ifdef ENABLE_VISUALIZATOR
@@ -32,7 +33,7 @@ namespace AICup
   public:
     InfluenceMap();
 
-    void update();
+    void update(const model::Wizard& self);
 
     const float* const getFriendsMap() const;
     const float* const getEnemiesMap() const;
@@ -50,7 +51,7 @@ namespace AICup
 #endif // ENABLE_VISUALIZATOR
 
   private:
-    void updateLinePosition();
+    void updateLinePosition(const model::Wizard& self);
 
     void clean();
     void includeFriends();
@@ -61,10 +62,10 @@ namespace AICup
     void includeEnemy(const model::Unit& unit, const double radius, const float danger);
 
     const std::vector<Position>& getLinePoints(const model::LaneType lane) const;
-    Position calculateForeFront(const model::LaneType lane) const;
+    Position calculateForeFront(const model::Wizard& self, const model::LaneType lane) const;
     bool isFriendZone(const int x, const int y) const;
     float zonePriority(const int x, const int y) const;
-    Position pointToForeFront(const int x, const int y, const std::vector<Position>& line, const size_t index) const;
+    Position pointToForeFront(const model::Wizard& self, const int x, const int y, const std::vector<Position>& line, const size_t index) const;
 
     Position offsetForeFront(const Position& foreFront, float offset, const std::vector<Position>& line) const;
   private:

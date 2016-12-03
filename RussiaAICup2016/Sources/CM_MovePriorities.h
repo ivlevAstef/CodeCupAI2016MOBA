@@ -19,6 +19,8 @@ namespace AICup
 
   // ќбъедин€ю в один файл, чтобы легче было настраивать приоритеты
   namespace MovePriorities {
+    double pushOffMinion(const Wizard& self, const model::Minion& minion);
+
     double avoidBuild(const Wizard& self, const model::Building& build);
     double avoidMinion(const Wizard& self, const model::Minion& minion);
     double avoidWizard(const Wizard& self, const model::Wizard& wizard);

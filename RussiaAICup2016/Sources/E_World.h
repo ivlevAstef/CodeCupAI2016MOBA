@@ -45,7 +45,7 @@ namespace AICup
 
 
     Obstacles allObstacles(const model::CircularUnit& unit, const bool onlyStatic = false) const;
-    Obstacles obstacles(const model::CircularUnit& unit, const double range) const;
+    Obstacles obstacles(const model::CircularUnit& unit, const double range, const Vector direction = Vector()) const;
     ObstaclesGroups createGroup(const Obstacles& obstacles, const double radius) const;
 
     const model::LivingUnit* unit(long long id) const;

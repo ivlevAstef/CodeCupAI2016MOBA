@@ -47,9 +47,9 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     isInitialized = true;
   }
 
-  /// раз в 250 тиков пересматриваю линию,
-  /// 250 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
-  if (World::model().getTickIndex() - lastChangeLineTick >= 250) {
+  /// раз в 125 тиков пересматриваю линию,
+  /// 125 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
+  if (World::model().getTickIndex() - lastChangeLineTick >= 125) {
     model::LaneType lane;
     if (Algorithm::checkChangeLine(pathFinder, self, lane)) {
       myLine = lane;
@@ -62,6 +62,12 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     moveCommands.insert(moveCommands.end(), avoidAroundCommands.begin(), avoidAroundCommands.end());
   }
 
+  const auto pushOffMinionsCommands = calcAllPushOffMinions(self);
+  if (!pushOffMinionsCommands.empty()) {
+    moveCommands.insert(moveCommands.end(), pushOffMinionsCommands.begin(), pushOffMinionsCommands.end());
+  }
+
+  /// бежать чтобы добить
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange())) {
     if (EX::isWizard(*enemy)) {
       const auto& wizard = EX::asWizard(*enemy);
@@ -142,8 +148,6 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
 }
 
 const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const Wizard& self) {
-  /// гдето тут надо будет началь указывать что эти команды могуть иметь больше/меньше приоритет в зависимости от ситуации на карте
-  /// возможно avoidAround обернуть еще в одну ком анду
   const auto selfPos = EX::pos(self);
 
   const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + self.getRadius() * 2);
@@ -166,4 +170,26 @@ const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const Wiza
   }
 
   return avoidAroundCommands;
+}
+
+const std::vector<MoveCommandPtr> FirstStrategy::calcAllPushOffMinions(const Wizard& self) {
+  const auto selfPos = EX::pos(self);
+
+  const auto aroundUnits = World::instance().around(self, self.getFaction(), 2 * self.getRadius() + 100);
+
+  std::vector<MoveCommandPtr> pushOffCommands;
+  pushOffCommands.reserve(aroundUnits.size());
+  for (const auto& unit : aroundUnits) {
+    if (!EX::isMinion(*unit)) {
+      continue;
+    }
+
+    const auto& minion = EX::asMinion(*unit);
+    const auto command = fabric.pushOffMinion(minion);
+    if (command->check(self)) {
+      pushOffCommands.push_back(command);
+    }
+  }
+
+  return pushOffCommands;
 }

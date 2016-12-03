@@ -23,6 +23,7 @@
 #include "CM_CommandPool.h"
 #include "CM_CommandFollowAttackEnemy.h"
 
+#include "CM_CommandPushOffMinion.h"
 #include "CM_CommandAvoidWizard.h"
 #include "CM_CommandAvoidBuild.h"
 #include "CM_CommandAvoidMinion.h"
@@ -97,6 +98,10 @@ AttackCommandPtr CommandFabric::attackUseFireball() const {
 
 AttackCommandPtr CommandFabric::pool(const long long neutralUnitId) const {
   return std::make_shared<CommandPool>(neutralUnitId);
+}
+
+MoveCommandPtr CommandFabric::pushOffMinion(const model::Minion& minion) const {
+  return std::make_shared<CommandPushOffMinion>(minion);
 }
 
 MoveCommandPtr CommandFabric::avoidEnemy(const model::LivingUnit& unit) const {

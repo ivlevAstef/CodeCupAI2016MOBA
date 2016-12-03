@@ -127,7 +127,7 @@ powershell start-process local-runner.bat</Command>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;ENABLE_TESTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;ENABLE_TESTS;ENABLE_VISUALIZATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\cpp-cgdk;$(SolutionDir)Sources;$(SolutionDir)Sources\Visualizator;$(SolutionDir)Sources\Tests</AdditionalIncludeDirectories>
     </ClCompile>
@@ -183,6 +183,7 @@ powershell start-process local-runner.bat</Command>
     <ClCompile Include="..\Sources\CM_CommandFollow.cpp" />
     <ClCompile Include="..\Sources\CM_CommandFollowAttackEnemy.cpp" />
     <ClCompile Include="..\Sources\CM_CommandKeepDistance.cpp" />
+    <ClCompile Include="..\Sources\CM_CommandPushOffMinion.cpp" />
     <ClCompile Include="..\Sources\CM_MoveCommand.cpp" />
     <ClCompile Include="..\Sources\CM_MovePriorities.cpp" />
     <ClCompile Include="..\Sources\E_InfluenceMap.cpp" />
@@ -236,6 +237,7 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\CM_CommandFollow.h" />
     <ClInclude Include="..\Sources\CM_CommandFollowAttackEnemy.h" />
     <ClInclude Include="..\Sources\CM_CommandKeepDistance.h" />
+    <ClInclude Include="..\Sources\CM_CommandPushOffMinion.h" />
     <ClInclude Include="..\Sources\CM_MoveCommand.h" />
     <ClInclude Include="..\Sources\CM_MovePriorities.h" />
     <ClInclude Include="..\Sources\CM_TurnPriority.h" />

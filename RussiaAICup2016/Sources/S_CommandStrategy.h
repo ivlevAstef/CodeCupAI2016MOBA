@@ -49,6 +49,9 @@ namespace AICup
   protected:
     const CommandFabric& fabric;
     const Algorithm::PathFinder& pathFinder;
+    std::shared_ptr<Algorithm::Path> path;
+    Position movePosition;
+
 
     std::vector<MoveCommandPtr> moveCommands;
     std::vector<AttackCommandPtr> attackCommands;
