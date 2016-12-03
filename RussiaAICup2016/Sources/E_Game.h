@@ -16,6 +16,9 @@ namespace AICup
   class Game: public Singleton<Game> {
   public:
     Game() : isInitialized(false) {
+      modelGame = nullptr;
+      friendFactionValue = model::FACTION_NEUTRAL;
+      enemyFactionValue = model::FACTION_NEUTRAL;
     }
 
     void update(const model::Game& game, const model::Wizard& self);

@@ -10,6 +10,7 @@
 using namespace AICup;
 
 CommandAvoidProjectile::CommandAvoidProjectile(const model::Projectile& projectile): projectile(projectile) {
+  turnStyle = TurnStyle::NO_TURN;
 }
 
 bool CommandAvoidProjectile::check(const Wizard& self) {

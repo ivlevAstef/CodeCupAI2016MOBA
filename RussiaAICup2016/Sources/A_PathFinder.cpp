@@ -25,6 +25,7 @@ Vector2D<int> PathConstants::toInt(Position point) {
 Path::Path(Position from, Position to, const double radius):
   from(from), to(to), radius(radius) {
   length = 0;
+  realLength = 0;
   count = 0;
 }
 
@@ -114,6 +115,10 @@ Position Path::calculateNearestCurvaturePoint(const double visionRange) const {
 
 PathFinder::PathFinder() {
   lastCalculateTick = -10000;
+  fastCalculateWeight = 1;
+  radius = 0;
+
+  clean();
 }
 
 void PathFinder::calculate(const model::CircularUnit& unit) {

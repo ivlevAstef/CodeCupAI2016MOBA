@@ -12,6 +12,7 @@ FirstStrategy::FirstStrategy(const CommandFabric& fabric, const Algorithm::PathF
   CommandStrategy(fabric, pathFinder) {
   isInitialized = false;
   lastChangeLineTick = 0;
+  myLine = model::LANE_MIDDLE;
 }
 
 void FirstStrategy::init(const Wizard& self) {

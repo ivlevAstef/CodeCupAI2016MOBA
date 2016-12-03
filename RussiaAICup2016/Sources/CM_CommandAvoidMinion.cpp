@@ -10,7 +10,7 @@
 using namespace AICup;
 
 CommandAvoidMinion::CommandAvoidMinion(const model::Minion& minion): minion(minion) {
-
+  distance = 0;
 }
 
 bool CommandAvoidMinion::check(const Wizard& self) {

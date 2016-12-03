@@ -17,6 +17,7 @@
 using namespace AICup;
 
 CommandMoveGetExpirience::CommandMoveGetExpirience() {
+  target = nullptr;
 }
 
 

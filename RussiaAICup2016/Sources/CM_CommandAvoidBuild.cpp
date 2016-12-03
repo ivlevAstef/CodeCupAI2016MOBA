@@ -8,7 +8,10 @@
 
 using namespace AICup;
 
+///http://russianaicup.ru/game/view/86164 отдалься башне почти в начале
+///http://russianaicup.ru/game/view/86165 получил от вышки вначале
 CommandAvoidBuild::CommandAvoidBuild(const model::Building& build): build(build) {
+  distance = 0;
 }
 
 bool CommandAvoidBuild::check(const Wizard& self) {
@@ -28,7 +31,6 @@ void CommandAvoidBuild::execute(const Wizard& self, Result& result) {
   const auto delta = selfPos - buildPos;
 
   position = buildPos + delta.normal() * distance;
-
 
   result.set(position, self);
   result.turnStyle = TurnStyle::TURN;

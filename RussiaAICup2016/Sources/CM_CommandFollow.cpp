@@ -17,6 +17,7 @@ using namespace AICup;
 
 CommandFollow::CommandFollow(const long long unitId, const double minDistance, const double maxDistance):
   unitId(unitId), minDistance(minDistance), maxDistance(maxDistance) {
+  target = nullptr;
 }
 
 

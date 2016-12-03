@@ -78,7 +78,7 @@ namespace AICup
     bool checkMinionOnNeutral(const model::Minion& neutral) const;
 
   private:
-    bool isInitial;
+    bool isInitialized;
     int lastUpdateTick;
 
     const model::World* modelWorld;

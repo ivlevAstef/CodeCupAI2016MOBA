@@ -17,11 +17,13 @@ Vector2D<int> InfluenceMapConstants::toInt(Position point) {
   return Vector2D<int>((int)floor(point.x / step), (int)floor(point.y / step));
 }
 
+///http://russianaicup.ru/game/view/86164 стою в пачке крипов
 InfluenceMap::InfluenceMap() {
   topForeFront = Points::point(Points::TOP_CENTER);
   middleForeFront = Points::point(Points::MIDDLE_CENTER);
   bottomForeFront = Points::point(Points::BOTTOM_CENTER);
   lastCalculateTick = -10000;
+  clean();
 }
 
 void InfluenceMap::update() {

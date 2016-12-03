@@ -12,17 +12,73 @@
 
 using namespace AICup;
 
-World::World() {
-  isInitial = true;
+/// Support
+template<typename Type>
+static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real, const std::vector<Looking> visionZone) {
+  //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
+  std::vector<Type> result;
+  result.reserve(supposed.size() + real.size());
+
+  for (const auto& sIter : supposed) {
+    bool found = false;
+    for (const auto& vision : visionZone) {
+      const double dx = sIter.getX() - vision.getX();
+      const double dy = sIter.getY() - vision.getY();
+      if (dx*dx + dy*dy < vision.getVisionRange() * vision.getVisionRange()) {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      result.push_back(sIter);
+    }
+  }
+
+  for (const auto& rIter : real) {
+    result.push_back(rIter);
+  }
+
+  return result;
+}
+
+
+template<typename Type, typename CreateType>
+static std::vector<Type> updateRadius(const std::vector<Type>& real) {
+  std::vector<Type> result;
+  result.reserve(real.size());
+
+  for (const auto& obj : real) {
+    result.push_back(CreateType(obj, obj.getRadius() + 0.1));
+  }
+
+  return result;
+}
+
+static std::vector<model::Building> updateBuildingTicks(const std::vector<model::Building>& real, int tickDt) {
+  assert(tickDt >= 0);
+  std::vector<model::Building> result;
+  result.reserve(real.size());
+
+  for (const auto& obj : real) {
+    result.push_back(Building(obj, MAX(0, obj.getRemainingActionCooldownTicks() - tickDt)));
+  }
+
+  return result;
+}
+
+
+/// World
+World::World(): isInitialized(false), lastUpdateTick(0), modelWorld(nullptr) {
 }
 
 void World::update(const model::World& world) {
   modelWorld = &world;
 
-  if (isInitial) {
+  if (!isInitialized) {
     initTrees();
     initBuildings();
-    isInitial = false;
+    isInitialized = true;
   }
 
   updateVisionZone();
@@ -77,7 +133,6 @@ void World::initTrees() {
     }
   }
 
-  //специально делаю немножко выпирающими
   for (int i = 150; i <= size() - 150; i += 100) {
     invisibleAreaTrees.push_back(Tree(i, -50, 50/*радиус*/));
     invisibleAreaTrees.push_back(Tree(i, size() + 50, 50/*радиус*/));
@@ -112,59 +167,6 @@ void World::updateVisionZone() {
       visionZone.emplace_back(building);
     }
   }
-}
-
-template<typename Type>
-static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real, const std::vector<Looking> visionZone) {
-  //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
-  std::vector<Type> result;
-  result.reserve(supposed.size() + real.size());
-
-  for (const auto& sIter : supposed) {
-    bool found = false;
-    for (const auto& vision : visionZone) {
-      const double dx = sIter.getX() - vision.getX();
-      const double dy = sIter.getY() - vision.getY();
-      if (dx*dx + dy*dy < vision.getVisionRange() * vision.getVisionRange()) {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
-      result.push_back(sIter);
-    }
-  }
-
-  for (const auto& rIter : real) {
-    result.push_back(rIter);
-  }
-
-  return result;
-}
-
-
-template<typename Type, typename CreateType>
-static std::vector<Type> updateRadius(const std::vector<Type>& real) {
-  std::vector<Type> result;
-  result.reserve(real.size());
-
-  for (const auto& obj : real) {
-    result.push_back(CreateType(obj, obj.getRadius() + 0.1));
-  }
-
-  return result;
-}
-
-static std::vector<model::Building> updateBuildingTicks(const std::vector<model::Building>& real, int tickDt) {
-  std::vector<model::Building> result;
-  result.reserve(real.size());
-
-  for (const auto& obj : real) {
-    result.push_back(Building(obj, MAX(0, obj.getRemainingActionCooldownTicks() - tickDt)));
-  }
-
-  return result;
 }
 
 void World::updateMinions() {
