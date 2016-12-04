@@ -141,7 +141,7 @@ void PathFinder::calculate(const model::CircularUnit& unit) {
     clean();
 
     obstacles = World::instance().allObstacles(unit, true);
-    calculateCost(fromByInt, 400/*ширина линии*/ / PathConstants::step);
+    calculateCost(fromByInt, 600/*радиус обзора*/ / PathConstants::step);
     /// расчитываем все веса из точки где мы находимся
     calculateWeight(fromByInt);
 
@@ -194,7 +194,7 @@ void PathFinder::calculateCost(Vector2D<int> ignoreCenter, int ignoreRadius) {
       const size_t mapX = size_t((x * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const size_t mapY = size_t((y * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const float value = enemiesMap[mapX * InfluenceMapConstants::memorySize + mapY];
-      costs[x][y] += value;
+      costs[x][y] += value * 10/*магическая константа, о том насколько не стоит проходить по точкам врага*/;
     }
   }
 

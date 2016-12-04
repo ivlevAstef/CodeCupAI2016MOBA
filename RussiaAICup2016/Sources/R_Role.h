@@ -5,10 +5,7 @@
 //Created: 27/11/2016
 //
 
-#pragma once
-
 #include "model\SkillType.h"
-#include "model\Wizard.h"
 #include "model\Move.h"
 #include <vector>
 
@@ -26,16 +23,22 @@ namespace AICup
   typedef std::vector<model::SkillType> SkillBranch;
   typedef std::vector<SkillBranch> SkillBuild;
 
+  class Wizard;
+
   class Role {
   public:
     Role(const SkillBuild& skillBuild);
 
     /// устанавливает скилы
-    virtual void update(const model::Wizard& self, model::Move& move);
+    virtual void update(const Wizard& self, model::Move& move);
 
 
     inline const float& getAudacity() const {
       return audacity;
+    }
+
+    inline const float& getAudacityWithWizards() const {
+      return audacityWithWizards;
     }
 
     inline const float& getImportanceOfXP() const {
@@ -98,6 +101,7 @@ namespace AICup
 
   protected:
     float audacity; // дерзость. влияет на расположение на линии, каждая +1 увеличивает близость к врагу на 100, -1 увеличивает на 100
+    float audacityWithWizards; // дерзость, от количества вражеских магов на линии, влияет на расположение на линии, каждая +1 увеличивает близость к врагу на 100, -1 увеличивает на 100
     float importanceOfXP; // Важность получения XP.  0 - не нужен, 1 - нормальная. влияет насколько сильно тянет к линии героя, и насколько сильно он приследует умирающие цели
     float importanceOfBonus; // Важность взятия бонуса. 0 - не нужен, 1 - нормальная
 

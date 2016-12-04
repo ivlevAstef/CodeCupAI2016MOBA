@@ -37,6 +37,9 @@ namespace AICup
     double damage(const model::ActionType action) const;
     double dps(const model::ActionType action) const;
 
+    bool isBurn() const;
+    double burnResidualDamage() const;
+
     inline const Role& getRole() const {
       return *role.get();
     }

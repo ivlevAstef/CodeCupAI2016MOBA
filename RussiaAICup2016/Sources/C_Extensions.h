@@ -58,6 +58,8 @@ namespace AICup
     int cooldownSkill(const model::Wizard& obj, model::ActionType action);
     int cooldownMaxSkill(const model::Wizard& obj, model::ActionType action);
 
+
+    double burnResidualDamage(const model::Wizard& obj);
     //Support
 
     ///радиус с которого мой маг предположительно может уклониться от заклинаний вражеского мага

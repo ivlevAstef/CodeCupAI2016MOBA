@@ -78,3 +78,16 @@ double Wizard::damage(const model::ActionType action) const {
 double Wizard::dps(const model::ActionType action) const {
   return EX::dps(*this, action);
 }
+
+bool Wizard::isBurn() const {
+  for (const auto& status : getStatuses()) {
+    if (status.getType() == model::STATUS_BURNING) {
+      return true;
+    }
+  }
+  return false;
+}
+
+double Wizard::burnResidualDamage() const {
+  return EX::burnResidualDamage(*this);
+}

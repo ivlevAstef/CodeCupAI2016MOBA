@@ -7,6 +7,7 @@
 #pragma once
 
 #include "R_Role.h"
+#include "E_Wizard.h"
 
 namespace AICup
 {
@@ -14,19 +15,20 @@ namespace AICup
   public:
     RolePusher() :
       Role({
+        SkillBranches::meleeDamageFireBolt,
         SkillBranches::magicalDamageFrostBolt,
         SkillBranches::moveHast,
         SkillBranches::rangeMagicMissile,
-        SkillBranches::meleeDamageFireBolt,
         SkillBranches::armorShield,
       }) {
-      audacity = -1.5;
+      audacity = 0;
+      audacityWithWizards = -1.0;
 
       importanceOfXP = 1.5;
       importanceOfBonus = 0.9;
 
 
-      buildPriority = 10.0;
+      buildPriority = 8.0;
       minionPriority = 1.0;
       treePriority = 3.5;
       wizardPriority = 1.5;
@@ -36,17 +38,20 @@ namespace AICup
       audacityWizard = 1.25;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 0.75;
-      changeLinePathLengthPriority = 2.5;
-      changeLineWizardCountPriority = 1;
-      changeLineTowerBalancePriority = 1;
-      changeLineLaneStrengthPriority = 1.5;
+      desireChangeLine = 3.5;
+      changeLinePathLengthPriority = 1.0;
+      changeLineWizardCountPriority = 0.125;
+      changeLineTowerBalancePriority = 0.5;
+      changeLineLaneStrengthPriority = 0.25;
     }
 
-    void update(const model::Wizard& self, model::Move& move) override {
+    void update(const Wizard& self, model::Move& move) override {
       Role::update(self, move);
 
-      audacity = -1.5 - 5.5 * (1 - (float(self.getLife()) / float(self.getMaxLife())));
+      const auto realLife = self.getLife() - self.burnResidualDamage();
+
+      audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
+      audacityWithWizards = -1.0 - 3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
 }

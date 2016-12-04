@@ -42,6 +42,8 @@ namespace AICup
     /// смещение может быть отрицательным (ближе к врагам) и положительным (ближе к своим)
     /// Линия фронта - точка где находиться край своих (юнитов, зданий). за частую он совпадает с краем врагов, но не обязательно
     Position getForeFront(const model::LaneType lane, const float offset = 0) const;
+    /// Возращает направление линии фронта. всегда в сторону противников
+    Vector getForeDirection(const model::LaneType lane, const Position foreFront) const;
 
     /// положительный наших больше, отрицательный наших меньше
     float getLineStrength(const model::LaneType lane) const;
@@ -67,7 +69,6 @@ namespace AICup
     float zonePriority(const int x, const int y) const;
     Position pointToForeFront(const model::Wizard& self, const int x, const int y, const std::vector<Position>& line, const size_t index) const;
 
-    Position offsetForeFront(const Position& foreFront, float offset, const std::vector<Position>& line) const;
   private:
     int lastCalculateTick;
 

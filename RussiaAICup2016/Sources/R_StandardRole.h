@@ -7,6 +7,7 @@
 #pragma once
 
 #include "R_Role.h"
+#include "E_Wizard.h"
 
 namespace AICup
 {
@@ -27,7 +28,7 @@ namespace AICup
       audacityWizard = 1.5;
     }
 
-    void update(const model::Wizard& self, model::Move& move) override {
+    void update(const Wizard& self, model::Move& move) override {
       Role::update(self, move);
 
       audacity = - (1 - (self.getLife() / self.getMaxLife()));

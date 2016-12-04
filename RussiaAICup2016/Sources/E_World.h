@@ -42,6 +42,7 @@ namespace AICup
     const std::vector<model::Wizard>& wizards() const;
 
     const std::vector<Looking>& getVisionZone() const;
+    bool isInVisionZone(double x, double y) const;
 
 
     Obstacles allObstacles(const model::CircularUnit& unit, const bool onlyStatic = false) const;
@@ -57,8 +58,8 @@ namespace AICup
     const std::vector<const model::Wizard*> aroundAuraWizards(const model::Wizard& unit);
 
     const int towerCount(model::LaneType line, model::Faction faction) const;
-    const int wizardCount(model::LaneType line) const;
-    const int wizardCount(model::LaneType line, const model::Wizard& excludeWizard) const;
+    const int wizardCount(model::LaneType line, model::Faction faction) const;
+    const int wizardCount(model::LaneType line, model::Faction faction, const model::Wizard& excludeWizard) const;
     const model::LaneType positionToLine(const double x, const double y) const;
 
 #ifdef ENABLE_VISUALIZATOR

@@ -302,6 +302,18 @@ int EX::cooldownMaxSkill(const model::Wizard& obj, model::ActionType action) {
   return MAX(cd1, cd2);
 }
 
+double EX::burnResidualDamage(const model::Wizard& obj) {
+  double result = 0;
+
+  for (const auto& status : obj.getStatuses()) {
+    if (status.getType() == model::STATUS_BURNING) {
+      result += (Game::model().getBurningSummaryDamage() * status.getRemainingDurationTicks()) / Game::model().getBurningDurationTicks();
+    }
+  }
+
+  return result;
+}
+
 /////////////////////// Support
 double EX::radiusForGuaranteedDodge(const model::Wizard& self) {
   const auto radius = self.getRadius() + Game::model().getMagicMissileRadius();

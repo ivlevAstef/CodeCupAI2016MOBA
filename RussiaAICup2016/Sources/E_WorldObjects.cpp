@@ -1,4 +1,5 @@
 #include "E_WorldObjects.h"
+#include "E_Game.h"
 #include <cmath>
 
 using namespace AICup;
@@ -72,12 +73,45 @@ Building::Building(double x, double y, model::Faction faction, const model::Buil
 
 Minion::Minion(const model::Minion& minion, model::Faction faction):
   model::Minion(minion.getId(),
-    minion.getX(), minion.getY(), 0, 0, 0,
+    minion.getX(), minion.getY(), minion.getSpeedX(), minion.getSpeedY(), minion.getAngle(),
     faction, minion.getRadius(),
     minion.getMaxLife(), minion.getMaxLife(),
-    std::vector<model::Status>(),
+    minion.getStatuses(),
     minion.getType(), minion.getVisionRange(),
-    minion.getDamage(), minion.getCooldownTicks(), 0) {
+    minion.getDamage(), minion.getCooldownTicks(), minion.getRemainingActionCooldownTicks()) {
+}
+
+Minion::Minion(double x, double y, const model::Minion& minion) :
+  model::Minion(minion.getId(),
+  x, y, minion.getSpeedX(), minion.getSpeedY(), minion.getAngle(),
+  minion.getFaction(), minion.getRadius(),
+  minion.getMaxLife(), minion.getMaxLife(),
+  minion.getStatuses(),
+  minion.getType(), minion.getVisionRange(),
+  minion.getDamage(), minion.getCooldownTicks(), minion.getRemainingActionCooldownTicks()) {
+
+}
+
+FetishMinion::FetishMinion(double x, double y, model::Faction faction) :
+  model::Minion(calcId(),
+    x, y, 0, 0, 0,
+    faction, Game::model().getMinionRadius(),
+    Game::model().getMinionLife(), Game::model().getMinionLife(),
+    std::vector<model::Status>(),
+    model::MINION_FETISH_BLOWDART, Game::model().getMinionVisionRange(),
+    Game::model().getDartDirectDamage(), Game::model().getFetishBlowdartActionCooldownTicks(), 0) {
+
+}
+
+
+OrcMinion::OrcMinion(double x, double y, model::Faction faction) :
+  model::Minion(calcId(),
+    x, y, 0, 0, 0,
+    faction, Game::model().getMinionRadius(),
+    Game::model().getMinionLife(), Game::model().getMinionLife(),
+    std::vector<model::Status>(),
+    model::MINION_ORC_WOODCUTTER, Game::model().getMinionVisionRange(),
+    Game::model().getOrcWoodcutterDamage(), Game::model().getOrcWoodcutterActionCooldownTicks(), 0) {
 
 }
 

@@ -1,5 +1,6 @@
 #include "R_Role.h"
 #include "C_Extensions.h"
+#include "E_Wizard.h"
 
 using namespace AICup;
 
@@ -45,6 +46,7 @@ const std::vector<model::SkillType> SkillBranches::armorShield = {
 
 Role::Role(const SkillBuild& skillBuild): skillBuild(skillBuild) {
   audacity = 1;
+  audacityWithWizards = 1;
   importanceOfXP = 1;
   importanceOfBonus = 1;
 
@@ -67,7 +69,7 @@ Role::Role(const SkillBuild& skillBuild): skillBuild(skillBuild) {
   changeLineLaneStrengthPriority = 1;
 }
 
-void Role::update(const model::Wizard& self, model::Move& move) {
+void Role::update(const Wizard& self, model::Move& move) {
   while (currentLevel < self.getLevel()) {
     const size_t branchIndex = currentLevel / 5;
     const size_t skillIndex = currentLevel % 5;

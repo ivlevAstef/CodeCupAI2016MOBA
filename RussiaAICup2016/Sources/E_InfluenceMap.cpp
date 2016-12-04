@@ -6,6 +6,7 @@
 #include "E_Points.h"
 #include "C_Logger.h"
 #include "C_Extensions.h"
+#include "A_Move.h"
 #include <algorithm>
 
 using namespace AICup;
@@ -17,7 +18,6 @@ Vector2D<int> InfluenceMapConstants::toInt(Position point) {
   return Vector2D<int>((int)floor(point.x / step), (int)floor(point.y / step));
 }
 
-///http://russianaicup.ru/game/view/86164 стою в пачке крипов
 InfluenceMap::InfluenceMap() {
   topForeFront = Points::point(Points::TOP_CENTER);
   middleForeFront = Points::point(Points::MIDDLE_CENTER);
@@ -88,16 +88,29 @@ void InfluenceMap::updateLinePosition(const model::Wizard& self) {
 Position InfluenceMap::getForeFront(const model::LaneType lane, const float offset) const {
   switch (lane) {
     case model::LANE_TOP:
-      return offsetForeFront(topForeFront, offset, getLinePoints(lane));
+      return Algorithm::offsetPointByPath(topForeFront, offset, getLinePoints(lane));
     case model::LANE_MIDDLE:
-      return offsetForeFront(middleForeFront, offset, getLinePoints(lane));
+      return Algorithm::offsetPointByPath(middleForeFront, offset, getLinePoints(lane));
     case model::LANE_BOTTOM:
-      return offsetForeFront(bottomForeFront, offset, getLinePoints(lane));
+      return Algorithm::offsetPointByPath(bottomForeFront, offset, getLinePoints(lane));
     default:
       break;
   }
   assert(false && "Incorrect lane type");
   return Position(0,0);
+}
+
+Vector InfluenceMap::getForeDirection(const model::LaneType lane, const Position foreFront) const {
+  const auto& linePoints = getLinePoints(lane);
+
+  for (size_t i = 1; i < linePoints.size(); i++) {
+    if (Math::distanceToSegment(foreFront, linePoints[i - 1], linePoints[i]) < 1.0e-3) {
+      return (linePoints[i - 1] - linePoints[i]).normal();
+    }
+  }
+
+  assert(false && "can't found forefront line for fore front point...");
+  return Vector(0, 0);
 }
 
 float InfluenceMap::getLineStrength(const model::LaneType lane) const {
@@ -137,20 +150,21 @@ float InfluenceMap::getLineStrength(const model::LaneType lane) const {
 
 const std::vector<Position>& InfluenceMap::getLinePoints(const model::LaneType lane) const {
   /// ћассивы точек, по которым идут крипы
+  /// не симметричен, ибо на своей базе уйти в угол можно, а вот на базе врага... очень не желательно
   static const std::vector<Position> topLinePoints = {
-    Points::point(Points::RENEGADES_BASE),
+    Points::point(Points::RENEGADES_BASE_TOP),
     Points::point(Points::RENEGADES_TOP_CENTER),
     Points::point(Points::ACADEMY_TOP_CENTER),
     Points::point(Points::ACADEMY_BASE)
   };
 
   static const std::vector<Position> middleLinePoints = {
-    Points::point(Points::RENEGADES_BASE),
+    Points::point(Points::RENEGADES_BASE_MIDDLE),
     Points::point(Points::ACADEMY_BASE)
   };
 
   static const std::vector<Position> bottomLinePoints = {
-    Points::point(Points::RENEGADES_BASE),
+    Points::point(Points::RENEGADES_BASE_BOTTOM),
     Points::point(Points::RENEGADES_BOTTOM_CENTER),
     Points::point(Points::ACADEMY_BOTTOM_CENTER),
     Points::point(Points::ACADEMY_BASE)
@@ -255,40 +269,6 @@ Position InfluenceMap::pointToForeFront(const model::Wizard& self, const int x, 
 }
 
 
-
-Position InfluenceMap::offsetForeFront(const Position& foreFront, float offset, const std::vector<Position>& line) const {
-  if (offset < 0) {
-    std::vector<Position> reverseLine = line;
-    std::reverse(reverseLine.begin(), reverseLine.end());
-    return offsetForeFront(foreFront, -offset, reverseLine);
-  }
-
-  size_t index = 0;
-  for (index = 1; index < line.size(); index++) {
-    if (Math::distanceToLine(foreFront, line[index - 1], line[index]) < 1.0e-3) {
-      break;
-    }
-  }
-
-  auto iterPos = foreFront;
-  while (offset > 0 && index < line.size()) {
-    //const auto& p1 = line[index - 1];
-    const auto& p2 = line[index];
-    const float length = float((p2 - iterPos).length());
-    if (length < offset) {
-      offset -= length;
-      index++;
-      iterPos = p2;
-      continue;
-    } else {
-      iterPos = iterPos + ((p2 - iterPos) * (offset / length));
-      break;
-    }
-  }
-
-  return iterPos;
-}
-
 void InfluenceMap::clean() {
   for (size_t x = 0; x < InfluenceMapConstants::memorySize; x++) {
     for (size_t y = 0; y < InfluenceMapConstants::memorySize; y++) {
@@ -342,7 +322,7 @@ double baseRadius(const model::Building& build) {
 }
 
 float baseDanger(const model::Building& build) {
-  return 0.25f * float(MIN(200, build.getLife())) * buildDps(build);
+  return 0.25f * float(MIN(300, build.getLife())) * buildDps(build);
 }
 
 float wizardDps(const model::Wizard& wizard) {
@@ -422,9 +402,17 @@ void InfluenceMap::includeEnemies() {
   }
 
 }
+
 void InfluenceMap::includeHypotheticalEnemies() {
   for (const auto& minion : HypotheticalEnemies::instance().getHypotheticalMinions()) {
     includeEnemy(minion, minionRadius(minion), minionDanger(minion));
+  }
+
+  double procent = 0;
+  for (const auto& wave : HypotheticalEnemies::instance().nextWaveData(procent)) {
+    for (const auto& minion : wave.minions) {
+      includeEnemy(minion, minionRadius(minion), procent * minionDanger(minion));
+    }
   }
 }
 
@@ -449,8 +437,9 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
     }
   }*/
 
-  if (Visualizator::PRE == visualizator.getStyle()) {
-    const auto size = 24; // InfluenceMapConstants::memorySize;
+
+  /*if (Visualizator::PRE == visualizator.getStyle()) {
+    const auto size = InfluenceMapConstants::memorySize;
     for (int x = 0; x < size; x++) {
       for (int y = 0; y < size; y++) {
         const auto p1 = InfluenceMapConstants::toReal(Vector2D<int>(x, y));
@@ -463,7 +452,7 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
         visualizator.fillRect(p1.x, p1.y, p2.x, p2.y, (colorRed << 16) | (colorGreen << 8) | (100));
       }
     }
-  }
+  }*/
 
   if (Visualizator::PRE == visualizator.getStyle()) {
     const auto topLine    = getForeFront(model::LANE_TOP, 0);

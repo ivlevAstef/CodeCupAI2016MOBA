@@ -43,7 +43,20 @@ namespace AICup
     //копия миньона но со смененной фракцией
     Minion(const model::Minion& minion, model::Faction faction);
 
+    //копия миньона но в другой позиции
+    Minion(double x, double y, const model::Minion& minion);
   };
+
+  class FetishMinion: public model::Minion {
+  public:
+    FetishMinion(double x, double y, model::Faction faction);
+  };
+
+  class OrcMinion: public model::Minion {
+  public:
+    OrcMinion(double x, double y, model::Faction faction);
+  };
+
 
   class Looking {
   public:

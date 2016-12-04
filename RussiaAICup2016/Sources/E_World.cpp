@@ -14,23 +14,13 @@ using namespace AICup;
 
 /// Support
 template<typename Type>
-static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real, const std::vector<Looking> visionZone) {
+static std::vector<Type> merge(const std::vector<Type>& supposed, const std::vector<Type>& real) {
   //static_assert(std::tr1::is_base_of<model::CircularUnit, Type>::value, "Type not derived from CircularUnit");
   std::vector<Type> result;
   result.reserve(supposed.size() + real.size());
 
   for (const auto& sIter : supposed) {
-    bool found = false;
-    for (const auto& vision : visionZone) {
-      const double dx = sIter.getX() - vision.getX();
-      const double dy = sIter.getY() - vision.getY();
-      if (dx*dx + dy*dy < vision.getVisionRange() * vision.getVisionRange()) {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
+    if (!World::instance().isInVisionZone(sIter.getX(), sIter.getY())) {
       result.push_back(sIter);
     }
   }
@@ -169,6 +159,17 @@ void World::updateVisionZone() {
   }
 }
 
+bool World::isInVisionZone(double x, double y) const {
+  for (const auto& vision : visionZone) {
+    const double dx = x - vision.getX();
+    const double dy = y - vision.getY();
+    if (dx*dx + dy*dy < vision.getVisionRange() * vision.getVisionRange()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void World::updateMinions() {
   realMinions.clear();
   const auto& worldMinions = modelWorld->getMinions();
@@ -190,13 +191,13 @@ void World::updateMinions() {
 }
 
 void World::updateSupposedData() {
-  supposedTrees = merge(supposedTrees, updateRadius<model::Tree, Tree>(modelWorld->getTrees()), visionZone);
+  supposedTrees = merge(supposedTrees, updateRadius<model::Tree, Tree>(modelWorld->getTrees()));
 
   allTrees = supposedTrees;
   allTrees.insert(allTrees.end(), invisibleAreaTrees.begin(), invisibleAreaTrees.end());
 
   supposedBuilding = updateBuildingTicks(supposedBuilding, model().getTickIndex() - lastUpdateTick);
-  supposedBuilding = merge(supposedBuilding, updateRadius<model::Building, Building>(modelWorld->getBuildings()), visionZone);
+  supposedBuilding = merge(supposedBuilding, updateRadius<model::Building, Building>(modelWorld->getBuildings()));
 }
 
 
@@ -234,10 +235,10 @@ const int World::towerCount(model::LaneType lane, model::Faction faction) const 
   return count;
 }
 
-const int World::wizardCount(model::LaneType line) const {
+const int World::wizardCount(model::LaneType line, model::Faction faction) const {
   int result = 0;
   for (const auto& wizard : model().getWizards()) {
-    if (Game::friendFaction() == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
+    if (faction == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
       result++;
     }
   }
@@ -245,11 +246,11 @@ const int World::wizardCount(model::LaneType line) const {
   return result;
 }
 
-const int World::wizardCount(model::LaneType line, const model::Wizard& excludeWizard) const {
+const int World::wizardCount(model::LaneType line, model::Faction faction, const model::Wizard& excludeWizard) const {
   int result = 0;
   for (const auto& wizard : model().getWizards()) {
     if (wizard.getId() != excludeWizard.getId()
-      && Game::friendFaction() == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
+      && faction == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
       result++;
     }
   }

@@ -26,6 +26,39 @@ Vector Algorithm::maxSpeed(const model::Wizard& wizard, const double wizardAngle
   return speed;
 }
 
+Position Algorithm::offsetPointByPath(const Position& foreFront, float offset, const std::vector<Position>& line) {
+  if (offset < 0) {
+    std::vector<Position> reverseLine = line;
+    std::reverse(reverseLine.begin(), reverseLine.end());
+    return offsetPointByPath(foreFront, -offset, reverseLine);
+  }
+
+  size_t index = 0;
+  for (index = 1; index < line.size(); index++) {
+    if (Math::distanceToLine(foreFront, line[index - 1], line[index]) < 1.0e-3) {
+      break;
+    }
+  }
+
+  auto iterPos = foreFront;
+  while (offset > 0 && index < line.size()) {
+    //const auto& p1 = line[index - 1];
+    const auto& p2 = line[index];
+    const float length = float((p2 - iterPos).length());
+    if (length < offset) {
+      offset -= length;
+      index++;
+      iterPos = p2;
+      continue;
+    } else {
+      iterPos = iterPos + ((p2 - iterPos) * (offset / length));
+      break;
+    }
+  }
+
+  return iterPos;
+}
+
 
 /// находит ближайшую группу, с которой пересекаеться вектор движения юнита.
 const Obstacles* findNearestGroup(const Position& from, const double radius, const Position& to, const ObstaclesGroups& obstacles, double& minDistance) {
