@@ -20,11 +20,12 @@ CommandMoveToLine::CommandMoveToLine(model::LaneType line): line(line) {
 
 }
 
-bool CommandMoveToLine::check(const Wizard&) {
+bool CommandMoveToLine::check(const Wizard& self) {
   const auto foreFront = InfluenceMap::instance().getForeFront(line, 0.0f);
 
-  /// если линия находиться на своей базе, значит на базе враги, и очень не выгодно к ней бежать
-  if (foreFront.x < 1200 && foreFront.y > World::size() - 1200) {
+  /// если линия находиться на своей базе, и мы тоже на ней, значит на базе враги, и нужно обращать внимание только на врагов, а не на линии
+  if (foreFront.x < 1200 && foreFront.y > World::size() - 1200
+    && self.getX() < 1000 && self.getY() > World::size() - 1000) {
     return false;
   }
 

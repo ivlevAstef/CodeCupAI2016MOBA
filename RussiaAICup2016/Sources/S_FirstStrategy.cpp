@@ -47,9 +47,9 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     isInitialized = true;
   }
 
-  /// раз в 125 тиков пересматриваю линию,
-  /// 125 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
-  if (World::model().getTickIndex() - lastChangeLineTick >= 125) {
+  /// раз в 500 тиков пересматриваю линию,
+  /// 500 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
+  if (World::model().getTickIndex() - lastChangeLineTick >= 500) {
     model::LaneType lane;
     if (Algorithm::checkChangeLine(pathFinder, self, lane)) {
       myLine = lane;

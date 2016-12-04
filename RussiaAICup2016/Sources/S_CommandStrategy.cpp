@@ -27,12 +27,17 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
     double speedLimit = -1;
     const Vector direction = move(moveResults, self, speedLimit);
 
-    /// нужно для уворота, и там очень важно, чтобы был правильный стиль уворота
-    if (TurnStyle::SIDE_TURN != turnStyle) {
-      turnDirection = direction;
-    }
+    /// если мы в окружении, значит все плохо... или алгоритм глюканул
+    if (direction.length() < 1.0e-5) {
+      Algorithm::execAroundMove(self, finalMove);
+    } else {
+      /// нужно для уворота, и там очень важно, чтобы был правильный стиль уворота
+      if (TurnStyle::SIDE_TURN != turnStyle) {
+        turnDirection = direction;
+      }
 
-    Algorithm::execMove(self, turnStyle, turnDirection, direction, speedLimit, finalMove);
+      Algorithm::execMove(self, turnStyle, turnDirection, direction, speedLimit, finalMove);
+    }
   }
 
   double turnSave = finalMove.getTurn();
@@ -155,12 +160,7 @@ const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Posi
     addTreeForRemove(self, tree);
   }
 
-  const auto result = Algorithm::move(self, preEndPoint, obstaclesGroups, self.getVisionRange()) * speedLimit;
-  /// если мы в окружении, значит все плохо... или алгоритм глюканул
-  if (result.length() < 0.01) {
-    return (preEndPoint - EX::pos(self)).normal() * speedLimit;
-  }
-  return result;
+  return Algorithm::move(self, preEndPoint, obstaclesGroups, self.getVisionRange()) * speedLimit;
 }
 
 

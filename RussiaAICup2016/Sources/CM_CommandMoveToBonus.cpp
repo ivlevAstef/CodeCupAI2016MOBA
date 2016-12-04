@@ -18,14 +18,50 @@
 
 using namespace AICup;
 
+bool hasNearestWizard(const Wizard& self, const Position& bonusPos) {
+  const auto selfPos = EX::pos(self);
+
+  const auto distance2 = (selfPos - bonusPos).length2();
+
+  /// проверяем что нет магoв который ближе к бонусу
+  for (const auto& wizard : World::model().getWizards()) {
+    if (wizard.getId() == self.getId()) {
+      continue;
+    }
+
+    if (distance2 > (EX::pos(wizard) - bonusPos).length2() + Game::model().getBonusRadius()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 CommandMoveToBonus::CommandMoveToBonus(Algorithm::PathFinder& finder): pathFinder(finder) {
 }
 
 bool CommandMoveToBonus::check(const Wizard& self) {
+  static const Position topBonusPos = Points::point(Points::BONUS_TOP);
+  static const Position bottomBonusPos = Points::point(Points::BONUS_BOTTOM);
   const auto selfPos = EX::pos(self);
 
+  /// есть маг которому ближе чем мне
+  if ((selfPos - topBonusPos).length() < self.getVisionRange() && hasNearestWizard(self, topBonusPos)) {
+    return false;
+  }
+
+  /// есть маг которому ближе чем мне
+  if ((selfPos - bottomBonusPos).length() < self.getVisionRange() && hasNearestWizard(self, bottomBonusPos)) {
+    return false;
+  }
+
+  /// проверяем что нет магoв который ближе к бонусу
+  for (const auto& wizard : World::instance().aroundEnemies(self, self.getVisionRange())) {
+
+  }
+
   /// если есть бонусы рядом
-  for (const auto& bonus : World::instance().model().getBonuses()) {
+  for (const auto& bonus : World::model().getBonuses()) {
     const auto cBonusPos = EX::pos(bonus);
     if ((selfPos - cBonusPos).length() < self.getVisionRange()) {
       bonusPos = cBonusPos;
@@ -35,9 +71,6 @@ bool CommandMoveToBonus::check(const Wizard& self) {
 
 
   const double fullRadius = self.getRadius() + Game::model().getBonusRadius();
-
-  const auto topBonusPos = Points::point(Points::BONUS_TOP);
-  const auto bottomBonusPos = Points::point(Points::BONUS_BOTTOM);
 
   std::shared_ptr<Algorithm::Path> path;
 

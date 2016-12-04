@@ -15,17 +15,17 @@ namespace AICup
   public:
     RolePusher() :
       Role({
-        SkillBranches::meleeDamageFireBolt,
         SkillBranches::magicalDamageFrostBolt,
-        SkillBranches::moveHast,
         SkillBranches::rangeMagicMissile,
+        SkillBranches::moveHast,
+        SkillBranches::meleeDamageFireBolt,
         SkillBranches::armorShield,
       }) {
       audacity = 0;
       audacityWithWizards = -1.0;
 
       importanceOfXP = 1.5;
-      importanceOfBonus = 0.9;
+      importanceOfBonus = 1.0;
 
 
       buildPriority = 8.0;
@@ -38,7 +38,7 @@ namespace AICup
       audacityWizard = 1.25;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 3.5;
+      desireChangeLine = 0.55;
       changeLinePathLengthPriority = 1.0;
       changeLineWizardCountPriority = 0.125;
       changeLineTowerBalancePriority = 0.5;

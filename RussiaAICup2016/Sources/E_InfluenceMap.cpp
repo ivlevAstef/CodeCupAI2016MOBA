@@ -19,9 +19,9 @@ Vector2D<int> InfluenceMapConstants::toInt(Position point) {
 }
 
 InfluenceMap::InfluenceMap() {
-  topForeFront = Points::point(Points::TOP_CENTER);
+  topForeFront = Points::point(Points::ACADEMY_TOP_CENTER);
   middleForeFront = Points::point(Points::MIDDLE_CENTER);
-  bottomForeFront = Points::point(Points::BOTTOM_CENTER);
+  bottomForeFront = Points::point(Points::ACADEMY_BOTTOM_CENTER);
   lastCalculateTick = -10000;
   clean();
 }
@@ -322,7 +322,7 @@ double baseRadius(const model::Building& build) {
 }
 
 float baseDanger(const model::Building& build) {
-  return 0.25f * float(MIN(300, build.getLife())) * buildDps(build);
+  return 0.5f * float(MIN(300, build.getLife())) * buildDps(build);
 }
 
 float wizardDps(const model::Wizard& wizard) {

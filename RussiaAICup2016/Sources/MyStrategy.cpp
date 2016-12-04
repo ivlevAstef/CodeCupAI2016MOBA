@@ -31,11 +31,7 @@ void visualization(const model::Wizard& self, const Visualizator& visualizator) 
   AICup::World::instance().visualization(visualizator);
   AICup::Points::instance().visualization(visualizator);
   AICup::HypotheticalEnemies::instance().visualization(visualizator);
-
-  if (AICup::World::model().getTickIndex() > 100) {
-    AICup::InfluenceMap::instance().visualization(visualizator);
-  }
-
+  AICup::InfluenceMap::instance().visualization(visualizator);
   AICup::StrategyManager::instance().visualization(self, visualizator);
 }
 #endif

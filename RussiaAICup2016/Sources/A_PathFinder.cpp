@@ -141,7 +141,7 @@ void PathFinder::calculate(const model::CircularUnit& unit) {
     clean();
 
     obstacles = World::instance().allObstacles(unit, true);
-    calculateCost(fromByInt, 600/*радиус обзора*/ / PathConstants::step);
+    calculateCost(fromByInt, 400/*ширина линии*/ / PathConstants::step);
     /// расчитываем все веса из точки где мы находимся
     calculateWeight(fromByInt);
 
@@ -163,11 +163,11 @@ void PathFinder::calculatePath(const Position& to, std::shared_ptr<Path>& path) 
   calculatePath(*path.get());
 }
 
-void PathFinder::calculateCost(Vector2D<int> ignoreCenter, int ignoreRadius) {
+void PathFinder::calculateCost(const Vector2D<int> ignoreCenter, const int ignoreRadius) {
   for (const auto& obstacle : obstacles) {
     float life = 1;
     if (EX::isTree(*obstacle)) {
-      life = float(obstacle->getLife() * obstacle->getLife()) / 10.0f; /// дерево
+      life = float(obstacle->getLife() * obstacle->getLife()) / 20.0f; /// дерево
     } else if (EX::isNeutral(*obstacle)) {
       life = 1000.0f; /// нейтрал очень дорогое удовольствие
     } else {
@@ -182,19 +182,23 @@ void PathFinder::calculateCost(Vector2D<int> ignoreCenter, int ignoreRadius) {
 
 
   const float* enemiesMap = InfluenceMap::instance().getEnemiesMap();
-  for (size_t x = 0; x < PathConstants::memorySize; x++) {
-    if (ignoreCenter.x - ignoreRadius < int(x) && int(x) < ignoreCenter.x + ignoreRadius) {
-      continue;
-    }
-    for (size_t y = 0; y < PathConstants::memorySize; y++) {
-      if (ignoreCenter.y - ignoreRadius < int(y) && int(y) < ignoreCenter.y + ignoreRadius) {
+  for (size_t x = 2; x < PathConstants::memorySize-2; x++) {
+    for (size_t y = 2; y < PathConstants::memorySize-2; y++) {
+      if ( ignoreCenter.y - ignoreRadius < int(y) && int(y) < ignoreCenter.y + ignoreRadius
+        && ignoreCenter.x - ignoreRadius < int(x) && int(x) < ignoreCenter.x + ignoreRadius) {
         continue;
       }
 
       const size_t mapX = size_t((x * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const size_t mapY = size_t((y * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const float value = enemiesMap[mapX * InfluenceMapConstants::memorySize + mapY];
-      costs[x][y] += value * 10/*магическая константа, о том насколько не стоит проходить по точкам врага*/;
+      costs[x][y] += value * 30/*магическая константа, о том насколько не стоит проходить по точкам врага*/;
+      /// и еще немного ячеек вокруге захватим, дабы точно не пройти рядом с врагами
+      for (int nx = -2; nx <= 2; nx++) {
+        for (int ny = -2; ny <= 2; ny++) {
+          costs[x + nx][y + ny] += value * 15;
+        }
+      }
     }
   }
 
@@ -357,14 +361,29 @@ void PathFinder::visualization(const Visualizator& visualizator) const {
 
 
   /*if (Visualizator::PRE == visualizator.getStyle()) {
-    for (int x = 0; x < PathConstants::memorySize - 1; x++) {
-      for (int y = 0; y < PathConstants::memorySize - 1; y++) {
+    const auto size = 80; // PathConstants::memorySize
+    for (int x = 0; x < size; x++) {
+      for (int y = 0; y < size; y++) {
         const auto p1 = PathConstants::toReal({x,y}, 0, 0);
         const auto p2 = PathConstants::toReal({x,y}, 1, 1);
 
-        const double weight = weights[x][y];
-        int color = 255 - MIN(255, (int)(weight));
-        visualizator.fillRect(p1.x, p1.y, p2.x, p2.y, color);
+        const double weight = weights[x][y] / 50;
+        int color = 255 - MIN(255, (int)(weight * 255));
+        visualizator.fillRect(p1.x, p1.y, p2.x, p2.y, color << 8);
+      }
+    }
+  }*/
+
+  /*if (Visualizator::PRE == visualizator.getStyle()) {
+    const auto size = PathConstants::memorySize;
+    for (int x = 0; x < size; x++) {
+      for (int y = 0; y < size; y++) {
+        const auto p1 = PathConstants::toReal({x,y}, 0, 0);
+        const auto p2 = PathConstants::toReal({x,y}, 1, 1);
+
+        const double weight = costs[x][y] / 100;
+        int color = 255 - MIN(255, (int)(weight * 255));
+        visualizator.fillRect(p1.x, p1.y, p2.x, p2.y, color << 8);
       }
     }
   }*/
