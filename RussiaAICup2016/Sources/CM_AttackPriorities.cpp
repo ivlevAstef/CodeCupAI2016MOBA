@@ -73,10 +73,10 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   const auto bulletSpeed = delta.normal() * Game::model().getMagicMissileSpeed();
   /// если маг может уклонится от снаряда, то снижаем приоритет
   double dodgePriority = 1;
-  if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, Game::model().getMagicMissileRadius())) {
+  if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, 2 * Game::model().getMagicMissileRadius())) {
     dodgePriority *= 0.5;
   }
-  if (Algorithm::canSideBackwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, Game::model().getMagicMissileRadius())) {
+  if (Algorithm::canSideBackwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, 2 * Game::model().getMagicMissileRadius())) {
     dodgePriority *= 0.5;
   }
 

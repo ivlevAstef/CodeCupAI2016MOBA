@@ -17,7 +17,7 @@ bool CommandAttackWizard::check(const Wizard& self) {
   const auto delta = wizardPos - selfPos;
 
   /// маг далеко
-  if (delta.length() > self.getCastRange()) {
+  if (delta.length() > self.getCastRange() + wizard.getRadius()) {
     return false;
   }
 
@@ -42,8 +42,6 @@ bool CommandAttackWizard::check(const Wizard& self) {
 
 
 void CommandAttackWizard::execute(const Wizard& self, Result& result) {
-  const double distance = self.getDistanceTo(wizard);
-
   result.unit = &wizard;
 
   if (Algorithm::isMelee(self, wizard) && !self.isCooldown(model::ACTION_STAFF)) {

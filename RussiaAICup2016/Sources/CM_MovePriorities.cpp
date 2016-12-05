@@ -79,13 +79,13 @@ double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wiz
 double MovePriorities::avoidProjectile(const Wizard& self, const model::Projectile& projectile) {
   switch (projectile.getType()) {
     case model::PROJECTILE_DART:
-      return 1000 - self.getDistanceTo(projectile);
-    case model::PROJECTILE_MAGIC_MISSILE:
       return 3000 - self.getDistanceTo(projectile);
+    case model::PROJECTILE_MAGIC_MISSILE:
+      return 8000 - self.getDistanceTo(projectile);
     case model::PROJECTILE_FIREBALL:
-      return 4000 - self.getDistanceTo(projectile);
-    case model::PROJECTILE_FROST_BOLT:
       return 10000 - self.getDistanceTo(projectile);
+    case model::PROJECTILE_FROST_BOLT:
+      return 15000 - self.getDistanceTo(projectile);
   }
   return 0;
 }
@@ -107,7 +107,7 @@ double MovePriorities::keepDistance(const Wizard&, const Position, const double,
 }
 
 double MovePriorities::moveToBonus(const Wizard& self, const Position&) {
-  return (750 + 5 * self.getLife()) * self.getRole().getImportanceOfBonus();
+  return (750 + 4 * MAX(100, self.getLife())) * self.getRole().getImportanceOfBonus();
 }
 
 double MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {

@@ -52,10 +52,9 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
 
   if (!castCommands.empty()) {
     model::ActionType action;
-    long long int id = cast(self, action);
-    if (id > 0) {
-      finalMove.setStatusTargetId(id);
-      finalMove.setAction(action);
+    const auto unit = cast(self, action);
+    if (nullptr != unit) {
+      Algorithm::execCast(self, action, *unit, finalMove);
     }
   }
 
@@ -201,7 +200,7 @@ const model::LivingUnit* CommandStrategy::attack(const Wizard& self, model::Acti
   return result.unit;
 }
 
-const long long int CommandStrategy::cast(const Wizard& self, model::ActionType& action) {
+const model::LivingUnit* CommandStrategy::cast(const Wizard& self, model::ActionType& action) {
   double maxPriority = 0;
   CastCommandPtr maxCastCommand = nullptr;
 
@@ -214,7 +213,7 @@ const long long int CommandStrategy::cast(const Wizard& self, model::ActionType&
   }
 
   if (nullptr == maxCastCommand) {
-    return -1;
+    return nullptr;
   }
 
 
@@ -222,7 +221,7 @@ const long long int CommandStrategy::cast(const Wizard& self, model::ActionType&
   maxCastCommand->execute(self, result);
 
   action = result.action;
-  return result.id;
+  return result.unit;
 }
 
 

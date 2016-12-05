@@ -17,9 +17,9 @@ namespace AICup
       Role({
         SkillBranches::magicalDamageFrostBolt,
         SkillBranches::moveHast,
+        SkillBranches::armorShield,
         SkillBranches::rangeMagicMissile,
         SkillBranches::meleeDamageFireBolt,
-        SkillBranches::armorShield,
       }) {
       audacity = 0;
       audacityWithWizards = -1.0;
@@ -38,7 +38,7 @@ namespace AICup
       audacityWizard = 1.25;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 0.7;
+      desireChangeLine = 0.5;
       changeLinePathLengthPriority = 1.0;
       changeLineWizardCountPriority = 0.125;
       changeLineTowerBalancePriority = 0.75;

@@ -127,7 +127,7 @@ powershell start-process local-runner.bat</Command>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;ENABLE_TESTS;ENABLE_VISUALIZATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;ENABLE_TESTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\cpp-cgdk;$(SolutionDir)Sources;$(SolutionDir)Sources\Visualizator;$(SolutionDir)Sources\Tests</AdditionalIncludeDirectories>
     </ClCompile>

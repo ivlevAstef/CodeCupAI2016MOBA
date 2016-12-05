@@ -139,7 +139,7 @@ bool Algorithm::canSideBackwardEscape(const Position attackingPos, const double 
 Vector Algorithm::dodge(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius, TurnStyle& turnStyle) {
   const double centerAngle = prey.getAngle();
 
-  const auto obstacles = World::instance().obstacles(prey, prey.getRadius() + bulletRadius);
+  const auto obstacles = World::instance().obstacles(prey, prey.getRadius() + bulletRadius + 100);
 
   /// проверяем возможность уклониться при всех возможных конечных углах, начиная с текущего
   /// проверяем каждые 4 градуса

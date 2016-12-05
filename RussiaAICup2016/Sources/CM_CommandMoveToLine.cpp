@@ -23,12 +23,6 @@ CommandMoveToLine::CommandMoveToLine(model::LaneType line): line(line) {
 bool CommandMoveToLine::check(const Wizard& self) {
   const auto foreFront = InfluenceMap::instance().getForeFront(line, 0.0f);
 
-  /// если линия наход1иться на своей базе, и мы тоже на ней, значит на базе враги, и нужно обращать внимание только на врагов, а не на линии
-  if (foreFront.x < 800 && foreFront.y > World::size() - 800
-    && self.getX() < 700 && self.getY() > World::size() - 700) {
-    return false;
-  }
-
   return true;
 }
 
@@ -59,8 +53,14 @@ void CommandMoveToLine::execute(const Wizard& self, Result& result) {
 }
 
 double CommandMoveToLine::priority(const Wizard& self) {
+  /// если линия находиться на своей базе, и мы тоже на ней, значит на базе враги, и нужно обращать внимание на врагов, а не на линию
+  if (toPoint.x < 800 && toPoint.y > World::size() - 800
+    && self.getX() < 800 && self.getY() > World::size() - 800) {
+    return MovePriorities::moveToLine(self, line) * 0.5;
+  }
+
   const double length = (toPoint - EX::pos(self)).length();
-  const double lenC = INTERVAL(1, sqrt(length / 200.0), 1.5);
+  const double lenC = INTERVAL(1, sqrt(length / 200.0), 7);
   return MovePriorities::moveToLine(self, line) * lenC;
 }
 

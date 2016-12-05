@@ -15,7 +15,26 @@ void TestDodgeStrategy::update(const Wizard& self, model::Move& move) {
     moveCommands.push_back(moveCommand);
   }*/
 
-  const auto moveCommand = fabric.moveToPoint(400, 2400);
+  auto moveCommand = fabric.moveToPoint(200, 800);
+  switch ((int)self.getId()) {
+    case 1:
+    case 2:
+    case 6:
+    case 7:
+      moveCommand = fabric.moveToPoint(200, 800);
+      break;
+    case 3:
+    case 8:
+      moveCommand = fabric.moveToPoint(1600, 2400);
+      break;
+    case 4:
+    case 5:
+    case 9:
+    case 10:
+      moveCommand = fabric.moveToPoint(800, 4000-200);
+      break;
+  }
+
   if (moveCommand->check(self)) {
     moveCommands.push_back(moveCommand);
   }

@@ -105,3 +105,21 @@ bool Algorithm::execAttack(const Wizard& self, const model::ActionType action, c
 
   return true;
 }
+
+
+bool Algorithm::execCast(const Wizard& self, const model::ActionType action, const model::LivingUnit& unit, model::Move& move) {
+  const double angleDeviation = self.getAngleTo(unit);
+
+  /// в любом случае поворачиваемся к врагу, для упрощения своей жизни
+  move.setTurn(angleDeviation);
+
+  /// не тот угол, чтобы кастовать
+  if (unit.getId() != self.getId() && abs(angleDeviation) > Game::model().getStaffSector() * 0.5) {
+    return false;
+  }
+
+  move.setStatusTargetId(unit.getId());
+  move.setAction(action);
+
+  return true;
+}

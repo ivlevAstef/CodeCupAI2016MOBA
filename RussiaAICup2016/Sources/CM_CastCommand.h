@@ -14,7 +14,7 @@ namespace AICup
   class CastCommand: public Command {
   public:
     struct Result {
-      long long id;
+      const model::LivingUnit* unit;
       model::ActionType action;
     };
 

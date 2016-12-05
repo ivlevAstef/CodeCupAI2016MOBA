@@ -38,7 +38,7 @@ namespace AICup
     const Vector move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit);
 
     const model::LivingUnit* attack(const Wizard& self, model::ActionType& action);
-    const long long int cast(const Wizard& self, model::ActionType& action);
+    const model::LivingUnit* cast(const Wizard& self, model::ActionType& action);
 
     std::vector<MoveCommand::Result> moveCommandsToMoveResult(const Wizard& self) const;
     /// просчитываеть столкновения, и добавляет деревья для уничтожения

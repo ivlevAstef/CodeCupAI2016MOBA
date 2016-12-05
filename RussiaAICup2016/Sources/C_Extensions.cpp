@@ -317,24 +317,24 @@ double EX::burnResidualDamage(const model::Wizard& obj) {
 /////////////////////// Support
 double EX::radiusForGuaranteedDodge(const model::Wizard& self) {
   const auto radius = self.getRadius() + Game::model().getMagicMissileRadius();
-  ///такая скорость, ибо наврятли я буду стоять идеально боком
-  const auto speed = maxSpeed(self) * 0.25 + maxStrafeSpeed(self) * 0.75;
+  ///такая скорость, ибо наврятли условия будут идеальные
+  const auto speed = 0.9 * maxStrafeSpeed(self);
 
   return Game::model().getMagicMissileSpeed() * radius / speed;
 }
 
 double EX::radiusForGuaranteedDodgeFrostBolt(const model::Wizard& self) {
   const auto radius = self.getRadius() + Game::model().getFrostBoltRadius();
-  ///такая скорость, ибо наврятли я буду стоять идеально боком
-  const auto speed = maxSpeed(self) * 0.25 + maxStrafeSpeed(self) * 0.75;
+  ///такая скорость, ибо наврятли условия будут идеальные
+  const auto speed = 0.9 * maxStrafeSpeed(self);
 
   return Game::model().getFrostBoltSpeed() * radius / speed;
 }
 
 double EX::radiusForGuaranteedDodgeFireBall(const model::Wizard& self) {
   const auto radius = self.getRadius() + Game::model().getFireballRadius();
-  ///такая скорость, ибо наврятли я буду стоять идеально боком
-  const auto speed = maxSpeed(self) * 0.25 + maxStrafeSpeed(self) * 0.75;
+  ///такая скорость, ибо наврятли условия будут идеальные
+  const auto speed = 0.9 * maxStrafeSpeed(self);
 
   return Game::model().getFireballSpeed() * radius / speed;
 }

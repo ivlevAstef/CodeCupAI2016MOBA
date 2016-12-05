@@ -35,7 +35,7 @@ bool CommandCastHast::check(const Wizard& self) {
 
 
 void CommandCastHast::execute(const Wizard& self, Result& result) {
-  result.id = self.getId();
+  result.unit = &self;
   result.action = model::ACTION_HASTE;
 
   for (const auto& wizard : World::model().getWizards()) {
@@ -52,7 +52,7 @@ void CommandCastHast::execute(const Wizard& self, Result& result) {
     }
 
     if (!found) {
-      result.id = wizard.getId();
+      result.unit = &wizard;
       break;
     }
   }

@@ -78,32 +78,39 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     }
   }
 
-  ///
+  ///////
 
   if (nullptr == moveToBonus.get()) {
     const auto newMoveToBonus = fabric.moveToBonus();
     if (newMoveToBonus->check(self)) {
       moveToBonus = newMoveToBonus;
-      moveCommands.push_back(moveToBonus);
     }
-  } else if (moveToBonus->check(self)) {
-    moveCommands.push_back(moveToBonus);
-  } else {
+  } else if (!moveToBonus->check(self)) {
     moveToBonus = nullptr;
   }
 
+  int needMoveToBonus = true;
 
-  if (nullptr == moveToBonus) {
-    const auto moveToLineCommand = fabric.moveToLine(myLine);
-    if (moveToLineCommand->check(self)) {
+  const auto moveToLineCommand = fabric.moveToLine(myLine);
+  if (moveToLineCommand->check(self)) {
+    if (nullptr == moveToBonus || moveToLineCommand->priority(self) > moveToBonus->priority(self)) {
       moveCommands.push_back(moveToLineCommand);
-    }
-
-    const auto getExpirienceCommand = fabric.moveGetExpirience();
-    if (getExpirienceCommand->check(self)) {
-      moveCommands.push_back(getExpirienceCommand);
+      needMoveToBonus = false;
     }
   }
+
+  const auto getExpirienceCommand = fabric.moveGetExpirience();
+  if (getExpirienceCommand->check(self)) {
+    if (nullptr == moveToBonus || moveToLineCommand->priority(self) > moveToBonus->priority(self)) {
+      moveCommands.push_back(getExpirienceCommand);
+      needMoveToBonus = false;
+    }
+  }
+
+  if (nullptr != moveToBonus && needMoveToBonus) {
+    moveCommands.push_back(moveToBonus);
+  }
+  ////
 
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange()+100)) {
     const auto attackCommand = fabric.attack(*enemy);
