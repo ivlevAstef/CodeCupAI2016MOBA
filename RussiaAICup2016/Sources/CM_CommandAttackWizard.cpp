@@ -36,17 +36,6 @@ bool CommandAttackWizard::check(const Wizard& self) {
     return true;
   }
 
-  /// если маг может уклонится от снаряда, то не будем в него стрелять, но так как никто не идеален, то условие стоил слегка ослабить
-  const auto bulletSpeed = delta.normal() * Game::model().getMagicMissileSpeed();
-  if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, 2 * Game::model().getMagicMissileRadius())) {
-    return false;
-  }
-
-  /// второй вариант уклонения, пока никто не реализовывал, поэтому закоменчен
-  /*if (Algorithm::canBackwardEscape(selfPos, self.getCastRange(), wizard, Game::model().getMagicMissileSpeed(), Game::model().getMagicMissileRadius())) {
-    return false;
-  }*/
-
   /// во всех остальных случаях возможна или атака, или поворот к дереву для атаки
   return true;
 }

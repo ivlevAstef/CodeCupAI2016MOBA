@@ -11,13 +11,14 @@
 #include "S_TestMoveStrategy.h"
 #include "S_TestMoveAndAttackStrategy.h"
 #include "S_TestFollowStrategy.h"
+#include "S_TestDodgeStrategy.h"
 #endif
 #include "S_FirstStrategy.h"
 
 using namespace AICup;
 
 StrategyManager::StrategyManager(): fabric(pathFinder) {
-  currentStrategy = std::make_shared<FirstStrategy>(fabric, pathFinder);
+  currentStrategy = std::make_shared<TestDodgeStrategy>(fabric, pathFinder);
 }
 
 void StrategyManager::update(const Wizard& self, model::Move& move) {

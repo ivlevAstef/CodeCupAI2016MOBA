@@ -66,6 +66,21 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
     return 2500;
   }
 
+  const auto selfPos = EX::pos(self);
+  const auto wizardPos = EX::pos(wizard);
+  const auto delta = wizardPos - selfPos;
+
+  const auto bulletSpeed = delta.normal() * Game::model().getMagicMissileSpeed();
+  /// если маг может уклонится от снаряда, то снижаем приоритет
+  double dodgePriority = 1;
+  if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, Game::model().getMagicMissileRadius())) {
+    dodgePriority *= 0.5;
+  }
+  if (Algorithm::canSideBackwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, Game::model().getMagicMissileRadius())) {
+    dodgePriority *= 0.5;
+  }
+
+
   const double lifePriority = 500 * (100 - MIN(100, wizard.getLife())) / 100;
 
   double statusPriority = 0;
@@ -95,7 +110,7 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   const double distancePriority = 75 * ((500 * 500) / (distance * distance));
 
 
-  return MAX(lifePriority + statusPriority + distancePriority, 1000);
+  return MAX((lifePriority + statusPriority + distancePriority) * dodgePriority, 1000);
 }
 
 double AttackPriorities::attackFrostbolt(const Wizard& self) {

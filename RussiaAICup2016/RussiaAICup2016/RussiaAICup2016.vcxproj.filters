@@ -201,6 +201,9 @@
     <ClCompile Include="..\Sources\CM_CommandPushOffMinion.cpp">
       <Filter>Sources\Command\Commands\defend</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\Tests\S_TestDodgeStrategy.cpp">
+      <Filter>Sources\Strategy\Strategy\Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -376,6 +379,9 @@
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandPushOffMinion.h">
       <Filter>Sources\Command\Commands\defend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\Tests\S_TestDodgeStrategy.h">
+      <Filter>Sources\Strategy\Strategy\Tests</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -29,48 +29,14 @@ bool CommandAvoidProjectile::check(const Wizard& self) {
   }
 
 
-  auto perpedicular = speed.perpendicular().normal();
-  /// если угол больше 90 градусов то выбран не оптимальный из двух возможных перпендикуляров
-  if (perpedicular.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
-    perpedicular *= -1;
+  const auto dodgeVector = Algorithm::dodge(projectilePos, 600, self, speed, projectile.getRadius(), turnStyle);
+  /// невозможно отклониться
+  if (dodgeVector.length() < 1.0e-5) {
+    return false;
   }
 
-  /// если могу уклониться идя вперед и в бок от полета то хорошо
-  if (Algorithm::canSideForwardEscape(projectilePos, 600, self, speed, projectile.getRadius())) {
-    position = selfPos + perpedicular.normal() * (distanceMoved + self.maxSpeed());
-    turnStyle = TurnStyle::TURN;
-    return true;
-  }
-
-  /// если могу уклониться идя назад и в бок от полета то хорошо
-  if (Algorithm::canSideBackwardEscape(projectilePos, 600, self, speed, projectile.getRadius())) {
-    position = selfPos - perpedicular.normal() * (distanceMoved + self.maxBackwardSpeed());
-    turnStyle = TurnStyle::BACK_TURN;
-    return true;
-  }
-
-  auto direction = speed.normal();
-  /// если угол больше 90 градусов то выбран не оптимальный из двух возможных перпендикуляров
-  if (direction.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
-    direction *= -1;
-  }
-
-  /// если могу уклониться идя назад передом
-  if (Algorithm::canBackForwardEscape(projectilePos, 600, self, speed, projectile.getRadius())) {
-    position = selfPos + direction.normal() * (distanceMoved + self.maxSpeed());
-    turnStyle = TurnStyle::TURN;
-    return true;
-  }
-
-  /// если могу уклониться идя назад задом
-  if (Algorithm::canBackBackwardEscape(projectilePos, 600, self, speed, projectile.getRadius())) {
-    position = selfPos - direction.normal() * (distanceMoved + self.maxBackwardSpeed());
-    turnStyle = TurnStyle::BACK_TURN;
-    return true;
-  }
-
-  /// иначе плохо...
-  return false;
+  position = selfPos + dodgeVector;
+  return true;
 }
 
 void CommandAvoidProjectile::execute(const Wizard& self, Result& result) {

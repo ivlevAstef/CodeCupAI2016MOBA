@@ -20,12 +20,12 @@ namespace AICup
 
     bool isMelee(const model::Wizard& wizard, const model::LivingUnit& unit);
 
-    /// происходит эмуляция движения, которое должно давать наилучший способ уклонения
-    /// да простят меня другие программист, за эти 4! функции (а не одну...)
+    /// происходит эмуляция движения, на простой способ - уклонение в бок
     bool canSideForwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
     bool canSideBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
-    bool canBackForwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
-    bool canBackBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
+
+    ///расчитывает вектор по которому можно уклониться, если он нулевой - уклонение невозможно
+    Vector dodge(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius, TurnStyle& turnStyle);
 
     double timeToTurnForAttack(const model::Unit& attacked, const model::Wizard& attacking);
     double timeToTurn(const model::Wizard& wizard, const double angle);
