@@ -1,5 +1,6 @@
 #include "CM_CommandCastHast.h"
 #include "E_Game.h"
+#include "E_World.h"
 
 using namespace AICup;
 
@@ -36,6 +37,25 @@ bool CommandCastHast::check(const Wizard& self) {
 void CommandCastHast::execute(const Wizard& self, Result& result) {
   result.id = self.getId();
   result.action = model::ACTION_HASTE;
+
+  for (const auto& wizard : World::model().getWizards()) {
+    if (wizard.getFaction() != self.getFaction() || wizard.getDistanceTo(self) > self.getCastRange()) {
+      continue;
+    }
+
+    bool found = false;
+    for (const auto& status : self.getStatuses()) {
+      if (status.getType() == model::STATUS_HASTENED) {
+        found = true;
+        continue;
+      }
+    }
+
+    if (!found) {
+      result.id = wizard.getId();
+      break;
+    }
+  }
 }
 
 double CommandCastHast::priority(const Wizard& self) {

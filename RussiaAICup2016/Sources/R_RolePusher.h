@@ -16,8 +16,8 @@ namespace AICup
     RolePusher() :
       Role({
         SkillBranches::magicalDamageFrostBolt,
-        SkillBranches::rangeMagicMissile,
         SkillBranches::moveHast,
+        SkillBranches::rangeMagicMissile,
         SkillBranches::meleeDamageFireBolt,
         SkillBranches::armorShield,
       }) {
