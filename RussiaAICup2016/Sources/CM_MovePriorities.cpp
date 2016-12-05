@@ -77,7 +77,17 @@ double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wiz
 /// Это очень важно, поэтому завышено значение от нормы
 /// Вариативность нужна чтобы каждый тик, выбирался один и тотже projectile из доступных, а не случайный
 double MovePriorities::avoidProjectile(const Wizard& self, const model::Projectile& projectile) {
-  return 2000 - self.getDistanceTo(projectile);
+  switch (projectile.getType()) {
+    case model::PROJECTILE_DART:
+      return 1000 - self.getDistanceTo(projectile);
+    case model::PROJECTILE_MAGIC_MISSILE:
+      return 3000 - self.getDistanceTo(projectile);
+    case model::PROJECTILE_FIREBALL:
+      return 4000 - self.getDistanceTo(projectile);
+    case model::PROJECTILE_FROST_BOLT:
+      return 10000 - self.getDistanceTo(projectile);
+  }
+  return 0;
 }
 
 double MovePriorities::defendPoint(const Wizard&, const Position&) {
