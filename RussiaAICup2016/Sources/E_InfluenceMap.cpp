@@ -300,7 +300,7 @@ float minionDps(const model::Minion& minion) {
 
 /// причина, то что дружественный дальний миньон не должен смещать линию фронта вперед, ибо он будет стрелять, а не подойдет близко
 double friendMinionRadius(const model::Minion& minion) {
-  return 4 * Game::model().getOrcWoodcutterAttackRange();
+  return Game::model().getOrcWoodcutterAttackRange();
 }
 
 double minionRadius(const model::Minion& minion) {
@@ -361,7 +361,8 @@ float wizardDanger(const model::Wizard& wizard) {
   float ticks = 1.0f - (EX::minTimeForMagic(wizard) / float(Game::model().getWizardActionCooldownTicks()));
   ticks = MAX(0.5f, ticks);
 
-  return 5.0f * float(wizard.getLife())/float(wizard.getMaxLife()) * wizardDps(wizard) * ticks;
+  float life = float(wizard.getLife()) / float(wizard.getMaxLife());
+  return 5.0f * life * wizardDps(wizard) * ticks;
 }
 
 void InfluenceMap::includeFriends() {
@@ -374,7 +375,7 @@ void InfluenceMap::includeFriends() {
   /// своим магам доверять, себе дороже
   for (const auto& wizard : World::instance().wizards()) {
     if (Game::friendFaction() == wizard.getFaction()) {
-      includeFriend(wizard, 0.25 * wizardRadius(wizard), 0.5 * wizardDanger(wizard));
+      includeFriend(wizard, 0.25 * wizardRadius(wizard), 0.25 * wizardDanger(wizard));
 
     }
   }

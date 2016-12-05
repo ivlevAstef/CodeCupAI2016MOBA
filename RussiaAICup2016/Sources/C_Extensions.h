@@ -63,9 +63,9 @@ namespace AICup
     //Support
 
     ///радиус с которого мой маг предположительно может уклониться от заклинаний вражеского мага
-    double radiusForGuaranteedDodge(const model::Wizard& self);
-    double radiusForGuaranteedDodgeFrostBolt(const model::Wizard& self);
-    double radiusForGuaranteedDodgeFireBall(const model::Wizard& self);
+    double radiusForGuaranteedDodge(const model::Wizard& self, double coef);
+    double radiusForGuaranteedDodgeFrostBolt(const model::Wizard& self, double coef);
+    double radiusForGuaranteedDodgeFireBall(const model::Wizard& self, double coef);
 
     int minTimeForMagic(const model::Wizard& obj);
 

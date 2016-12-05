@@ -49,6 +49,9 @@ bool CommandAttackFrostbolt::check(const Wizard& self) {
       if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, frostBoltSpeed, 1.5 * Game::model().getFrostBoltRadius())) {
         continue;
       }
+      if (Algorithm::canSideBackwardEscape(selfPos, self.getCastRange(), wizard, frostBoltSpeed, 1.5 * Game::model().getFrostBoltRadius())) {
+        continue;
+      }
 
       const auto priority = self.getRole().getWizardPriority() * AttackPriorities::attackWizard(self, wizard);
       if (priority > maxPriority) {

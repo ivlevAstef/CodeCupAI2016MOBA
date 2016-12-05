@@ -21,13 +21,6 @@ CommandMoveToLine::CommandMoveToLine(model::LaneType line): line(line) {
 }
 
 bool CommandMoveToLine::check(const Wizard& self) {
-  const auto foreFront = InfluenceMap::instance().getForeFront(line, 0.0f);
-
-  return true;
-}
-
-
-void CommandMoveToLine::execute(const Wizard& self, Result& result) {
   const auto offset = -100 * self.getRole().getAudacity();
 
   double WizardPriority = 0;
@@ -47,6 +40,11 @@ void CommandMoveToLine::execute(const Wizard& self, Result& result) {
 
   toPoint = Math::point_distanceToSegment(selfPos, foreFrontLeft, foreFrontRight);
 
+  return true;
+}
+
+
+void CommandMoveToLine::execute(const Wizard& self, Result& result) {
   result.set(toPoint, self);
   result.turnStyle = TurnStyle::TURN;
   result.turnPriority = TurnPriority::moveToLine;

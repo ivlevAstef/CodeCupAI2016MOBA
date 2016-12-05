@@ -65,14 +65,25 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
   /// находим максимальную дистанцию на которую можно сместиться при таком векторе, и не упереться
   auto preyEndPos = preyBeginPos + preyEndVec * (EX::maxSpeed(prey) * maxIteration);
   for (const auto& obstacle : obstacles) {
-    /// уперся в препятствие
+    /// проверка на уперся в препятствие
     const auto obstaclePos = EX::pos(*obstacle);
     const auto intersectPoint = Math::point_distanceToSegment(EX::pos(*obstacle), preyBeginPos, preyEndPos);
     const auto distance = (obstaclePos - intersectPoint).length();
     const auto radius = obstacle->getRadius() + prey.getRadius();
     if (distance < radius) {
       double translate = sqrt(radius*radius - distance * distance);
-      preyEndPos = intersectPoint - preyEndVec * translate;
+
+      /// если этот объект движимый, то предполагаем что он от нас отходит
+      if (EX::isMinion(*obstacle) || EX::isWizard(*obstacle)) {
+        const auto newEndPoint = intersectPoint - preyEndVec * translate;
+        const auto time = (newEndPoint - preyBeginPos).length() / EX::maxSpeed(prey);
+        translate -= time * EX::maxSpeed(*obstacle);
+      }
+
+      const auto newEndPoint = intersectPoint - preyEndVec * translate;
+      if ((newEndPoint - preyBeginPos).length2() > (preyEndPos - preyBeginPos).length2()) {
+        preyEndPos = newEndPoint;
+      }
     }
   }
 

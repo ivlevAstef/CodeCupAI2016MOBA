@@ -46,24 +46,19 @@ bool CommandMoveToBonus::check(const Wizard& self) {
   const auto selfPos = EX::pos(self);
 
   /// есть маг которому ближе чем мне
-  if ((selfPos - topBonusPos).length() < self.getVisionRange() && hasNearestWizard(self, topBonusPos)) {
-    return false;
-  }
+  bool ignoreTop = (selfPos - topBonusPos).length() < self.getVisionRange() && hasNearestWizard(self, topBonusPos);
 
   /// есть маг которому ближе чем мне
-  if ((selfPos - bottomBonusPos).length() < self.getVisionRange() && hasNearestWizard(self, bottomBonusPos)) {
+  bool ignoreBottom = (selfPos - bottomBonusPos).length() < self.getVisionRange() && hasNearestWizard(self, bottomBonusPos);
+
+  if (ignoreTop && ignoreBottom) {
     return false;
-  }
-
-  /// проверяем что нет магoв который ближе к бонусу
-  for (const auto& wizard : World::instance().aroundEnemies(self, self.getVisionRange())) {
-
   }
 
   /// если есть бонусы рядом
   for (const auto& bonus : World::model().getBonuses()) {
     const auto cBonusPos = EX::pos(bonus);
-    if ((selfPos - cBonusPos).length() < self.getVisionRange()) {
+    if ((selfPos - cBonusPos).length() < self.getVisionRange() && !hasNearestWizard(self, cBonusPos)) {
       bonusPos = cBonusPos;
       return true;
     }
@@ -85,19 +80,13 @@ bool CommandMoveToBonus::check(const Wizard& self) {
 
   double minMoveTicks = MIN(ticksToTop, ticksToBottom);
 
-  /// если бонус появился недавно
-  if (ticksToBonus > maxTicksToBonus - 0) {
-    ///TODO: ну тут желательна проверка на то что его не взяли
-  } else {
-    /// если до появления бонуса еще далеко
-    if (ticksToBonus > minMoveTicks) {
-      return false;
-    }
+  /// если до появления бонуса еще далеко
+  if (ticksToBonus > minMoveTicks) {
+    return false;
   }
 
-
   /// если бежать далеко, то оно того не стоит
-  if (minMoveTicks > 325) {
+  if (minMoveTicks > 350) {
     return false;
   }
 
@@ -106,11 +95,19 @@ bool CommandMoveToBonus::check(const Wizard& self) {
     return false;
   }
 
-  if (ticksToTop < ticksToBottom) {
+  if (!ignoreTop && !ignoreBottom) {
+    if (ticksToTop < ticksToBottom) {
+      bonusPos = topBonusPos;
+    } else {
+      bonusPos = bottomBonusPos;
+    }
+  } else if (!ignoreTop) {
     bonusPos = topBonusPos;
   } else {
     bonusPos = bottomBonusPos;
   }
+
+
 
   const double minDistance = self.getRadius() + Game::model().getBonusRadius();
   const auto delta = bonusPos - selfPos;
@@ -122,7 +119,7 @@ bool CommandMoveToBonus::check(const Wizard& self) {
 double CommandMoveToBonus::potensialExpirience(const Wizard& self) {
   double result = 0;
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 200)) {
-    if (enemy->getLife() < 150) {
+    if (enemy->getLife() < 100) {
       result += enemy->getMaxLife() * 0.25f;
     }
   }

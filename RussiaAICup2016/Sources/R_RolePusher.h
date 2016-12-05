@@ -51,7 +51,7 @@ namespace AICup
       const auto realLife = self.getLife() - self.burnResidualDamage();
 
       audacity = -2.5 * (1 - (float(realLife) / float(self.getMaxLife())));
-      audacityWithWizards = -3.0 - 3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
+      audacityWithWizards = -2.0 - 3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
 }

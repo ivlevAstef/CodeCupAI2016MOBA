@@ -34,7 +34,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
 
   const double castRange = wizard.getCastRange() + self.getRadius();
   if (EX::availableSkill(wizard, model::ACTION_MAGIC_MISSILE)) { ///magic missile
-    const double mRadius = EX::radiusForGuaranteedDodge(self);
+    const double mRadius = EX::radiusForGuaranteedDodge(self, 0);
 
     const double distance1 = EX::cooldownMaxSkill(wizard, model::ACTION_MAGIC_MISSILE) * self.maxBackwardSpeed();
     const double maxDistance = MAX(distance1, MAX(distance2, distance3));
@@ -46,7 +46,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
-    const double fRadius = EX::radiusForGuaranteedDodgeFireBall(self);
+    const double fRadius = EX::radiusForGuaranteedDodgeFireBall(self, 0);
 
     const double distance1 = EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL) * self.maxBackwardSpeed();
     const double maxDistance = MAX(distance1, MAX(distance2, distance3));
@@ -58,7 +58,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
-    const double fRadius = 50/*экстра радиус ибо попасться на это это очень плохо*/ + EX::radiusForGuaranteedDodgeFrostBolt(self);
+    const double fRadius = 50/*экстра радиус ибо попасться на это это очень плохо*/ + EX::radiusForGuaranteedDodgeFrostBolt(self, 0);
 
     const double distance1 = EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT) * self.maxBackwardSpeed();
     const double maxDistance = MAX(distance1, MAX(distance2, distance3));
@@ -81,7 +81,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   }
 
   /// если далеко, то бояться его не стоит
-  if (delta.length() > MAX(finalCheckDistance, finalDistance) + self.maxSpeed()) {
+  if (delta.length() > MIN(finalCheckDistance, finalDistance) + self.maxSpeed()) {
     return false;
   }
 
@@ -134,7 +134,7 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   /// Если враг на подходе, то стоит повернуться боком
   if (timeToTurn * EX::maxSpeed(wizard) + distance+15/*небольшой запас*/ > delta.length()) {
     result.turnStyle = TurnStyle::SIDE_TURN;
-    result.deactivateOtherTurn = true;
+    //result.deactivateOtherTurn = true;
   }
 }
 
