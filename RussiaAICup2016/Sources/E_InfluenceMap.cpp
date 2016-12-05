@@ -204,17 +204,17 @@ Position InfluenceMap::calculateForeFront(const model::Wizard& self, const model
     if (abs(delta.x) > abs(delta.y)) {
       int sign = SIGN(p2.x - p1.x);
       for (int x = p1.x; x != p2.x+sign; x += sign) {
-        const int y = p1.y + ((x - p1.x) * delta.y) / delta.x;
+        int y = p1.y + ((x - p1.x) * delta.y) / delta.x;
         if (isFriendZone(x, y)) {
-          return pointToForeFront(self, x, y, linePoints, i);
+          return pointToForeFront(self, x, y, linePoints);
         }
       }
     } else {
       int sign = SIGN(p2.y - p1.y);
       for (int y = p1.y; y != p2.y+sign; y += sign) {
-        const int x = p1.x + ((y - p1.y) * delta.x) / delta.y;
+        int x = p1.x + ((y - p1.y) * delta.x) / delta.y;
         if (isFriendZone(x, y)) {
-          return pointToForeFront(self, x, y, linePoints, i);
+          return pointToForeFront(self, x, y, linePoints);
         }
       }
     }
@@ -227,45 +227,57 @@ Position InfluenceMap::calculateForeFront(const model::Wizard& self, const model
 
 
 float InfluenceMap::zonePriority(const int x, const int y) const {
-  float friendForce = 0;
-  float enemyForce = 0;
+  int ignoreX = x;
+  int ignoreY = y;
+  return zonePriorityAndPoint(ignoreX, ignoreY);
+}
+
+float InfluenceMap::zonePriorityAndPoint(int& x, int& y) const {
+  const int xB = x;
+  const int yB = y;
+
+  float maxPriority = 0;
   for (int nx = -3; nx <= 3; nx++) {
     for (int ny = -3; ny <= 3; ny++) {
-      friendForce += friends[x + nx][y + ny];
-      enemyForce += enemies[x + nx][y + ny];
+      float priority = friends[xB + nx][yB + ny] - enemies[xB + nx][yB + ny];
+      if (priority > maxPriority) {
+        x = xB + nx;
+        y = yB + ny;
+        maxPriority = priority;
+      }
     }
   }
 
-  return friendForce - enemyForce;
+  return maxPriority;
 }
 
-bool InfluenceMap::isFriendZone(const int x, const int y) const {
-  return zonePriority(x, y) > 0;
+
+bool InfluenceMap::isFriendZone(int& x, int& y) const {
+  int friendX = x;
+  int friendY = y;
+  if (zonePriorityAndPoint(friendX, friendY) > 1) {
+    x = friendX;
+    y = friendY;
+    return true;
+  }
+  return false;
 }
 
-Position InfluenceMap::pointToForeFront(const model::Wizard& self, const int x, const int y, const std::vector<Position>& line, const size_t index) const {
+Position InfluenceMap::pointToForeFront(const model::Wizard& self, const int x, const int y, const std::vector<Position>& line) const {
   const Position startCentralPosition = InfluenceMapConstants::toReal({x, y}, 0.5, 0.5);
-  auto foreFront = Math::point_distanceToSegment(startCentralPosition, line[index - 1], line[index]);
 
-  for (const auto& minion : World::instance().minions()) {
-    if (minion.getFaction() != self.getFaction()) {
-      continue;
-    }
-
-    const auto minionPos = EX::pos(minion);
-    const auto minionForeFront = Math::point_distanceToSegment(minionPos, line[index - 1], line[index]);
-    /// миньон с другой линии
-    if ((minionPos - minionForeFront).length() > 400) {
-      continue;
-    }
-
-    /// если миньон ближе к противникам то выбираем его позицию
-    if ((minionForeFront - line[index - 1]).length2() < (foreFront - line[index - 1]).length2()) {
-      foreFront = minionForeFront;
+  double minDistance = 999999;
+  Position minPoint = startCentralPosition;
+  for (size_t i = 0; i < line.size(); i++) {
+    Position point = Math::point_distanceToSegment(startCentralPosition, line[i - 1], line[i]);
+    const double distance = (point - startCentralPosition).length2();
+    if (distance < minDistance) {
+      minPoint = point;
+      minDistance = distance;
     }
   }
 
-  return foreFront;
+  return minPoint;
 }
 
 
@@ -349,7 +361,7 @@ float wizardDanger(const model::Wizard& wizard) {
   float ticks = 1.0f - (EX::minTimeForMagic(wizard) / float(Game::model().getWizardActionCooldownTicks()));
   ticks = MAX(0.5f, ticks);
 
-  return 25.0f * float(wizard.getLife())/float(wizard.getMaxLife()) * wizardDps(wizard) * ticks;
+  return 5.0f * float(wizard.getLife())/float(wizard.getMaxLife()) * wizardDps(wizard) * ticks;
 }
 
 void InfluenceMap::includeFriends() {
@@ -362,14 +374,14 @@ void InfluenceMap::includeFriends() {
   /// своим магам доверять, себе дороже
   for (const auto& wizard : World::instance().wizards()) {
     if (Game::friendFaction() == wizard.getFaction()) {
-      includeFriend(wizard, 0.5 * wizardRadius(wizard), wizardDanger(wizard));
+      includeFriend(wizard, 0.25 * wizardRadius(wizard), 0.5 * wizardDanger(wizard));
 
     }
   }
 
   for (const auto& build : World::instance().buildings()) {
     if (Game::friendFaction() == build.getFaction()) {
-      includeFriend(build, 0.5 * buildRadius(build), buildDanger(build));
+      includeFriend(build, 0.75 * buildRadius(build), buildDanger(build));
     }
   }
 
@@ -439,7 +451,7 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
 
 
   /*if (Visualizator::PRE == visualizator.getStyle()) {
-    const auto size = InfluenceMapConstants::memorySize;
+    const auto size = 40;// InfluenceMapConstants::memorySize;
     for (int x = 0; x < size; x++) {
       for (int y = 0; y < size; y++) {
         const auto p1 = InfluenceMapConstants::toReal(Vector2D<int>(x, y));

@@ -38,11 +38,11 @@ namespace AICup
       audacityWizard = 1.25;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 0.55;
+      desireChangeLine = 0.7;
       changeLinePathLengthPriority = 1.0;
       changeLineWizardCountPriority = 0.125;
-      changeLineTowerBalancePriority = 0.5;
-      changeLineLaneStrengthPriority = 0.25;
+      changeLineTowerBalancePriority = 0.75;
+      changeLineLaneStrengthPriority = 0.35;
     }
 
     void update(const Wizard& self, model::Move& move) override {
@@ -50,8 +50,8 @@ namespace AICup
 
       const auto realLife = self.getLife() - self.burnResidualDamage();
 
-      audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
-      audacityWithWizards = -1.0 - 3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
+      audacity = -2.5 * (1 - (float(realLife) / float(self.getMaxLife())));
+      audacityWithWizards = -3.0 - 3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
 }

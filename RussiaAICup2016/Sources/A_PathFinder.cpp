@@ -192,11 +192,11 @@ void PathFinder::calculateCost(const Vector2D<int> ignoreCenter, const int ignor
       const size_t mapX = size_t((x * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const size_t mapY = size_t((y * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const float value = enemiesMap[mapX * InfluenceMapConstants::memorySize + mapY];
-      costs[x][y] += value * 30/*магическая константа, о том насколько не стоит проходить по точкам врага*/;
+      costs[x][y] += value * 1000/*магическая константа, о том насколько не стоит проходить по точкам врага*/;
       /// и еще немного ячеек вокруге захватим, дабы точно не пройти рядом с врагами
       for (int nx = -2; nx <= 2; nx++) {
         for (int ny = -2; ny <= 2; ny++) {
-          costs[x + nx][y + ny] += value * 15;
+          costs[x + nx][y + ny] += value * 500;
         }
       }
     }

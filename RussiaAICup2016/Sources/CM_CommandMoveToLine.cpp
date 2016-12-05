@@ -23,9 +23,9 @@ CommandMoveToLine::CommandMoveToLine(model::LaneType line): line(line) {
 bool CommandMoveToLine::check(const Wizard& self) {
   const auto foreFront = InfluenceMap::instance().getForeFront(line, 0.0f);
 
-  /// если линия находиться на своей базе, и мы тоже на ней, значит на базе враги, и нужно обращать внимание только на врагов, а не на линии
-  if (foreFront.x < 1200 && foreFront.y > World::size() - 1200
-    && self.getX() < 1000 && self.getY() > World::size() - 1000) {
+  /// если линия наход1иться на своей базе, и мы тоже на ней, значит на базе враги, и нужно обращать внимание только на врагов, а не на линии
+  if (foreFront.x < 800 && foreFront.y > World::size() - 800
+    && self.getX() < 700 && self.getY() > World::size() - 700) {
     return false;
   }
 
@@ -35,13 +35,19 @@ bool CommandMoveToLine::check(const Wizard& self) {
 
 void CommandMoveToLine::execute(const Wizard& self, Result& result) {
   const auto offset = -100 * self.getRole().getAudacity();
-  const auto wizardOffset = -100 * self.getRole().getAudacityWithWizards() * World::instance().wizardCount(line, Game::enemyFaction());
+
+  double WizardPriority = 0;
+  for (const auto& wizard : World::instance().wizards(line, Game::enemyFaction())) {
+    WizardPriority += double(wizard->getLife()) / double(wizard->getMaxLife());
+  }
+  const auto wizardOffset = -100 * self.getRole().getAudacityWithWizards() * MIN(1, WizardPriority);
+
   const auto foreFront = InfluenceMap::instance().getForeFront(line, float(offset + wizardOffset));
   const auto foreFrontDirection = InfluenceMap::instance().getForeDirection(line, foreFront);
 
-  /// 400 это ширина линии, поэтому +-200
-  const auto foreFrontLeft = foreFront + foreFrontDirection.perpendicular() * 200;
-  const auto foreFrontRight = foreFront - foreFrontDirection.perpendicular() * 200;
+  /// 400 это ширина линии, будем ходить по 1/2 этой линии, поэтому +-100
+  const auto foreFrontLeft = foreFront + foreFrontDirection.perpendicular() * 100;
+  const auto foreFrontRight = foreFront - foreFrontDirection.perpendicular() * 100;
 
   const auto selfPos = EX::pos(self);
 

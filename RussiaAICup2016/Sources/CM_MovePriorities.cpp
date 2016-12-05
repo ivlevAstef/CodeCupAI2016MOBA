@@ -7,7 +7,7 @@
 using namespace AICup;
 
 double MovePriorities::pushOffMinion(const Wizard& self, const model::Minion& minion) {
-  return 500;
+  return 0;
 }
 
 ///слегка выше
@@ -77,7 +77,7 @@ double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wiz
 /// Это очень важно, поэтому завышено значение от нормы
 /// Вариативность нужна чтобы каждый тик, выбирался один и тотже projectile из доступных, а не случайный
 double MovePriorities::avoidProjectile(const Wizard& self, const model::Projectile& projectile) {
-  return 15000 - self.getDistanceTo(projectile);
+  return 2000 - self.getDistanceTo(projectile);
 }
 
 double MovePriorities::defendPoint(const Wizard&, const Position&) {

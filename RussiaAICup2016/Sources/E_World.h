@@ -59,6 +59,7 @@ namespace AICup
 
     const int towerCount(model::LaneType line, model::Faction faction) const;
     const int wizardCount(model::LaneType line, model::Faction faction) const;
+    const std::vector<const model::Wizard*> wizards(model::LaneType line, model::Faction faction) const;
     const int wizardCount(model::LaneType line, model::Faction faction, const model::Wizard& excludeWizard) const;
     const model::LaneType positionToLine(const double x, const double y) const;
 

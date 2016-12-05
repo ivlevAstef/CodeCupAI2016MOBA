@@ -51,7 +51,7 @@ double Algorithm::calculateLinePriority(const Algorithm::PathFinder& finder, con
   double distancePriority = 1000 - selfLength / 8;// будем предполагать что максимальная длина пути 8000
   double wizardPriority = 1000 - 200 * wizardCount;
   double towerPriority = 500 - 250 * towerBalance;// если своих башен нет то приоритет 1000
-  double laneStrengthPriority = 500 - (MAX(-10000, MIN(laneStrength, 10000)) / 20);
+  double laneStrengthPriority = 500 - (MAX(-1000, MIN(laneStrength, 1000)) / 2);
 
   const auto lengthRole = 1;
   const auto distanceRole = self.getRole().getChangeLinePathLengthPriority();

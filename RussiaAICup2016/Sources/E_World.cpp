@@ -258,6 +258,17 @@ const int World::wizardCount(model::LaneType line, model::Faction faction, const
   return result;
 }
 
+const std::vector<const model::Wizard*> World::wizards(model::LaneType line, model::Faction faction) const {
+  std::vector<const model::Wizard*> result;
+  for (const auto& wizard : model().getWizards()) {
+    if (faction == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
+      result.push_back(&wizard);
+    }
+  }
+
+  return result;
+}
+
 const std::vector<const model::Wizard*> World::aroundAuraWizards(const model::Wizard& unit) {
   std::vector<const model::Wizard*> result;
 
