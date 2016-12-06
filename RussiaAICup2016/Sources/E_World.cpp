@@ -8,6 +8,7 @@
 #include "E_Points.h"
 #include "E_Game.h"
 #include "C_Math.h"
+#include "C_Extensions.h"
 #include "E_WorldObjects.h"
 
 using namespace AICup;
@@ -72,6 +73,7 @@ void World::update(const model::World& world) {
   }
 
   updateVisionZone();
+  updateSupposedWizards();
   updateSupposedData();
   updateMinions();
 
@@ -91,7 +93,7 @@ const std::vector<model::Minion>& World::minions() const {
 }
 
 const std::vector<model::Wizard>& World::wizards() const {
-  return modelWorld->getWizards();
+  return supposedWizards;
 }
 
 const std::vector<Looking>& World::getVisionZone() const {
@@ -198,6 +200,52 @@ void World::updateSupposedData() {
 
   supposedBuilding = updateBuildingTicks(supposedBuilding, model().getTickIndex() - lastUpdateTick);
   supposedBuilding = merge(supposedBuilding, updateRadius<model::Building, Building>(modelWorld->getBuildings()));
+}
+
+void World::updateSupposedWizards() {
+  std::vector<model::Wizard> newWizardData;
+
+  for (const auto& wizard : model().getWizards()) {
+    newWizardData.push_back(wizard);
+
+    /// удаляем мага из старых данных
+    for (size_t i = 0; i < supposedWizards.size(); i++) {
+      if (supposedWizards[i].getId() == wizard.getId()) {
+        supposedWizards.erase(supposedWizards.begin() + i);
+        break;
+      }
+    }
+  }
+
+  const auto enemyRessurection = Points::point(Points::RENEGADES_BASE);
+  const double dt = model().getTickIndex() - lastUpdateTick;
+
+  /// после чего остались маги, о которых была утеряна информация, но на прошлом тике они были
+  for (const auto& wizard : supposedWizards) {
+    /// если раньше дружественный маг был, а сейчас нет, значит он мертв
+    if (wizard.getFaction() == Game::friendFaction()) {
+      continue;
+    }
+
+    /// иначе это вражеский маг, и его надо просто сместить, или причислить к убитым
+    /// если мы можем его видеть, значит скорей всего он мертв
+    if (isInVisionZone(wizard.getX(), wizard.getY())) {
+      newWizardData.push_back(EnemyWizard(wizard, enemyRessurection.x, enemyRessurection.y));
+    } else {
+      /// сдвигаем мага по направлении базы, с максимальной его скоростью
+      auto delta = enemyRessurection - EX::pos(wizard);
+      double dLength = delta.length();
+      if (dLength > 1) {
+        double length = EX::maxSpeed(wizard) * dt;
+        length = MIN(dLength, length);
+        delta = delta.normal() * length;
+      }
+
+      newWizardData.push_back(EnemyWizard(wizard, wizard.getX() + delta.x, wizard.getY() + delta.y));
+    }
+  }
+
+  supposedWizards = newWizardData;
 }
 
 
@@ -516,9 +564,15 @@ bool World::checkMinionOnNeutral(const model::Minion& neutral) const {
 
 #ifdef ENABLE_VISUALIZATOR
 void World::visualization(const Visualizator& visualizator) const {
-  if (Visualizator::PRE == visualizator.getStyle()) {
+  /*if (Visualizator::PRE == visualizator.getStyle()) {
     for (const auto& build : supposedBuilding) {
       visualizator.fillCircle(build.getX(), build.getY(), build.getRadius(), 0xffff00);
+    }
+  }*/
+
+  if (Visualizator::POST == visualizator.getStyle()) {
+    for (const auto& wizard : supposedWizards) {
+      visualizator.fillCircle(wizard.getX(), wizard.getY(), wizard.getRadius() * 0.75, 0xffff00);
     }
   }
 

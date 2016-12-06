@@ -6,6 +6,7 @@
 #include "CM_MovePriorities.h"
 #include "CM_TurnPriority.h"
 #include "A_Attack.h"
+#include "A_WinPredictor.h"
 
 using namespace AICup;
 
@@ -13,7 +14,14 @@ CommandFollowAttack::CommandFollowAttack(const model::Wizard& wizard): wizard(wi
 }
 
 bool CommandFollowAttack::check(const Wizard& self) {
-  return wizard.getLife() < 2 * self.damage(model::ACTION_MAGIC_MISSILE);
+  const auto selfPos = EX::pos(self);
+  const auto wizardPos = EX::pos(wizard);
+  const auto delta = wizardPos - selfPos;
+  if (delta.length() < self.getVisionRange() + 100) {
+    return false;
+  }
+
+  return wizard.getLife() < self.damage(model::ACTION_MAGIC_MISSILE) || Algorithm::changeOfWinning(self) > 0.9;
 }
 
 

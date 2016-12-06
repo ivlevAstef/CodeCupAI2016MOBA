@@ -31,12 +31,7 @@ bool CommandAttackWizard::check(const Wizard& self) {
     return false;
   }
 
-  /// если враг очень близко, и мы можем бить посохом, то надо ударить
-  if (Algorithm::isMelee(self, wizard) && !self.isCooldown(model::ACTION_STAFF)) {
-    return true;
-  }
-
-  /// во всех остальных случаях возможна или атака, или поворот к дереву для атаки
+  /// во всех остальных случаях возможна или атака, или поворот к магу для атаки
   return true;
 }
 

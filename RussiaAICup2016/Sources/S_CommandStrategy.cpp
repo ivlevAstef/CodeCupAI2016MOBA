@@ -97,18 +97,11 @@ const Vector CommandStrategy::turn(const std::vector<MoveCommand::Result>& moveR
 
   /// выбираем самый предпочтительный вид поворота
   int turnPriority = 0;
-  double normalPriority = 0;
   for (const auto& move : moveResults) {
     if (move.turnPriority < turnPriority) {
       continue;
     }
-    if (move.turnPriority > turnPriority) {
-      turnPriority = move.turnPriority;
-    } else if (move.priority < normalPriority) { //equals
-      continue;
-    }
-
-    normalPriority = move.priority;
+    turnPriority = move.turnPriority;
 
     turnStyle = move.turnStyle;
     result = move.moveDirection;

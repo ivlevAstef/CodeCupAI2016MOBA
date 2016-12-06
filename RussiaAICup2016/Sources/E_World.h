@@ -73,6 +73,7 @@ namespace AICup
 
     void updateVisionZone();
     void updateSupposedData();
+    void updateSupposedWizards();
 
     void updateMinions();
 
@@ -92,6 +93,7 @@ namespace AICup
     std::vector<model::Tree> invisibleAreaTrees;
     std::vector<model::Building> supposedBuilding;
     std::vector<model::Minion> realMinions;
+    std::vector<model::Wizard> supposedWizards;
 
     std::unordered_set<long long int> hateNeuralMinions;/// дада злые нейтральные миньоны
   };

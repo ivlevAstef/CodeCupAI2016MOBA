@@ -314,6 +314,49 @@ double EX::burnResidualDamage(const model::Wizard& obj) {
   return result;
 }
 
+bool EX::isShield(const model::Wizard& obj) {
+  for (const auto& status : obj.getStatuses()) {
+    if (status.getType() == model::STATUS_SHIELDED) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool EX::isEmpower(const model::Wizard& obj) {
+  for (const auto& status : obj.getStatuses()) {
+    if (status.getType() == model::STATUS_EMPOWERED) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+double EX::danger(const model::Wizard& obj) {
+  double lifeDanger = double(obj.getLife() - burnResidualDamage(obj)) / 10.0; /// 10 вначале - 35 вконце
+  double mmDanger = 20 * dps(obj, model::ACTION_MAGIC_MISSILE); /// 4 вначале - 8 с вкаченной скорость, 5,3 c атакой+ - max = 10,66
+  double staffDanger = 15 * dps(obj, model::ACTION_STAFF); // 3 вначале - 6 вконце
+  double speedDanger = (maxSpeed(obj) * maxSpeed(obj)) / 5.333; /// 3 вначале - 6.75 на максиуме
+  double armorDanger = armor(obj) * 1.5; /// 0 вначале - 6 вконце
+  double shieldDanger = isShield(obj) ? 6 : 0; /// 0-6
+  double empowerdDanger = isEmpower(obj) ? 6 : 0; ///0-6
+  double frostDanger = availableSkill(obj, model::ACTION_FROST_BOLT) ? 15 : 0; ///0-15
+  double fireDanger = availableSkill(obj, model::ACTION_FIREBALL) ? 10 : 0; ///0-10
+
+  mmDanger *= MIN(1, obj.getMana() / (2 * Game::model().getMagicMissileManacost()));
+  frostDanger *= MIN(1, obj.getMana() / Game::model().getFrostBoltManacost());
+  fireDanger *= MIN(1, obj.getMana() / Game::model().getFireballManacost());
+
+  double frozenAntiDanger = -0.4 * EX::frozenTime(obj); ///0-24
+
+  /// min 20
+  /// max 101,42
+  ///      10-35      4-10,66       3-6          3-6.75          0-6           0-6             0-6            0-15          0-10          -24-0
+  return lifeDanger + mmDanger + staffDanger + speedDanger + armorDanger + shieldDanger + empowerdDanger + frostDanger + fireDanger + frozenAntiDanger;
+}
+
+
 /////////////////////// Support
 double EX::radiusForGuaranteedDodge(const model::Wizard& self, double coef) {
   const auto radius = self.getRadius() + Game::model().getMagicMissileRadius();

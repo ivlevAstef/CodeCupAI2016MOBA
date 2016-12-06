@@ -37,8 +37,11 @@ namespace AICup
       return audacity;
     }
 
-    inline const float& getAudacityWithWizards() const {
-      return audacityWithWizards;
+    inline const float& getLinePressureWizards() const {
+      return linePressureWizards;
+    }
+    inline const float& getLineAudacityWizard() const {
+      return lineAudacityWizards;
     }
 
     inline const float& getImportanceOfXP() const {
@@ -101,7 +104,10 @@ namespace AICup
 
   protected:
     float audacity; // дерзость. влияет на расположение на линии, каждая +1 увеличивает близость к врагу на 100, -1 увеличивает на 100
-    float audacityWithWizards; // дерзость, от количества вражеских магов на линии, влияет на расположение на линии, каждая +1 увеличивает близость к врагу на 100, -1 увеличивает на 100
+    /// коэцифиенты выбираються в зависимости от ситуации на линии - если шансы на победу маленькие то боязнь, иначе прессование
+    float linePressureWizards; // прессование магов на линии, влияет на расположение на линии, каждая +1 увеличивает близость к врагу на 100
+    float lineAudacityWizards; // боязнь магов на линии, влияет на расположение на линии, каждая +1 увеличивает дальность от врага на 100
+
     float importanceOfXP; // Важность получения XP.  0 - не нужен, 1 - нормальная. влияет насколько сильно тянет к линии героя, и насколько сильно он приследует умирающие цели
     float importanceOfBonus; // Важность взятия бонуса. 0 - не нужен, 1 - нормальная
 

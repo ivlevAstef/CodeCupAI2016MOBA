@@ -57,6 +57,11 @@ namespace AICup
     OrcMinion(double x, double y, model::Faction faction);
   };
 
+  class EnemyWizard: public model::Wizard {
+  public:
+    EnemyWizard(const model::Wizard& wizard, double x, double y);
+  };
+
 
   class Looking {
   public:

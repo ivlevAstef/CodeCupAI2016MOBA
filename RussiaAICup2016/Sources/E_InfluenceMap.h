@@ -48,6 +48,8 @@ namespace AICup
     /// положительный наших больше, отрицательный наших меньше
     float getLineStrength(const model::LaneType lane) const;
 
+    float getStrength(const Position center, double radius) const;
+
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const Visualizator& visualizator) const;
 #endif // ENABLE_VISUALIZATOR

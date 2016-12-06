@@ -46,7 +46,8 @@ const std::vector<model::SkillType> SkillBranches::armorShield = {
 
 Role::Role(const SkillBuild& skillBuild): skillBuild(skillBuild) {
   audacity = 1;
-  audacityWithWizards = 1;
+  linePressureWizards = 1;
+  lineAudacityWizards = 1;
   importanceOfXP = 1;
   importanceOfBonus = 1;
 

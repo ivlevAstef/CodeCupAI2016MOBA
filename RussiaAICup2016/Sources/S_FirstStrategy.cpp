@@ -62,13 +62,13 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     moveCommands.insert(moveCommands.end(), avoidAroundCommands.begin(), avoidAroundCommands.end());
   }
 
-  const auto pushOffMinionsCommands = calcAllPushOffMinions(self);
+  /*const auto pushOffMinionsCommands = calcAllPushOffMinions(self);
   if (!pushOffMinionsCommands.empty()) {
     moveCommands.insert(moveCommands.end(), pushOffMinionsCommands.begin(), pushOffMinionsCommands.end());
-  }
+  }*/
 
   /// бежать чтобы добить
-  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange())) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 100)) {
     if (EX::isWizard(*enemy)) {
       const auto& wizard = EX::asWizard(*enemy);
       const auto command = fabric.followAttack(wizard);
@@ -110,7 +110,7 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
 
   ////
 
-  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange()+100)) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 100)) {
     const auto attackCommand = fabric.attack(*enemy);
     if (nullptr != attackCommand && attackCommand->check(self)) {
       attackCommands.push_back(attackCommand);
@@ -138,24 +138,13 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     castCommands.push_back(castShieldCommand);
   }
 
-
-
-  /*
-  как должно быть:
-  1)!! пока нету крипов, иследуем карту и бъем нейтралов, для получения опыта и очков
-  3)!! при моменте появления руны (надо еще написать эту команду), идем к ней в двух случаях:
-     а) это выгодно по xp (руна близко, и тут много не заработаешь)
-     б) идем на ту линию где ситуация не очень
-     с) идем на ту линию где своих меньше (дабы побольше оттяпать)
- */
-
   CommandStrategy::update(self, move);
 }
 
 const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const Wizard& self) {
   const auto selfPos = EX::pos(self);
 
-  const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + self.getRadius() * 2);
+  const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + 100);
 
   std::vector<MoveCommandPtr> avoidAroundCommands;
   avoidAroundCommands.reserve(aroundEnemies.size());
@@ -168,6 +157,9 @@ const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const Wiza
 
 
   for (const auto& projectile : World::model().getProjectiles()) {
+    if (projectile.getFaction() == self.getFaction()) {
+      continue;
+    }
     const auto command = fabric.avoidProjectile(projectile);
     if (command->check(self)) {
       avoidAroundCommands.push_back(command);

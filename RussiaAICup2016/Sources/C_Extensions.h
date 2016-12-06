@@ -60,6 +60,11 @@ namespace AICup
 
 
     double burnResidualDamage(const model::Wizard& obj);
+    bool isShield(const model::Wizard& obj);
+    bool isEmpower(const model::Wizard& obj);
+
+    /// возращает насколько опасен маг. значение 20 соответствует изначальной силе мага, сто - 25 уровню, с макс прокастами
+    double danger(const model::Wizard& obj);
     //Support
 
     ///радиус с которого мой маг предположительно может уклониться от заклинаний вражеского мага

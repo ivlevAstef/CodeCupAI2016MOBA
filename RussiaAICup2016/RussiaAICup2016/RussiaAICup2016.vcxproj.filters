@@ -204,6 +204,9 @@
     <ClCompile Include="..\Sources\Tests\S_TestDodgeStrategy.cpp">
       <Filter>Sources\Strategy\Strategy\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\A_WinPredictor.cpp">
+      <Filter>Sources\Algorithms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -382,6 +385,9 @@
     </ClInclude>
     <ClInclude Include="..\Sources\Tests\S_TestDodgeStrategy.h">
       <Filter>Sources\Strategy\Strategy\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\A_WinPredictor.h">
+      <Filter>Sources\Algorithms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

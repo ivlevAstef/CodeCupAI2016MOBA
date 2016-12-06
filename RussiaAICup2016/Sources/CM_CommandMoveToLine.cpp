@@ -7,6 +7,7 @@
 
 #include "CM_CommandMoveToLine.h"
 #include "E_InfluenceMap.h"
+#include "A_WinPredictor.h"
 #include "E_World.h"
 #include "E_Game.h"
 #include "CM_MovePriorities.h"
@@ -23,11 +24,10 @@ CommandMoveToLine::CommandMoveToLine(model::LaneType line): line(line) {
 bool CommandMoveToLine::check(const Wizard& self) {
   const auto offset = -100 * self.getRole().getAudacity();
 
-  double WizardPriority = 0;
-  for (const auto& wizard : World::instance().wizards(line, Game::enemyFaction())) {
-    WizardPriority += double(wizard->getLife()) / double(wizard->getMaxLife());
-  }
-  const auto wizardOffset = -100 * self.getRole().getAudacityWithWizards() * MIN(1, WizardPriority);
+  const auto preForeFront = InfluenceMap::instance().getForeFront(line, float(offset));
+  const double changeOfWinning = Algorithm::changeOfWinning(self, preForeFront.x, preForeFront.y);
+  const double factor = (changeOfWinning > 0) ? self.getRole().getLinePressureWizards() : self.getRole().getLineAudacityWizard();
+  const auto wizardOffset = -100 * changeOfWinning * factor;
 
   const auto foreFront = InfluenceMap::instance().getForeFront(line, float(offset + wizardOffset));
   const auto foreFrontDirection = InfluenceMap::instance().getForeDirection(line, foreFront);

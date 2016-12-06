@@ -115,6 +115,18 @@ OrcMinion::OrcMinion(double x, double y, model::Faction faction) :
 
 }
 
+EnemyWizard::EnemyWizard(const model::Wizard& wizard, double x, double y):
+  model::Wizard(wizard.getId(),
+  x, y, wizard.getSpeedX(), wizard.getSpeedY(), wizard.getAngle(),
+  wizard.getFaction(), wizard.getRadius(), wizard.getLife(), wizard.getMaxLife(), wizard.getStatuses(),
+  wizard.getOwnerPlayerId(), wizard.isMe(), wizard.getMana(), wizard.getMaxMana(),
+  wizard.getVisionRange(), wizard.getCastRange(),
+  wizard.getXp(), wizard.getLevel(), wizard.getSkills(),
+  wizard.getRemainingActionCooldownTicks(), wizard.getRemainingCooldownTicksByAction(),
+  wizard.isMaster(), wizard.getMessages()) {
+
+}
+
 Looking::Looking(const model::Wizard& unit) {
   x = unit.getX();
   y = unit.getY();

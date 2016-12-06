@@ -6,12 +6,12 @@
 #include "CM_TurnPriority.h"
 #include "A_Attack.h"
 #include "C_Math.h"
+#include "A_WinPredictor.h"
 
 using namespace AICup;
 
 CommandAvoidWizard::CommandAvoidWizard(const model::Wizard& wizard): wizard(wizard) {
   distance = 0;
-  checkDistance = 0;
 }
 
 bool CommandAvoidWizard::check(const Wizard& self) {
@@ -80,8 +80,15 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     finalCheckDistance = MAX(finalCheckDistance, sCheckDistance);
   }
 
+  distance = MIN(finalDistance, finalCheckDistance);
+
+  const double changeOfWin = Algorithm::changeOfWinning(self);
+  if (changeOfWin > 0.5) {
+    distance *= (1.0 - changeOfWin * 0.2);
+  }
+
   /// если далеко, то бояться его не стоит
-  if (delta.length() > MIN(finalCheckDistance, finalDistance) + self.maxSpeed()) {
+  if (delta.length() > distance + self.maxSpeed()) {
     return false;
   }
 
@@ -89,9 +96,6 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   if (Algorithm::checkIntersectedTree(selfPos, wizardPos, Game::model().getMagicMissileRadius())) {
     return false;
   }
-
-  distance = finalDistance;
-  checkDistance = finalCheckDistance;
 
   return true;
 }
@@ -101,8 +105,8 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   const auto wizardPos = EX::pos(wizard);
   const auto delta = selfPos - wizardPos;
 
-  const auto pos = wizardPos + delta.normal() * MIN(distance, checkDistance);
-  if (delta.length() < MIN(distance, checkDistance)) {
+  const auto pos = wizardPos + delta.normal() * distance;
+  if (delta.length() < distance) {
     result.turnStyle = TurnStyle::BACK_TURN;
   } else {
     result.turnStyle = TurnStyle::TURN;
@@ -119,7 +123,7 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   }
 
   // если я совсем далеко то поворачиватся не нужно
-  if (delta.length() > distance && delta.length() > checkDistance) {
+  if (delta.length() > distance) {
     return;
   }
 

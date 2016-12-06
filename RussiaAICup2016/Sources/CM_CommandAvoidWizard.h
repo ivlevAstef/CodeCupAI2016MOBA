@@ -30,6 +30,5 @@ namespace AICup
     const model::Wizard& wizard;
 
     double distance;
-    double checkDistance;
   };
 }

@@ -22,7 +22,8 @@ namespace AICup
         SkillBranches::meleeDamageFireBolt,
       }) {
       audacity = 0;
-      audacityWithWizards = -1.0;
+      linePressureWizards = 0.25;
+      lineAudacityWizards = 2.0;
 
       importanceOfXP = 1.5;
       importanceOfBonus = 1.0;
@@ -35,7 +36,7 @@ namespace AICup
 
       audacityBuild = 3.0;
       audacityMinion = 1.0;
-      audacityWizard = 1.25;
+      audacityWizard = 1.5;
       attackSkillPriority = 1.5;
 
       desireChangeLine = 0.5;
@@ -50,8 +51,10 @@ namespace AICup
 
       const auto realLife = self.getLife() - self.burnResidualDamage();
 
-      audacity = -2.5 * (1 - (float(realLife) / float(self.getMaxLife())));
-      audacityWithWizards = -2.0 - 3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
+      audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
+
+      linePressureWizards = 0.25 * float(realLife) / float(self.getMaxLife());
+      lineAudacityWizards = 2.0 + 3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
 }

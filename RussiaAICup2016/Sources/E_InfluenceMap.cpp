@@ -148,6 +148,36 @@ float InfluenceMap::getLineStrength(const model::LaneType lane) const {
   return strength;
 }
 
+float InfluenceMap::getStrength(const Position center, double radius) const {
+  const size_t size = size_t(World::size() / InfluenceMapConstants::step);
+
+  const float minRealX = float(MAX(0, center.x - radius) / InfluenceMapConstants::step);
+  const float maxRealX = float(MIN(World::size(), center.x + radius) / InfluenceMapConstants::step);
+  const float minRealY = float(MAX(0, center.y - radius) / InfluenceMapConstants::step);
+  const float maxRealY = float(MIN(World::size(), center.y + radius) / InfluenceMapConstants::step);
+
+  const size_t minX = (size_t)floor(minRealX);
+  const size_t maxX = (size_t)ceil(maxRealX);
+  const size_t minY = (size_t)floor(minRealY);
+  const size_t maxY = (size_t)ceil(maxRealY);
+
+  const float radius2 = radius* radius;
+
+  float strength = 0;
+  for (size_t x = minX; x < maxX; x++) {
+    const float dx = ((float(x) + 0.5f) * InfluenceMapConstants::step) - center.x;
+
+    for (size_t y = minY; y < maxY; y++) {
+      const float dy = ((float(y) + 0.5f) * InfluenceMapConstants::step) - center.y;
+      const float coef = (dx*dx + dy*dy) / radius2;
+
+      strength += (1.0f - MIN(1.0f, coef)) * (friends[x][y] - enemies[x][y]);
+    }
+  }
+
+  return strength;
+}
+
 const std::vector<Position>& InfluenceMap::getLinePoints(const model::LaneType lane) const {
   /// Массивы точек, по которым идут крипы
   /// не симметричен, ибо на своей базе уйти в угол можно, а вот на базе врага... очень не желательно
@@ -255,7 +285,7 @@ float InfluenceMap::zonePriorityAndPoint(int& x, int& y) const {
 bool InfluenceMap::isFriendZone(int& x, int& y) const {
   int friendX = x;
   int friendY = y;
-  if (zonePriorityAndPoint(friendX, friendY) > 1) {
+  if (zonePriorityAndPoint(friendX, friendY) > 0.5) {
     x = friendX;
     y = friendY;
     return true;
@@ -307,7 +337,7 @@ double minionRadius(const model::Minion& minion) {
   if (model::MINION_FETISH_BLOWDART == minion.getType()) {
     return Game::model().getFetishBlowdartAttackRange();
   }
-  return 2 * Game::model().getOrcWoodcutterAttackRange();
+  return Game::model().getOrcWoodcutterAttackRange();
 }
 
 float minionDanger(const model::Minion& minion) {
@@ -325,7 +355,8 @@ double buildRadius(const model::Building& build) {
 }
 
 float buildDanger(const model::Building& build) {
-  return float(MIN(100, build.getLife())) * buildDps(build);
+  /// так как башни имеют больший радиус, то ихняя опасность повышаеться сильно завышенной
+  return 0.025f * float(MIN(100, build.getLife())) * buildDps(build);
 }
 
 double baseRadius(const model::Building& build) {
@@ -334,7 +365,8 @@ double baseRadius(const model::Building& build) {
 }
 
 float baseDanger(const model::Building& build) {
-  return 0.5f * float(MIN(300, build.getLife())) * buildDps(build);
+  /// так как база имеет больший радиус, то её опасность повышается сильно завышенной
+  return 0.01f * float(MIN(300, build.getLife())) * buildDps(build);
 }
 
 float wizardDps(const model::Wizard& wizard) {
@@ -362,7 +394,7 @@ float wizardDanger(const model::Wizard& wizard) {
   ticks = MAX(0.5f, ticks);
 
   float life = float(wizard.getLife()) / float(wizard.getMaxLife());
-  return 5.0f * life * wizardDps(wizard) * ticks;
+  return life * wizardDps(wizard) * ticks;
 }
 
 void InfluenceMap::includeFriends() {
@@ -375,14 +407,14 @@ void InfluenceMap::includeFriends() {
   /// своим магам доверять, себе дороже
   for (const auto& wizard : World::instance().wizards()) {
     if (Game::friendFaction() == wizard.getFaction()) {
-      includeFriend(wizard, 0.25 * wizardRadius(wizard), 0.25 * wizardDanger(wizard));
+      includeFriend(wizard, wizardRadius(wizard), wizardDanger(wizard));
 
     }
   }
 
   for (const auto& build : World::instance().buildings()) {
     if (Game::friendFaction() == build.getFaction()) {
-      includeFriend(build, 0.75 * buildRadius(build), buildDanger(build));
+      includeFriend(build, buildRadius(build), buildDanger(build));
     }
   }
 
@@ -393,7 +425,7 @@ void InfluenceMap::includeEnemies() {
       includeEnemy(minion, minionRadius(minion), minionDanger(minion));
 
     } else if (model::FACTION_NEUTRAL == minion.getFaction()) {
-      includeEnemy(minion, minionRadius(minion), minionDanger(minion));
+      includeEnemy(minion, minionRadius(minion), 0.25 * minionDanger(minion));
     }
   }
 

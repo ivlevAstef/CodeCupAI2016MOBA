@@ -65,6 +65,10 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
   /// находим максимальную дистанцию на которую можно сместиться при таком векторе, и не упереться
   auto preyEndPos = preyBeginPos + preyEndVec * (EX::maxSpeed(prey) * maxIteration);
   for (const auto& obstacle : obstacles) {
+    /// пока не будет учитывать движимые объекты, ибо сложно
+    if (EX::isMinion(*obstacle) || EX::isWizard(*obstacle)) {
+      continue;
+    }
     /// проверка на уперся в препятствие
     const auto obstaclePos = EX::pos(*obstacle);
     const auto intersectPoint = Math::point_distanceToSegment(EX::pos(*obstacle), preyBeginPos, preyEndPos);
@@ -72,18 +76,7 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
     const auto radius = obstacle->getRadius() + prey.getRadius();
     if (distance < radius) {
       double translate = sqrt(radius*radius - distance * distance);
-
-      /// если этот объект движимый, то предполагаем что он от нас отходит
-      if (EX::isMinion(*obstacle) || EX::isWizard(*obstacle)) {
-        const auto newEndPoint = intersectPoint - preyEndVec * translate;
-        const auto time = (newEndPoint - preyBeginPos).length() / EX::maxSpeed(prey);
-        translate -= time * EX::maxSpeed(*obstacle);
-      }
-
-      const auto newEndPoint = intersectPoint - preyEndVec * translate;
-      if ((newEndPoint - preyBeginPos).length2() > (preyEndPos - preyBeginPos).length2()) {
-        preyEndPos = newEndPoint;
-      }
+      preyEndPos = intersectPoint - preyEndVec * translate;
     }
   }
 
@@ -154,7 +147,7 @@ Vector Algorithm::dodge(const Position attackingPos, const double castRange, con
 
   /// проверяем возможность уклониться при всех возможных конечных углах, начиная с текущего
   /// проверяем каждые 4 градуса
-  for (double angleDt = 0; angleDt < AICUP_PI; angleDt += AICUP_PI / 45) {
+  for (double angleDt = 0; angleDt < AICUP_PI; angleDt += AICUP_PI / 45.0) {
     const auto leftAngle = centerAngle + angleDt;
     const auto rightAngle = centerAngle - angleDt;
     const auto endVectorLeft = Vector(1, 0).rotate(leftAngle);
