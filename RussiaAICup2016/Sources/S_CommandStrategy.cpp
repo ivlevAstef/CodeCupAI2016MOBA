@@ -17,26 +17,28 @@ CommandStrategy::CommandStrategy(const CommandFabric& fabric, const Algorithm::P
 }
 
 void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
-  const auto moveResults = moveCommandsToMoveResult(self);
+  auto moveResults = moveCommandsToMoveResult(self);
 
   bool deactivateOtherTurn = false;
-  if (!moveResults.empty()) {
-    TurnStyle turnStyle = TurnStyle::NO_TURN;
-    Vector turnDirection = turn(moveResults, turnStyle, deactivateOtherTurn);
-
+  {
     double speedLimit = -1;
-    const Vector direction = move(moveResults, self, speedLimit);
+    Vector direction;
+    if (move(moveResults, self, speedLimit, direction)) {
+      TurnStyle turnStyle = TurnStyle::TURN;
+      Vector turnDirection = turn(moveResults, turnStyle, deactivateOtherTurn);
 
-    /// если мы в окружении, значит все плохо... или алгоритм глюканул
-    if (direction.length() < 1.0e-5) {
-      Algorithm::execAroundMove(self, finalMove);
-    } else {
-      /// нужно для уворота, и там очень важно, чтобы был правильный стиль уворота
-      if (TurnStyle::SIDE_TURN != turnStyle) {
-        turnDirection = direction;
+      /// если мы в окружении, значит все плохо... или алгоритм глюканул
+      if (direction.length() < 1.0e-5) {
+        Algorithm::execAroundMove(self, finalMove);
+      } else {
+        assert(turnDirection.length() > 1.0e-5);
+        /// нужно для подготовке к увороту, и там важно, чтобы был правильный вектор поворота (либо его просто нет)
+        if (TurnStyle::SIDE_TURN != turnStyle) {
+          turnDirection = direction;
+        }
+
+        Algorithm::execMove(self, turnStyle, turnDirection, direction, speedLimit, finalMove);
       }
-
-      Algorithm::execMove(self, turnStyle, turnDirection, direction, speedLimit, finalMove);
     }
   }
 
@@ -110,10 +112,12 @@ const Vector CommandStrategy::turn(const std::vector<MoveCommand::Result>& moveR
   return result;
 }
 
-const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit) {
-  assert(0 != moveResults.size());
-
+const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit) {
   speedLimit = EX::maxSpeed(self);
+  if (moveResults.empty()) { /// если нет движения значит двигаемся вперед (P.S. там проверка выше есть, чтобы при 0 не двигаться)
+    return Vector(speedLimit, 0).rotated(self.getAngle());
+  }
+
   double maxPriority = 0;
   Vector result = Vector(0, 0);
   for (const auto& moveIter : moveResults) {
@@ -131,8 +135,25 @@ const Vector CommandStrategy::move(const std::vector<MoveCommand::Result>& moveR
     }
   }
 
-  //
-  return calculateCollisions(self, EX::pos(self) + result/*куда ищем путь*/, speedLimit);
+  return result;
+}
+
+bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit, Vector& direction) {
+  assert(0 != moveResults.size());
+
+  const auto moveVector = calcMoveVector(moveResults, self, speedLimit);
+
+  addAvoidProjectiles(moveResults, self, moveVector);
+
+  if (moveResults.empty()) {
+    return false;
+  }
+
+  const auto finalMoveVector = calcMoveVector(moveResults, self, speedLimit);
+
+  direction = calculateCollisions(self, EX::pos(self) + finalMoveVector/*куда ищем путь*/, speedLimit);
+
+  return true;
 }
 
 const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Position& endPoint, const double speedLimit) {
@@ -167,6 +188,29 @@ void CommandStrategy::addTreeForRemove(const Wizard& self, const model::LivingUn
   const auto attack = fabric.attack(*tree);
   if (attack->check(self)) {
     attackCommands.push_back(attack);
+  }
+}
+
+
+void CommandStrategy::addAvoidProjectiles(std::vector<MoveCommand::Result>& moveResults, const Wizard& self, const Vector& moveDirection) {
+
+  for (const auto& projectile : World::instance().bullets()) {
+    //if (projectile.faction == self.getFaction()) { // игнорируем свои снаряды, так как они наврятли летят в нас
+    //  continue;
+    //}
+    const auto command = fabric.avoidProjectile(projectile, moveDirection);
+
+    MoveCommand::Result moveCommandResult;
+    if (command->check(self)) {
+      moveCommandResult.priority = command->priority(self);
+      command->execute(self, moveCommandResult);
+
+      if (moveCommandResult.priority < 1 || moveCommandResult.moveDirection.length() < 0.5) {
+        continue;
+      }
+
+      moveResults.push_back(moveCommandResult);
+    }
   }
 }
 

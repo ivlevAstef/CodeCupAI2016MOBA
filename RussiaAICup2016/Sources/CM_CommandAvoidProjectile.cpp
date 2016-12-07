@@ -9,19 +9,23 @@
 
 using namespace AICup;
 
-CommandAvoidProjectile::CommandAvoidProjectile(const model::Projectile& projectile): projectile(projectile) {
+CommandAvoidProjectile::CommandAvoidProjectile(const Bullet& projectile, const Vector& moveDirection):
+  projectile(projectile), moveDirection(moveDirection) {
   turnStyle = TurnStyle::NO_TURN;
 }
 
 bool CommandAvoidProjectile::check(const Wizard& self) {
   const auto mc = Game::model();
+  double projectileRadius = projectile.radius; /// специальный радиус, чтобы убегать от взрыва дабы снизить урон
+  if (projectile.type == model::PROJECTILE_FIREBALL) {
+    projectileRadius += Game::model().getFireballExplosionMinDamageRange();
+  }
+
 
   const auto selfPos = EX::pos(self);
-  const auto projectilePos = EX::pos(projectile);
-  const auto speed = Vector(projectile.getSpeedX(), projectile.getSpeedY());
 
-  const auto distanceToLine = Math::distanceToLine(selfPos, projectilePos, projectilePos + speed);
-  const auto distanceMoved = self.getRadius() + projectile.getRadius() - distanceToLine;
+  const auto distanceToLine = Math::distanceToLine(selfPos, projectile.startPoint, projectile.startPoint + projectile.speed);
+  const auto distanceMoved = self.getRadius() + projectileRadius - distanceToLine;
 
   /// если снаряд не в нас, и я не могу в него войти то что беспокоиться
   if (distanceMoved < -self.maxSpeed()) {
@@ -29,13 +33,13 @@ bool CommandAvoidProjectile::check(const Wizard& self) {
   }
 
 
-  const auto dodgeVector = Algorithm::dodge(projectilePos, 600, self, speed, projectile.getRadius(), turnStyle);
+  const auto dodgeVector = Algorithm::dodge(self, moveDirection, projectile, turnStyle);
   /// невозможно отклониться
   if (dodgeVector.length() < 1.0e-5) {
     return false;
   }
 
-  position = selfPos + dodgeVector;
+  position = selfPos + dodgeVector * self.maxSpeed();
   return true;
 }
 

@@ -11,6 +11,7 @@
 #include "model\Building.h"
 #include "model\Wizard.h"
 #include "model\Minion.h"
+#include "C_Vector2D.h"
 
 namespace AICup
 {

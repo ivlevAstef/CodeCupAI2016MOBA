@@ -10,7 +10,7 @@
 #include "model\LaneType.h"
 #include "model\Building.h"
 #include "model\Minion.h"
-#include "model\Projectile.h"
+#include "E_Bullet.h"
 #include "C_Vector2D.h"
 
 
@@ -24,7 +24,7 @@ namespace AICup
     double avoidBuild(const Wizard& self, const model::Building& build);
     double avoidMinion(const Wizard& self, const model::Minion& minion);
     double avoidWizard(const Wizard& self, const model::Wizard& wizard);
-    double avoidProjectile(const Wizard& self, const model::Projectile& projectile);
+    double avoidProjectile(const Wizard& self, const Bullet& projectile);
 
     double defendPoint(const Wizard& self, const Position& point);
 

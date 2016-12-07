@@ -5,6 +5,7 @@
 #include "C_Extensions.h"
 #include "CM_AttackPriorities.h"
 #include "A_Attack.h"
+#include "A_WinPredictor.h"
 
 using namespace AICup;
 
@@ -31,7 +32,6 @@ bool CommandAttackWizard::check(const Wizard& self) {
     return false;
   }
 
-  /// во всех остальных случаях возможна или атака, или поворот к магу для атаки
   return true;
 }
 

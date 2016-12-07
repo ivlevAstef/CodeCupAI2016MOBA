@@ -49,7 +49,9 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
 
   /// раз в 500 тиков пересматриваю линию,
   /// 500 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
-  if (World::model().getTickIndex() - lastChangeLineTick >= 500) {
+  if (World::model().getTickIndex() - lastChangeLineTick >= 500 ||
+    /// также проверяем вначале каждый тик, чтобы поудачней выбрать линию
+    (200 <= World::model().getTickIndex() && World::model().getTickIndex() <= 750)) {
     model::LaneType lane;
     if (Algorithm::checkChangeLine(pathFinder, self, lane)) {
       myLine = lane;
@@ -57,15 +59,8 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     lastChangeLineTick = World::model().getTickIndex();
   }
 
-  const auto avoidAroundCommands = calcAllAroundEnemies(self);
-  if (!avoidAroundCommands.empty()) {
-    moveCommands.insert(moveCommands.end(), avoidAroundCommands.begin(), avoidAroundCommands.end());
-  }
+  addAroundEnemies(self);
 
-  /*const auto pushOffMinionsCommands = calcAllPushOffMinions(self);
-  if (!pushOffMinionsCommands.empty()) {
-    moveCommands.insert(moveCommands.end(), pushOffMinionsCommands.begin(), pushOffMinionsCommands.end());
-  }*/
 
   /// бежать чтобы добить
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 100)) {
@@ -141,52 +136,14 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
   CommandStrategy::update(self, move);
 }
 
-const std::vector<MoveCommandPtr> FirstStrategy::calcAllAroundEnemies(const Wizard& self) {
+void FirstStrategy::addAroundEnemies(const Wizard& self) {
   const auto selfPos = EX::pos(self);
 
   const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + 100);
-
-  std::vector<MoveCommandPtr> avoidAroundCommands;
-  avoidAroundCommands.reserve(aroundEnemies.size());
   for (const auto& enemy : aroundEnemies) {
     const auto command = fabric.avoidEnemy(*enemy);
     if (command->check(self)) {
-      avoidAroundCommands.push_back(command);
+      moveCommands.push_back(command);
     }
   }
-
-
-  for (const auto& projectile : World::model().getProjectiles()) {
-    if (projectile.getFaction() == self.getFaction()) {
-      continue;
-    }
-    const auto command = fabric.avoidProjectile(projectile);
-    if (command->check(self)) {
-      avoidAroundCommands.push_back(command);
-    }
-  }
-
-  return avoidAroundCommands;
-}
-
-const std::vector<MoveCommandPtr> FirstStrategy::calcAllPushOffMinions(const Wizard& self) {
-  const auto selfPos = EX::pos(self);
-
-  const auto aroundUnits = World::instance().around(self, self.getFaction(), 2 * self.getRadius() + 100);
-
-  std::vector<MoveCommandPtr> pushOffCommands;
-  pushOffCommands.reserve(aroundUnits.size());
-  for (const auto& unit : aroundUnits) {
-    if (!EX::isMinion(*unit)) {
-      continue;
-    }
-
-    const auto& minion = EX::asMinion(*unit);
-    const auto command = fabric.pushOffMinion(minion);
-    if (command->check(self)) {
-      pushOffCommands.push_back(command);
-    }
-  }
-
-  return pushOffCommands;
 }

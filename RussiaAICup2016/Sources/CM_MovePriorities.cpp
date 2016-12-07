@@ -71,21 +71,22 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
 
 double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {
   /*сочетается с get expirience*/
-  return 250 * double(self.getLife())/double(self.getMaxLife());
+  return 650 * double(self.getLife())/double(self.getMaxLife());
 }
 
 /// Это очень важно, поэтому завышено значение от нормы
 /// Вариативность нужна чтобы каждый тик, выбирался один и тотже projectile из доступных, а не случайный
-double MovePriorities::avoidProjectile(const Wizard& self, const model::Projectile& projectile) {
-  switch (projectile.getType()) {
+double MovePriorities::avoidProjectile(const Wizard& self, const Bullet& projectile) {
+  double distance = (EX::pos(self) - projectile.pos).length();
+  switch (projectile.type) {
     case model::PROJECTILE_DART:
-      return 3000 - self.getDistanceTo(projectile);
+      return 3000 - distance;
     case model::PROJECTILE_MAGIC_MISSILE:
-      return 8000 - self.getDistanceTo(projectile);
+      return 8000 - distance;
     case model::PROJECTILE_FIREBALL:
-      return 10000 - self.getDistanceTo(projectile);
+      return 10000 - distance;
     case model::PROJECTILE_FROST_BOLT:
-      return 15000 - self.getDistanceTo(projectile);
+      return 15000 - distance;
   }
   return 0;
 }
@@ -107,7 +108,7 @@ double MovePriorities::keepDistance(const Wizard&, const Position, const double,
 }
 
 double MovePriorities::moveToBonus(const Wizard& self, const Position&) {
-  return (350 + 4 * MAX(100, self.getLife())) * self.getRole().getImportanceOfBonus();
+  return (650 + 4 * MAX(100, self.getLife())) * self.getRole().getImportanceOfBonus();
 }
 
 double MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {

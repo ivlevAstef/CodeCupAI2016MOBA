@@ -31,7 +31,7 @@ namespace AICup
 
       buildPriority = 8.0;
       minionPriority = 1.0;
-      treePriority = 3.5;
+      treePriority = 15.0;
       wizardPriority = 1.5;
 
       audacityBuild = 3.0;
@@ -39,9 +39,9 @@ namespace AICup
       audacityWizard = 1.5;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 0.5;
+      desireChangeLine = 0.7;
       changeLinePathLengthPriority = 1.0;
-      changeLineWizardCountPriority = 0.125;
+      changeLineWizardCountPriority = 0.5;
       changeLineTowerBalancePriority = 0.75;
       changeLineLaneStrengthPriority = 0.35;
     }
@@ -53,8 +53,8 @@ namespace AICup
 
       audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
 
-      linePressureWizards = 0.25 * float(realLife) / float(self.getMaxLife());
-      lineAudacityWizards = 2.0 + 3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
+      linePressureWizards = 0.5 * float(realLife) / float(self.getMaxLife());
+      lineAudacityWizards = 1.0 + 5.0 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
 }

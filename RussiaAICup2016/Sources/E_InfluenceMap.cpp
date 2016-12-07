@@ -425,7 +425,7 @@ void InfluenceMap::includeEnemies() {
       includeEnemy(minion, minionRadius(minion), minionDanger(minion));
 
     } else if (model::FACTION_NEUTRAL == minion.getFaction()) {
-      includeEnemy(minion, minionRadius(minion), 0.25 * minionDanger(minion));
+      includeEnemy(minion, minionRadius(minion), 0.01 * minionDanger(minion));
     }
   }
 
@@ -455,6 +455,7 @@ void InfluenceMap::includeHypotheticalEnemies() {
 
   double procent = 0;
   for (const auto& wave : HypotheticalEnemies::instance().nextWaveData(procent)) {
+    procent *= 0.9; ///слегка занижаем
     for (const auto& minion : wave.minions) {
       includeEnemy(minion, minionRadius(minion), procent * minionDanger(minion));
     }

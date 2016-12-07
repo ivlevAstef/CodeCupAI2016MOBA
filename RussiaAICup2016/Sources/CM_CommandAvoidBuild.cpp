@@ -8,8 +8,6 @@
 
 using namespace AICup;
 
-///http://russianaicup.ru/game/view/86164 отдалься башне почти в начале
-///http://russianaicup.ru/game/view/86165 получил от вышки вначале
 CommandAvoidBuild::CommandAvoidBuild(const model::Building& build): build(build) {
   distance = 0;
 }
@@ -20,7 +18,7 @@ bool CommandAvoidBuild::check(const Wizard& self) {
   const auto delta = selfPos - buildPos;
 
   distance = build.getAttackRange() - build.getRemainingActionCooldownTicks() * self.maxBackwardSpeed();
-  distance += self.maxSpeed() + self.getRadius(); /// небольшой запасец, ибо есть погрешность с позиционированием, да и невсегда все идет идеально когда уходишь от башни
+  distance += 2 * self.maxSpeed(); /// небольшой запасец, ибо есть погрешность с позиционированием
 
   return delta.length() < distance;
 }

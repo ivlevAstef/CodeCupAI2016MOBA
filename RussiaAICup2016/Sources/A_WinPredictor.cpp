@@ -29,7 +29,7 @@ double Algorithm::changeOfWinning(const Wizard& self, const double x, const doub
   /// определяем перевес сил, так как маги мало на него влияют то, он по факту сообщит чьих крипов больше, с учетом вышек
   float strength = InfluenceMap::instance().getStrength(pos, self.getVisionRange()+250) / 5;
 
-  float priority = wizardSummaryDanger + strength;
+  double priority = wizardSummaryDanger + double(strength);
 
   /// по факту можно расписать так - если сил на полтора мага первого уровня больше, то шанс на победу (одной из сторон) очень большой.
   return INTERVAL(-1, priority / 30, 1);

@@ -41,6 +41,11 @@ CommandMoveToBonus::CommandMoveToBonus(Algorithm::PathFinder& finder): pathFinde
 }
 
 bool CommandMoveToBonus::check(const Wizard& self) {
+  /// не стоит бежать за бонусом в конце игры
+  if (World::model().getTickIndex() > 19000) {
+    return false;
+  }
+
   static const Position topBonusPos = Points::point(Points::BONUS_TOP);
   static const Position bottomBonusPos = Points::point(Points::BONUS_BOTTOM);
   const auto selfPos = EX::pos(self);
@@ -75,6 +80,9 @@ bool CommandMoveToBonus::check(const Wizard& self) {
   pathFinder.calculatePath(bottomBonusPos, path);
   double ticksToBottom = (path->getRealLength() - fullRadius) / self.maxSpeed();
 
+  ticksToTop = ignoreTop ? 99999 : ticksToTop;
+  ticksToBottom = ignoreBottom ? 99999 : ticksToBottom;
+
   int maxTicksToBonus = Game::model().getBonusAppearanceIntervalTicks();
   int ticksToBonus = maxTicksToBonus - World::model().getTickIndex() % maxTicksToBonus;
 
@@ -86,7 +94,7 @@ bool CommandMoveToBonus::check(const Wizard& self) {
   }
 
   /// если бежать далеко, то оно того не стоит
-  if (minMoveTicks > 350) {
+  if (minMoveTicks > 280) {
     return false;
   }
 
@@ -95,13 +103,7 @@ bool CommandMoveToBonus::check(const Wizard& self) {
     return false;
   }
 
-  if (!ignoreTop && !ignoreBottom) {
-    if (ticksToTop < ticksToBottom) {
-      bonusPos = topBonusPos;
-    } else {
-      bonusPos = bottomBonusPos;
-    }
-  } else if (!ignoreTop) {
+  if (ticksToTop < ticksToBottom) {
     bonusPos = topBonusPos;
   } else {
     bonusPos = bottomBonusPos;
@@ -118,8 +120,8 @@ bool CommandMoveToBonus::check(const Wizard& self) {
 
 double CommandMoveToBonus::potensialExpirience(const Wizard& self) {
   double result = 0;
-  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 200)) {
-    if (enemy->getLife() < 100) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 100)) {
+    if (enemy->getLife() < 150) {
       result += enemy->getMaxLife() * 0.25f;
     }
   }

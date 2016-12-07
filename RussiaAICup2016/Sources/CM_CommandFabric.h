@@ -11,7 +11,7 @@
 #include "CM_CastCommand.h"
 #include "E_Types.h"
 #include "model\LaneType.h"
-#include "model\Projectile.h"
+#include "E_Bullet.h"
 #include "model\Minion.h"
 
 namespace AICup
@@ -62,7 +62,7 @@ namespace AICup
     MoveCommandPtr avoidEnemy(const model::LivingUnit& unit) const;
 
     // /уворот от снаряда
-    MoveCommandPtr avoidProjectile(const model::Projectile& projectile) const;
+    MoveCommandPtr avoidProjectile(const Bullet& projectile, const Vector& moveDirection) const;
 
 /// #pragma mark - cast
     CastCommandPtr haste() const;

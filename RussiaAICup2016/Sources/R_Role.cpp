@@ -1,6 +1,7 @@
 #include "R_Role.h"
 #include "C_Extensions.h"
 #include "E_Wizard.h"
+#include "E_World.h"
 
 using namespace AICup;
 
@@ -70,7 +71,10 @@ Role::Role(const SkillBuild& skillBuild): skillBuild(skillBuild) {
   changeLineLaneStrengthPriority = 1;
 }
 
+
 void Role::update(const Wizard& self, model::Move& move) {
+  useStartedLinePriority = World::model().getTickIndex() < 750;
+
   while (currentLevel < self.getLevel()) {
     const size_t branchIndex = currentLevel / 5;
     const size_t skillIndex = currentLevel % 5;

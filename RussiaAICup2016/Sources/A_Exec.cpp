@@ -28,7 +28,7 @@ bool Algorithm::execMove(const Wizard& self, const TurnStyle style, const Vector
   const auto toPos = selfPos + direction.normal() * maxSpeed;
 
   ///вообще я так и не понял как эта магия работает, но без двух минусов не пашет
-  Vector speed = Vector(direction.x, -direction.y).normal().rotated(self.getAngle());
+  Vector speed = Vector(direction.x, -direction.y).rotated(self.getAngle()).normal();
   speed.y *= -1;
   speed *= maxSpeed;
 

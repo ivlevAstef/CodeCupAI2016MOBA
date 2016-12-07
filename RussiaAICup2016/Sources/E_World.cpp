@@ -46,6 +46,28 @@ static std::vector<Type> updateRadius(const std::vector<Type>& real) {
   return result;
 }
 
+/// есть у такого способа один минус - если миньона убьет, кокраз в тот момент когда он подошел к вышке, то может быть косяк
+static std::vector<model::Building> updateBuildingsTicksByAttack(const std::vector<model::Building>& real) {
+  std::vector<model::Building> result;
+  result.reserve(real.size());
+  for (const auto& build : real) {
+    /// если вражеское строение
+    /// у него нет кд
+    /// и рядом есть враги (то бишь для нас союзники)
+
+    if ( build.getFaction() == Game::enemyFaction()
+      && 0 == build.getRemainingActionCooldownTicks()
+      && !World::instance().aroundEnemies(build, build.getAttackRange()).empty()) {
+      result.push_back(Building(build, build.getCooldownTicks()));
+    } else {
+      result.push_back(build);
+    }
+  }
+
+  return result;
+
+}
+
 static std::vector<model::Building> updateBuildingTicks(const std::vector<model::Building>& real, int tickDt) {
   assert(tickDt >= 0);
   std::vector<model::Building> result;
@@ -75,6 +97,7 @@ void World::update(const model::World& world) {
   updateVisionZone();
   updateSupposedWizards();
   updateSupposedData();
+  updateBullets();
   updateMinions();
 
   lastUpdateTick = world.getTickIndex();
@@ -94,6 +117,10 @@ const std::vector<model::Minion>& World::minions() const {
 
 const std::vector<model::Wizard>& World::wizards() const {
   return supposedWizards;
+}
+
+const std::vector<Bullet>& World::bullets() const {
+  return bulletsData;
 }
 
 const std::vector<Looking>& World::getVisionZone() const {
@@ -199,6 +226,7 @@ void World::updateSupposedData() {
   allTrees.insert(allTrees.end(), invisibleAreaTrees.begin(), invisibleAreaTrees.end());
 
   supposedBuilding = updateBuildingTicks(supposedBuilding, model().getTickIndex() - lastUpdateTick);
+  supposedBuilding = updateBuildingsTicksByAttack(supposedBuilding);
   supposedBuilding = merge(supposedBuilding, updateRadius<model::Building, Building>(modelWorld->getBuildings()));
 }
 
@@ -246,6 +274,56 @@ void World::updateSupposedWizards() {
   }
 
   supposedWizards = newWizardData;
+}
+
+void World::updateBullets() {
+  std::vector<Bullet> newBullets;
+
+  for (const auto& projectile : model().getProjectiles()) {
+    bool found = false;
+    /// проверяем нет ли у нас уже такой пули, и если есть то берем данные из нее и обновляем позицию
+    for (auto& bullet : bulletsData) {
+      if (projectile.getId() == bullet.id) {
+        bullet.pos = EX::pos(projectile);
+        newBullets.push_back(bullet);
+        found = true;
+        break;
+      }
+    }
+
+    if (found) {
+      continue;
+    }
+
+    /// находим максимальную дистанцию полета
+    double castRange = 500;
+    if (model::PROJECTILE_DART == projectile.getType()) {
+      castRange = Game::model().getFetishBlowdartAttackRange();
+    } else {
+      for (const auto& wizard : supposedWizards) {
+        if (projectile.getOwnerUnitId() == wizard.getId()) {
+          castRange = wizard.getCastRange();
+          break;
+        }
+      }
+    }
+
+    const auto pos = EX::pos(projectile);
+    const auto speed = Vector(projectile.getSpeedX(), projectile.getSpeedY());
+    /// Если пули не нашлось, значит это новая
+    newBullets.push_back(Bullet(
+      projectile.getId(),
+      speed,
+      projectile.getRadius(),
+      pos - speed, /// так как пули мы видим только после его запуска, то её позиция запуска всегда смещена как миниум на тик назад
+      pos,
+      castRange,
+      projectile.getType(),
+      projectile.getFaction()
+    ));
+  }
+
+  bulletsData = newBullets;
 }
 
 
@@ -296,7 +374,7 @@ const int World::wizardCount(model::LaneType line, model::Faction faction) const
 
 const int World::wizardCount(model::LaneType line, model::Faction faction, const model::Wizard& excludeWizard) const {
   int result = 0;
-  for (const auto& wizard : model().getWizards()) {
+  for (const auto& wizard : wizards()) {
     if (wizard.getId() != excludeWizard.getId()
       && faction == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
       result++;
@@ -308,7 +386,7 @@ const int World::wizardCount(model::LaneType line, model::Faction faction, const
 
 const std::vector<const model::Wizard*> World::wizards(model::LaneType line, model::Faction faction) const {
   std::vector<const model::Wizard*> result;
-  for (const auto& wizard : model().getWizards()) {
+  for (const auto& wizard : wizards()) {
     if (faction == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
       result.push_back(&wizard);
     }
@@ -504,7 +582,7 @@ std::vector<const model::LivingUnit*> World::around(const model::LivingUnit& uni
   const auto unitPos = Position(unit.getX(), unit.getY());
   const auto radius2 = radius * radius;
 
-  for (const auto& wizard : model().getWizards()) {
+  for (const auto& wizard : wizards()) {
     if (wizard.getFaction() == faction && wizard.getId() != unit.getId()) {
       const auto wizardPos = Position(wizard.getX(), wizard.getY());
       if ((wizardPos - unitPos).length2() < radius2) {
@@ -513,7 +591,7 @@ std::vector<const model::LivingUnit*> World::around(const model::LivingUnit& uni
     }
   }
 
-  for (const auto& minion : model().getMinions()) {
+  for (const auto& minion : minions()) {
     if (minion.getFaction() == faction) {
       const auto minionPos = Position(minion.getX(), minion.getY());
       if ((minionPos - unitPos).length2() < radius2) {

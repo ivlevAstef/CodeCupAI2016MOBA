@@ -12,6 +12,7 @@
 #include "C_Singleton.h"
 #include "E_Types.h"
 #include "E_WorldObjects.h"
+#include "E_Bullet.h"
 #include <unordered_set>
 
 #ifdef ENABLE_VISUALIZATOR
@@ -40,6 +41,8 @@ namespace AICup
     const std::vector<model::Building>& buildings() const;
     const std::vector<model::Minion>& minions() const;
     const std::vector<model::Wizard>& wizards() const;
+
+    const std::vector<Bullet>& bullets() const;
 
     const std::vector<Looking>& getVisionZone() const;
     bool isInVisionZone(double x, double y) const;
@@ -74,6 +77,7 @@ namespace AICup
     void updateVisionZone();
     void updateSupposedData();
     void updateSupposedWizards();
+    void updateBullets();
 
     void updateMinions();
 
@@ -94,6 +98,7 @@ namespace AICup
     std::vector<model::Building> supposedBuilding;
     std::vector<model::Minion> realMinions;
     std::vector<model::Wizard> supposedWizards;
+    std::vector<Bullet> bulletsData;
 
     std::unordered_set<long long int> hateNeuralMinions;/// дада злые нейтральные миньоны
   };

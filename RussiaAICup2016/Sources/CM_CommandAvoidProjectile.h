@@ -8,13 +8,13 @@
 #pragma once
 
 #include "CM_MoveCommand.h"
-#include "model\Projectile.h"
+#include "E_Bullet.h"
 
 namespace AICup
 {
   class CommandAvoidProjectile: public MoveCommand {
   public:
-    CommandAvoidProjectile(const model::Projectile& projectile);
+    CommandAvoidProjectile(const Bullet& projectile, const Vector& moveDirection);
 
     bool check(const Wizard& self) override;
 
@@ -27,7 +27,8 @@ namespace AICup
 #endif // ENABLE_VISUALIZATOR
 
   private:
-    const model::Projectile& projectile;
+    const Bullet& projectile;
+    const Vector& moveDirection;
 
     TurnStyle turnStyle;
     Position position;

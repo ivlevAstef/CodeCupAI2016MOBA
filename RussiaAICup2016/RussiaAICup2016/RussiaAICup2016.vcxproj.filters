@@ -389,6 +389,9 @@
     <ClInclude Include="..\Sources\A_WinPredictor.h">
       <Filter>Sources\Algorithms</Filter>
     </ClInclude>
+    <ClInclude Include="..\Sources\E_Bullet.h">
+      <Filter>Sources\Environment</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\local-runner\read.me" />

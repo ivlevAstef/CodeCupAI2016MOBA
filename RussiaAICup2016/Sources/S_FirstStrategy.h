@@ -21,8 +21,7 @@ namespace AICup
 
     void changeLane(const Wizard& self);
 
-    const std::vector<MoveCommandPtr> calcAllAroundEnemies(const Wizard& self);
-    const std::vector<MoveCommandPtr> calcAllPushOffMinions(const Wizard& self);
+    void addAroundEnemies(const Wizard& self);
 
   private:
     bool isInitialized;

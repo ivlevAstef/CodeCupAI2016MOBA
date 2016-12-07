@@ -17,11 +17,17 @@ bool CommandFollowAttack::check(const Wizard& self) {
   const auto selfPos = EX::pos(self);
   const auto wizardPos = EX::pos(wizard);
   const auto delta = wizardPos - selfPos;
-  if (delta.length() < self.getVisionRange() + 100) {
+  if (delta.length() > self.getVisionRange() + 150) {
     return false;
   }
 
-  return wizard.getLife() < self.damage(model::ACTION_MAGIC_MISSILE) || Algorithm::changeOfWinning(self) > 0.9;
+  const auto center = selfPos + delta * 0.5;
+  const auto changeOfWin = Algorithm::changeOfWinning(self, center.x, center.y);
+
+  // если у мага мало хп и шанс на победу есть, то стоит приследовать
+  return (wizard.getLife() + 1 < self.damage(model::ACTION_MAGIC_MISSILE) && changeOfWin > 0)
+  /// если шанс на победу при нападении высокий, то тоже приследуем
+    || changeOfWin > 0.7;
 }
 
 

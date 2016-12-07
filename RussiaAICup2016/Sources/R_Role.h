@@ -87,19 +87,19 @@ namespace AICup
 
     // смена линии
     inline const float& getDesireChangeLine() const {
-      return desireChangeLine;
+      return !useStartedLinePriority ? desireChangeLine : 0.95f;
     }
     inline const float& getChangeLinePathLengthPriority() const {
-      return changeLinePathLengthPriority;
+      return !useStartedLinePriority ? changeLinePathLengthPriority : 0.0f;
     }
     inline const float& getChangeLineWizardCountPriority() const {
-      return changeLineWizardCountPriority;
+      return !useStartedLinePriority ? changeLineWizardCountPriority : 1.0f;
     }
     inline const float& getChangeLineTowerBalancePriority() const {
-      return changeLineTowerBalancePriority;
+      return !useStartedLinePriority ? changeLineTowerBalancePriority : 0.0f;
     }
     inline const float& getChangeLineLaneStrengthPriority() const {
-      return changeLineLaneStrengthPriority;
+      return !useStartedLinePriority ? changeLineLaneStrengthPriority : 0.0f;
     }
 
   protected:
@@ -134,6 +134,8 @@ namespace AICup
     SkillBuild skillBuild; // Последовательность изучения скилов
 
   private:
+    /// если только начала игры, то приоритет всегда один
+    bool useStartedLinePriority;
     int currentLevel;
   };
 }

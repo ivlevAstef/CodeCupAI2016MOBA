@@ -39,12 +39,5 @@ void TestDodgeStrategy::update(const Wizard& self, model::Move& move) {
     moveCommands.push_back(moveCommand);
   }
 
-  for (const auto& projectile : World::model().getProjectiles()) {
-    const auto command = fabric.avoidProjectile(projectile);
-    if (command->check(self)) {
-      moveCommands.push_back(command);
-    }
-  }
-
   CommandStrategy::update(self, move);
 }

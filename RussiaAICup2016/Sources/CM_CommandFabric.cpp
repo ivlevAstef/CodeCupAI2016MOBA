@@ -117,8 +117,8 @@ MoveCommandPtr CommandFabric::avoidEnemy(const model::LivingUnit& unit) const {
 }
 
 // /уворот от снаряда
-MoveCommandPtr CommandFabric::avoidProjectile(const model::Projectile& projectile) const {
-  return std::make_shared<CommandAvoidProjectile>(projectile);
+MoveCommandPtr CommandFabric::avoidProjectile(const Bullet& projectile, const Vector& moveDirection) const {
+  return std::make_shared<CommandAvoidProjectile>(projectile, moveDirection);
 }
 
 CastCommandPtr CommandFabric::haste() const {

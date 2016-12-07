@@ -90,7 +90,7 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
 
   for (size_t iter = 0; iter <= maxIteration; iter++) {
     if ((bulletPos - attackingPos).length() > castRange) {
-      bulletPos = bulletSpeed.normal() * castRange;
+      bulletPos = attackingPos + bulletSpeed.normal() * castRange;
     }
 
     if (Math::distanceToSegment(preyPos, bulletPos, lastBulletPos) < bulletRadius + prey.getRadius()) {
@@ -140,10 +140,10 @@ bool Algorithm::canSideBackwardEscape(const Position attackingPos, const double 
   return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, -endAngleVec, preyEndAngle, obstacles);
 }
 
-Vector Algorithm::dodge(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius, TurnStyle& turnStyle) {
-  const double centerAngle = prey.getAngle();
+Vector Algorithm::dodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet, TurnStyle& turnStyle) {
+  const double centerAngle = desiredDir.angle();
 
-  const auto obstacles = World::instance().obstacles(prey, prey.getRadius() + bulletRadius + 100);
+  const auto obstacles = World::instance().obstacles(prey, prey.getRadius() + bullet.radius + 100);
 
   /// проверяем возможность уклониться при всех возможных конечных углах, начиная с текущего
   /// проверяем каждые 4 градуса
@@ -154,22 +154,22 @@ Vector Algorithm::dodge(const Position attackingPos, const double castRange, con
     const auto endVectorRight = Vector(1, 0).rotate(rightAngle);
 
     /// если идти вперед
-    if (canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, endVectorLeft, leftAngle, obstacles)) {
+    if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, endVectorLeft, leftAngle, obstacles)) {
       turnStyle = TurnStyle::TURN;
       return endVectorLeft;
     }
 
-    if (canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, endVectorRight, rightAngle, obstacles)) {
+    if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, endVectorRight, rightAngle, obstacles)) {
       turnStyle = TurnStyle::TURN;
       return endVectorRight;
     }
 
     /// если идти назад
-    if (canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, -endVectorLeft, leftAngle, obstacles)) {
+    if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, -endVectorLeft, leftAngle, obstacles)) {
       turnStyle = TurnStyle::BACK_TURN;
       return -endVectorLeft;
     }
-    if (canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, -endVectorRight, rightAngle, obstacles)) {
+    if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, -endVectorRight, rightAngle, obstacles)) {
       turnStyle = TurnStyle::BACK_TURN;
       return -endVectorRight;
     }
