@@ -298,7 +298,7 @@ Position InfluenceMap::pointToForeFront(const model::Wizard& self, const int x, 
 
   double minDistance = 999999;
   Position minPoint = startCentralPosition;
-  for (size_t i = 0; i < line.size(); i++) {
+  for (size_t i = 1; i < line.size(); i++) {
     Position point = Math::point_distanceToSegment(startCentralPosition, line[i - 1], line[i]);
     const double distance = (point - startCentralPosition).length2();
     if (distance < minDistance) {

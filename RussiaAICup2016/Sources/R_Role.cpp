@@ -46,6 +46,8 @@ const std::vector<model::SkillType> SkillBranches::armorShield = {
 };
 
 Role::Role(const SkillBuild& skillBuild): skillBuild(skillBuild) {
+  useStartedLinePriority = true;
+
   audacity = 1;
   linePressureWizards = 1;
   lineAudacityWizards = 1;
@@ -73,7 +75,7 @@ Role::Role(const SkillBuild& skillBuild): skillBuild(skillBuild) {
 
 
 void Role::update(const Wizard& self, model::Move& move) {
-  useStartedLinePriority = World::model().getTickIndex() < 750;
+  useStartedLinePriority = (World::model().getTickIndex() < 750);
 
   while (currentLevel < self.getLevel()) {
     const size_t branchIndex = currentLevel / 5;

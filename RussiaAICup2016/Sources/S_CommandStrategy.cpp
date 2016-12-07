@@ -139,8 +139,6 @@ const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Resu
 }
 
 bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit, Vector& direction) {
-  assert(0 != moveResults.size());
-
   const auto moveVector = calcMoveVector(moveResults, self, speedLimit);
 
   addAvoidProjectiles(moveResults, self, moveVector);
