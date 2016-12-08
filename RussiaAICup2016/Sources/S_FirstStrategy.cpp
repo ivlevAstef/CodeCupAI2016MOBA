@@ -47,6 +47,32 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     isInitialized = true;
   }
 
+  checkAndChangeLane(self);
+
+  ///////////////////////////////////
+
+  addAroundEnemies(self);
+  addAttackFollow(self);
+
+
+  ///////////////////////////////////
+
+  addMoveTo(self);
+
+  const auto getExpirienceCommand = fabric.moveGetExpirience();
+  if (getExpirienceCommand->check(self)) {
+    moveCommands.push_back(getExpirienceCommand);
+  }
+
+  ///////////////////////////////////////
+
+  addAttacks(self);
+  addCasts(self);
+
+  CommandStrategy::update(self, move);
+}
+
+void FirstStrategy::checkAndChangeLane(const Wizard& self) {
   /// раз в 500 тиков пересматриваю линию,
   /// 500 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
   if (World::model().getTickIndex() - lastChangeLineTick >= 500 ||
@@ -58,11 +84,21 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     }
     lastChangeLineTick = World::model().getTickIndex();
   }
+}
 
-  addAroundEnemies(self);
+void FirstStrategy::addAroundEnemies(const Wizard& self) {
+  const auto selfPos = EX::pos(self);
 
+  const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + 100);
+  for (const auto& enemy : aroundEnemies) {
+    const auto command = fabric.avoidEnemy(*enemy);
+    if (command->check(self)) {
+      moveCommands.push_back(command);
+    }
+  }
+}
 
-  /// бежать чтобы добить
+void FirstStrategy::addAttackFollow(const Wizard& self) {
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 100)) {
     if (EX::isWizard(*enemy)) {
       const auto& wizard = EX::asWizard(*enemy);
@@ -72,40 +108,47 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
       }
     }
   }
+}
 
-  ///////
+void FirstStrategy::addMoveTo(const Wizard& self) {
+  MoveCommand::Result cache;
 
-  if (nullptr == moveToBonus.get()) {
-    const auto newMoveToBonus = fabric.moveToBonus();
-    if (newMoveToBonus->check(self)) {
-      moveToBonus = newMoveToBonus;
-    }
-  } else if (!moveToBonus->check(self)) {
+  /// эмуляция машины состояний... кривая до невозможности
+
+  double moveToBonusPriority = -1000;
+  if (nullptr == moveToBonus) {
+    moveToBonus = fabric.moveToBonus();
+  }
+
+  if (moveToBonus->check(self)) {
+    moveToBonus->execute(self, cache);
+    moveToBonusPriority = cache.priority;
+  } else {
     moveToBonus = nullptr;
   }
 
-  bool needMoveToBonus = true;
-  const auto moveToLineCommand = fabric.moveToLine(myLine);
-  if (moveToLineCommand->check(self)) {
-    if (nullptr == moveToBonus || moveToLineCommand->priority(self) > moveToBonus->priority(self)) {
-      moveCommands.push_back(moveToLineCommand);
-      needMoveToBonus = false;
-    }
+
+  double moveToLinePriority = -1000;
+  const auto moveToLine = fabric.moveToLine(myLine);
+  if (moveToLine->check(self)) {
+    moveToLine->execute(self, cache);
+    moveToLinePriority = cache.priority;
+  }
+
+  if (moveToLinePriority < 0 && moveToBonusPriority < 0) {
+    return;
   }
 
 
-  if (nullptr != moveToBonus && needMoveToBonus) {
+  if (moveToLinePriority >= moveToBonusPriority) {
+    moveCommands.push_back(moveToLine);
+  } else {
     moveCommands.push_back(moveToBonus);
   }
+}
 
-  const auto getExpirienceCommand = fabric.moveGetExpirience();
-  if (getExpirienceCommand->check(self)) {
-    moveCommands.push_back(getExpirienceCommand);
-  }
-
-  ////
-
-  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 100)) {
+void FirstStrategy::addAttacks(const Wizard& self) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 200)) {
     const auto attackCommand = fabric.attack(*enemy);
     if (nullptr != attackCommand && attackCommand->check(self)) {
       attackCommands.push_back(attackCommand);
@@ -122,7 +165,8 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
     attackCommands.push_back(attackFireballCommand);
   }
 
-
+}
+void FirstStrategy::addCasts(const Wizard& self) {
   const auto castHasteCommand = fabric.haste();
   if (nullptr != castHasteCommand && castHasteCommand->check(self)) {
     castCommands.push_back(castHasteCommand);
@@ -131,19 +175,5 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
   const auto castShieldCommand = fabric.shield();
   if (nullptr != castShieldCommand && castShieldCommand->check(self)) {
     castCommands.push_back(castShieldCommand);
-  }
-
-  CommandStrategy::update(self, move);
-}
-
-void FirstStrategy::addAroundEnemies(const Wizard& self) {
-  const auto selfPos = EX::pos(self);
-
-  const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + 100);
-  for (const auto& enemy : aroundEnemies) {
-    const auto command = fabric.avoidEnemy(*enemy);
-    if (command->check(self)) {
-      moveCommands.push_back(command);
-    }
   }
 }

@@ -24,7 +24,7 @@ bool CommandAttackMinion::check(const Wizard& self) {
   }
 
   /// Если еще много времени до кд, то не стоит атаковать
-  if (self.minStaffOrMissileCooldown() > Algorithm::timeToTurnForAttack(minion, self)) {
+  if (self.minStaffOrMissileCooldown() > Algorithm::timeToTurnForAttack(minion, self) + 1) {
     return false;
   }
 
@@ -42,16 +42,13 @@ void CommandAttackMinion::execute(const Wizard& self, Result& result) {
   const double distance = self.getDistanceTo(minion);
 
   result.unit = &minion;
+  result.priority = self.getRole().getMinionPriority() * AttackPriorities::attackMinion(self, minion);
 
   if (Algorithm::isMelee(self, minion) && !self.isCooldown(model::ACTION_STAFF)) {
     result.action = model::ACTION_STAFF;
   } else {
     result.action = model::ACTION_MAGIC_MISSILE;
   }
-}
-
-double CommandAttackMinion::priority(const Wizard& self) {
-  return self.getRole().getMinionPriority() * AttackPriorities::attackMinion(self, minion);
 }
 
 #ifdef ENABLE_VISUALIZATOR

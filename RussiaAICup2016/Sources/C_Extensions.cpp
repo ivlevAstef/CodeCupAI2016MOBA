@@ -342,17 +342,22 @@ double EX::danger(const model::Wizard& obj) {
   double shieldDanger = isShield(obj) ? 6 : 0; /// 0-6
   double empowerdDanger = isEmpower(obj) ? 6 : 0; ///0-6
   double frostDanger = availableSkill(obj, model::ACTION_FROST_BOLT) ? 15 : 0; ///0-15
-  double fireDanger = availableSkill(obj, model::ACTION_FIREBALL) ? 10 : 0; ///0-10
+  double frostCd = double(cooldownMaxSkill(obj, model::ACTION_FROST_BOLT)) / double(Game::model().getFrostBoltCooldownTicks());
+  double fireDanger = availableSkill(obj, model::ACTION_FIREBALL) ? 8 : 0; ///0-8
+  double fireCd = double(cooldownMaxSkill(obj, model::ACTION_FIREBALL)) / double(Game::model().getFireballCooldownTicks());
 
-  mmDanger *= MIN(1, obj.getMana() / (2 * Game::model().getMagicMissileManacost()));
-  frostDanger *= MIN(1, obj.getMana() / Game::model().getFrostBoltManacost());
-  fireDanger *= MIN(1, obj.getMana() / Game::model().getFireballManacost());
+  frostDanger *= MAX(0.5, 1.0 - frostCd);
+  fireDanger *= (1.0 - fireCd);
+
+  mmDanger *= MIN(1.0, double(obj.getMana()) / double(2.0 * Game::model().getMagicMissileManacost()));
+  frostDanger *= MIN(1.0, double(obj.getMana()) / double(Game::model().getFrostBoltManacost()));
+  fireDanger *= MIN(1.0, double(obj.getMana()) / double(Game::model().getFireballManacost()));
 
   double frozenAntiDanger = -0.4 * EX::frozenTime(obj); ///0-24
 
   /// min 20
-  /// max 101,42
-  ///      10-35      4-10,66       3-6          3-6.75          0-6           0-6             0-6            0-15          0-10          -24-0
+  /// max 100
+  ///      10-35      4-10,66       3-6          3-6.75          0-6           0-6             0-6            0-15          0-8          -24-0
   return lifeDanger + mmDanger + staffDanger + speedDanger + armorDanger + shieldDanger + empowerdDanger + frostDanger + fireDanger + frozenAntiDanger;
 }
 
@@ -361,7 +366,7 @@ double EX::danger(const model::Wizard& obj) {
 double EX::radiusForGuaranteedDodge(const model::Wizard& self, double coef) {
   const auto radius = self.getRadius() + Game::model().getMagicMissileRadius();
   ///такая скорость, ибо наврятли условия будут идеальные
-  const auto speed = maxSpeed(self) * coef +  maxStrafeSpeed(self) * (1-coef);
+  const auto speed = maxSpeed(self) * coef +  maxStrafeSpeed(self) * (1 - coef);
 
   return Game::model().getMagicMissileSpeed() * (1.0 + (radius / speed));
 }
@@ -375,7 +380,7 @@ double EX::radiusForGuaranteedDodgeFrostBolt(const model::Wizard& self, double c
 }
 
 double EX::radiusForGuaranteedDodgeFireBall(const model::Wizard& self, double coef) {
-  const auto radius = self.getRadius() + Game::model().getFireballRadius();
+  const auto radius = self.getRadius() + Game::model().getFireballExplosionMinDamageRange();
   ///такая скорость, ибо наврятли условия будут идеальные
   const auto speed = maxSpeed(self) * coef + maxStrafeSpeed(self) * (1 - coef);
 

@@ -57,12 +57,9 @@ void CommandMoveGetExpirience::execute(const Wizard& self, Result& result) {
   assert(nullptr != target);
 
   result.set(EX::pos(*target), self);
-  result.turnStyle = TurnStyle::TURN;
-  result.turnPriority = TurnPriority::getExpirience;
-}
 
-double CommandMoveGetExpirience::priority(const Wizard& self) {
-  return MovePriorities::getExpirience(self, *target);
+  result.turnPriority = TurnPriority::getExpirience;
+  result.priority = MovePriorities::getExpirience(self, *target);
 }
 
 #ifdef ENABLE_VISUALIZATOR

@@ -11,7 +11,6 @@ using namespace AICup;
 
 CommandAvoidProjectile::CommandAvoidProjectile(const Bullet& projectile, const Vector& moveDirection):
   projectile(projectile), moveDirection(moveDirection) {
-  turnStyle = TurnStyle::NO_TURN;
 }
 
 bool CommandAvoidProjectile::check(const Wizard& self) {
@@ -24,7 +23,7 @@ bool CommandAvoidProjectile::check(const Wizard& self) {
 
   const auto selfPos = EX::pos(self);
 
-  const auto distanceToLine = Math::distanceToLine(selfPos, projectile.startPoint, projectile.startPoint + projectile.speed);
+  const auto distanceToLine = Math::distanceToSegment(selfPos, projectile.startPoint, projectile.startPoint + projectile.speed.normal() * projectile.range);
   const auto distanceMoved = self.getRadius() + projectileRadius - distanceToLine;
 
   /// если снаряд не в нас, и я не могу в него войти то что беспокоиться
@@ -32,26 +31,25 @@ bool CommandAvoidProjectile::check(const Wizard& self) {
     return false;
   }
 
-
-  const auto dodgeVector = Algorithm::dodge(self, moveDirection, projectile, turnStyle);
+  int turnSign = 0;
+  const auto dodgeVector = Algorithm::dodge(self, moveDirection, projectile, turnSign);
   /// невозможно отклониться
   if (dodgeVector.length() < 1.0e-5) {
     return false;
   }
 
+  turnDirection = dodgeVector.normal() * turnSign;
   position = selfPos + dodgeVector * self.maxSpeed();
+
   return true;
 }
 
 void CommandAvoidProjectile::execute(const Wizard& self, Result& result) {
   result.set(position, self);
-  result.turnStyle = turnStyle;
-  result.turnPriority = TurnPriority::avoidProjectile;
-  result.deactivateOtherTurn = true;
-}
+  result.turnDirection = turnDirection;
 
-double CommandAvoidProjectile::priority(const Wizard& self) {
-  return MovePriorities::avoidProjectile(self, projectile);
+  result.turnPriority = TurnPriority::avoidProjectile;
+  result.priority = MovePriorities::avoidProjectile(self, projectile);
 }
 
 #ifdef ENABLE_VISUALIZATOR

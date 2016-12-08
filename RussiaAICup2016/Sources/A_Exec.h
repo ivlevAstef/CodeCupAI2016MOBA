@@ -16,7 +16,7 @@ namespace AICup
 {
   namespace Algorithm
   {
-    bool execMove(const Wizard& self, const TurnStyle style, const Vector& turnDirection, const Vector& direction, const double speedLimit, model::Move& move);
+    bool execMove(const Wizard& self, const Vector& turnDirection, const Vector& direction, model::Move& move);
 
     bool execAroundMove(const Wizard& self, model::Move& move);
 

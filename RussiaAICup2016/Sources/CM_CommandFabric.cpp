@@ -6,13 +6,11 @@
 
 #include "CM_CommandFabric.h"
 
-#include "CM_CommandKeepDistance.h"
 #include "CM_CommandMoveToPoint.h"
 #include "CM_CommandMoveToLine.h"
 #include "CM_CommandFollow.h"
 #include "CM_CommandMoveGetExpirience.h"
 #include "CM_CommandMoveToBonus.h"
-#include "CM_CommandObserveMap.h"
 
 #include "CM_CommandAttackBuild.h"
 #include "CM_CommandAttackMinion.h"
@@ -23,7 +21,6 @@
 #include "CM_CommandPool.h"
 #include "CM_CommandFollowAttackEnemy.h"
 
-#include "CM_CommandPushOffMinion.h"
 #include "CM_CommandAvoidWizard.h"
 #include "CM_CommandAvoidBuild.h"
 #include "CM_CommandAvoidMinion.h"
@@ -42,12 +39,8 @@ CommandFabric::CommandFabric(Algorithm::PathFinder& finder):
 
 }
 
-MoveCommandPtr CommandFabric::keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const {
-  return std::make_shared<CommandKeepDistance>(x, y, minDistance, maxDistance);
-}
-
-MoveCommandPtr CommandFabric::moveToPoint(const double x, const double y, const TurnStyle style, const double speedLimit) const {
-  return std::make_shared<CommandMoveToPoint>(x, y, style, speedLimit);
+MoveCommandPtr CommandFabric::moveToPoint(const double x, const double y) const {
+  return std::make_shared<CommandMoveToPoint>(x, y);
 }
 
 MoveCommandPtr CommandFabric::moveToLine(const model::LaneType line) const {
@@ -69,10 +62,6 @@ MoveCommandPtr CommandFabric::followAttack(const model::Wizard& wizard) const {
 
 MoveCommandPtr CommandFabric::moveGetExpirience() const {
   return std::make_shared<CommandMoveGetExpirience>();
-}
-
-MoveCommandPtr CommandFabric::observeMap() const {
-  return std::make_shared<CommandObserveMap>();
 }
 
 AttackCommandPtr CommandFabric::attack(const model::LivingUnit& unit) const {
@@ -98,10 +87,6 @@ AttackCommandPtr CommandFabric::attackUseFireball() const {
 
 AttackCommandPtr CommandFabric::pool(const long long neutralUnitId) const {
   return std::make_shared<CommandPool>(neutralUnitId);
-}
-
-MoveCommandPtr CommandFabric::pushOffMinion(const model::Minion& minion) const {
-  return std::make_shared<CommandPushOffMinion>(minion);
 }
 
 MoveCommandPtr CommandFabric::avoidEnemy(const model::LivingUnit& unit) const {

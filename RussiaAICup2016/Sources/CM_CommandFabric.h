@@ -21,11 +21,8 @@ namespace AICup
     CommandFabric(Algorithm::PathFinder& finder);
 
 /// #pragma mark - перемещение
-    /// даржаться от точки на определенном расстоянии
-    MoveCommandPtr keepDistance(const double x, const double y, const double minDistance, const double maxDistance) const;
-
     /// переместиться в точку
-    MoveCommandPtr moveToPoint(const double x, const double y, const TurnStyle style = TurnStyle::TURN, const double speedLimit = -1) const;
+    MoveCommandPtr moveToPoint(const double x, const double y) const;
 
     /// переместиться на линию
     MoveCommandPtr moveToLine(const model::LaneType line) const;
@@ -38,9 +35,6 @@ namespace AICup
 
     /// подойти чтобы взять руну
     MoveCommandPtr moveToBonus() const;
-
-    /// обследование карты - посещение мест где был давно
-    MoveCommandPtr observeMap() const;
 
 /// #pragma mark - атака
     MoveCommandPtr followAttack(const model::Wizard& wizard) const;
@@ -56,7 +50,6 @@ namespace AICup
 
 
 /// #pragma mark - защита
-    MoveCommandPtr pushOffMinion(const model::Minion& minion) const;
 
     /// держаться на безопасном расстоянии от юнита
     MoveCommandPtr avoidEnemy(const model::LivingUnit& unit) const;

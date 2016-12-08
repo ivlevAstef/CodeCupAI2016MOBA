@@ -15,11 +15,4 @@ namespace AICup
 {
   typedef std::vector<const model::LivingUnit*> Obstacles;
   typedef std::vector<Obstacles> ObstaclesGroups;
-
-  enum class TurnStyle {
-    NO_TURN,
-    TURN,
-    BACK_TURN,
-    SIDE_TURN
-  };
 };

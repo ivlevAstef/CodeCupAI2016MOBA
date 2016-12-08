@@ -33,12 +33,9 @@ void CommandFollow::execute(const Wizard& self, Result& result) {
   const auto unitPos = EX::pos(*target);
   const double distance = (selfPos - unitPos).length();
 
-  TurnStyle turnStyle = TurnStyle::TURN;
-  double speedLimit = -1;
   if (distance < minDistance) {
     /// противоположная точка, точке где находиться объект, и длиной = радиусу обзора
     position = selfPos + (selfPos - unitPos).normal() * self.getVisionRange();
-    result.turnStyle = TurnStyle::BACK_TURN;
   } else if (distance > maxDistance) {
     position = unitPos;
   } else {
@@ -62,8 +59,6 @@ void CommandFollow::execute(const Wizard& self, Result& result) {
           /// двигаемся от него
           position = selfPos + (selfPos - unitPos).normal() * self.getVisionRange();
         }
-
-        speedLimit = speed.length();
       } else {
         // двигаться за спину объекта в центр дистанции
         position = unitPos + backVec * (minDistance + (maxDistance - minDistance) * 0.5);
@@ -72,13 +67,9 @@ void CommandFollow::execute(const Wizard& self, Result& result) {
   }
 
   result.set(position, self);
-  result.turnStyle = turnStyle;
-  result.turnPriority = TurnPriority::follow;
-  result.speedLimit = speedLimit;
-}
 
-double CommandFollow::priority(const Wizard& self) {
-  return MovePriorities::follow(self, *target);
+  result.turnPriority = TurnPriority::follow;
+  result.priority = MovePriorities::follow(self, *target);
 }
 
 #ifdef ENABLE_VISUALIZATOR

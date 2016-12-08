@@ -8,59 +8,41 @@
 
 using namespace AICup;
 
-double calcMaxSpeed(const Wizard& self, const Vector& direction, const double speedLimit) {
+double angleDiff(const Wizard& self, const Vector& turnDirection) {
+  double angleDiff = Math::angleDiff(turnDirection.angle(), self.getAngle());
+  const auto preyTurnSpeed = EX::turnSpeed(self);
+  if (ABS(angleDiff) > preyTurnSpeed) {
+    angleDiff = preyTurnSpeed * SIGN(angleDiff);
+  }
+  return angleDiff;
+}
+
+double calcMaxSpeed(const Wizard& self, const Vector& turnDirection, const Vector& direction) {
   Vector speed = Algorithm::maxSpeed(self, self.getAngle(), direction);
 
   const double maxSpeed = speed.length();
   const double dirLength = direction.length();
 
-  if (speedLimit < 0) {
-    return MIN(maxSpeed, dirLength);
-  }
-  return MIN(maxSpeed, MIN(speedLimit, dirLength));
+  return MIN(maxSpeed, dirLength);
 }
 
 
-bool Algorithm::execMove(const Wizard& self, const TurnStyle style, const Vector& turnDirection, const Vector& direction, const double speedLimit, model::Move& move) {
-  double maxSpeed = calcMaxSpeed(self, direction, speedLimit);
+bool Algorithm::execMove(const Wizard& self, const Vector& turnDirection, const Vector& direction, model::Move& move) {
+  double maxSpeed = calcMaxSpeed(self, turnDirection, direction);
 
   const auto selfPos = EX::pos(self);
   const auto toPos = selfPos + direction.normal() * maxSpeed;
 
   ///вообще я так и не понял как эта магия работает, но без двух минусов не пашет
-  Vector speed = Vector(direction.x, -direction.y).rotated(self.getAngle()).normal();
-  speed.y *= -1;
+  Vector speed = Vector(direction.x, direction.y).rotated(-self.getAngle()).normal();
   speed *= maxSpeed;
+
+  const double turn = angleDiff(self, turnDirection);
 
 
   move.setSpeed(speed.x);
   move.setStrafeSpeed(speed.y);
-
-
-  switch (style) {
-  case TurnStyle::TURN:
-    move.setTurn(self.getAngleTo(self.getX() + turnDirection.x, self.getY() + turnDirection.y));
-    break;
-  case TurnStyle::NO_TURN:
-    break;
-  case TurnStyle::BACK_TURN:
-    move.setTurn(self.getAngleTo(self.getX() - turnDirection.x, self.getY() - turnDirection.y));
-    break;
-  case TurnStyle::SIDE_TURN: {
-    auto perDirection = turnDirection.perpendicular();
-    auto diff = Math::angleDiff(turnDirection.angle(), self.getAngle());
-    /// если уол близок к одному смещению, то выбираем направление чтобы идти в центр, дабы при отклонениях не упереться в сторону карты
-    if (perDirection.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
-    /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикуляров
-      perDirection *= -1;
-    }
-
-    move.setTurn(self.getAngleTo(self.getX() + perDirection.x, self.getY() + perDirection.y));
-    break;
-  }
-  default:
-    assert(false && "incorrect turn style");
-  }
+  move.setTurn(turn);
 
   return true;
 }
@@ -71,7 +53,7 @@ bool Algorithm::execAroundMove(const Wizard& self, model::Move& move) {
   ///случайно смещаемся, поворачиваемся и бьем все вокруге
 
   move.setSpeed((double(rand() % 1000) / 100.0) - 5.0);
-  move.setStrafeSpeed((double(rand()%1000)/100.0) - 5.0);
+  move.setStrafeSpeed((double(rand() % 1000) / 100.0) - 5.0);
   move.setTurn(1);
 
   if (0 == self.cooldown(model::ACTION_STAFF)) {

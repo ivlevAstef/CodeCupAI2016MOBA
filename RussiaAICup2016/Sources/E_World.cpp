@@ -340,9 +340,9 @@ const model::LaneType World::positionToLine(const double x, const double y) cons
     return model::_LANE_UNKNOWN_;
   }
 
-  if (delta > size()/8) {
+  if (delta > size() / 6) {
     return model::LANE_TOP;
-  } else if (delta < -size() / 8) {
+  } else if (delta < -size() / 6) {
     return model::LANE_BOTTOM;
   }
 

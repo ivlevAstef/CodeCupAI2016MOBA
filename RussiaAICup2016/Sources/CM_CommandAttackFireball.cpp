@@ -33,21 +33,22 @@ bool CommandAttackFireball::check(const Wizard& self) {
     return false;
   }
 
-  /// скилл в кулдауне
-  if (self.cooldown(model::ACTION_FIREBALL) > 0) {
-    return false;
-  }
-
-  // нет маны
-  if (self.getMana() < Game::model().getFireballManacost()) {
-    return false;
-  }
-
   const auto selfPos = EX::pos(self);
 
   double maxPriority = 0;
   /// находим кого поджечь
-  for (const auto& enemy : World::instance().aroundEnemies(self, self.getCastRange())) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getCastRange() + 50)) {
+    double timeForAttack = Algorithm::timeToTurnForAttack(*enemy, self);
+
+    if (self.cooldown(model::ACTION_FIREBALL) > timeForAttack + 1) {
+      continue;
+    }
+
+    double manaRestore = Game::model().getWizardBaseManaRegeneration() + self.getLevel() * Game::model().getWizardManaRegenerationGrowthPerLevel();
+    if (self.getMana() + manaRestore * timeForAttack < Game::model().getFireballManacost()) {
+      continue;
+    }
+
     const auto& unit = *enemy;
 
     const auto unitPos = EX::pos(unit);
@@ -61,22 +62,6 @@ bool CommandAttackFireball::check(const Wizard& self) {
     /// если на пути дерево, то не стреляем
     if (Algorithm::checkIntersectedTree(selfPos, unitPos, Game::model().getFireballRadius())) {
       continue;
-    }
-
-    if (EX::isWizard(unit)) {
-      const auto& wizard = EX::asWizard(unit);
-
-      const auto fireballSpeed = delta.normal() * Game::model().getFireballSpeed();
-      const auto fireballRadius = Game::model().getFireballRadius() + (Game::model().getFireballExplosionMaxDamageRange() + Game::model().getFireballExplosionMinDamageRange()) * 0.5;
-      /// если маг может уклонится от снаряда, то не будем в него стрелять
-      if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, fireballSpeed, fireballRadius)) {
-        continue;
-      }
-
-      /// второй вариант уклонения
-      if (Algorithm::canSideBackwardEscape(selfPos, self.getCastRange(), wizard, fireballSpeed, fireballRadius)) {
-        continue;
-      }
     }
 
     const auto priority = calcPriority(unit);
@@ -95,14 +80,11 @@ bool CommandAttackFireball::check(const Wizard& self) {
 }
 
 
-void CommandAttackFireball::execute(const Wizard&, Result& result) {
+void CommandAttackFireball::execute(const Wizard& self, Result& result) {
   assert(nullptr != target);
   result.unit = target;
   result.action = model::ACTION_FIREBALL;
-}
-
-double CommandAttackFireball::priority(const Wizard& self) {
-  return AttackPriorities::attackFireball(self) * self.getRole().getAttackSkillPriority();
+  result.priority = AttackPriorities::attackFireball(self) * self.getRole().getAttackSkillPriority();
 }
 
 #ifdef ENABLE_VISUALIZATOR

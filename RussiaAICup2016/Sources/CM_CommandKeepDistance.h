@@ -17,8 +17,6 @@ namespace AICup
 
     bool check(const Wizard& self) override;
 
-    double priority(const Wizard& self) override;
-
     void execute(const Wizard& self, Result& result) override;
 
 

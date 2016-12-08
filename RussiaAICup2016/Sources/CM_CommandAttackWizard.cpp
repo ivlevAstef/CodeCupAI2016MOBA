@@ -23,7 +23,7 @@ bool CommandAttackWizard::check(const Wizard& self) {
   }
 
   /// Если еще много времени до кд, то не стоит атаковать
-  if (self.minStaffOrMissileCooldown() > Algorithm::timeToTurnForAttack(wizard, self)) {
+  if (self.minStaffOrMissileCooldown() > Algorithm::timeToTurnForAttack(wizard, self) + 1) {
     return false;
   }
 
@@ -41,13 +41,23 @@ void CommandAttackWizard::execute(const Wizard& self, Result& result) {
 
   if (Algorithm::isMelee(self, wizard) && !self.isCooldown(model::ACTION_STAFF)) {
     result.action = model::ACTION_STAFF;
+    result.priority = AttackPriorities::attackWizard(self, wizard, nullptr);
   } else {
     result.action = model::ACTION_MAGIC_MISSILE;
-  }
-}
 
-double CommandAttackWizard::priority(const Wizard& self) {
-  return self.getRole().getWizardPriority() * AttackPriorities::attackWizard(self, wizard);
+    const auto selfPos = EX::pos(self);
+    const auto wizardPos = EX::pos(wizard);
+    const auto delta = wizardPos - selfPos;
+
+    Bullet bullet = Bullet(0,
+      delta.normal() * Game::model().getMagicMissileSpeed(),
+      Game::model().getMagicMissileRadius(),
+      selfPos, selfPos, self.getCastRange(), model::PROJECTILE_MAGIC_MISSILE, self.getFaction());
+
+    result.priority = AttackPriorities::attackWizard(self, wizard, &bullet);
+  }
+
+  result.priority *= self.getRole().getWizardPriority();
 }
 
 #ifdef ENABLE_VISUALIZATOR

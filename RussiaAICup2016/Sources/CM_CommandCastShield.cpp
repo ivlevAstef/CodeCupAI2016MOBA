@@ -37,6 +37,7 @@ bool CommandCastShield::check(const Wizard& self) {
 void CommandCastShield::execute(const Wizard& self, Result& result) {
   result.unit = &self;
   result.action = model::ACTION_SHIELD;
+  result.priority = 1000;
 
   for (const auto& wizard : World::model().getWizards()) {
     if (wizard.getFaction() != self.getFaction() || wizard.getDistanceTo(self) > self.getCastRange()) {
@@ -56,8 +57,4 @@ void CommandCastShield::execute(const Wizard& self, Result& result) {
       break;
     }
   }
-}
-
-double CommandCastShield::priority(const Wizard& self) {
-  return 1000;
 }

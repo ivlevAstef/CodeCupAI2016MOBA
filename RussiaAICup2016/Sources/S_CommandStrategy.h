@@ -34,8 +34,8 @@ namespace AICup
     void clear();
 
   private:
-    const Vector turn(const std::vector<MoveCommand::Result>& moveResults, TurnStyle& turnStyle, bool& deactivateOtherTurn);
-    bool move(std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit, Vector& direction);
+    const Vector turn(const std::vector<MoveCommand::Result>& moveResults);
+    bool move(std::vector<MoveCommand::Result>& moveResults, const Wizard& self, Vector& direction);
 
     const model::LivingUnit* attack(const Wizard& self, model::ActionType& action);
     const model::LivingUnit* cast(const Wizard& self, model::ActionType& action);
@@ -43,10 +43,10 @@ namespace AICup
     std::vector<MoveCommand::Result> moveCommandsToMoveResult(const Wizard& self) const;
 
     /// просчитывает движение, на указанном векторе moveResults
-    const Vector calcMoveVector(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit);
+    const Vector calcMoveVector(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self);
 
     /// просчитывает столкновения, и добавляет деревья для уничтожения
-    const Vector calculateCollisions(const Wizard& self, const Position& endPoint, const double speedLimit);
+    const Vector calculateCollisions(const Wizard& self, const Position& endPoint);
 
     void addTreeForRemove(const Wizard& self, const model::LivingUnit* tree);
 

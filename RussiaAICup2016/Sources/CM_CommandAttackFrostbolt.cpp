@@ -18,42 +18,50 @@ bool CommandAttackFrostbolt::check(const Wizard& self) {
     return false;
   }
 
-  /// скилл в кулдауне
-  if (self.cooldown(model::ACTION_FROST_BOLT) > 0) {
-    return false;
-  }
-
-  // нет маны
-  if (self.getMana() < Game::model().getFrostBoltManacost()) {
-    return false;
-  }
-
   const auto selfPos = EX::pos(self);
 
   double maxPriority = 0;
   /// находим кого заморозить
-  for (const auto& enemy : World::instance().aroundEnemies(self, self.getCastRange())) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getCastRange()+35+15)) {
+    double timeForAttack = Algorithm::timeToTurnForAttack(*enemy, self);
+
+    if (self.cooldown(model::ACTION_FROST_BOLT) > timeForAttack + 1) {
+      continue;
+    }
+
+    double manaRestore = Game::model().getWizardBaseManaRegeneration() + self.getLevel() * Game::model().getWizardManaRegenerationGrowthPerLevel();
+    if (self.getMana() + manaRestore * timeForAttack < Game::model().getFrostBoltManacost()) {
+      continue;
+    }
+
     if (EX::isWizard(*enemy)) {
       const auto& wizard = EX::asWizard(*enemy);
 
       const auto wizardPos = EX::pos(wizard);
       const auto delta = wizardPos - selfPos;
 
+      /// игнорируем юнитов которые могут увернуться даже если идти боком
+      if (delta.length() > EX::radiusForGuaranteedDodgeFrostBolt(wizard, 0)) {
+        continue;
+      }
+
       /// если на пути дерево, то не стреляем
       if (Algorithm::checkIntersectedTree(selfPos, wizardPos, Game::model().getFrostBoltRadius())) {
         continue;
       }
 
-      /// если маг может уклонится от снаряда, то не будем в него стрелять
-      const auto frostBoltSpeed = delta.normal() * Game::model().getFrostBoltSpeed();
-      if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, frostBoltSpeed, 1.5 * Game::model().getFrostBoltRadius())) {
-        continue;
-      }
-      if (Algorithm::canSideBackwardEscape(selfPos, self.getCastRange(), wizard, frostBoltSpeed, 1.5 * Game::model().getFrostBoltRadius())) {
+      /// если маг может уклонится от снаряда, то приоритет занизится него стрелять
+      Bullet bullet = Bullet(0,
+        delta.normal() * Game::model().getFrostBoltSpeed(),
+        Game::model().getFrostBoltRadius(),
+        selfPos, selfPos, self.getCastRange(), model::PROJECTILE_FROST_BOLT, self.getFaction());
+
+      /*если мы скоро можем умереть то что тратить жизнь в пустую хоть на последок кинуть стан*/
+      if (self.getLife() > 24 && Algorithm::canDodge(wizard, Vector(1, 0).rotate(wizard.getAngle()), bullet)) {
         continue;
       }
 
-      const auto priority = self.getRole().getWizardPriority() * AttackPriorities::attackWizard(self, wizard);
+      const auto priority = self.getRole().getWizardPriority() * AttackPriorities::attackWizard(self, wizard, nullptr);
       if (priority > maxPriority) {
         target = &wizard;
         maxPriority = priority;
@@ -76,14 +84,11 @@ bool CommandAttackFrostbolt::check(const Wizard& self) {
 }
 
 
-void CommandAttackFrostbolt::execute(const Wizard&, Result& result) {
+void CommandAttackFrostbolt::execute(const Wizard& self, Result& result) {
   assert(nullptr != target);
   result.unit = target;
   result.action = model::ACTION_FROST_BOLT;
-}
-
-double CommandAttackFrostbolt::priority(const Wizard& self) {
-  return AttackPriorities::attackFrostbolt(self) * self.getRole().getAttackSkillPriority();
+  result.priority = AttackPriorities::attackFrostbolt(self) * self.getRole().getAttackSkillPriority();
 }
 
 #ifdef ENABLE_VISUALIZATOR

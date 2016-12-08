@@ -19,30 +19,21 @@ CommandStrategy::CommandStrategy(const CommandFabric& fabric, const Algorithm::P
 void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
   auto moveResults = moveCommandsToMoveResult(self);
 
-  bool deactivateOtherTurn = false;
   {
-    double speedLimit = -1;
     Vector direction;
-    if (move(moveResults, self, speedLimit, direction)) {
-      TurnStyle turnStyle = TurnStyle::TURN;
-      Vector turnDirection = turn(moveResults, turnStyle, deactivateOtherTurn);
+    if (move(moveResults, self, direction)) {
+      Vector turnDirection = turn(moveResults);
 
       /// если мы в окружении, значит все плохо... или алгоритм глюканул
       if (direction.length() < 1.0e-5) {
         Algorithm::execAroundMove(self, finalMove);
       } else {
         assert(turnDirection.length() > 1.0e-5);
-        /// нужно для подготовке к увороту, и там важно, чтобы был правильный вектор поворота (либо его просто нет)
-        if (TurnStyle::SIDE_TURN != turnStyle) {
-          turnDirection = direction;
-        }
 
-        Algorithm::execMove(self, turnStyle, turnDirection, direction, speedLimit, finalMove);
+        Algorithm::execMove(self, turnDirection, direction, finalMove);
       }
     }
   }
-
-  double turnSave = finalMove.getTurn();
 
   if (!attackCommands.empty()) {
     model::ActionType action;
@@ -59,10 +50,6 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
       Algorithm::execCast(self, action, *unit, finalMove);
     }
   }
-
-  if (deactivateOtherTurn) {
-    finalMove.setTurn(turnSave);
-  }
 }
 
 void CommandStrategy::clear() {
@@ -73,49 +60,46 @@ void CommandStrategy::clear() {
 
 std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const Wizard& self) const {
   std::vector<MoveCommand::Result> moveResults;
-  moveResults.resize(moveCommands.size());
+  moveResults.reserve(moveCommands.size());
 
   for (size_t index = 0; index < moveCommands.size(); index++) {
-    moveResults[index].priority = moveCommands[index]->priority(self);
+    MoveCommand::Result res;
+    moveCommands[index]->execute(self, res);
 
-    if (moveResults[index].priority >= 1) {
-      moveCommands[index]->execute(self, moveResults[index]);
-    }
-  }
-
-  /// Удаляем вектора, которые очень короткие, или не приоритетные
-  for (size_t index = 0; index < moveResults.size(); index++) {
-    const size_t i = moveResults.size() - index - 1;
-    if (moveResults[i].priority < 1 || moveResults[i].moveDirection.length() < 0.5) {
-      moveResults.erase(moveResults.begin() + i);
+    if (res.priority >= 1 && res.moveDirection.length() > 0.1) {
+      moveResults.push_back(res);
     }
   }
 
   return moveResults;
 }
 
-const Vector CommandStrategy::turn(const std::vector<MoveCommand::Result>& moveResults, TurnStyle& turnStyle, bool& deactivateOtherTurn) {
-  Vector result = Vector(0, 0);
+const Vector CommandStrategy::turn(const std::vector<MoveCommand::Result>& moveResults) {
+  assert(!moveResults.empty());
 
   /// выбираем самый предпочтительный вид поворота
-  int turnPriority = 0;
-  for (const auto& move : moveResults) {
-    if (move.turnPriority < turnPriority) {
-      continue;
-    }
-    turnPriority = move.turnPriority;
+  double maxPriority = 0;
+  Vector result = Vector(0, 0);
+  for (const auto& moveIter : moveResults) {
+    const auto direction = moveIter.turnDirection;
 
-    turnStyle = move.turnStyle;
-    result = move.moveDirection;
-    deactivateOtherTurn = move.deactivateOtherTurn;
+    double sumPriority = 0;
+    for (const auto& move : moveResults) {
+      sumPriority += move.turnDirection.normal().dot(direction) * move.turnPriority * move.priority;
+    }
+
+    if (sumPriority > maxPriority) {
+      sumPriority = maxPriority;
+      result = direction;
+    }
   }
+
   return result;
 }
 
-const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit) {
-  speedLimit = EX::maxSpeed(self);
+const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self) {
   if (moveResults.empty()) { /// если нет движения значит двигаемся вперед (P.S. там проверка выше есть, чтобы при 0 не двигаться)
-    return Vector(speedLimit, 0).rotated(self.getAngle());
+    return Vector(EX::maxSpeed(self), 0).rotated(self.getAngle());
   }
 
   double maxPriority = 0;
@@ -131,15 +115,14 @@ const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Resu
     if (sumPriority > maxPriority) {
       sumPriority = maxPriority;
       result = moveIter.moveDirection;
-      speedLimit = moveIter.speedLimit < 0 ? speedLimit : moveIter.speedLimit;
     }
   }
 
   return result;
 }
 
-bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const Wizard& self, double& speedLimit, Vector& direction) {
-  const auto moveVector = calcMoveVector(moveResults, self, speedLimit);
+bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const Wizard& self, Vector& direction) {
+  const auto moveVector = calcMoveVector(moveResults, self);
 
   addAvoidProjectiles(moveResults, self, moveVector);
 
@@ -147,14 +130,14 @@ bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const 
     return false;
   }
 
-  const auto finalMoveVector = calcMoveVector(moveResults, self, speedLimit);
+  const auto finalMoveVector = calcMoveVector(moveResults, self);
 
-  direction = calculateCollisions(self, EX::pos(self) + finalMoveVector/*куда ищем путь*/, speedLimit);
+  direction = calculateCollisions(self, EX::pos(self) + finalMoveVector/*куда ищем путь*/);
 
   return true;
 }
 
-const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Position& endPoint, const double speedLimit) {
+const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Position& endPoint) {
   movePosition = endPoint;
   pathFinder.calculatePath(endPoint, path);
   assert(nullptr != path);
@@ -171,7 +154,7 @@ const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Posi
     addTreeForRemove(self, tree);
   }
 
-  return Algorithm::move(self, preEndPoint, obstaclesGroups, self.getVisionRange()) * speedLimit;
+  return Algorithm::move(self, preEndPoint, obstaclesGroups, self.getVisionRange());
 }
 
 
@@ -200,60 +183,52 @@ void CommandStrategy::addAvoidProjectiles(std::vector<MoveCommand::Result>& move
 
     MoveCommand::Result moveCommandResult;
     if (command->check(self)) {
-      moveCommandResult.priority = command->priority(self);
       command->execute(self, moveCommandResult);
 
-      if (moveCommandResult.priority < 1 || moveCommandResult.moveDirection.length() < 0.5) {
-        continue;
+      if (moveCommandResult.priority >= 1 && moveCommandResult.moveDirection.length() > 0.1) {
+        moveResults.push_back(moveCommandResult);
       }
-
-      moveResults.push_back(moveCommandResult);
     }
   }
 }
 
 const model::LivingUnit* CommandStrategy::attack(const Wizard& self, model::ActionType& action) {
-  AttackCommandPtr maxPriorityAttack = nullptr;
-  double maxPriority = 0;
+  AttackCommand::Result result;
+  result.priority = 0;
 
   for (const auto& attackCommand: attackCommands) {
-    const double priority = attackCommand->priority(self);
-    if (priority > maxPriority) {
-      maxPriority = priority;
-      maxPriorityAttack = attackCommand;
+    AttackCommand::Result attackResult;
+    attackCommand->execute(self, attackResult);
+
+    if (attackResult.priority > result.priority) {
+      result = attackResult;
     }
   }
 
-  if (nullptr == maxPriorityAttack) {
+  if (result.priority < 1) {
     return nullptr;
   }
-
-  AttackCommand::Result result;
-  maxPriorityAttack->execute(self, result);
 
   action = result.action;
   return result.unit;
 }
 
 const model::LivingUnit* CommandStrategy::cast(const Wizard& self, model::ActionType& action) {
-  double maxPriority = 0;
-  CastCommandPtr maxCastCommand = nullptr;
+  CastCommand::Result result;
+  result.priority = 0;
 
   for (const auto& castCommand: castCommands) {
-    const double priority = castCommand->priority(self);
-    if (priority > maxPriority) {
-      maxPriority = priority;
-      maxCastCommand = castCommand;
+    CastCommand::Result castResult;
+    castCommand->execute(self, castResult);
+
+    if (castResult.priority > result.priority) {
+      result = castResult;
     }
   }
 
-  if (nullptr == maxCastCommand) {
+  if (result.priority < 1) {
     return nullptr;
   }
-
-
-  CastCommand::Result result;
-  maxCastCommand->execute(self, result);
 
   action = result.action;
   return result.unit;

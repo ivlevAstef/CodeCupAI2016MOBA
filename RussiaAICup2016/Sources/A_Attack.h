@@ -26,7 +26,8 @@ namespace AICup
     bool canSideBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius);
 
     ///расчитывает вектор по которому можно уклониться, если он нулевой - уклонение невозможно
-    Vector dodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet, TurnStyle& turnStyle);
+    bool canDodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet);
+    Vector dodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet, int& turnSign);
 
     double timeToTurnForAttack(const model::Unit& attacked, const model::Wizard& attacking);
     double timeToTurn(const model::Wizard& wizard, const double angle);

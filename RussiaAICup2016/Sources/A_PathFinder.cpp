@@ -169,7 +169,7 @@ void PathFinder::calculateCost(const Vector2D<int> ignoreCenter, const int ignor
     if (EX::isTree(*obstacle)) {
       life = float(obstacle->getLife() * obstacle->getLife()) / 20.0f; /// дерево
     } else if (EX::isNeutral(*obstacle)) {
-      life = 1000.0f; /// нейтрал очень дорогое удовольствие
+      life = 100.0f; /// нейтрал очень дорогое удовольствие
     } else {
       life = 5000.0f; /// здания вообще не обходимо
     }
@@ -192,11 +192,11 @@ void PathFinder::calculateCost(const Vector2D<int> ignoreCenter, const int ignor
       const size_t mapX = size_t((x * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const size_t mapY = size_t((y * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const float value = enemiesMap[mapX * InfluenceMapConstants::memorySize + mapY];
-      costs[x][y] += value * 1000/*магическая константа, о том насколько не стоит проходить по точкам врага*/;
+      costs[x][y] += value * 20/*магическая константа, о том насколько не стоит проходить по точкам врага*/;
       /// и еще немного ячеек вокруге захватим, дабы точно не пройти рядом с врагами
       for (int nx = -2; nx <= 2; nx++) {
         for (int ny = -2; ny <= 2; ny++) {
-          costs[x + nx][y + ny] += value * 500;
+          costs[x + nx][y + ny] += value * 10;
         }
       }
     }

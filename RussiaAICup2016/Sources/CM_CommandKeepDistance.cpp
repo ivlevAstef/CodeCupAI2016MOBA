@@ -56,10 +56,7 @@ void CommandKeepDistance::execute(const Wizard& self, Result& result) {
   result.set(position, self);
   result.turnStyle = turnStyle;
   result.turnPriority = TurnPriority::keepDistance;
-}
-
-double CommandKeepDistance::priority(const Wizard& self) {
-  return MovePriorities::keepDistance(self, Position(x, y), minDistance, maxDistance);
+  result.priority = MovePriorities::keepDistance(self, Position(x, y), minDistance, maxDistance);
 }
 
 

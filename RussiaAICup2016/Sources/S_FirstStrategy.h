@@ -19,9 +19,15 @@ namespace AICup
   private:
     void init(const Wizard& self);
 
-    void changeLane(const Wizard& self);
+    void checkAndChangeLane(const Wizard& self);
 
     void addAroundEnemies(const Wizard& self);
+    void addAttackFollow(const Wizard& self);
+
+    void addMoveTo(const Wizard& self);
+
+    void addAttacks(const Wizard& self);
+    void addCasts(const Wizard& self);
 
   private:
     bool isInitialized;

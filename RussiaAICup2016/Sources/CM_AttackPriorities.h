@@ -11,6 +11,7 @@
 #include "model\Building.h"
 #include "model\Minion.h"
 #include "model\LaneType.h"
+#include "E_Bullet.h"
 #include "C_Vector2D.h"
 
 
@@ -19,9 +20,7 @@ namespace AICup
 
   // ќбъедин€ю в один файл, чтобы легче было настраивать приоритеты
   namespace AttackPriorities {
-    double attackEnemy(const Wizard& self, const model::LivingUnit& enemy);
-
-    double attackWizard(const Wizard& self, const model::Wizard& wizard);
+    double attackWizard(const Wizard& self, const model::Wizard& wizard, const Bullet* bullet);
     double attackMinion(const Wizard& self, const model::Minion& minion);
     double attackBuild(const Wizard& self, const model::Building& build);
     double attackTree(const Wizard& self, const model::Tree& tree);

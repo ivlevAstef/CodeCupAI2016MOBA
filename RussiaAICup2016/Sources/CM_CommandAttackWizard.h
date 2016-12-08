@@ -21,8 +21,6 @@ namespace AICup
 
     void execute(const Wizard& self, Result& result) override;
 
-    double priority(const Wizard& self) override;
-
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const model::Wizard& self, const Visualizator& visualizator) const override;
 #endif // ENABLE_VISUALIZATOR

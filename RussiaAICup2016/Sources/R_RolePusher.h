@@ -40,8 +40,10 @@ namespace AICup
       attackSkillPriority = 1.5;
 
       desireChangeLine = 0.7;
+      changeLineForeFrontPriority = 1.0;
       changeLinePathLengthPriority = 1.0;
       changeLineWizardCountPriority = 0.5;
+      changeLineWizardCountOnlyFriend = false;
       changeLineTowerBalancePriority = 0.75;
       changeLineLaneStrengthPriority = 0.35;
     }
@@ -53,8 +55,8 @@ namespace AICup
 
       audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
 
-      linePressureWizards = 0.5 * float(realLife) / float(self.getMaxLife());
-      lineAudacityWizards = 1.0 + 5.0 * (1 - (float(realLife) / float(self.getMaxLife())));
+      linePressureWizards = 0.75 * float(realLife) / float(self.getMaxLife());
+      lineAudacityWizards = 0.5 + 3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
 }

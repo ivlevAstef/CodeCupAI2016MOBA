@@ -17,11 +17,9 @@ namespace AICup
 {
   class CommandMoveToPoint: public MoveCommand {
   public:
-    CommandMoveToPoint(const double x, const double y, const TurnStyle style = TurnStyle::TURN, const double speedLimit = -1);
+    CommandMoveToPoint(const double x, const double y);
 
     bool check(const Wizard& self) override;
-
-    double priority(const Wizard& self) override;
 
     void execute(const Wizard& self, Result& result) override;
 
@@ -31,7 +29,5 @@ namespace AICup
 
   private:
     const Position point;
-    const TurnStyle style;
-    const double speedLimit;
   };
 }

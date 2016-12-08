@@ -69,9 +69,6 @@
     <ClCompile Include="..\Sources\CM_CommandMoveToPoint.cpp">
       <Filter>Sources\Command\Commands\move</Filter>
     </ClCompile>
-    <ClCompile Include="..\Sources\CM_CommandObserveMap.cpp">
-      <Filter>Sources\Command\Commands\move</Filter>
-    </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandPool.cpp">
       <Filter>Sources\Command\Commands\attack</Filter>
     </ClCompile>
@@ -83,9 +80,6 @@
     </ClCompile>
     <ClCompile Include="..\Sources\Visualizator\Visualizator.cpp">
       <Filter>Sources\Visualizator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Sources\CM_CommandKeepDistance.cpp">
-      <Filter>Sources\Command\Commands\move</Filter>
     </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandMoveGetExpirience.cpp">
       <Filter>Sources\Command\Commands\move</Filter>
@@ -198,9 +192,6 @@
     <ClCompile Include="..\Sources\CM_MoveCommand.cpp">
       <Filter>Sources\Command</Filter>
     </ClCompile>
-    <ClCompile Include="..\Sources\CM_CommandPushOffMinion.cpp">
-      <Filter>Sources\Command\Commands\defend</Filter>
-    </ClCompile>
     <ClCompile Include="..\Sources\Tests\S_TestDodgeStrategy.cpp">
       <Filter>Sources\Strategy\Strategy\Tests</Filter>
     </ClCompile>
@@ -239,9 +230,6 @@
     <ClInclude Include="..\Sources\CM_CommandMoveToPoint.h">
       <Filter>Sources\Command\Commands\move</Filter>
     </ClInclude>
-    <ClInclude Include="..\Sources\CM_CommandObserveMap.h">
-      <Filter>Sources\Command\Commands\move</Filter>
-    </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandPool.h">
       <Filter>Sources\Command\Commands\attack</Filter>
     </ClInclude>
@@ -256,9 +244,6 @@
     </ClInclude>
     <ClInclude Include="..\Sources\Visualizator\Visualizator.h">
       <Filter>Sources\Visualizator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\CM_CommandKeepDistance.h">
-      <Filter>Sources\Command\Commands\move</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandMoveGetExpirience.h">
       <Filter>Sources\Command\Commands\move</Filter>
@@ -379,9 +364,6 @@
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandCastShield.h">
       <Filter>Sources\Command\Commands\cast</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\CM_CommandPushOffMinion.h">
-      <Filter>Sources\Command\Commands\defend</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\Tests\S_TestDodgeStrategy.h">
       <Filter>Sources\Strategy\Strategy\Tests</Filter>

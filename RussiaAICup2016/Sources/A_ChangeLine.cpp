@@ -37,7 +37,10 @@ double Algorithm::calculateLinePriority(const Algorithm::PathFinder& finder, con
 
 
   /// на сколько перевес магов на линии
-  double wizardCount = World::instance().wizardCount(lane, Game::friendFaction(), self) - World::instance().wizardCount(lane, Game::enemyFaction());
+  double wizardCount = World::instance().wizardCount(lane, Game::friendFaction(), self);
+  if (!self.getRole().getChangeLineWizardCountOnlyFriend()) {
+    wizardCount -= World::instance().wizardCount(lane, Game::enemyFaction());
+  }
 
   /// баланс башен положительный - наших больше, отрицательный наших меньше
   int towerBalance = World::instance().towerCount(lane, Game::friendFaction()) - World::instance().towerCount(lane, Game::enemyFaction());
@@ -53,7 +56,7 @@ double Algorithm::calculateLinePriority(const Algorithm::PathFinder& finder, con
   double towerPriority = 500 - 250 * towerBalance;// если своих башен нет то приоритет 1000
   double laneStrengthPriority = 500 - (MAX(-1000, MIN(laneStrength, 1000)) / 2);
 
-  const auto lengthRole = 1;
+  const auto lengthRole = self.getRole().getChangeLineForeFrontPriority();
   const auto distanceRole = self.getRole().getChangeLinePathLengthPriority();
   const auto wizardRole = self.getRole().getChangeLineWizardCountPriority();
   const auto towerRole = self.getRole().getChangeLineTowerBalancePriority();

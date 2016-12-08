@@ -16,13 +16,15 @@ bool CommandAttackBuild::check(const Wizard& self) {
   const auto buildPos = EX::pos(build);
   const auto delta = selfPos - buildPos;
 
+  double timeForAttack = Algorithm::timeToTurnForAttack(build, self);
+
   /// здание далеко
   if (delta.length() > self.getCastRange() + build.getRadius()) {
     return false;
   }
 
   /// Если еще много времени до кд, то не стоит атаковать
-  if (self.minStaffOrMissileCooldown() > Algorithm::timeToTurnForAttack(build, self)) {
+  if (self.minStaffOrMissileCooldown() > timeForAttack + 1) {
     return false;
   }
 
@@ -40,16 +42,13 @@ void CommandAttackBuild::execute(const Wizard& self, Result& result) {
   const double distance = self.getDistanceTo(build);
 
   result.unit = &build;
+  result.priority = self.getRole().getBuildPriority() * AttackPriorities::attackBuild(self, build);
 
   if (Algorithm::isMelee(self, build) && !self.isCooldown(model::ACTION_STAFF)) {
     result.action = model::ACTION_STAFF;
   } else {
     result.action = model::ACTION_MAGIC_MISSILE;
   }
-}
-
-double CommandAttackBuild::priority(const Wizard& self) {
-  return self.getRole().getBuildPriority() * AttackPriorities::attackBuild(self, build);
 }
 
 #ifdef ENABLE_VISUALIZATOR

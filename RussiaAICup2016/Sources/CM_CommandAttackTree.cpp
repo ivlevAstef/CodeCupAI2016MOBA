@@ -23,7 +23,7 @@ bool CommandAttackTree::check(const Wizard& self) {
 
 
   /// Если еще много времени до кд, то не стоит атаковать
-  if (self.minStaffOrMissileCooldown() > Algorithm::timeToTurnForAttack(tree, self)) {
+  if (self.minStaffOrMissileCooldown() > Algorithm::timeToTurnForAttack(tree, self) + 1) {
     return false;
   }
 
@@ -41,16 +41,13 @@ void CommandAttackTree::execute(const Wizard& self, Result& result) {
   const double distance = self.getDistanceTo(tree);
 
   result.unit = &tree;
+  result.priority = self.getRole().getTreePriority() * AttackPriorities::attackTree(self, tree);
 
   if (Algorithm::isMelee(self, tree) && !self.isCooldown(model::ACTION_STAFF)) {
     result.action = model::ACTION_STAFF;
   } else {
     result.action = model::ACTION_MAGIC_MISSILE;
   }
-}
-
-double CommandAttackTree::priority(const Wizard& self) {
-  return self.getRole().getTreePriority() * AttackPriorities::attackTree(self, tree);
 }
 
 #ifdef ENABLE_VISUALIZATOR

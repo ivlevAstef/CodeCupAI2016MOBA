@@ -67,8 +67,10 @@ Role::Role(const SkillBuild& skillBuild): skillBuild(skillBuild) {
   audacityWizard = 1;
 
   desireChangeLine = 1;
+  changeLineForeFrontPriority = 1;
   changeLinePathLengthPriority = 1;
   changeLineWizardCountPriority = 1;
+  changeLineWizardCountOnlyFriend = false;
   changeLineTowerBalancePriority = 1;
   changeLineLaneStrengthPriority = 1;
 }

@@ -17,12 +17,10 @@ namespace AICup
   public:
     struct Result {
       Vector moveDirection; /// вместе с длиной
-      TurnStyle turnStyle;
-      int turnPriority;
-      bool deactivateOtherTurn;
+      Vector turnDirection;
 
-      double speedLimit;
       double priority; /// просто тут его удобно хранить, чем создавать потом обертку, но при этом оно не инициализуется!
+      double turnPriority;
 
       void set(const Position& position, const Wizard& self);
     };

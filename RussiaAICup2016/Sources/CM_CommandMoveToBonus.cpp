@@ -131,14 +131,10 @@ double CommandMoveToBonus::potensialExpirience(const Wizard& self) {
 
 void CommandMoveToBonus::execute(const Wizard& self, Result& result) {
   result.set(bonusPos, self);
-  result.turnStyle = TurnStyle::TURN;
+
   result.turnPriority = TurnPriority::moveToBonus;
+  result.priority = MovePriorities::moveToBonus(self, bonusPos);
 }
-
-double CommandMoveToBonus::priority(const Wizard& self) {
-  return MovePriorities::moveToBonus(self, bonusPos);
-}
-
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandMoveToBonus::visualization(const model::Wizard& self, const Visualizator& visualizator) const {

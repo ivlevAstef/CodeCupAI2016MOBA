@@ -31,12 +31,9 @@ void CommandAvoidBuild::execute(const Wizard& self, Result& result) {
   position = buildPos + delta.normal() * distance;
 
   result.set(position, self);
-  result.turnStyle = TurnStyle::TURN;
-  result.turnPriority = TurnPriority::avoidBuild;
-}
 
-double CommandAvoidBuild::priority(const Wizard& self) {
-  return MovePriorities::avoidBuild(self, build) * self.getRole().getAudacityBuild();
+  result.turnPriority = TurnPriority::avoidBuild;
+  result.priority = MovePriorities::avoidBuild(self, build) * self.getRole().getAudacityBuild();
 }
 
 #ifdef ENABLE_VISUALIZATOR

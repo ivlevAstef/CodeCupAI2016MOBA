@@ -21,13 +21,13 @@ bool CommandFollowAttack::check(const Wizard& self) {
     return false;
   }
 
-  const auto center = selfPos + delta * 0.5;
+  const auto center = selfPos + delta * 0.25;
   const auto changeOfWin = Algorithm::changeOfWinning(self, center.x, center.y);
 
-  // если у мага мало хп и шанс на победу есть, то стоит приследовать
+  // если у мага мало хп и шанс на победу есть, то стоит преследовать
   return (wizard.getLife() + 1 < self.damage(model::ACTION_MAGIC_MISSILE) && changeOfWin > 0)
-  /// если шанс на победу при нападении высокий, то тоже приследуем
-    || changeOfWin > 0.7;
+  /// если шанс на победу при нападении высокий, то тоже преследуем
+    || changeOfWin > 0.5;
 }
 
 
@@ -37,13 +37,11 @@ void CommandFollowAttack::execute(const Wizard& self, Result& result) {
   const auto delta = wizardPos - selfPos;
 
   result.set(wizardPos, self);
-  result.turnStyle = TurnStyle::TURN;
+
   result.turnPriority = TurnPriority::follow;
+  result.priority = self.getRole().getWizardPriority() * MovePriorities::attackFollow(self, wizard);
 }
 
-double CommandFollowAttack::priority(const Wizard& self) {
-  return self.getRole().getWizardPriority() * MovePriorities::attackFollow(self, wizard);
-}
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandFollowAttack::visualization(const model::Wizard& self, const Visualizator& visualizator) const {

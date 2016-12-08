@@ -20,19 +20,16 @@ double AttackPriorities::attackMinion(const Wizard& self, const model::Minion& m
     return 1000;
   }
 
-  double lifePriority = 500 * (minion.getMaxLife() - minion.getLife()) / minion.getMaxLife();
-  if (self.damage(model::ACTION_MAGIC_MISSILE) < minion.getLife()) {
-    lifePriority = 0;
-  }
+  double lifePriority = 200 * (minion.getMaxLife() - minion.getLife()) / minion.getMaxLife();
 
   if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
     const double range = Game::model().getOrcWoodcutterAttackRange() + self.getRadius();
     const double distance = self.getDistanceTo(minion);
     const double nDistance = MAX(distance, range);
 
-    return 100 + lifePriority + 400 * ((range * range) / (nDistance * nDistance));
+    return 200 + lifePriority + 400 * ((range * range) / (nDistance * nDistance));
   } else if (model::MINION_FETISH_BLOWDART == minion.getType()) {
-    return 500 + lifePriority;
+    return 300 + lifePriority;
   }
   assert(false && "Incorrect minion type...");
   return 0;
@@ -56,7 +53,7 @@ double AttackPriorities::attackTree(const Wizard& self, const model::Tree& tree)
   return 0;
 }
 
-double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& wizard) {
+double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& wizard, const Bullet* bullet) {
   if (Algorithm::isMelee(self, wizard)) {
     return 1000;
   }
@@ -70,18 +67,14 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   const auto wizardPos = EX::pos(wizard);
   const auto delta = wizardPos - selfPos;
 
-  const auto bulletSpeed = delta.normal() * Game::model().getMagicMissileSpeed();
   /// если маг может уклонится от снаряда, то снижаем приоритет
   double dodgePriority = 1;
-  if (Algorithm::canSideForwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, 1.5 * Game::model().getMagicMissileRadius())) {
-    dodgePriority *= 0.5;
-  }
-  if (Algorithm::canSideBackwardEscape(selfPos, self.getCastRange(), wizard, bulletSpeed, 1.5 * Game::model().getMagicMissileRadius())) {
-    dodgePriority *= 0.5;
+  if (nullptr != bullet && Algorithm::canDodge(wizard, Vector(1, 0).rotate(wizard.getAngle()), *bullet)) {
+    dodgePriority = 0.25;
   }
 
 
-  const double lifePriority = 500 * (100 - MIN(100, wizard.getLife())) / 100;
+  const double lifePriority = 100.0 + 400.0 * (1.0 - MIN(100.0, double(wizard.getLife()))/100.0);
 
   double statusPriority = 0;
   for (const auto& status : wizard.getStatuses()) {
@@ -93,7 +86,7 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
         statusPriority += 100;
         break;
       case model::STATUS_FROZEN:
-        statusPriority += 500;
+        statusPriority += 750;
         break;
       case model::STATUS_HASTENED:
         statusPriority -= 150;
@@ -107,10 +100,10 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   }
 
   const double distance = self.getDistanceTo(wizard);
-  const double distancePriority = 75 * ((500 * 500) / (distance * distance));
+  const double distancePriority = 500 * ((500 * 500) / (distance * distance));
 
 
-  return MAX((lifePriority + statusPriority + distancePriority) * dodgePriority, 1000);
+  return MIN((lifePriority + statusPriority + distancePriority) * dodgePriority, 1500);
 }
 
 double AttackPriorities::attackFrostbolt(const Wizard& self) {

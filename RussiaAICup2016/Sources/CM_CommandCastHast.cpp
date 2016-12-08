@@ -37,6 +37,7 @@ bool CommandCastHast::check(const Wizard& self) {
 void CommandCastHast::execute(const Wizard& self, Result& result) {
   result.unit = &self;
   result.action = model::ACTION_HASTE;
+  result.priority = 1000;
 
   for (const auto& wizard : World::model().getWizards()) {
     if (wizard.getFaction() != self.getFaction() || wizard.getDistanceTo(self) > self.getCastRange()) {
@@ -56,8 +57,4 @@ void CommandCastHast::execute(const Wizard& self, Result& result) {
       break;
     }
   }
-}
-
-double CommandCastHast::priority(const Wizard& self) {
-  return 1000;
 }

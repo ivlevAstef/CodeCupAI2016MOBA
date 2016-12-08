@@ -19,14 +19,10 @@ namespace AICup
 
   // ќбъедин€ю в один файл, чтобы легче было настраивать приоритеты
   namespace MovePriorities {
-    double pushOffMinion(const Wizard& self, const model::Minion& minion);
-
     double avoidBuild(const Wizard& self, const model::Building& build);
     double avoidMinion(const Wizard& self, const model::Minion& minion);
     double avoidWizard(const Wizard& self, const model::Wizard& wizard);
     double avoidProjectile(const Wizard& self, const Bullet& projectile);
-
-    double defendPoint(const Wizard& self, const Position& point);
 
     double attackFollow(const Wizard& self, const model::Wizard& wizard);
     double follow(const Wizard& self, const model::LivingUnit& unit);
@@ -38,9 +34,6 @@ namespace AICup
     double moveToLine(const Wizard& self, const model::LaneType& lane);
 
     double moveToPoint(const Wizard& self, const Position& point);
-
-    double observeMap(const Wizard& self);
-
   };
 }
 

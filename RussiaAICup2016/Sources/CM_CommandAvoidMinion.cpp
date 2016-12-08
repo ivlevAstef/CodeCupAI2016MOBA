@@ -21,11 +21,12 @@ bool CommandAvoidMinion::check(const Wizard& self) {
   const auto delta = selfPos - unitPos;
 
   if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
-    distance = MAX(mc.getStaffRange(), mc.getOrcWoodcutterAttackRange()) + self.getRadius();
+    distance = mc.getOrcWoodcutterAttackRange() + self.getRadius();
   } else {
     distance = mc.getFetishBlowdartAttackRange() + self.getRadius() + mc.getDartRadius();
   }
 
+  distance += 2 * self.maxSpeed();
   if (delta.length() > distance) {
     return false;
   }
@@ -47,12 +48,10 @@ void CommandAvoidMinion::execute(const Wizard& self, Result& result) {
 
 
   result.set(position, self);
-  result.turnStyle = TurnStyle::BACK_TURN;
-  result.turnPriority = TurnPriority::avoidMinion;
-}
+  result.turnDirection = -result.turnDirection;
 
-double CommandAvoidMinion::priority(const Wizard& self) {
-  return MovePriorities::avoidMinion(self, minion) * self.getRole().getAudacityMinion();
+  result.turnPriority = TurnPriority::avoidMinion;
+  result.priority = MovePriorities::avoidMinion(self, minion) * self.getRole().getAudacityMinion();
 }
 
 #ifdef ENABLE_VISUALIZATOR

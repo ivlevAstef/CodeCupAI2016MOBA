@@ -6,14 +6,10 @@
 
 using namespace AICup;
 
-double MovePriorities::pushOffMinion(const Wizard& self, const model::Minion& minion) {
-  return 0;
-}
-
 ///слегка выше
 double MovePriorities::avoidBuild(const Wizard& self, const model::Building& build) {
-  const int lifePriority = (300 * build.getLife()) / build.getMaxLife();
-  return 800 + lifePriority;
+  const int lifePriority = (5000 * build.getLife()) / build.getMaxLife();
+  return 3000 + lifePriority;
 }
 
 double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& minion) {
@@ -66,7 +62,7 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
   }
 
 
-  return MAX(1000, 500 + statusPriority + skillPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 25);
+  return 500 + statusPriority + skillPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 25;
 }
 
 double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {
@@ -88,10 +84,6 @@ double MovePriorities::avoidProjectile(const Wizard& self, const Bullet& project
     case model::PROJECTILE_FROST_BOLT:
       return 15000 - distance;
   }
-  return 0;
-}
-
-double MovePriorities::defendPoint(const Wizard&, const Position&) {
   return 0;
 }
 
@@ -118,8 +110,4 @@ double MovePriorities::moveToLine(const Wizard& self, const model::LaneType&) {
 
 double MovePriorities::moveToPoint(const Wizard&, const Position&) {
   return 10;
-}
-
-double MovePriorities::observeMap(const Wizard&) {
-  return 0;
 }

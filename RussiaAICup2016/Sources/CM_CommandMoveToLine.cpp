@@ -40,17 +40,18 @@ bool CommandMoveToLine::check(const Wizard& self) {
 
   toPoint = Math::point_distanceToSegment(selfPos, foreFrontLeft, foreFrontRight);
 
-  return true;
+  return (toPoint-selfPos).length() > 1;
 }
 
 
 void CommandMoveToLine::execute(const Wizard& self, Result& result) {
   result.set(toPoint, self);
-  result.turnStyle = TurnStyle::TURN;
+
   result.turnPriority = TurnPriority::moveToLine;
+  result.priority = priority(self);
 }
 
-double CommandMoveToLine::priority(const Wizard& self) {
+double CommandMoveToLine::priority(const Wizard& self) const {
   /// если линия находиться на своей базе, и мы тоже на ней, значит на базе враги, и нужно обращать внимание на врагов, а не на линию
   if (toPoint.x < 800 && toPoint.y > World::size() - 800
     && self.getX() < 800 && self.getY() > World::size() - 800) {

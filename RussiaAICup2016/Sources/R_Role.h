@@ -87,13 +87,20 @@ namespace AICup
 
     // смена линии
     inline const float getDesireChangeLine() const {
-      return !useStartedLinePriority ? desireChangeLine : 0.95f;
+      return !useStartedLinePriority ? desireChangeLine : 0.85f;
     }
+    inline const float getChangeLineForeFrontPriority() const {
+      return !useStartedLinePriority ? changeLineForeFrontPriority : 0.0f;
+    }
+
     inline const float getChangeLinePathLengthPriority() const {
-      return !useStartedLinePriority ? changeLinePathLengthPriority : 0.0f;
+      return !useStartedLinePriority ? changeLinePathLengthPriority : 0.5f;
     }
     inline const float getChangeLineWizardCountPriority() const {
       return !useStartedLinePriority ? changeLineWizardCountPriority : 1.0f;
+    }
+    inline const bool getChangeLineWizardCountOnlyFriend() const {
+      return !useStartedLinePriority ? changeLineWizardCountOnlyFriend : true;
     }
     inline const float getChangeLineTowerBalancePriority() const {
       return !useStartedLinePriority ? changeLineTowerBalancePriority : 0.0f;
@@ -126,8 +133,10 @@ namespace AICup
 
     /// смена линии
     float desireChangeLine; /// насколько сильно бот будет хотеть менять линию - 0 никогда.
+    float changeLineForeFrontPriority; /// насколько сильно влияет расположение линии
     float changeLinePathLengthPriority; /// насколько сильно влияет длина пути которую надо пройти до линии
     float changeLineWizardCountPriority; /// насколько сильно влияет количество своих магов на линии
+    bool  changeLineWizardCountOnlyFriend; /// учитывать только своих магов, или своих - противника
     float changeLineTowerBalancePriority; /// насколько сильно влияет количество вышек на линии (свои - вражеские)
     float changeLineLaneStrengthPriority; /// насколько сильно влияет дизбаланс сил
 

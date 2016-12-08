@@ -66,9 +66,9 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
   auto preyEndPos = preyBeginPos + preyEndVec * (EX::maxSpeed(prey) * maxIteration);
   for (const auto& obstacle : obstacles) {
     /// пока не будет учитывать движимые объекты, ибо сложно
-    if (EX::isMinion(*obstacle) || EX::isWizard(*obstacle)) {
+    /*if (EX::isMinion(*obstacle) || EX::isWizard(*obstacle)) {
       continue;
-    }
+    }*/
     /// проверка на уперся в препятствие
     const auto obstaclePos = EX::pos(*obstacle);
     const auto intersectPoint = Math::point_distanceToSegment(EX::pos(*obstacle), preyBeginPos, preyEndPos);
@@ -89,6 +89,10 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
   Position bulletPos = attackingPos;
 
   for (size_t iter = 0; iter <= maxIteration; iter++) {
+    ///////////////////
+    lastBulletPos = bulletPos;
+    bulletPos += bulletSpeed;
+
     if ((bulletPos - attackingPos).length() > castRange) {
       bulletPos = attackingPos + bulletSpeed.normal() * castRange;
     }
@@ -97,20 +101,18 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
       return false;
     }
 
-    lastBulletPos = bulletPos;
-    bulletPos += bulletSpeed;
-
+    ////////////////////
     const auto speed = Algorithm::maxSpeed(prey, preyAngle, preyEndVec);
     preyPos += preyEndVec * speed.length();
     if ((preyPos - preyBeginPos).length2() > (preyEndPos - preyBeginPos).length2()) {
       preyPos = preyEndPos;
     }
 
+    ////////////////////
     double angleDiff = Math::angleDiff(preyEndAngle, preyAngle);
     if (ABS(angleDiff) > preyTurnSpeed) {
       angleDiff = preyTurnSpeed * SIGN(angleDiff);
     }
-
     preyAngle += angleDiff;
   }
 
@@ -140,14 +142,19 @@ bool Algorithm::canSideBackwardEscape(const Position attackingPos, const double 
   return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, -endAngleVec, preyEndAngle, obstacles);
 }
 
-Vector Algorithm::dodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet, TurnStyle& turnStyle) {
+bool Algorithm::canDodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet) {
+  int turnSign = 0;
+  return dodge(prey, desiredDir, bullet, turnSign).length() > 0.1;
+}
+
+Vector Algorithm::dodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet, int& turnSign) {
   const double centerAngle = desiredDir.angle();
 
   const auto obstacles = World::instance().obstacles(prey, prey.getRadius() + bullet.radius + 100);
 
   /// проверяем возможность уклониться при всех возможных конечных углах, начиная с текущего
-  /// проверяем каждые 4 градуса
-  for (double angleDt = 0; angleDt < AICUP_PI; angleDt += AICUP_PI / 45.0) {
+  /// проверяем каждые 6 градусов
+  for (double angleDt = 0; angleDt < AICUP_PI; angleDt += AICUP_PI / 30.0) {
     const auto leftAngle = centerAngle + angleDt;
     const auto rightAngle = centerAngle - angleDt;
     const auto endVectorLeft = Vector(1, 0).rotate(leftAngle);
@@ -155,22 +162,22 @@ Vector Algorithm::dodge(const model::Wizard& prey, const Vector desiredDir, cons
 
     /// если идти вперед
     if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, endVectorLeft, leftAngle, obstacles)) {
-      turnStyle = TurnStyle::TURN;
+      turnSign = 1;
       return endVectorLeft;
     }
 
     if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, endVectorRight, rightAngle, obstacles)) {
-      turnStyle = TurnStyle::TURN;
+      turnSign = 1;
       return endVectorRight;
     }
 
     /// если идти назад
     if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, -endVectorLeft, leftAngle, obstacles)) {
-      turnStyle = TurnStyle::BACK_TURN;
+      turnSign = -1;
       return -endVectorLeft;
     }
     if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, -endVectorRight, rightAngle, obstacles)) {
-      turnStyle = TurnStyle::BACK_TURN;
+      turnSign = -1;
       return -endVectorRight;
     }
   }

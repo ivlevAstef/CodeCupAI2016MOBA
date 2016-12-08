@@ -14,6 +14,12 @@ CommandAvoidWizard::CommandAvoidWizard(const model::Wizard& wizard): wizard(wiza
   distance = 0;
 }
 
+struct MagicInfo {
+  double dodgeRange;
+  double distanceCooldown;
+  double projectileRadius;
+};
+
 bool CommandAvoidWizard::check(const Wizard& self) {
   const auto mc = Game::model();
 
@@ -22,73 +28,77 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   const auto delta = selfPos - wizardPos;
 
   //// для сокращения расчетов
-  if (delta.length() > 650) {
+  if (delta.length() > 600 + 35 + 100) {//максимальный радиус атаки + радиус мага + максимальный радиус снаряда(fireball)
     return false;
   }
 
-  double finalDistance = 0;
-  double finalCheckDistance = 0;
+  const double useSpeed = self.maxBackwardSpeed();
 
-  const double distance2 = Algorithm::timeToTurnForAttack(self, wizard) * self.maxBackwardSpeed();
-  const double distance3 = EX::frozenTime(wizard) * self.maxBackwardSpeed();
+  std::vector<MagicInfo> magics;
 
-  const double castRange = wizard.getCastRange() + self.getRadius();
   if (EX::availableSkill(wizard, model::ACTION_MAGIC_MISSILE)) { ///magic missile
-    const double mRadius = EX::radiusForGuaranteedDodge(self, 0);
-
-    const double distance1 = EX::cooldownMaxSkill(wizard, model::ACTION_MAGIC_MISSILE) * self.maxBackwardSpeed();
-    const double maxDistance = MAX(distance1, MAX(distance2, distance3));
-    const double mDistance = mRadius - maxDistance;
-    const double mCheckDistance = castRange - maxDistance + Game::model().getMagicMissileRadius();
-
-    finalDistance = MAX(finalDistance, mDistance);
-    finalCheckDistance = MAX(finalCheckDistance, mCheckDistance);
+    magics.push_back(MagicInfo{
+      EX::radiusForGuaranteedDodge(self, 0),
+      EX::cooldownMaxSkill(wizard, model::ACTION_MAGIC_MISSILE) * useSpeed,
+      Game::model().getMagicMissileRadius()
+    });
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
-    const double fRadius = EX::radiusForGuaranteedDodgeFireBall(self, 0);
-
-    const double distance1 = EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL) * self.maxBackwardSpeed();
-    const double maxDistance = MAX(distance1, MAX(distance2, distance3));
-    const double fDistance = fRadius - maxDistance;
-    const double fCheckDistance = castRange - maxDistance + Game::model().getFireballRadius();
-
-    finalDistance = MAX(finalDistance, fDistance);
-    finalCheckDistance = MAX(finalCheckDistance, fCheckDistance);
+    magics.push_back(MagicInfo{
+      EX::radiusForGuaranteedDodgeFireBall(self, 0),
+      EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL) * useSpeed,
+      Game::model().getFireballRadius()
+    });
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
-    const double fRadius = 50/*экстра радиус ибо попасться на это это очень плохо*/ + EX::radiusForGuaranteedDodgeFrostBolt(self, 0);
-
-    const double distance1 = EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT) * self.maxBackwardSpeed();
-    const double maxDistance = MAX(distance1, MAX(distance2, distance3));
-    const double fDistance = fRadius - maxDistance;
-    const double fCheckDistance = castRange - maxDistance + Game::model().getFrostBoltRadius();
-
-    finalDistance = MAX(finalDistance, fDistance);
-    finalCheckDistance = MAX(finalCheckDistance, fCheckDistance);
+    magics.push_back(MagicInfo{
+      EX::radiusForGuaranteedDodgeFrostBolt(self, 0),
+      EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT) * useSpeed,
+      Game::model().getFrostBoltRadius()
+    });
   }
 
   if (EX::availableSkill(wizard, model::ACTION_STAFF)) {
-    const double sRadius = Game::model().getStaffRange() + self.getRadius();
-    const double distance1 = EX::cooldownMaxSkill(wizard, model::ACTION_STAFF) * self.maxBackwardSpeed();
-    const double maxDistance = MAX(distance1, MAX(distance2, distance3));
-    const double sDistance = sRadius - maxDistance;
-    const double sCheckDistance = castRange - maxDistance;
-
-    finalDistance = MAX(finalDistance, sDistance);
-    finalCheckDistance = MAX(finalCheckDistance, sCheckDistance);
+    magics.push_back(MagicInfo{
+      Game::model().getStaffRange() + self.getRadius(),
+      EX::cooldownMaxSkill(wizard, model::ACTION_STAFF) * useSpeed,
+      0
+    });
   }
 
-  distance = MIN(finalDistance, finalCheckDistance);
+  const double distanceTime = Algorithm::timeToTurnForAttack(self, wizard) * useSpeed;
+  const double distanceFrozen = EX::frozenTime(wizard) * useSpeed;
 
-  const double changeOfWin = Algorithm::changeOfWinning(self);
+  const double maxCastRange = wizard.getCastRange() + self.getRadius();
+
+
+  double finalDodgeRange = 0;
+  double finalCastRange = 0;
+  for (const auto& magic : magics) {
+    const double stockDistance = MAX(magic.distanceCooldown, MAX(distanceTime, distanceFrozen));
+    const double dodgeRange = magic.dodgeRange - stockDistance;
+    const double castRange = maxCastRange - stockDistance + magic.projectileRadius;
+
+    finalDodgeRange = MAX(finalDodgeRange, dodgeRange);
+    finalCastRange = MAX(finalCastRange, castRange);
+  }
+
+
+  /// дистанция на которой я должен находиться чтобы в меня не попали
+  distance = MIN(finalDodgeRange, finalCastRange);
+  distance += self.maxSpeed(); ///небольшой запас
+
+  const auto center = wizardPos + delta * 0.8;
+  changeOfWin = Algorithm::changeOfWinning(self, center.x, center.y);
+
   if (changeOfWin > 0.5) {
-    distance *= (1.0 - changeOfWin * 0.2);
+    distance *= (1.5 - changeOfWin);
   }
 
-  /// если далеко, то бояться его не стоит
-  if (delta.length() > distance + self.maxSpeed()) {
+  /// если маг дальше чем нужно, то бояться его не стоит
+  if (delta.length() > distance) {
     return false;
   }
 
@@ -106,44 +116,23 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   const auto delta = selfPos - wizardPos;
 
   const auto pos = wizardPos + delta.normal() * distance;
-  if (delta.length() < distance) {
-    result.turnStyle = TurnStyle::BACK_TURN;
+  result.set(pos, self);
+
+  /// если шансы на победу маленькие, то стоит повернуться спиной к магу, ну или точнее тупо бежать к точке, ибо мы находимся ближе
+  if (changeOfWin > 0.8) { ///если шансы на победу высоки, то можно идти по наглому в лоб
+    result.turnDirection = -result.turnDirection;
   } else {
-    result.turnStyle = TurnStyle::TURN;
+    result.turnDirection = result.turnDirection.perpendicular();
+    /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикуляров
+    if (result.turnDirection.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
+      result.turnDirection *= -1;
+    }
   }
 
-  result.moveDirection = pos - selfPos;
-  result.speedLimit = -1;
+  double changeOfWinPriority = (changeOfWin > 0) ? (1 - changeOfWin * 0.75) : (1 - changeOfWin);
+
   result.turnPriority = TurnPriority::avoidWizard + int(delta.length()/2);
-  result.deactivateOtherTurn = false;
-
-  /// если хп много то подготовку к увороту не делаем
-  if (self.getLife() > self.getMaxLife()/2) {
-    return;
-  }
-
-  // если я совсем далеко то поворачиватся не нужно
-  if (delta.length() > distance) {
-    return;
-  }
-
-  auto direction = delta.perpendicular().normal();
-  /// если угол больше 90 градусов то выбран не оптимальный из двух возможных перпендикуляров
-  if (direction.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
-    direction *= -1;
-  }
-
-  const auto timeToTurn = Algorithm::timeToTurn(self, direction.angle());
-
-  /// Если враг на подходе, то стоит повернуться боком
-  if (timeToTurn * EX::maxSpeed(wizard) + distance+15/*небольшой запас*/ > delta.length()) {
-    result.turnStyle = TurnStyle::SIDE_TURN;
-    //result.deactivateOtherTurn = true;
-  }
-}
-
-double CommandAvoidWizard::priority(const Wizard& self) {
-  return MovePriorities::avoidWizard(self, wizard) * self.getRole().getAudacityWizard();
+  result.priority = MovePriorities::avoidWizard(self, wizard) * changeOfWinPriority * self.getRole().getAudacityWizard();
 }
 
 #ifdef ENABLE_VISUALIZATOR

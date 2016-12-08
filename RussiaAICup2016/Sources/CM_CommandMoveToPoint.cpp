@@ -13,28 +13,22 @@
 
 using namespace AICup;
 
-/// так как какие-нибудь алгоритмы аля follow могут выдать плохие координаты, то лучше их обрезать
-CommandMoveToPoint::CommandMoveToPoint(const double x, const double y, const TurnStyle style, const double speedLimit):
-point(x,y), style(style), speedLimit(speedLimit) {
-
+CommandMoveToPoint::CommandMoveToPoint(const double x, const double y):
+  point(x,y) {
 }
 
 bool CommandMoveToPoint::check(const Wizard& self) {
-  return (EX::pos(self) - point).length() > 1;
+  return (EX::pos(self) - point).length() > 0.1;
 }
 
 
 void CommandMoveToPoint::execute(const Wizard& self, Result& result) {
   result.set(point, self);
-  result.turnStyle = style;
-  result.speedLimit = speedLimit;
+
   result.turnPriority = TurnPriority::moveToPoint;
-  result.deactivateOtherTurn = false;
+  result.priority = MovePriorities::moveToPoint(self, point);
 }
 
-double CommandMoveToPoint::priority(const Wizard& self) {
-  return MovePriorities::moveToPoint(self, point);
-}
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandMoveToPoint::visualization(const model::Wizard& self, const Visualizator& visualizator) const {

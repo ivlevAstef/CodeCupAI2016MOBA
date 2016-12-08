@@ -285,7 +285,7 @@ float InfluenceMap::zonePriorityAndPoint(int& x, int& y) const {
 bool InfluenceMap::isFriendZone(int& x, int& y) const {
   int friendX = x;
   int friendY = y;
-  if (zonePriorityAndPoint(friendX, friendY) > 0.5) {
+  if (zonePriorityAndPoint(friendX, friendY) > 0.3) {
     x = friendX;
     y = friendY;
     return true;
@@ -394,7 +394,7 @@ float wizardDanger(const model::Wizard& wizard) {
   ticks = MAX(0.5f, ticks);
 
   float life = float(wizard.getLife()) / float(wizard.getMaxLife());
-  return life * wizardDps(wizard) * ticks;
+  return 0.75f * life * wizardDps(wizard) * ticks;
 }
 
 void InfluenceMap::includeFriends() {
