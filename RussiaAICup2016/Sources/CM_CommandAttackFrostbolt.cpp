@@ -45,6 +45,11 @@ bool CommandAttackFrostbolt::check(const Wizard& self) {
         continue;
       }
 
+      /// замораживать того, кто уже заморожен бессмысленно
+      if (EX::frozenTime(wizard) > 1 + delta.length() / Game::model().getFrostBoltSpeed()) {
+        continue;
+      }
+
       /// если на пути дерево, то не стреляем
       if (Algorithm::checkIntersectedTree(selfPos, wizardPos, Game::model().getFrostBoltRadius())) {
         continue;

@@ -32,21 +32,26 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     return false;
   }
 
+  const auto center = wizardPos + delta * 0.8;
+  changeOfWin = Algorithm::changeOfWinning(self, center.x, center.y);
+
   const double useSpeed = self.maxBackwardSpeed();
 
   std::vector<MagicInfo> magics;
 
   if (EX::availableSkill(wizard, model::ACTION_MAGIC_MISSILE)) { ///magic missile
+    double additionalMult = MIN(1, 1.5 - changeOfWin);
     magics.push_back(MagicInfo{
-      EX::radiusForGuaranteedDodge(self, 0),
+      EX::radiusForGuaranteedDodge(self, 0) * additionalMult,
       EX::cooldownMaxSkill(wizard, model::ACTION_MAGIC_MISSILE) * useSpeed,
       Game::model().getMagicMissileRadius()
     });
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
+    double additionalMult = MIN(1, 1.5 - changeOfWin);
     magics.push_back(MagicInfo{
-      EX::radiusForGuaranteedDodgeFireBall(self, 0),
+      EX::radiusForGuaranteedDodgeFireBall(self, 0) * additionalMult,
       EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL) * useSpeed,
       Game::model().getFireballRadius()
     });
@@ -54,7 +59,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
 
   if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
     magics.push_back(MagicInfo{
-      EX::radiusForGuaranteedDodgeFrostBolt(self, 0),
+      EX::radiusForGuaranteedDodgeFrostBolt(self, 0) + self.maxSpeed()/*лучше перестраховаться*/,
       EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT) * useSpeed,
       Game::model().getFrostBoltRadius()
     });
@@ -89,13 +94,6 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   /// дистанция на которой я должен находиться чтобы в меня не попали
   distance = MIN(finalDodgeRange, finalCastRange);
   distance += self.maxSpeed(); ///небольшой запас
-
-  const auto center = wizardPos + delta * 0.8;
-  changeOfWin = Algorithm::changeOfWinning(self, center.x, center.y);
-
-  if (changeOfWin > 0.5) {
-    distance *= (1.5 - changeOfWin);
-  }
 
   /// если маг дальше чем нужно, то бояться его не стоит
   if (delta.length() > distance) {
