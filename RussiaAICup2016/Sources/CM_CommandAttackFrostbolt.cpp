@@ -50,12 +50,14 @@ bool CommandAttackFrostbolt::check(const Wizard& self) {
         continue;
       }
 
-      /// если маг может уклонится от снаряда, то приоритет занизится него стрелять
+      /// подвинуть мага на один тик вперед сложно, но зато можно пулю слегка отодвинуть назад, и убедиться что она попадет
+      const auto bulletPos = selfPos - delta.normal() * EX::maxSpeed(wizard);
       Bullet bullet = Bullet(0,
         delta.normal() * Game::model().getFrostBoltSpeed(),
         Game::model().getFrostBoltRadius(),
-        selfPos, selfPos, self.getCastRange(), model::PROJECTILE_FROST_BOLT, self.getFaction());
+        bulletPos, bulletPos, self.getCastRange(), model::PROJECTILE_FROST_BOLT, self.getFaction());
 
+      /// если маг может уклонится от снаряда, то приоритет занизится него стрелять
       /*если мы скоро можем умереть то что тратить жизнь в пустую хоть на последок кинуть стан*/
       if (self.getLife() > 24 && Algorithm::canDodge(wizard, Vector(1, 0).rotate(wizard.getAngle()), bullet)) {
         continue;
