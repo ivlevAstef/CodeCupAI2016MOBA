@@ -6,8 +6,6 @@
 
 
 #include "CM_CommandMoveToBonus.h"
-#include "CM_CommandMoveToPoint.h"
-#include "CM_CommandKeepDistance.h"
 #include "E_World.h"
 #include "E_Points.h"
 #include "E_Game.h"

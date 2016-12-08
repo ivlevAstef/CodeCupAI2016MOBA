@@ -1,5 +1,4 @@
 #include "CM_CommandAvoidMinion.h"
-#include "CM_CommandMoveToPoint.h"
 #include "E_Game.h"
 #include "C_Extensions.h"
 #include "CM_MovePriorities.h"
