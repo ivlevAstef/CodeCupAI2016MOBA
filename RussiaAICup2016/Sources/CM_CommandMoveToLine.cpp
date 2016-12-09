@@ -46,6 +46,7 @@ bool CommandMoveToLine::check(const Wizard& self) {
 
 void CommandMoveToLine::execute(const Wizard& self, Result& result) {
   result.set(toPoint, self);
+  result.turnDirection = Vector();
 
   result.turnPriority = TurnPriority::moveToLine;
   result.priority = priority(self);

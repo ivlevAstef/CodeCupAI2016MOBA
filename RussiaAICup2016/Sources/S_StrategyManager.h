@@ -9,7 +9,7 @@
 
 #include "E_Wizard.h"
 #include "model\Move.h"
-
+#include "S_StrategyType.h"
 #include "C_Singleton.h"
 
 #include "CM_CommandFabric.h"
@@ -25,7 +25,7 @@ namespace AICup
   public:
     StrategyManager();
 
-    void update(const Wizard& self, model::Move& move);
+    void update(const StrategyType& strategyType, const Wizard& self, model::Move& move);
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const model::Wizard& self, const Visualizator& visualizator) const;
@@ -33,7 +33,7 @@ namespace AICup
 
 
   private:
-    CommandStrategyPtr currentStrategy;
+    CommandStrategyPtr strategy;
     CommandFabric fabric;
     Algorithm::PathFinder pathFinder;
   };

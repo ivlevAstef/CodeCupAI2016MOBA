@@ -37,6 +37,7 @@ void CommandFollowAttack::execute(const Wizard& self, Result& result) {
   const auto delta = wizardPos - selfPos;
 
   result.set(wizardPos, self);
+  result.turnDirection = Vector();
 
   result.turnPriority = TurnPriority::follow;
   result.priority = self.getRole().getWizardPriority() * MovePriorities::attackFollow(self, wizard);

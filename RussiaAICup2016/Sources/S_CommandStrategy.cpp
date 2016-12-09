@@ -28,7 +28,9 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
       if (direction.length() < 1.0e-5) {
         Algorithm::execAroundMove(self, finalMove);
       } else {
-        assert(turnDirection.length() > 1.0e-5);
+        if (turnDirection.length() < 0.1) {
+          turnDirection = direction;
+        }
 
         Algorithm::execMove(self, turnDirection, direction, finalMove);
       }
@@ -85,7 +87,11 @@ const Vector CommandStrategy::turn(const std::vector<MoveCommand::Result>& moveR
 
     double sumPriority = 0;
     for (const auto& move : moveResults) {
-      sumPriority += move.turnDirection.normal().dot(direction) * move.turnPriority * move.priority;
+      if (direction.length() < 0.1 || move.turnDirection.length() < 0.1) {
+        sumPriority += move.turnPriority * move.priority;
+      } else {
+        sumPriority += move.turnDirection.normal().dot(direction) * move.turnPriority * move.priority;
+      }
     }
 
     if (sumPriority > maxPriority) {

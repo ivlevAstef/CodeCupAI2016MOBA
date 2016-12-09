@@ -57,6 +57,7 @@ void CommandMoveGetExpirience::execute(const Wizard& self, Result& result) {
   assert(nullptr != target);
 
   result.set(EX::pos(*target), self);
+  result.turnDirection = Vector();
 
   result.turnPriority = TurnPriority::getExpirience;
   result.priority = MovePriorities::getExpirience(self, *target);

@@ -1,12 +1,11 @@
 #include "E_Wizard.h"
-#include "R_StandardRole.h"
-#include "R_RolePusher.h"
 #include "C_Extensions.h"
 #include "C_Math.h"
+#include <assert.h>
 
 using namespace AICup;
 
-Wizard::Wizard(const model::Wizard& wizard):
+Wizard::Wizard(const model::Wizard& wizard, const Role& role):
   model::Wizard(wizard.getId(),
     wizard.getX(), wizard.getY(), wizard.getSpeedX(), wizard.getSpeedY(), wizard.getAngle(),
     wizard.getFaction(), wizard.getRadius(), wizard.getLife(), wizard.getMaxLife(), wizard.getStatuses(),
@@ -14,18 +13,11 @@ Wizard::Wizard(const model::Wizard& wizard):
     wizard.getVisionRange(), wizard.getCastRange(),
     wizard.getXp(), wizard.getLevel(), wizard.getSkills(),
     wizard.getRemainingActionCooldownTicks(), wizard.getRemainingCooldownTicksByAction(),
-    wizard.isMaster(), wizard.getMessages())
+    wizard.isMaster(), wizard.getMessages()),
+  role(role)
 {
-  role = std::make_shared<RolePusher>();
 }
 
-void Wizard::update(model::Move& move) {
-  role->update(*this, move);
-}
-
-void Wizard::moveInfoFrom(const Wizard& last) {
-  this->role = last.role;
-}
 bool Wizard::availableAction(const model::ActionType action) const {
   return EX::availableSkills(*this)[action];
 }

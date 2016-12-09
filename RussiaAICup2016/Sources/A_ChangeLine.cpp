@@ -47,25 +47,27 @@ double Algorithm::calculateLinePriority(const Algorithm::PathFinder& finder, con
 
   /// баланс по силам
   /// пачка крипов около 1500, башня около 4000
-  double laneStrength = InfluenceMap::instance().getLineStrength(lane);
+  const double laneStrength = InfluenceMap::instance().getLineStrength(lane);
 
-  /// все значения от 0 до 1000
-  double lengthPriority = (baseReverseLength * baseReverseLength) / (14.4 * 3600);
-  double distancePriority = 1000 - selfLength / 8;// будем предполагать что максимальная длина пути 8000
-  double wizardPriority = 1000 - 200 * wizardCount;
-  double towerPriority = 500 - 250 * towerBalance;// если своих башен нет то приоритет 1000
-  double laneStrengthPriority = 500 - (MAX(-1000, MIN(laneStrength, 1000)) / 2);
 
+  /// Множители из роли
   const auto lengthRole = self.getRole().getChangeLineForeFrontPriority();
   const auto distanceRole = self.getRole().getChangeLinePathLengthPriority();
   const auto wizardRole = self.getRole().getChangeLineWizardCountPriority();
   const auto towerRole = self.getRole().getChangeLineTowerBalancePriority();
   const auto laneStrengthRoley = self.getRole().getChangeLineLaneStrengthPriority();
 
+  /// все значения от 0 до 1000
+  double lengthPriority = (baseReverseLength * baseReverseLength) / (14.4 * 3600);
+  double distancePriority = 1000 - selfLength / 8;// будем предполагать что максимальная длина пути 8000
+  double wizardPriority = wizardRole > 0 ? (500 - 100 * wizardCount) : (500 + 100 * wizardCount);
+  double towerPriority = towerRole > 0 ? (500 - 250 * towerBalance) : (500 + 250 * towerBalance);
+  double laneStrengthPriority = 500 - (MAX(-1000, MIN(laneStrength, 1000)) / 2);
+
   return (lengthPriority * lengthRole
     + distancePriority * distanceRole
-    + wizardPriority * wizardRole
-    + towerPriority * towerRole
+    + wizardPriority * abs(wizardRole)
+    + towerPriority * abs(towerRole)
     + laneStrengthPriority * laneStrengthRoley) / (lengthRole + distanceRole + wizardRole + towerRole + laneStrengthRoley);
 }
 

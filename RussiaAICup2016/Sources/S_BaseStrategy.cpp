@@ -1,4 +1,4 @@
-﻿#include "S_FirstStrategy.h"
+﻿#include "S_BaseStrategy.h"
 #include "E_World.h"
 #include "E_Points.h"
 #include "E_InfluenceMap.h"
@@ -8,46 +8,14 @@
 
 using namespace AICup;
 
-FirstStrategy::FirstStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder) :
+BaseStrategy::BaseStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder):
   CommandStrategy(fabric, pathFinder) {
-  isInitialized = false;
-  lastChangeLineTick = 0;
-  myLine = model::LANE_MIDDLE;
 }
 
-void FirstStrategy::init(const Wizard& self) {
-  // вначале линию выбираем также как в smart game, так как это даст скорей всего наименьшее количество коллизий
-  switch ((int)self.getId()) {
-    case 1:
-    case 2:
-    case 6:
-    case 7:
-      myLine = model::LANE_TOP;
-      break;
-    case 3:
-    case 8:
-      myLine = model::LANE_MIDDLE;
-      break;
-    case 4:
-    case 5:
-    case 9:
-    case 10:
-      myLine = model::LANE_BOTTOM;
-      break;
-    default:
-      myLine = model::LANE_MIDDLE;
-  }
-}
-
-void FirstStrategy::update(const Wizard& self, model::Move& move) {
+void BaseStrategy::update(const Wizard& self, model::Move& move) {
   CommandStrategy::clear();
 
-  if (!isInitialized) {
-    init(self);
-    isInitialized = true;
-  }
-
-  checkAndChangeLane(self);
+  const auto lane = checkAndChangeLane(self);
 
   ///////////////////////////////////
 
@@ -57,7 +25,7 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
 
   ///////////////////////////////////
 
-  addMoveTo(self);
+  addMoveTo(self, lane);
 
   const auto getExpirienceCommand = fabric.moveGetExpirience();
   if (getExpirienceCommand->check(self)) {
@@ -72,21 +40,25 @@ void FirstStrategy::update(const Wizard& self, model::Move& move) {
   CommandStrategy::update(self, move);
 }
 
-void FirstStrategy::checkAndChangeLane(const Wizard& self) {
+model::LaneType BaseStrategy::checkAndChangeLane(const Wizard& self) {
+  static int lastChangeLineTick = 0;
+  static model::LaneType lane = model::LANE_MIDDLE;
+
   /// раз в 500 тиков пересматриваю линию,
   /// 500 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
   if (World::model().getTickIndex() - lastChangeLineTick >= 500 ||
     /// также проверяем вначале каждый тик, чтобы поудачней выбрать линию
-    (200 <= World::model().getTickIndex() && World::model().getTickIndex() <= 750)) {
-    model::LaneType lane;
+    (100 <= World::model().getTickIndex() && World::model().getTickIndex() <= 750)) {
+
     if (Algorithm::checkChangeLine(pathFinder, self, lane)) {
-      myLine = lane;
+      lastChangeLineTick = World::model().getTickIndex();
     }
-    lastChangeLineTick = World::model().getTickIndex();
   }
+
+  return lane;
 }
 
-void FirstStrategy::addAroundEnemies(const Wizard& self) {
+void BaseStrategy::addAroundEnemies(const Wizard& self) {
   const auto selfPos = EX::pos(self);
 
   const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + 100);
@@ -98,7 +70,7 @@ void FirstStrategy::addAroundEnemies(const Wizard& self) {
   }
 }
 
-void FirstStrategy::addAttackFollow(const Wizard& self) {
+void BaseStrategy::addAttackFollow(const Wizard& self) {
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 100)) {
     if (EX::isWizard(*enemy)) {
       const auto& wizard = EX::asWizard(*enemy);
@@ -110,26 +82,21 @@ void FirstStrategy::addAttackFollow(const Wizard& self) {
   }
 }
 
-void FirstStrategy::addMoveTo(const Wizard& self) {
+void BaseStrategy::addMoveTo(const Wizard& self, model::LaneType lane) {
   MoveCommand::Result cache;
 
   /// эмуляция машины состояний... кривая до невозможности
 
   double moveToBonusPriority = -1000;
-  if (nullptr == moveToBonus) {
-    moveToBonus = fabric.moveToBonus();
-  }
-
+  const auto moveToBonus = fabric.moveToBonus();
   if (moveToBonus->check(self)) {
     moveToBonus->execute(self, cache);
     moveToBonusPriority = cache.priority;
-  } else {
-    moveToBonus = nullptr;
   }
 
 
   double moveToLinePriority = -1000;
-  const auto moveToLine = fabric.moveToLine(myLine);
+  const auto moveToLine = fabric.moveToLine(lane);
   if (moveToLine->check(self)) {
     moveToLine->execute(self, cache);
     moveToLinePriority = cache.priority;
@@ -147,7 +114,7 @@ void FirstStrategy::addMoveTo(const Wizard& self) {
   }
 }
 
-void FirstStrategy::addAttacks(const Wizard& self) {
+void BaseStrategy::addAttacks(const Wizard& self) {
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 200)) {
     const auto attackCommand = fabric.attack(*enemy);
     if (nullptr != attackCommand && attackCommand->check(self)) {
@@ -166,7 +133,7 @@ void FirstStrategy::addAttacks(const Wizard& self) {
   }
 
 }
-void FirstStrategy::addCasts(const Wizard& self) {
+void BaseStrategy::addCasts(const Wizard& self) {
   const auto castHasteCommand = fabric.haste();
   if (nullptr != castHasteCommand && castHasteCommand->check(self)) {
     castCommands.push_back(castHasteCommand);

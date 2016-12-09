@@ -129,6 +129,7 @@ double CommandMoveToBonus::potensialExpirience(const Wizard& self) {
 
 void CommandMoveToBonus::execute(const Wizard& self, Result& result) {
   result.set(bonusPos, self);
+  result.turnDirection = Vector();
 
   result.turnPriority = TurnPriority::moveToBonus;
   result.priority = MovePriorities::moveToBonus(self, bonusPos);

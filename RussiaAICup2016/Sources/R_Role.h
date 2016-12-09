@@ -5,32 +5,17 @@
 //Created: 27/11/2016
 //
 
-#include "model\SkillType.h"
-#include "model\Move.h"
-#include <vector>
+#include <memory>
+#include "model\Wizard.h"
 
 namespace AICup
 {
-  class SkillBranches {
-  public:
-    const static std::vector<model::SkillType> rangeMagicMissile;
-    const static std::vector<model::SkillType> magicalDamageFrostBolt;
-    const static std::vector<model::SkillType> meleeDamageFireBolt;
-    const static std::vector<model::SkillType> moveHast;
-    const static std::vector<model::SkillType> armorShield;
-  };
-
-  typedef std::vector<model::SkillType> SkillBranch;
-  typedef std::vector<SkillBranch> SkillBuild;
-
-  class Wizard;
-
   class Role {
   public:
-    Role(const SkillBuild& skillBuild);
+    Role();
 
     /// устанавливает скилы
-    virtual void update(const Wizard& self, model::Move& move);
+    virtual void update(const model::Wizard& self);
 
 
     inline const float& getAudacity() const {
@@ -50,10 +35,6 @@ namespace AICup
 
     inline const float& getImportanceOfBonus() const {
       return importanceOfBonus;
-    }
-
-    inline const SkillBuild& getSkillBuild() const {
-      return skillBuild;
     }
 
     /// приоритеты атаки
@@ -140,12 +121,11 @@ namespace AICup
     float changeLineTowerBalancePriority; /// насколько сильно влияет количество вышек на линии (свои - вражеские)
     float changeLineLaneStrengthPriority; /// насколько сильно влияет дизбаланс сил
 
-    SkillBuild skillBuild; // Последовательность изучения скилов
-
   private:
     /// если только начала игры, то приоритет всегда один
     bool useStartedLinePriority;
-    int currentLevel;
   };
+
+  typedef std::shared_ptr<Role> RolePtr;
 }
 

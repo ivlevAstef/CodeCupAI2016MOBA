@@ -1,26 +1,33 @@
 //
-//File: R_RolePusher.h
+//File: R_StandardRole.h
 //Author: Ivlev Alexander. Stef
-//Created: 30/11/2016
+//Created: 27/11/2016
 //
 
 #pragma once
 
 #include "R_Role.h"
-#include "E_Wizard.h"
+#include "R_SkillBuild.h"
+#include "C_Extensions.h"
 
 namespace AICup
 {
-  class RolePusher: public Role {
+  class StandardSkillBuild: public SkillBuild {
   public:
-    RolePusher() :
-      Role({
-        SkillBranches::magicalDamageFrostBolt,
-        SkillBranches::moveHast,
-        SkillBranches::armorShield,
-        SkillBranches::rangeMagicMissile,
-        SkillBranches::meleeDamageFireBolt,
-      }) {
+    StandardSkillBuild() : SkillBuild({
+      SkillBranches::magicalDamageFrostBolt,
+      SkillBranches::moveHast,
+      SkillBranches::armorShield,
+      SkillBranches::rangeMagicMissile,
+      SkillBranches::meleeDamageFireBolt
+    }) {
+
+    }
+  };
+
+  class StandardRole: public Role {
+  public:
+    StandardRole() {
       audacity = 0;
       linePressureWizards = 0.25;
       lineAudacityWizards = 2.0;
@@ -41,17 +48,17 @@ namespace AICup
 
       desireChangeLine = 0.7;
       changeLineForeFrontPriority = 1.0;
-      changeLinePathLengthPriority = 1.0;
-      changeLineWizardCountPriority = 0.5;
+      changeLinePathLengthPriority = 1.5;
+      changeLineWizardCountPriority = -1.0; /// чем больше вражеских магов, тем меньшее желание туда идти
       changeLineWizardCountOnlyFriend = false;
       changeLineTowerBalancePriority = 0.75;
-      changeLineLaneStrengthPriority = 0.35;
+      changeLineLaneStrengthPriority = 0.15;
     }
 
-    void update(const Wizard& self, model::Move& move) override {
-      Role::update(self, move);
+    void update(const model::Wizard& self) override {
+      Role::update(self);
 
-      const auto realLife = self.getLife() - self.burnResidualDamage();
+      const auto realLife = self.getLife() - EX::burnResidualDamage(self);
 
       audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
 

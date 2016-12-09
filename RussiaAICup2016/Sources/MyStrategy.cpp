@@ -15,7 +15,7 @@
 #include "C_Extensions.h"
 #include "C_Logger.h"
 #include "E_Wizard.h"
-
+#include "T_Session.h"
 
 using namespace AICup;
 
@@ -37,20 +37,20 @@ void visualization(const model::Wizard& self, const Visualizator& visualizator) 
 #endif
 
 void MyStrategy::move(const model::Wizard& modelSelf, const model::World& world, const model::Game& game, model::Move& move) {
-  static std::shared_ptr<AICup::Wizard> self = std::make_shared<Wizard>(modelSelf);
-  /// —оздаю экземпл€р своего мага, чтобы дальше с ним работать
-  const auto newSelf = std::make_shared<Wizard>(modelSelf);
-  newSelf->moveInfoFrom(*self);
-  self = newSelf;
-
+  /// ќбновл€ю различные карты, которые не завис€т от моего геро€
   AICup::Game::instance().update(game, modelSelf);
   AICup::World::instance().update(world);
-  /// —читывает сообщени€, мен€ет внутренние атрибуты, короче много чего делает...
-  self->update(move);
-
   AICup::HypotheticalEnemies::instance().update();
-  AICup::InfluenceMap::instance().update(*self);
-  AICup::StrategyManager::instance().update(*self, move);
+  AICup::InfluenceMap::instance().update(modelSelf);
+
+  /// «апускаю обновление сессии - локальных данных, которые вли€ют на прин€тие решений что делать
+  Session::instance().update(modelSelf, move);
+
+  /// —оздаю экземпл€р своего мага, чтобы дальше с ним работать
+  const auto self = Wizard(modelSelf, Session::instance().getRole());
+
+  /// запускаю стратегию, дл€ прин€т€ решени€ что делать
+  AICup::StrategyManager::instance().update(Session::instance().getStrategyType(), self, move);
 
 #ifdef ENABLE_VISUALIZATOR
   auto& visualizator = Visualizator::instance();

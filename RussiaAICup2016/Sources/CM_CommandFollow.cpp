@@ -66,6 +66,7 @@ void CommandFollow::execute(const Wizard& self, Result& result) {
   }
 
   result.set(position, self);
+  result.turnDirection = Vector();
 
   result.turnPriority = TurnPriority::follow;
   result.priority = MovePriorities::follow(self, *target);

@@ -24,6 +24,7 @@ bool CommandMoveToPoint::check(const Wizard& self) {
 
 void CommandMoveToPoint::execute(const Wizard& self, Result& result) {
   result.set(point, self);
+  result.turnDirection = Vector();
 
   result.turnPriority = TurnPriority::moveToPoint;
   result.priority = MovePriorities::moveToPoint(self, point);

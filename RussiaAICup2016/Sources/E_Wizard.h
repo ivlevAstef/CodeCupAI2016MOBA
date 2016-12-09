@@ -7,6 +7,7 @@
 #pragma once
 
 #include "model/Wizard.h"
+#include "model/ActionType.h"
 #include "R_Role.h"
 #include <memory>
 
@@ -14,13 +15,7 @@ namespace AICup
 {
   class Wizard: public model::Wizard {
   public:
-
-  public:
-    Wizard(const model::Wizard& wizard);
-    void moveInfoFrom(const Wizard& last);
-
-    /// читает message, и кидает обновление под классам
-    void update(model::Move& move);
+    Wizard(const model::Wizard& wizard, const Role& role);
 
     bool availableAction(const model::ActionType action) const;
 
@@ -40,12 +35,13 @@ namespace AICup
     bool isBurn() const;
     double burnResidualDamage() const;
 
+    /// Вообще я бы её отдельно посылал, но уже менять тяжко, поэтому сюда впихнул
     inline const Role& getRole() const {
-      return *role.get();
+      return role;
     }
 
   private:
-    std::shared_ptr<Role> role;
+    const Role& role;
   };
 }
 

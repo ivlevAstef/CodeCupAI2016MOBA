@@ -1,5 +1,5 @@
 //
-//File: S_FisrtStrategy.h
+//File: S_BaseStrategy.h
 //Author: Ivlev Alexander. Stef
 //Created: 14/11/2016
 //
@@ -10,30 +10,23 @@
 
 namespace AICup
 {
-  class FirstStrategy: public CommandStrategy {
+  class BaseStrategy: public CommandStrategy {
   public:
-    FirstStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
+    BaseStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
 
     void update(const Wizard& self, model::Move& move) override;
 
   private:
     void init(const Wizard& self);
 
-    void checkAndChangeLane(const Wizard& self);
+    model::LaneType checkAndChangeLane(const Wizard& self);
 
     void addAroundEnemies(const Wizard& self);
     void addAttackFollow(const Wizard& self);
 
-    void addMoveTo(const Wizard& self);
+    void addMoveTo(const Wizard& self, model::LaneType lane);
 
     void addAttacks(const Wizard& self);
     void addCasts(const Wizard& self);
-
-  private:
-    bool isInitialized;
-    model::LaneType myLine;
-    int lastChangeLineTick;
-
-    MoveCommandPtr moveToBonus;
   };
 };
