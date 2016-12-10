@@ -50,7 +50,7 @@ void MyStrategy::move(const model::Wizard& modelSelf, const model::World& world,
   const auto self = Wizard(modelSelf, Session::instance().getRole());
 
   /// запускаю стратегию, для принятя решения что делать
-  AICup::StrategyManager::instance().update(Session::instance().getStrategyType(), self, move);
+  AICup::StrategyManager::instance().update(Session::instance().getStrategyDTO(), self, move);
 
 #ifdef ENABLE_VISUALIZATOR
   auto& visualizator = Visualizator::instance();

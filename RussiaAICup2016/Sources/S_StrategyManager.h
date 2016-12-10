@@ -25,7 +25,7 @@ namespace AICup
   public:
     StrategyManager();
 
-    void update(const StrategyType& strategyType, const Wizard& self, model::Move& move);
+    void update(const StrategyDTO& strategyDTO, const Wizard& self, model::Move& move);
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const model::Wizard& self, const Visualizator& visualizator) const;
@@ -36,5 +36,7 @@ namespace AICup
     CommandStrategyPtr strategy;
     CommandFabric fabric;
     Algorithm::PathFinder pathFinder;
+
+    StrategyDTO lastStrategyDTO;
   };
 }

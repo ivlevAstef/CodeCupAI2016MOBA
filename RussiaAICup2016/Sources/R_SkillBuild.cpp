@@ -50,7 +50,8 @@ SkillBuild::SkillBuild(std::vector<SkillBranch> build) : build(build) {
 
 /// устанавливает скилы
 void SkillBuild::update(const model::Wizard& self, model::Move& move) {
-  while (currentLevel < self.getLevel()) {
+  // не цикл, ибо нельзя установить в один тик несколько скилов
+  if (currentLevel < self.getLevel()) {
     const size_t branchIndex = currentLevel / 5;
     const size_t skillIndex = currentLevel % 5;
     const auto skill = build[branchIndex][skillIndex];

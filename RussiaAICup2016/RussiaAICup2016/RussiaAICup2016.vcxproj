@@ -358,6 +358,7 @@ powershell start-process local-runner.bat</Command>
     <ClCompile Include="..\Sources\Tests\S_TestFollowStrategy.cpp" />
     <ClCompile Include="..\Sources\Tests\S_TestMoveAndAttackStrategy.cpp" />
     <ClCompile Include="..\Sources\Tests\S_TestMoveStrategy.cpp" />
+    <ClCompile Include="..\Sources\T_Message.cpp" />
     <ClCompile Include="..\Sources\T_Session.cpp" />
     <ClCompile Include="..\Sources\Visualizator\Visualizator.cpp" />
   </ItemGroup>
@@ -392,12 +393,16 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\E_Bullet.h" />
     <ClInclude Include="..\Sources\E_InfluenceMap.h" />
     <ClInclude Include="..\Sources\E_HypotheticalEnemies.h" />
+    <ClInclude Include="..\Sources\R_Attacks.h" />
     <ClInclude Include="..\Sources\R_DynamicSkillBuilds.h" />
     <ClInclude Include="..\Sources\R_SkillBuild.h" />
     <ClInclude Include="..\Sources\R_Standard.h" />
     <ClInclude Include="..\Sources\E_Wizard.h" />
     <ClInclude Include="..\Sources\E_WorldObjects.h" />
     <ClInclude Include="..\Sources\R_Role.h" />
+    <ClInclude Include="..\Sources\R_Supports.h" />
+    <ClInclude Include="..\Sources\R_TacticsRole.h" />
+    <ClInclude Include="..\Sources\R_Tanks.h" />
     <ClInclude Include="..\Sources\S_StrategyType.h" />
     <ClInclude Include="..\Sources\S_StrategyManager.h" />
     <ClInclude Include="..\Sources\CM_CommandMoveGetExpirience.h" />
@@ -422,7 +427,10 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\Tests\S_TestFollowStrategy.h" />
     <ClInclude Include="..\Sources\Tests\S_TestMoveAndAttackStrategy.h" />
     <ClInclude Include="..\Sources\Tests\S_TestMoveStrategy.h" />
+    <ClInclude Include="..\Sources\T_Message.h" />
     <ClInclude Include="..\Sources\T_Session.h" />
+    <ClInclude Include="..\Sources\T_Tactics.h" />
+    <ClInclude Include="..\Sources\T_TacticsType.h" />
     <ClInclude Include="..\Sources\Visualizator\Visualizator.h" />
   </ItemGroup>
   <ItemGroup>

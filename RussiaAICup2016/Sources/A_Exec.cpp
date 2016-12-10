@@ -47,25 +47,6 @@ bool Algorithm::execMove(const Wizard& self, const Vector& turnDirection, const 
   return true;
 }
 
-bool Algorithm::execAroundMove(const Wizard& self, model::Move& move) {
-  const auto selfPos = EX::pos(self);
-
-  ///случайно смещаемся, поворачиваемся и бьем все вокруге
-
-  move.setSpeed((double(rand() % 1000) / 100.0) - 5.0);
-  move.setStrafeSpeed((double(rand() % 1000) / 100.0) - 5.0);
-  move.setTurn(1);
-
-  if (0 == self.cooldown(model::ACTION_STAFF)) {
-    move.setAction(model::ACTION_STAFF);
-  } else if (0 == self.cooldown(model::ACTION_MAGIC_MISSILE)) {
-    move.setAction(model::ACTION_MAGIC_MISSILE);
-  }
-
-  return true;
-}
-
-
 bool Algorithm::execAttack(const Wizard& self, const model::ActionType action, const model::LivingUnit& unit, model::Move& move) {
   const double angleDeviation = self.getAngleTo(unit);
 

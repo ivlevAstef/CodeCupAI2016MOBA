@@ -1,7 +1,7 @@
 //
-//File: R_Standard.h
+//File: R_Attacks.h
 //Author: Ivlev Alexander. Stef
-//Created: 27/11/2016
+//Created: 10/12/2016
 //
 
 #pragma once
@@ -12,22 +12,36 @@
 
 namespace AICup
 {
-  class StandardSkillBuild: public SkillBuild {
+  class AttackStanSkillBuild: public SkillBuild {
   public:
-    StandardSkillBuild() : SkillBuild({
+    AttackStanSkillBuild() : SkillBuild({
       SkillBranches::magicalDamageFrostBolt,
       SkillBranches::moveHast,
-      SkillBranches::armorShield,
       SkillBranches::rangeMagicMissile,
-      SkillBranches::meleeDamageFireBolt
+      SkillBranches::meleeDamageFireBolt,
+      SkillBranches::armorShield,
     }) {
 
     }
   };
 
-  class StandardRole: public Role {
+  class AttackAOESkillBuild: public SkillBuild {
   public:
-    StandardRole() {
+    AttackAOESkillBuild() : SkillBuild({
+      SkillBranches::meleeDamageFireBolt,
+      SkillBranches::armorShield,
+      SkillBranches::magicalDamageFrostBolt,
+      SkillBranches::rangeMagicMissile,
+      SkillBranches::moveHast,
+    }) {
+
+    }
+  };
+
+  /// TODO: подогнать цифры
+  class AttackRole: public Role {
+  public:
+    AttackRole() {
       audacity = 0;
       linePressureWizards = 0.25;
       lineAudacityWizards = 2.0;
@@ -66,5 +80,22 @@ namespace AICup
       lineAudacityWizards = 0.5 + 3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
-}
 
+  class AttackStanRole: public AttackRole {
+  public:
+    AttackStanRole() {
+    }
+
+    void update(const model::Wizard& self) override {
+    }
+  };
+
+  class AttackAOERole: public AttackRole {
+  public:
+    AttackAOERole() {
+    }
+
+    void update(const model::Wizard& self) override {
+    }
+  };
+}

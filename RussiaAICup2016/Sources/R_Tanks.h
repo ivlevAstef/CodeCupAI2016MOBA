@@ -1,7 +1,7 @@
 //
-//File: R_Standard.h
+//File: R_Tanks.h
 //Author: Ivlev Alexander. Stef
-//Created: 27/11/2016
+//Created: 10/12/2016
 //
 
 #pragma once
@@ -12,22 +12,36 @@
 
 namespace AICup
 {
-  class StandardSkillBuild: public SkillBuild {
+  class TankAttackSkillBuild: public SkillBuild {
   public:
-    StandardSkillBuild() : SkillBuild({
-      SkillBranches::magicalDamageFrostBolt,
-      SkillBranches::moveHast,
+    TankAttackSkillBuild() : SkillBuild({
       SkillBranches::armorShield,
+      SkillBranches::meleeDamageFireBolt,
+      SkillBranches::moveHast,
+      SkillBranches::magicalDamageFrostBolt,
       SkillBranches::rangeMagicMissile,
-      SkillBranches::meleeDamageFireBolt
     }) {
 
     }
   };
 
-  class StandardRole: public Role {
+  class TankSupportSkillBuild: public SkillBuild {
   public:
-    StandardRole() {
+    TankSupportSkillBuild() : SkillBuild({
+      SkillBranches::armorShield,
+      SkillBranches::magicalDamageFrostBolt,
+      SkillBranches::moveHast,
+      SkillBranches::meleeDamageFireBolt,
+      SkillBranches::rangeMagicMissile,
+    }) {
+
+    }
+  };
+
+  /// TODO: подогнать цифры
+  class TankRole: public Role {
+  public:
+    TankRole() {
       audacity = 0;
       linePressureWizards = 0.25;
       lineAudacityWizards = 2.0;
@@ -66,5 +80,22 @@ namespace AICup
       lineAudacityWizards = 0.5 + 3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
-}
 
+  class TankAttackRole: public TankRole {
+  public:
+    TankAttackRole() {
+    }
+
+    void update(const model::Wizard& self) override {
+    }
+  };
+
+  class TankSupportRole: public TankRole {
+  public:
+    TankSupportRole() {
+    }
+
+    void update(const model::Wizard& self) override {
+    }
+  };
+}

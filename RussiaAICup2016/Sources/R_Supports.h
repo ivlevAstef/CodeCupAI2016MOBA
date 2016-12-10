@@ -1,7 +1,7 @@
 //
-//File: R_Standard.h
+//File: R_Supports.h
 //Author: Ivlev Alexander. Stef
-//Created: 27/11/2016
+//Created: 10/12/2016
 //
 
 #pragma once
@@ -12,22 +12,36 @@
 
 namespace AICup
 {
-  class StandardSkillBuild: public SkillBuild {
+  class SupportStanSkillBuild: public SkillBuild {
   public:
-    StandardSkillBuild() : SkillBuild({
+    SupportStanSkillBuild() : SkillBuild({
       SkillBranches::magicalDamageFrostBolt,
+      SkillBranches::rangeMagicMissile,
       SkillBranches::moveHast,
       SkillBranches::armorShield,
-      SkillBranches::rangeMagicMissile,
-      SkillBranches::meleeDamageFireBolt
+      SkillBranches::meleeDamageFireBolt,
     }) {
 
     }
   };
 
-  class StandardRole: public Role {
+  class SupportHasteSkillBuild: public SkillBuild {
   public:
-    StandardRole() {
+    SupportHasteSkillBuild() : SkillBuild({
+      SkillBranches::moveHast,
+      SkillBranches::magicalDamageFrostBolt,
+      SkillBranches::armorShield,
+      SkillBranches::meleeDamageFireBolt,
+      SkillBranches::rangeMagicMissile,
+    }) {
+
+    }
+  };
+
+  /// TODO: подогнать цифры
+  class SupportRole: public Role {
+  public:
+    SupportRole() {
       audacity = 0;
       linePressureWizards = 0.25;
       lineAudacityWizards = 2.0;
@@ -66,5 +80,22 @@ namespace AICup
       lineAudacityWizards = 0.5 + 3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
-}
 
+  class SupportStanRole: public SupportRole {
+  public:
+    SupportStanRole() {
+    }
+
+    void update(const model::Wizard& self) override {
+    }
+  };
+
+  class SupportHasteRole: public SupportRole {
+  public:
+    SupportHasteRole() {
+    }
+
+    void update(const model::Wizard& self) override {
+    }
+  };
+}

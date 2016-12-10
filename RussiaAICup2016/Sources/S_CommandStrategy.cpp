@@ -25,15 +25,13 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
       Vector turnDirection = turn(moveResults);
 
       /// если мы в окружении, значит все плохо... или алгоритм глюканул
-      if (direction.length() < 1.0e-5) {
-        Algorithm::execAroundMove(self, finalMove);
-      } else {
-        if (turnDirection.length() < 0.1) {
-          turnDirection = direction;
-        }
+      assert(direction.length() > 0.1);
 
-        Algorithm::execMove(self, turnDirection, direction, finalMove);
+      if (turnDirection.length() < 0.1) {
+        turnDirection = direction;
       }
+
+      Algorithm::execMove(self, turnDirection, direction, finalMove);
     }
   }
 
@@ -137,8 +135,18 @@ bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const 
   }
 
   const auto finalMoveVector = calcMoveVector(moveResults, self);
+  const auto selfPos = EX::pos(self);
 
-  direction = calculateCollisions(self, EX::pos(self) + finalMoveVector/*куда ищем путь*/);
+  direction = calculateCollisions(self, selfPos + finalMoveVector/*куда ищем путь*/);
+  /// если нет движения, значит идем прямо, перед этим найдя дерево под снос
+  if (direction.length() < 1) {
+    direction = finalMoveVector;
+    for (const auto& tree : World::instance().trees()) {
+      if (Math::distanceToLine(EX::pos(tree), selfPos, selfPos + direction) < tree.getRadius() + self.getRadius()) {
+        addTreeForRemove(self, &tree);
+      }
+    }
+  }
 
   return true;
 }

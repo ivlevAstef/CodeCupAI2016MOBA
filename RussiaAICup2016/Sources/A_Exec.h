@@ -18,8 +18,6 @@ namespace AICup
   {
     bool execMove(const Wizard& self, const Vector& turnDirection, const Vector& direction, model::Move& move);
 
-    bool execAroundMove(const Wizard& self, model::Move& move);
-
     bool execAttack(const Wizard& self, const model::ActionType action, const model::LivingUnit& unit, model::Move& move);
 
     bool execCast(const Wizard& self, const model::ActionType action, const model::LivingUnit& unit, model::Move& move);

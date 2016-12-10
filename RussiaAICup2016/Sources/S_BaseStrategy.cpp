@@ -44,11 +44,11 @@ model::LaneType BaseStrategy::checkAndChangeLane(const Wizard& self) {
   static int lastChangeLineTick = 0;
   static model::LaneType lane = model::LANE_MIDDLE;
 
-  /// раз в 500 тиков пересматриваю линию,
-  /// 500 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
-  if (World::model().getTickIndex() - lastChangeLineTick >= 500 ||
+  /// раз в 250 тиков пересматриваю линию,
+  /// 250 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
+  if (World::model().getTickIndex() - lastChangeLineTick >= 250 ||
     /// также проверяем вначале каждый тик, чтобы поудачней выбрать линию
-    (100 <= World::model().getTickIndex() && World::model().getTickIndex() <= 750)) {
+    (100 <= World::model().getTickIndex() && World::model().getTickIndex() <= 500)) {
 
     if (Algorithm::checkChangeLine(pathFinder, self, lane)) {
       lastChangeLineTick = World::model().getTickIndex();
@@ -99,6 +99,12 @@ void BaseStrategy::addMoveTo(const Wizard& self, model::LaneType lane) {
   if (moveToBonus->check(self)) {
     moveToBonus->execute(self, cache);
     moveToBonusPriority = cache.priority;
+
+    for (const auto& bonus : World::model().getBonuses()) {
+      if (self.getDistanceTo(bonus) < 350) {
+        moveToBonusPriority = 10000;
+      }
+    }
   }
 
 
