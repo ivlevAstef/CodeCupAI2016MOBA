@@ -14,13 +14,13 @@ CommandAttackFireball::CommandAttackFireball() {
 double calcPriority(const model::LivingUnit& unit) {
   double priority = 0;
 
-  for (const auto& enemy : World::instance().around(unit, unit.getFaction(), Game::model().getFireballExplosionMinDamageRange())) {
+  for (const auto& enemy : World::instance().around(unit, unit.getFaction(), Game::model().getFireballExplosionMinDamageRange()+25)) {
     if (EX::isWizard(*enemy)) {
-      priority += 20;
+      priority += 25;
     } else if (EX::isMinion(*enemy)) {
       priority += enemy->getLife() / 10;
     } else if (EX::isBuilding(*enemy)) {
-      priority += 12;
+      priority += 20;
     }
   }
   return priority;
@@ -33,22 +33,20 @@ bool CommandAttackFireball::check(const Wizard& self) {
     return false;
   }
 
+  if (self.cooldown(model::ACTION_FIREBALL) > 0) {
+    return false;
+  }
+
+  if (self.getMana() < Game::model().getFireballManacost()) {
+    return false;
+  }
+
+
   const auto selfPos = EX::pos(self);
 
   double maxPriority = 0;
   /// находим кого поджечь
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getCastRange() + 50)) {
-    double timeForAttack = Algorithm::timeToTurnForAttack(*enemy, self);
-
-    if (self.cooldown(model::ACTION_FIREBALL) > timeForAttack + 1) {
-      continue;
-    }
-
-    double manaRestore = Game::model().getWizardBaseManaRegeneration() + self.getLevel() * Game::model().getWizardManaRegenerationGrowthPerLevel();
-    if (self.getMana() + manaRestore * timeForAttack < Game::model().getFireballManacost()) {
-      continue;
-    }
-
     const auto& unit = *enemy;
 
     const auto unitPos = EX::pos(unit);

@@ -29,6 +29,10 @@ namespace AICup
     double getExpirience(const Wizard& self, const model::LivingUnit& unit);
     double keepDistance(const Wizard& self, const Position point, const double min, const double max);
 
+    double moveMeleeAttack(const Wizard& self, const model::Wizard& wizard);
+    double moveMeleeAttack(const Wizard& self, const model::Minion& minion);
+    double moveMeleeAttack(const Wizard& self, const model::Building& build);
+
     double moveToBonus(const Wizard& self, const Position& bonusPos);
 
     double moveToLine(const Wizard& self, const model::LaneType& lane);

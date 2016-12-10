@@ -37,6 +37,8 @@ namespace AICup
     MoveCommandPtr moveToBonus() const;
 
 /// #pragma mark - атака
+    MoveCommandPtr moveMeleeAttack(const model::LivingUnit& unit) const;
+
     MoveCommandPtr followAttack(const model::Wizard& wizard) const;
 
     /// атаковать врага

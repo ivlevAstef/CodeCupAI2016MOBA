@@ -23,7 +23,7 @@ namespace AICup
   public:
     static const int avoidBuild = 5;
     static const int avoidMinion = 5;
-    static const int avoidWizard = 10;
+    static const int avoidWizard = 30;
     static const int avoidProjectile = 100;
 
     static const int defendPoint = 1;

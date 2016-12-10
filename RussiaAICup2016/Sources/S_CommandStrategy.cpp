@@ -248,9 +248,9 @@ void CommandStrategy::visualization(const model::Wizard& self, const Visualizato
   }*/
 
   if (Visualizator::PRE == visualizator.getStyle()) {
-    for (const auto& move : moveCommandsToMoveResult(self)) {
+    /*for (const auto& move : moveCommandsToMoveResult(self)) {
       visualizator.line(self.getX(), self.getY(), self.getX() + move.moveDirection.x, self.getY() + move.moveDirection.y, 0xff0000);
-    }
+    }*/
   }
 
   for (const auto& command : attackCommands) {

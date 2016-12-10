@@ -207,6 +207,9 @@
     <ClCompile Include="..\Sources\T_Session.cpp">
       <Filter>Sources\Tactics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandMoveMeleeAttack.cpp">
+      <Filter>Sources\Command\Commands\attack</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -388,6 +391,12 @@
     </ClInclude>
     <ClInclude Include="..\Sources\S_BaseStrategy.h">
       <Filter>Sources\Strategy\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\R_DynamicSkillBuilds.h">
+      <Filter>Sources\Roles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandMoveMeleeAttack.h">
+      <Filter>Sources\Command\Commands\attack</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

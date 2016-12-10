@@ -21,7 +21,7 @@ namespace AICup
 
     model::LaneType checkAndChangeLane(const Wizard& self);
 
-    void addAroundEnemies(const Wizard& self);
+    void addAroundEnemiesOrMoveMelee(const Wizard& self);
     void addAttackFollow(const Wizard& self);
 
     void addMoveTo(const Wizard& self, model::LaneType lane);

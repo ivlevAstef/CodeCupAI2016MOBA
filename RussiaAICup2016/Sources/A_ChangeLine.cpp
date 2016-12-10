@@ -21,6 +21,7 @@ double Algorithm::calculateLinePriority(const Algorithm::PathFinder& finder, con
   /// расчитываем как далеко линии находиться от базы, и ревертируем это значение
   double baseLength = 0;
   double baseReverseLength = 0;
+  double priority = 1;
   switch (lane) {
     case model::LANE_TOP:
     case model::LANE_BOTTOM:
@@ -30,6 +31,7 @@ double Algorithm::calculateLinePriority(const Algorithm::PathFinder& finder, con
     case model::LANE_MIDDLE:
       baseLength = sqrt(2) * (basePosition - position).length();
       baseReverseLength = 7200 - baseLength;
+      priority = 0.95;
       break;
     default:
       break;
@@ -64,62 +66,11 @@ double Algorithm::calculateLinePriority(const Algorithm::PathFinder& finder, con
   double towerPriority = towerRole > 0 ? (500 - 250 * towerBalance) : (500 + 250 * towerBalance);
   double laneStrengthPriority = 500 - (MAX(-1000, MIN(laneStrength, 1000)) / 2);
 
-  return (lengthPriority * lengthRole
+  return priority * (lengthPriority * lengthRole
     + distancePriority * distanceRole
     + wizardPriority * abs(wizardRole)
     + towerPriority * abs(towerRole)
-    + laneStrengthPriority * laneStrengthRoley) / (lengthRole + distanceRole + wizardRole + towerRole + laneStrengthRoley);
-}
-
-double Algorithm::calculateLineEnemyPriority(const Algorithm::PathFinder& finder, const Wizard& self, const model::LaneType lane) {
-  const auto basePosition = Points::point(Points::RENEGADES_BASE);
-  /// получаем точки где сейчас находяться линии
-  const auto position = InfluenceMap::instance().getForeFront(lane, 0);
-
-  /// Считаем время сколько бежать до линии от текущей точки
-  std::shared_ptr<Algorithm::Path> path;
-  finder.calculatePath(position, path);
-  double selfLength = path->getRealLength();
-
-  /// расчитываем как далеко линии находиться от базы, и ревертируем это значение
-  double baseLength = 0;
-  double baseReverseLength = 0;
-  switch (lane) {
-    case model::LANE_TOP:
-    case model::LANE_BOTTOM:
-      baseLength = abs((basePosition - position).x) + abs((basePosition - position).y);
-      baseReverseLength = 7200 - baseLength;
-      break;
-    case model::LANE_MIDDLE:
-      baseLength = sqrt(2) * (basePosition - position).length();
-      baseReverseLength = 7200 - baseLength;
-      break;
-    default:
-      break;
-  }
-
-  /// баланс башен положительный - наших больше, отрицательный наших меньше
-  int towerBalance = World::instance().towerCount(lane, Game::enemyFaction()) - World::instance().towerCount(lane, Game::friendFaction());
-
-  /// баланс по силам
-  /// пачка крипов около 1500, башня около 4000
-  double laneStrength = -InfluenceMap::instance().getLineStrength(lane);
-
-  /// все значения от 0 до 1000
-  double lengthPriority = (baseReverseLength * baseReverseLength) / (14.4 * 3600);
-  double distancePriority = 1000 - selfLength / 8;// будем предполагать что максимальная длина пути 8000
-  double towerPriority = 500 - 250 * towerBalance;// если своих башен нет то приоритет 1000
-  double laneStrengthPriority = 500 - (MAX(-10000, MIN(laneStrength, 10000)) / 20);
-
-  const auto lengthRole = 1;
-  const auto distanceRole = self.getRole().getChangeLinePathLengthPriority();
-  const auto towerRole = self.getRole().getChangeLineTowerBalancePriority();
-  const auto laneStrengthRoley = self.getRole().getChangeLineLaneStrengthPriority();
-
-  return (lengthPriority * lengthRole
-    + distancePriority * lengthRole
-    + towerPriority * towerRole
-    + laneStrengthPriority * laneStrengthRoley) / (lengthRole + distanceRole + towerRole + laneStrengthRoley);
+    + laneStrengthPriority * laneStrengthRoley) / (lengthRole + distanceRole + abs(wizardRole) + abs(towerRole) + laneStrengthRoley);
 }
 
 bool equal(double a, double b) {

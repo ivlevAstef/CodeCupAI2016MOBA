@@ -1,5 +1,5 @@
 //
-//File: R_StandardRole.h
+//File: R_Standard.h
 //Author: Ivlev Alexander. Stef
 //Created: 27/11/2016
 //
@@ -46,13 +46,13 @@ namespace AICup
       audacityWizard = 1.5;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 0.7;
-      changeLineForeFrontPriority = 1.0;
-      changeLinePathLengthPriority = 1.5;
-      changeLineWizardCountPriority = -1.0; /// чем больше вражеских магов, тем меньшее желание туда идти
+      desireChangeLine = 0.94;
+      changeLineForeFrontPriority = 0.25;
+      changeLinePathLengthPriority = 0.75;
+      changeLineWizardCountPriority = 1.5;
       changeLineWizardCountOnlyFriend = false;
-      changeLineTowerBalancePriority = 0.75;
-      changeLineLaneStrengthPriority = 0.15;
+      changeLineTowerBalancePriority = -0.5; // бежим туда где больше вражеских вышек, при прочих равных
+      changeLineLaneStrengthPriority = 1.0;
     }
 
     void update(const model::Wizard& self) override {

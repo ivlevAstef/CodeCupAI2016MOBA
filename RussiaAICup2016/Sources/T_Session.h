@@ -37,6 +37,11 @@ namespace AICup
     }
 
   private:
+    /// для игры в одного - чтобы менять скилл билд в зависимости от ситуации на линии
+    void dynamicChangeSkillBuild(const model::Wizard& wizard);
+
+
+  private:
     RolePtr role;
     SkillBuildPtr skillBuild;
     StrategyType strategyType;

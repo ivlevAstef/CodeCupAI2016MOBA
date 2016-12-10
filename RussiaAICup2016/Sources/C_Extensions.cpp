@@ -248,6 +248,29 @@ double EX::damage(const model::Wizard& obj, const model::ActionType action) {
   return 0;
 }
 
+
+double EX::dps(const model::Wizard& obj) {
+  double mmMana = MIN(1.0, double(obj.getMana()) / double(Game::model().getMagicMissileManacost()));
+  double mmDps = dps(obj, model::ACTION_MAGIC_MISSILE) * mmMana;
+
+  double result = dps(obj, model::ACTION_STAFF);
+  result += mmDps;
+
+  if (availableSkill(obj, model::ACTION_FROST_BOLT)) {
+    double mana = MIN(1.0, double(obj.getMana()) / double(Game::model().getFrostBoltManacost()));
+    double ffDps = dps(obj, model::ACTION_FROST_BOLT);
+    result += ffDps*mana + mmDps;
+  }
+
+  if (availableSkill(obj, model::ACTION_FIREBALL)) {
+    double mana = MIN(1.0, double(obj.getMana()) / double(Game::model().getFireballManacost()));
+    double ffDps = dps(obj, model::ACTION_FIREBALL);
+    result += MAX(ffDps, mmDps) - mmDps;
+  }
+
+  return result;
+}
+
 double EX::dps(const model::Wizard& obj, const model::ActionType action) {
   if (model::ACTION_STAFF == action) {
     return staffAttack(obj) / Game::model().getStaffCooldownTicks();
@@ -261,7 +284,7 @@ double EX::dps(const model::Wizard& obj, const model::ActionType action) {
   } else if (model::ACTION_FROST_BOLT == action) {
     return Game::model().getFrostBoltDirectDamage() / Game::model().getFrostBoltCooldownTicks();
   } else if (model::ACTION_FIREBALL == action) {
-    return Game::model().getFireballExplosionMaxDamage() / Game::model().getFireballCooldownTicks();
+    return (Game::model().getFireballExplosionMaxDamage() + Game::model().getBurningSummaryDamage()) / Game::model().getFireballCooldownTicks();
   }
   return 0;
 }

@@ -66,9 +66,9 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
   auto preyEndPos = preyBeginPos + preyEndVec * (EX::maxSpeed(prey) * maxIteration);
   for (const auto& obstacle : obstacles) {
     /// пока не будет учитывать движимые объекты, ибо сложно
-    /*if (EX::isMinion(*obstacle) || EX::isWizard(*obstacle)) {
+    if (EX::isMinion(*obstacle) || EX::isWizard(*obstacle)) {
       continue;
-    }*/
+    }
     /// проверка на уперся в препятствие
     const auto obstaclePos = EX::pos(*obstacle);
     const auto intersectPoint = Math::point_distanceToSegment(EX::pos(*obstacle), preyBeginPos, preyEndPos);

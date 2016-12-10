@@ -52,6 +52,8 @@ namespace AICup
 
     double damage(const model::Wizard& obj, const model::ActionType action);
     double dps(const model::Wizard& obj, const model::ActionType action);
+    /// к сожалению не совсем правдивый, но учитывает количество маны
+    double dps(const model::Wizard& obj);
 
     std::vector<bool> availableSkills(const model::Wizard& obj);
     bool availableSkill(const model::Wizard& obj, model::ActionType action);

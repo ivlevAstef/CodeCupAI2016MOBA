@@ -19,7 +19,7 @@ void BaseStrategy::update(const Wizard& self, model::Move& move) {
 
   ///////////////////////////////////
 
-  addAroundEnemies(self);
+  addAroundEnemiesOrMoveMelee(self);
   addAttackFollow(self);
 
 
@@ -58,14 +58,21 @@ model::LaneType BaseStrategy::checkAndChangeLane(const Wizard& self) {
   return lane;
 }
 
-void BaseStrategy::addAroundEnemies(const Wizard& self) {
+void BaseStrategy::addAroundEnemiesOrMoveMelee(const Wizard& self) {
   const auto selfPos = EX::pos(self);
 
   const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + 100);
   for (const auto& enemy : aroundEnemies) {
-    const auto command = fabric.avoidEnemy(*enemy);
-    if (command->check(self)) {
-      moveCommands.push_back(command);
+    const auto avoidCommand = fabric.avoidEnemy(*enemy);
+    const auto moveMeleeCommand = fabric.moveMeleeAttack(*enemy);
+
+    const bool avoid = avoidCommand->check(self);
+    const bool moveMelee = moveMeleeCommand->check(self);
+
+    if (avoid && !moveMelee) {
+      moveCommands.push_back(avoidCommand);
+    } else if (moveMelee) {
+      moveCommands.push_back(moveMeleeCommand);
     }
   }
 }

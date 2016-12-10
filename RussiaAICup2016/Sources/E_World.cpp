@@ -340,9 +340,15 @@ const model::LaneType World::positionToLine(const double x, const double y) cons
     return model::_LANE_UNKNOWN_;
   }
 
-  if (delta > size() / 6) {
+  double ds = size() / 6;
+  /// лень писать нормальное вычисление прямых которые бы давали хорошую оценку где находиться маг
+  if ((x < 1200 && (size() - y) < 1200) || ((size() - x) < 1200 && y < 1200)) {
+    ds = size() / 10;
+  }
+
+  if (delta > ds) {
     return model::LANE_TOP;
-  } else if (delta < -size() / 6) {
+  } else if (delta < -ds) {
     return model::LANE_BOTTOM;
   }
 

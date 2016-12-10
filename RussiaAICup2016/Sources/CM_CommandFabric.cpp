@@ -20,6 +20,7 @@
 #include "CM_CommandAttackFireball.h"
 #include "CM_CommandPool.h"
 #include "CM_CommandFollowAttackEnemy.h"
+#include "CM_CommandMoveMeleeAttack.h"
 
 #include "CM_CommandAvoidWizard.h"
 #include "CM_CommandAvoidBuild.h"
@@ -62,6 +63,10 @@ MoveCommandPtr CommandFabric::followAttack(const model::Wizard& wizard) const {
 
 MoveCommandPtr CommandFabric::moveGetExpirience() const {
   return std::make_shared<CommandMoveGetExpirience>();
+}
+
+MoveCommandPtr CommandFabric::moveMeleeAttack(const model::LivingUnit& unit) const {
+  return std::make_shared<CommandMoveMeleeAttack>(unit);
 }
 
 AttackCommandPtr CommandFabric::attack(const model::LivingUnit& unit) const {

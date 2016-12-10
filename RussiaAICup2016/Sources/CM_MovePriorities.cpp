@@ -8,8 +8,14 @@ using namespace AICup;
 
 ///слегка выше
 double MovePriorities::avoidBuild(const Wizard& self, const model::Building& build) {
-  const int lifePriority = (5000 * build.getLife()) / build.getMaxLife();
-  return 3000 + lifePriority;
+  const int life = (100 - MIN(100.0, self.getLife()));
+
+  if (model::BUILDING_FACTION_BASE == build.getType()) {
+    const int lifePriority = 4 * life;
+    return 1000 + 50 * lifePriority;
+  }
+
+  return 2000 + 30 * life;
 }
 
 double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& minion) {
@@ -68,6 +74,38 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
 double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {
   /*сочетается с get expirience*/
   return 650 * double(self.getLife())/double(self.getMaxLife());
+}
+
+double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Wizard& wizard) {
+  const double timeToSelfKill = double(self.getLife()) / EX::dps(wizard);
+  const double timeToWizardKill = double(wizard.getLife()) / EX::dps(self);
+
+  if (timeToSelfKill + Game::model().getWizardActionCooldownTicks() < timeToWizardKill) {
+    return 0;
+  }
+
+  return 300 * (timeToSelfKill / timeToWizardKill);
+}
+
+double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Minion& minion) {
+  const double timeToMinionKill = EX::dps(self) / double(minion.getLife());
+  const double maxTimeToKill = Game::model().getWizardActionCooldownTicks() * 3;
+
+  if (timeToMinionKill < maxTimeToKill) {
+    return 500 * (1 - (timeToMinionKill / maxTimeToKill));
+  }
+
+  return 0;
+}
+
+double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Building& build) {
+  const double timeToTowerKill = EX::dps(self) / double(build.getLife());
+
+  if (timeToTowerKill < build.getCooldownTicks()) {
+    return 700;
+  }
+
+  return 0;
 }
 
 /// Это очень важно, поэтому завышено значение от нормы

@@ -54,20 +54,20 @@ void MyStrategy::move(const model::Wizard& modelSelf, const model::World& world,
 
 #ifdef ENABLE_VISUALIZATOR
   auto& visualizator = Visualizator::instance();
-  visualizator.isReverse = (self->getFaction() == model::FACTION_RENEGADES);
+  visualizator.isReverse = (self.getFaction() == model::FACTION_RENEGADES);
 
   visualizator.beginPre();
-  visualization(*self, visualizator);
+  visualization(self, visualizator);
   visualizator.endPre();
 
   visualizator.beginPost();
-  visualization(*self, visualizator);
+  visualization(self, visualizator);
   visualizator.endPost();
 
 
   visualizator.isReverse = false;
   visualizator.beginAbs();
-  visualization(*self, visualizator);
+  visualization(self, visualizator);
   visualizator.endAbs();
 
 #endif

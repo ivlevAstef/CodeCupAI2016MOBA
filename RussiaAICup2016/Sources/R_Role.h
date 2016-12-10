@@ -68,14 +68,14 @@ namespace AICup
 
     // смена линии
     inline const float getDesireChangeLine() const {
-      return !useStartedLinePriority ? desireChangeLine : 0.85f;
+      return !useStartedLinePriority ? desireChangeLine : 0.95f;
     }
     inline const float getChangeLineForeFrontPriority() const {
       return !useStartedLinePriority ? changeLineForeFrontPriority : 0.0f;
     }
 
     inline const float getChangeLinePathLengthPriority() const {
-      return !useStartedLinePriority ? changeLinePathLengthPriority : 0.5f;
+      return !useStartedLinePriority ? changeLinePathLengthPriority : 0.1f;
     }
     inline const float getChangeLineWizardCountPriority() const {
       return !useStartedLinePriority ? changeLineWizardCountPriority : 1.0f;

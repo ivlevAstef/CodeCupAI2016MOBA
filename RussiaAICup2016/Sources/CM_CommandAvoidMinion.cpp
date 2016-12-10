@@ -1,5 +1,6 @@
 #include "CM_CommandAvoidMinion.h"
 #include "E_Game.h"
+#include "E_World.h"
 #include "C_Extensions.h"
 #include "CM_MovePriorities.h"
 #include "CM_TurnPriority.h"
@@ -23,6 +24,14 @@ bool CommandAvoidMinion::check(const Wizard& self) {
     distance = mc.getOrcWoodcutterAttackRange() + self.getRadius();
   } else {
     distance = mc.getFetishBlowdartAttackRange() + self.getRadius() + mc.getDartRadius();
+  }
+
+  /// находим ближайшего к миньону юнита, так как бить он будет его, а значит дистанция минимальная = расстоянию до этого юнита
+  for (const auto& unit : World::instance().around(minion, Game::reverseFaction(minion.getFaction()), distance)) {
+    double distanceToUnit = unit->getDistanceTo(minion);
+    if (unit->getLife() > 24 && distanceToUnit < distance) {
+      distance = distanceToUnit;
+    }
   }
 
   distance += 2 * self.maxSpeed();
