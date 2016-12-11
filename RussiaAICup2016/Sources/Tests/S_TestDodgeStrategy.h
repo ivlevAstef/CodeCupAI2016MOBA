@@ -14,6 +14,6 @@ namespace AICup
   public:
     TestDodgeStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
 
-    void update(const Wizard& self, model::Move& move) override;
+    void update(const model::Wizard& self, model::Move& move) override;
   };
 };

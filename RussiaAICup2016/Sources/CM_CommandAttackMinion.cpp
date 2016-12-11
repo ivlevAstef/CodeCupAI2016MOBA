@@ -23,13 +23,7 @@ bool CommandAttackMinion::check(const Wizard& self) {
     return false;
   }
 
-  /// ≈сли еще много времени до кд, то не стоит атаковать
-  if (self.minStaffOrMissileCooldown() > Algorithm::timeToTurnForAttack(minion, self) + 1) {
-    return false;
-  }
-
-  /// если на пути есть дерево, то не стрел€ем
-  if (Algorithm::checkIntersectedTree(selfPos, futureMinionPos, Game::model().getMagicMissileRadius())) {
+  if (!Algorithm::canAttackMMOrMelee(self, minion)) {
     return false;
   }
 

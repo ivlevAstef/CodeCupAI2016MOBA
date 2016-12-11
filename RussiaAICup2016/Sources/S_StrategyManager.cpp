@@ -6,6 +6,7 @@
 
 
 #include "S_StrategyManager.h"
+#include "E_Wizard.h"
 
 #ifdef ENABLE_TESTS
 #include "S_TestMoveStrategy.h"
@@ -13,12 +14,15 @@
 #include "S_TestFollowStrategy.h"
 #include "S_TestDodgeStrategy.h"
 #endif
-#include "S_BaseStrategy.h"
+
+#include "S_RoundOneStrategy.h"
+#include "S_RoundTwoStrategy.h"
+#include "S_Mid5RushStrategy.h"
 
 using namespace AICup;
 
 StrategyManager::StrategyManager(): fabric(pathFinder) {
-  lastStrategyDTO = {StrategyType::Base, {model::_LANE_UNKNOWN_, 0, 0}};
+  lastStrategyDTO = {StrategyType::RoundTwo, {model::_LANE_UNKNOWN_, 0, 0}};
 }
 
 bool operator==(const StrategyDTO& dto1, const StrategyDTO& dto2) {
@@ -48,40 +52,39 @@ bool operator!=(const StrategyDTO& dto1, const StrategyDTO& dto2) {
   return !operator==(dto1, dto2);
 }
 
-void StrategyManager::update(const StrategyDTO& strategyDTO, const Wizard& self, model::Move& move) {
+void StrategyManager::update(const StrategyDTO& strategyDTO, const model::Wizard& self, model::Move& move) {
   pathFinder.calculate(self);
 
   if (lastStrategyDTO != strategyDTO || nullptr == strategy) {
     switch (strategyDTO.type) {
-      case StrategyType::Base:
-        strategy = std::make_shared<BaseStrategy>(fabric, pathFinder);
+      case StrategyType::RoundOne:
+        strategy = std::make_shared<RoundOneStrategy>(fabric, pathFinder);
+        break;
+
+      case StrategyType::RoundTwo:
+        strategy = std::make_shared<RoundTwoStrategy>(fabric, pathFinder);
         break;
 
       /// коммандные
       case StrategyType::Standart:
-        strategy = std::make_shared<BaseStrategy>(fabric, pathFinder);
-        break;
+        exit(1);
       case StrategyType::AntiRush:
-        strategy = std::make_shared<BaseStrategy>(fabric, pathFinder);
+        exit(1);
+      case StrategyType::Rush5:
+        strategy = std::make_shared<Mid5RushStrategy>(fabric, pathFinder);
         break;
       case StrategyType::Observer:
-        strategy = std::make_shared<BaseStrategy>(fabric, pathFinder);
-        break;
+        exit(1);
       case StrategyType::KillTop:
-        strategy = std::make_shared<BaseStrategy>(fabric, pathFinder);
-        break;
+        exit(1);
       case StrategyType::Push:
-        strategy = std::make_shared<BaseStrategy>(fabric, pathFinder);
-        break;
+        exit(1);
       case StrategyType::Win:
-        strategy = std::make_shared<BaseStrategy>(fabric, pathFinder);
-        break;
+        exit(1);
       case StrategyType::Attack:
-        strategy = std::make_shared<BaseStrategy>(fabric, pathFinder);
-        break;
+        exit(1);
       case StrategyType::Defense:
-        strategy = std::make_shared<BaseStrategy>(fabric, pathFinder);
-        break;
+        exit(1);
 
 #ifdef ENABLE_TESTS
       case StrategyType::Test_Move:
@@ -98,7 +101,10 @@ void StrategyManager::update(const StrategyDTO& strategyDTO, const Wizard& self,
         break;
 #endif // ENABLE_TESTS
     }
+
+    lastStrategyDTO = strategyDTO;
   }
+
 
   strategy->update(self, move);
 }

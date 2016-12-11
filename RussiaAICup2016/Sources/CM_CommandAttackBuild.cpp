@@ -12,6 +12,10 @@ CommandAttackBuild::CommandAttackBuild(const model::Building& build) : build(bui
 }
 
 bool CommandAttackBuild::check(const Wizard& self) {
+  if (Algorithm::isImmortal(build)) {
+    return false;
+  }
+
   const auto selfPos = EX::pos(self);
   const auto buildPos = EX::pos(build);
   const auto delta = selfPos - buildPos;

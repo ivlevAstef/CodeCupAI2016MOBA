@@ -1,14 +1,17 @@
 #include "S_TestDodgeStrategy.h"
 #include "E_World.h"
 
+#include "R_RoundOne.h"
+
 using namespace AICup;
 
 TestDodgeStrategy::TestDodgeStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder) :
-  CommandStrategy(fabric, pathFinder) {
+  CommandStrategy(fabric, pathFinder, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
 }
 
-void TestDodgeStrategy::update(const Wizard& self, model::Move& move) {
+void TestDodgeStrategy::update(const model::Wizard& model, model::Move& move) {
   CommandStrategy::clear();
+  const auto& self = CommandStrategy::preUpdate(model, move);
 
   /*const auto moveCommand = fabric.moveToPoint(1200, 1200);
   if (moveCommand->check(self)) {

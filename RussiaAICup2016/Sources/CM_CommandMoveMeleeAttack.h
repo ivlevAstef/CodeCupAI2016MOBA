@@ -27,6 +27,7 @@ namespace AICup
 
   private:
     const model::LivingUnit& unit;
+
     double changeOfWin;
   };
 }

@@ -18,5 +18,7 @@ namespace AICup
 
     SupportHaste,
     AttackStan,
+
+    Rush,
   };
 };

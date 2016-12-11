@@ -29,6 +29,11 @@ Role::Role() {
   changeLineWizardCountOnlyFriend = false;
   changeLineTowerBalancePriority = 1;
   changeLineLaneStrengthPriority = 1;
+
+  attackMeleeWinThreshold = 0.5;
+  attackWizardMeleePriority = 1;
+  attackMinionMeleePriority = 1;
+  attackBuildMeleePriority = 1;
 }
 
 

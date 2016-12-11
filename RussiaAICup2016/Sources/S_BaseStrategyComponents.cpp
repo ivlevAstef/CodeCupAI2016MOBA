@@ -1,4 +1,4 @@
-﻿#include "S_BaseStrategy.h"
+﻿#include "S_BaseStrategyComponents.h"
 #include "E_World.h"
 #include "E_Points.h"
 #include "E_InfluenceMap.h"
@@ -8,39 +8,11 @@
 
 using namespace AICup;
 
-BaseStrategy::BaseStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder):
-  CommandStrategy(fabric, pathFinder) {
+BaseStrategyComponents::BaseStrategyComponents(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder, RolePtr role, SkillBuildPtr skillBuild):
+  CommandStrategy(fabric, pathFinder, role, skillBuild) {
 }
 
-void BaseStrategy::update(const Wizard& self, model::Move& move) {
-  CommandStrategy::clear();
-
-  const auto lane = checkAndChangeLane(self);
-
-  ///////////////////////////////////
-
-  addAroundEnemiesOrMoveMelee(self);
-  addAttackFollow(self);
-
-
-  ///////////////////////////////////
-
-  addMoveTo(self, lane);
-
-  const auto getExpirienceCommand = fabric.moveGetExpirience();
-  if (getExpirienceCommand->check(self)) {
-    moveCommands.push_back(getExpirienceCommand);
-  }
-
-  ///////////////////////////////////////
-
-  addAttacks(self);
-  addCasts(self);
-
-  CommandStrategy::update(self, move);
-}
-
-model::LaneType BaseStrategy::checkAndChangeLane(const Wizard& self) {
+model::LaneType BaseStrategyComponents::checkAndChangeLane(const Wizard& self) {
   static int lastChangeLineTick = 0;
   static model::LaneType lane = model::LANE_MIDDLE;
 
@@ -58,7 +30,7 @@ model::LaneType BaseStrategy::checkAndChangeLane(const Wizard& self) {
   return lane;
 }
 
-void BaseStrategy::addAroundEnemiesOrMoveMelee(const Wizard& self) {
+void BaseStrategyComponents::addAroundEnemiesOrMoveMelee(const Wizard& self) {
   const auto selfPos = EX::pos(self);
 
   const auto aroundEnemies = World::instance().aroundEnemies(self, self.getVisionRange() + 100);
@@ -77,7 +49,7 @@ void BaseStrategy::addAroundEnemiesOrMoveMelee(const Wizard& self) {
   }
 }
 
-void BaseStrategy::addAttackFollow(const Wizard& self) {
+void BaseStrategyComponents::addAttackFollow(const Wizard& self) {
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 100)) {
     if (EX::isWizard(*enemy)) {
       const auto& wizard = EX::asWizard(*enemy);
@@ -89,7 +61,7 @@ void BaseStrategy::addAttackFollow(const Wizard& self) {
   }
 }
 
-void BaseStrategy::addMoveTo(const Wizard& self, model::LaneType lane) {
+void BaseStrategyComponents::addMoveTo(const Wizard& self, model::LaneType lane) {
   MoveCommand::Result cache;
 
   /// эмуляция машины состояний... кривая до невозможности
@@ -127,7 +99,7 @@ void BaseStrategy::addMoveTo(const Wizard& self, model::LaneType lane) {
   }
 }
 
-void BaseStrategy::addAttacks(const Wizard& self) {
+void BaseStrategyComponents::addAttacks(const Wizard& self) {
   for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 200)) {
     const auto attackCommand = fabric.attack(*enemy);
     if (nullptr != attackCommand && attackCommand->check(self)) {
@@ -146,7 +118,7 @@ void BaseStrategy::addAttacks(const Wizard& self) {
   }
 
 }
-void BaseStrategy::addCasts(const Wizard& self) {
+void BaseStrategyComponents::addCasts(const Wizard& self) {
   const auto castHasteCommand = fabric.haste();
   if (nullptr != castHasteCommand && castHasteCommand->check(self)) {
     castCommands.push_back(castHasteCommand);

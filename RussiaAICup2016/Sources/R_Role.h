@@ -90,6 +90,22 @@ namespace AICup
       return !useStartedLinePriority ? changeLineLaneStrengthPriority : 0.0f;
     }
 
+    inline const float getAttackMeleeWinThreshold() const {
+      return attackMeleeWinThreshold;
+    }
+
+    inline const float getAttackWizardMeleePriority() const {
+      return attackWizardMeleePriority;
+    }
+
+    inline const float getAttackMinionMeleePriority() const {
+      return attackMinionMeleePriority;
+    }
+
+    inline const float getAttackBuildMeleePriority() const {
+      return attackBuildMeleePriority;
+    }
+
   protected:
     float audacity; // дерзость. влияет на расположение на линии, каждая +1 увеличивает близость к врагу на 100, -1 увеличивает на 100
     /// коэцифиенты выбираються в зависимости от ситуации на линии - если шансы на победу маленькие то боязнь, иначе прессование
@@ -120,6 +136,11 @@ namespace AICup
     bool  changeLineWizardCountOnlyFriend; /// учитывать только своих магов, или своих - противника
     float changeLineTowerBalancePriority; /// насколько сильно влияет количество вышек на линии (свои - вражеские)
     float changeLineLaneStrengthPriority; /// насколько сильно влияет дизбаланс сил
+
+    float attackMeleeWinThreshold;
+    float attackWizardMeleePriority;
+    float attackMinionMeleePriority;
+    float attackBuildMeleePriority;
 
   private:
     /// если только начала игры, то приоритет всегда один

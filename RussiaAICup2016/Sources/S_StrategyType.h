@@ -11,11 +11,13 @@
 namespace AICup
 {
   enum class StrategyType {
-    Base,
+    RoundOne,
+    RoundTwo,
 
     /// коммандные
     Standart,
     AntiRush,
+    Rush5,
     Observer,
     KillTop,
     Push,

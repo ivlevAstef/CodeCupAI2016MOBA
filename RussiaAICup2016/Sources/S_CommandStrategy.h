@@ -13,6 +13,9 @@
 #include "CM_AttackCommand.h"
 #include "CM_CommandFabric.h"
 
+#include "R_Role.h"
+#include "R_SkillBuild.h"
+
 #ifdef ENABLE_VISUALIZATOR
 #include "Visualizator.h"
 #endif
@@ -22,9 +25,9 @@ namespace AICup
 {
   class CommandStrategy {
   public:
-    CommandStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
+    CommandStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder, RolePtr role, SkillBuildPtr skillBuild);
 
-    virtual void update(const Wizard& self, model::Move& move);
+    virtual void update(const model::Wizard& self, model::Move& move) = 0;
 
 #ifdef ENABLE_VISUALIZATOR
     virtual void visualization(const model::Wizard& self, const Visualizator& visualizator) const;
@@ -32,6 +35,9 @@ namespace AICup
 
   protected:
     void clear();
+
+    void update(const Wizard& self, model::Move& move);
+    Wizard preUpdate(const model::Wizard& self, model::Move& move);
 
   private:
     const Vector turn(const std::vector<MoveCommand::Result>& moveResults);
@@ -56,8 +62,10 @@ namespace AICup
     const CommandFabric& fabric;
     const Algorithm::PathFinder& pathFinder;
     std::shared_ptr<Algorithm::Path> path;
-    Position movePosition;
 
+
+    RolePtr role;
+    SkillBuildPtr skillBuild;
 
     std::vector<MoveCommandPtr> moveCommands;
     std::vector<AttackCommandPtr> attackCommands;

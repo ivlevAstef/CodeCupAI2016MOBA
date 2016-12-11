@@ -13,5 +13,7 @@ namespace AICup
   class TestFollowStrategy: public CommandStrategy {
   public:
     TestFollowStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
+
+    void update(const model::Wizard& self, model::Move& move) override;
   };
 };

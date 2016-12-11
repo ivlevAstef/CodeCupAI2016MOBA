@@ -1,5 +1,5 @@
 //
-//File: S_BaseStrategy.h
+//File: S_BaseStrategyComponents.h
 //Author: Ivlev Alexander. Stef
 //Created: 14/11/2016
 //
@@ -10,15 +10,11 @@
 
 namespace AICup
 {
-  class BaseStrategy: public CommandStrategy {
+  class BaseStrategyComponents: public CommandStrategy {
   public:
-    BaseStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
+    BaseStrategyComponents(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder, RolePtr role, SkillBuildPtr skillBuild);
 
-    void update(const Wizard& self, model::Move& move) override;
-
-  private:
-    void init(const Wizard& self);
-
+  protected:
     model::LaneType checkAndChangeLane(const Wizard& self);
 
     void addAroundEnemiesOrMoveMelee(const Wizard& self);

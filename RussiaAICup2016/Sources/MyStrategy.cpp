@@ -17,6 +17,8 @@
 #include "E_Wizard.h"
 #include "T_Session.h"
 
+#include "A_Attack.h"
+
 using namespace AICup;
 
 
@@ -28,26 +30,23 @@ MyStrategy::MyStrategy() {
 
 #ifdef ENABLE_VISUALIZATOR
 void visualization(const model::Wizard& self, const Visualizator& visualizator) {
-  AICup::World::instance().visualization(visualizator);
+  /*AICup::World::instance().visualization(visualizator);
   AICup::Points::instance().visualization(visualizator);
   AICup::HypotheticalEnemies::instance().visualization(visualizator);
   AICup::InfluenceMap::instance().visualization(visualizator);
-  AICup::StrategyManager::instance().visualization(self, visualizator);
+  AICup::StrategyManager::instance().visualization(self, visualizator);*/
 }
 #endif
 
-void MyStrategy::move(const model::Wizard& modelSelf, const model::World& world, const model::Game& game, model::Move& move) {
+void MyStrategy::move(const model::Wizard& self, const model::World& world, const model::Game& game, model::Move& move) {
   /// ќбновл€ю различные карты, которые не завис€т от моего геро€
-  AICup::Game::instance().update(game, modelSelf);
+  AICup::Game::instance().update(game, self);
   AICup::World::instance().update(world);
   AICup::HypotheticalEnemies::instance().update();
-  AICup::InfluenceMap::instance().update(modelSelf);
+  AICup::InfluenceMap::instance().update(self);
 
   /// «апускаю обновление сессии - локальных данных, которые вли€ют на прин€тие решений что делать
-  Session::instance().update(modelSelf, move);
-
-  /// —оздаю экземпл€р своего мага, чтобы дальше с ним работать
-  const auto self = Wizard(modelSelf, Session::instance().getRole());
+  Session::instance().update(self, move);
 
   /// запускаю стратегию, дл€ прин€т€ решени€ что делать
   AICup::StrategyManager::instance().update(Session::instance().getStrategyDTO(), self, move);

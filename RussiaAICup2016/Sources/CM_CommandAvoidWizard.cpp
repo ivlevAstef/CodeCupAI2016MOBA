@@ -10,6 +10,7 @@
 using namespace AICup;
 
 CommandAvoidWizard::CommandAvoidWizard(const model::Wizard& wizard): wizard(wizard) {
+  changeOfWin = 0;
   distance = 0;
 }
 
@@ -19,7 +20,20 @@ struct MagicInfo {
   double projectileRadius;
 };
 
+static Vector minimalPerpendicular(const Wizard& self, const Position& wizardPos) {
+  const auto selfPos = EX::pos(self);
+  const auto delta = selfPos - wizardPos;
+
+  const auto turnDirection = delta.perpendicular();
+  /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикуляров
+  if (turnDirection.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
+    return -turnDirection;
+  }
+  return turnDirection;
+}
+
 bool CommandAvoidWizard::check(const Wizard& self) {
+  return false;
   const auto mc = Game::model();
 
   const auto selfPos = EX::pos(self);
@@ -27,7 +41,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   const auto delta = selfPos - wizardPos;
 
   //// для сокращения расчетов
-  if (delta.length() > 600 + 35 + 100) {//максимальный радиус атаки + радиус мага + максимальный радиус снаряда(fireball)
+  if (delta.length() > 600 + 35 + 100 + 60) {//максимальный радиус атаки + радиус мага + максимальный радиус снаряда(fireball) + время на поворот
     return false;
   }
 
@@ -89,12 +103,9 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     finalCastRange = MAX(finalCastRange, castRange);
   }
 
+  double distance = MIN(finalDodgeRange, finalCastRange);
+  distance += self.maxSpeed() + EX::maxSpeed(wizard);
 
-  /// дистанция на которой я должен находиться чтобы в меня не попали
-  distance = MIN(finalDodgeRange, finalCastRange);
-  distance += self.maxSpeed(); ///небольшой запас
-
-  /// если маг дальше чем нужно, то бояться его не стоит
   if (delta.length() > distance) {
     return false;
   }
@@ -112,23 +123,21 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   const auto wizardPos = EX::pos(wizard);
   const auto delta = selfPos - wizardPos;
 
+
   const auto pos = wizardPos + delta.normal() * distance;
   result.set(pos, self);
+
 
   /// если шансы на победу маленькие, то стоит повернуться спиной к магу, ну или точнее тупо бежать к точке, ибо мы находимся ближе
   if (changeOfWin > 0.8) { ///если шансы на победу высоки, то можно идти по наглому в лоб
     result.turnDirection = -result.turnDirection;
   } else {
-    result.turnDirection = result.turnDirection.perpendicular();
-    /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикуляров
-    if (result.turnDirection.dot(Vector(1, 0).rotate(self.getAngle())) < 0) {
-      result.turnDirection *= -1;
-    }
+    result.turnDirection = minimalPerpendicular(self, wizardPos);
   }
 
   double changeOfWinPriority = (changeOfWin > 0) ? (1 - changeOfWin * 0.75) : (1 - changeOfWin);
 
-  result.turnPriority = TurnPriority::avoidWizard + int(delta.length()/2);
+  result.turnPriority = TurnPriority::avoidWizard + (10 - wizard.getId());
   result.priority = MovePriorities::avoidWizard(self, wizard) * changeOfWinPriority * self.getRole().getAudacityWizard();
 }
 

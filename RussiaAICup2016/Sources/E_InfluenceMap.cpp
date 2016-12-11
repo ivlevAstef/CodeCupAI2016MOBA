@@ -182,19 +182,19 @@ const std::vector<Position>& InfluenceMap::getLinePoints(const model::LaneType l
   /// ћассивы точек, по которым идут крипы
   /// не симметричен, ибо на своей базе уйти в угол можно, а вот на базе врага... очень не желательно
   static const std::vector<Position> topLinePoints = {
-    Points::point(Points::RENEGADES_BASE_TOP),
+    Points::point(Points::RENEGADES_BASE_TOP_MELEE),
     Points::point(Points::RENEGADES_TOP_CENTER),
     Points::point(Points::ACADEMY_TOP_CENTER),
     Points::point(Points::ACADEMY_BASE)
   };
 
   static const std::vector<Position> middleLinePoints = {
-    Points::point(Points::RENEGADES_BASE_MIDDLE),
+    Points::point(Points::RENEGADES_BASE_MIDDLE_MELEE),
     Points::point(Points::ACADEMY_BASE)
   };
 
   static const std::vector<Position> bottomLinePoints = {
-    Points::point(Points::RENEGADES_BASE_BOTTOM),
+    Points::point(Points::RENEGADES_BASE_BOTTOM_MELEE),
     Points::point(Points::RENEGADES_BOTTOM_CENTER),
     Points::point(Points::ACADEMY_BOTTOM_CENTER),
     Points::point(Points::ACADEMY_BASE)
@@ -366,7 +366,7 @@ double baseRadius(const model::Building& build) {
 
 float baseDanger(const model::Building& build) {
   /// так как база имеет больший радиус, то еЄ опасность повышаетс€ сильно завышенной
-  return 0.01f * float(MIN(300, build.getLife())) * buildDps(build);
+  return 0.005f * float(MIN(300, build.getLife())) * buildDps(build);
 }
 
 float wizardDps(const model::Wizard& wizard) {

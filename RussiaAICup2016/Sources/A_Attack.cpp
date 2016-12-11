@@ -184,3 +184,53 @@ Vector Algorithm::dodge(const model::Wizard& prey, const Vector desiredDir, cons
 
   return Vector();
 }
+
+bool Algorithm::canAttackMMOrMelee(const model::Wizard& self, const model::LivingUnit& unit) {
+  const double timeToAttack = timeToTurnForAttack(unit, self);
+  const int cooldownStaff = EX::cooldownSkill(self, model::ACTION_STAFF);
+  const int cooldownMM = EX::cooldownSkill(self, model::ACTION_MAGIC_MISSILE);
+
+  bool melee = isMelee(self, unit);
+
+  /// если далеко, и еще долго до дальнего боя.
+  if (!melee && cooldownMM > timeToAttack + 1) {
+    return false;
+  }
+  // если близко, но бить пока нечем
+  if (melee && MIN(cooldownStaff, cooldownMM) > timeToAttack + 1) {
+    return false;
+  }
+
+  return true;
+}
+
+bool Algorithm::isImmortal(const model::Building& building) {
+  const auto lane = World::instance().positionToLine(building.getX(), building.getY());
+
+  /// если всего одна вышка, то точно не бессмертна
+  if (World::instance().towerCount(lane, building.getFaction()) <= 1) {
+    return false;
+  }
+
+  /// иначе посмотреть какая она ближняя или дальняя
+  const model::Building* base = nullptr;
+  const model::Building* other = nullptr;
+  for (const auto& build : World::instance().buildings()) {
+    if (build.getFaction() != building.getFaction() || build.getId() == building.getId()) {
+      continue;
+    }
+
+    if (build.getType() == model::BUILDING_FACTION_BASE) {
+      base = &build;
+    } else if (World::instance().positionToLine(build.getX(), build.getY()) == lane) {
+      other = &build;
+    }
+  }
+
+  if (nullptr == base || nullptr == other) {
+    return false;
+  }
+
+  /// если здание ближе к базе, значит бесмертное
+  return base->getDistanceTo(building) < base->getDistanceTo(*other);
+}

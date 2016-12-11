@@ -20,7 +20,9 @@ double calcPriority(const model::LivingUnit& unit) {
     } else if (EX::isMinion(*enemy)) {
       priority += enemy->getLife() / 10;
     } else if (EX::isBuilding(*enemy)) {
-      priority += 20;
+      if (!Algorithm::isImmortal(EX::asBuilding(*enemy))) {
+        priority += 20;
+      }
     }
   }
   return priority;

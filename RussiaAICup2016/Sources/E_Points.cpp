@@ -35,9 +35,14 @@ void Points::initPoints() {
   points[ACADEMY_BASE_BOTTOM] = {left + width*0.15, bottom};
 
   points[RENEGADES_BASE] = {right, top};
-  points[RENEGADES_BASE_TOP] = {right - width*0.15, top};
-  points[RENEGADES_BASE_MIDDLE] = {right - width*0.12, top + height*0.12};
-  points[RENEGADES_BASE_BOTTOM] = {right, top + height*0.15};
+  points[RENEGADES_BASE_TOP] = {right - width*0.07, top};
+  points[RENEGADES_BASE_MIDDLE] = {right - width*0.06, top + height*0.06};
+  points[RENEGADES_BASE_BOTTOM] = {right, top + height*0.07};
+
+
+  points[RENEGADES_BASE_TOP_MELEE] = {right - width*0.15, top};
+  points[RENEGADES_BASE_MIDDLE_MELEE] = {right - width*0.12, top + height*0.12};
+  points[RENEGADES_BASE_BOTTOM_MELEE] = {right, top + height*0.15};
 
   points[ACADEMY_TOP_FIRST_TOWER] = {left, top + pHeight * 0.44};
   points[ACADEMY_TOP_SECOND_TOWER] = {left, bottom - pHeight * 0.3};

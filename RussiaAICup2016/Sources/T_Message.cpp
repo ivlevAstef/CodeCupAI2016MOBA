@@ -1,5 +1,6 @@
 #include "T_Message.h"
 #include <assert.h>
+#include <cstring>
 
 using namespace AICup;
 
@@ -39,14 +40,15 @@ const Message Message::read(const model::Message& message) {
 
   const auto lane = message.getLane();
 
-  MessageArchive archive;
-  memcpy(&archive, message.getRawMessage().data(), sizeof(signed int) * 4);
+  const MessageArchive* archive = (const MessageArchive*)message.getRawMessage().data();
+  /// тяжелые пошли времена, если memcpy на сервере не собирается
+  //memcpy(&archive, message.getRawMessage().data(), sizeof(signed int) * 4);
 
-  return Message((TacticsType)archive.tacticsType, (model::LaneType)lane, (int16_t)archive.attackTick, (long long)archive.attackedWizardId);
+  return Message((TacticsType)archive->tacticsType, (model::LaneType)lane, (int16_t)archive->attackTick, (long long)archive->attackedWizardId);
 }
 
 const model::Message Message::model() const {
-  assert(0 <= tacticsType && tacticsType < 32);
+  assert(0 <= int(tacticsType) && int(tacticsType) < 32);
   assert(0 <= attackTick && attackTick < 32768);
   assert(0 <= attackedWizardId && attackedWizardId < 16);
 

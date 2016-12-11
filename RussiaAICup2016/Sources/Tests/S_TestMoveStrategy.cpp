@@ -1,10 +1,12 @@
 #include "S_TestMoveStrategy.h"
 #include "E_World.h"
 
+#include "R_RoundOne.h"
+
 using namespace AICup;
 
 TestMoveStrategy::TestMoveStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder):
-  CommandStrategy(fabric, pathFinder) {
+  CommandStrategy(fabric, pathFinder, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
   currentMoveCommandIndex = 0;
 
   allMoveCommands.push_back(fabric.moveToPoint(1200, 1200));
@@ -16,8 +18,9 @@ TestMoveStrategy::TestMoveStrategy(const CommandFabric& fabric, const Algorithm:
   allMoveCommands.push_back(fabric.moveToLine(model::LANE_BOTTOM));
 }
 
-void TestMoveStrategy::update(const Wizard& self, model::Move& move) {
+void TestMoveStrategy::update(const model::Wizard& model, model::Move& move) {
   CommandStrategy::clear();
+  const auto& self = CommandStrategy::preUpdate(model, move);
 
   auto& command = allMoveCommands[currentMoveCommandIndex];
 

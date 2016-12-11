@@ -12,8 +12,8 @@
 
 using namespace AICup;
 
-CommandStrategy::CommandStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& finder):
-  fabric(fabric), pathFinder(finder) {
+CommandStrategy::CommandStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& finder, RolePtr role, SkillBuildPtr skillBuild):
+  fabric(fabric), pathFinder(finder), role(role), skillBuild(skillBuild) {
 }
 
 void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
@@ -56,6 +56,14 @@ void CommandStrategy::clear() {
   moveCommands.clear();
   attackCommands.clear();
   castCommands.clear();
+}
+
+Wizard CommandStrategy::preUpdate(const model::Wizard& self, model::Move& move) {
+  role->update(self);
+  skillBuild->update(self, move);
+
+  /// —оздаю экземпл€р своего мага, чтобы дальше с ним работать
+  return Wizard(self, *role);
 }
 
 std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const Wizard& self) const {
@@ -152,7 +160,6 @@ bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const 
 }
 
 const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Position& endPoint) {
-  movePosition = endPoint;
   pathFinder.calculatePath(endPoint, path);
   assert(nullptr != path);
 
@@ -263,14 +270,6 @@ void CommandStrategy::visualization(const model::Wizard& self, const Visualizato
 
   for (const auto& command : attackCommands) {
     command->visualization(self, visualizator);
-  }
-
-  if (Visualizator::POST == visualizator.getStyle()) {
-    if (nullptr != path) {
-      path->visualization(visualizator);
-
-      visualizator.line(self.getX(), self.getY(), movePosition.x, movePosition.y, 0x000000);
-    }
   }
 }
 #endif

@@ -49,8 +49,23 @@
     <Filter Include="Sources\Tactics">
       <UniqueIdentifier>{f101329b-7276-41cc-8c87-dd0badb7b06a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\Roles\TacticsRoles">
-      <UniqueIdentifier>{5c0188ef-3525-495c-ace3-132c957456ff}</UniqueIdentifier>
+    <Filter Include="Sources\Tactics\RoundOne">
+      <UniqueIdentifier>{a7a9f218-3e60-4f47-8193-4d19bd8215e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Tactics\RoundTwo">
+      <UniqueIdentifier>{969f30e2-3ef8-41d6-ae59-364d2d8bdeaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Tactics\Final">
+      <UniqueIdentifier>{589ed950-9a63-4589-9395-aa76cb76706b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Tactics\Final\Rush">
+      <UniqueIdentifier>{a65cba14-e769-4899-9add-11f3476e5616}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Tactics\Final\Standard">
+      <UniqueIdentifier>{8f2cf232-9246-4ab3-9f74-f795fbe5895c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Session">
+      <UniqueIdentifier>{0310cd64-3aff-4d4a-950d-f074e0a59118}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -204,17 +219,32 @@
     <ClCompile Include="..\Sources\R_SkillBuild.cpp">
       <Filter>Sources\Roles</Filter>
     </ClCompile>
-    <ClCompile Include="..\Sources\S_BaseStrategy.cpp">
-      <Filter>Sources\Strategy\Strategy</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Sources\T_Session.cpp">
-      <Filter>Sources\Tactics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Sources\CM_CommandMoveMeleeAttack.cpp">
       <Filter>Sources\Command\Commands\attack</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\S_Mid5RushStrategy.cpp">
+      <Filter>Sources\Tactics\Final\Rush</Filter>
+    </ClCompile>
     <ClCompile Include="..\Sources\T_Message.cpp">
-      <Filter>Sources\Tactics</Filter>
+      <Filter>Sources\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\T_Session.cpp">
+      <Filter>Sources\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\T_Tactics.cpp">
+      <Filter>Sources\Tactics\Final</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\S_RoundOneStrategy.cpp">
+      <Filter>Sources\Tactics\RoundOne</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\S_BaseStrategyComponents.cpp">
+      <Filter>Sources\Strategy\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\S_RoundTwoStrategy.cpp">
+      <Filter>Sources\Tactics\RoundTwo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Sources\S_StandardStrategy.cpp">
+      <Filter>Sources\Tactics\Final\Standard</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -386,44 +416,59 @@
     <ClInclude Include="..\Sources\R_SkillBuild.h">
       <Filter>Sources\Roles</Filter>
     </ClInclude>
-    <ClInclude Include="..\Sources\R_Standard.h">
-      <Filter>Sources\Roles</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\T_Session.h">
-      <Filter>Sources\Tactics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Sources\S_StrategyType.h">
       <Filter>Sources\Strategy</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\S_BaseStrategy.h">
-      <Filter>Sources\Strategy\Strategy</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\R_DynamicSkillBuilds.h">
-      <Filter>Sources\Roles</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\CM_CommandMoveMeleeAttack.h">
       <Filter>Sources\Command\Commands\attack</Filter>
     </ClInclude>
-    <ClInclude Include="..\Sources\T_Tactics.h">
-      <Filter>Sources\Tactics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Sources\T_TacticsType.h">
-      <Filter>Sources\Tactics</Filter>
+    <ClInclude Include="..\Sources\S_Mid5RushStrategy.h">
+      <Filter>Sources\Tactics\Final\Rush</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\R_Attacks.h">
-      <Filter>Sources\Roles\TacticsRoles</Filter>
+      <Filter>Sources\Tactics\Final\Standard</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\R_Supports.h">
-      <Filter>Sources\Roles\TacticsRoles</Filter>
+      <Filter>Sources\Tactics\Final\Standard</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\R_Tanks.h">
-      <Filter>Sources\Roles\TacticsRoles</Filter>
+      <Filter>Sources\Tactics\Final\Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\R_Rush.h">
+      <Filter>Sources\Tactics\Final\Rush</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\R_TacticsRole.h">
-      <Filter>Sources\Roles\TacticsRoles</Filter>
+      <Filter>Sources\Tactics\Final\Standard</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\T_Message.h">
-      <Filter>Sources\Tactics</Filter>
+      <Filter>Sources\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\T_Session.h">
+      <Filter>Sources\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\T_TacticsType.h">
+      <Filter>Sources\Tactics\Final</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\T_Tactics.h">
+      <Filter>Sources\Tactics\Final</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\S_RoundTwoStrategy.h">
+      <Filter>Sources\Tactics\RoundTwo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\S_RoundOneStrategy.h">
+      <Filter>Sources\Tactics\RoundOne</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\S_BaseStrategyComponents.h">
+      <Filter>Sources\Strategy\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\R_RoundOne.h">
+      <Filter>Sources\Tactics\RoundOne</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\R_RoundTwo.h">
+      <Filter>Sources\Tactics\RoundTwo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\S_StandardStrategy.h">
+      <Filter>Sources\Tactics\Final\Standard</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

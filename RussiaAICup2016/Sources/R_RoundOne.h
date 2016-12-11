@@ -1,7 +1,7 @@
 //
-//File: R_Standard.h
+//File: R_RoundOne.h
 //Author: Ivlev Alexander. Stef
-//Created: 27/11/2016
+//Created: 11/12/2016
 //
 
 #pragma once
@@ -12,22 +12,16 @@
 
 namespace AICup
 {
-  class StandardSkillBuild: public SkillBuild {
+  class RoundOneSkillBuild: public SkillBuild {
   public:
-    StandardSkillBuild() : SkillBuild({
-      SkillBranches::magicalDamageFrostBolt,
-      SkillBranches::moveHast,
-      SkillBranches::armorShield,
-      SkillBranches::rangeMagicMissile,
-      SkillBranches::meleeDamageFireBolt
+    RoundOneSkillBuild() : SkillBuild({
     }) {
-
     }
   };
 
-  class StandardRole: public Role {
+  class RoundOneRole: public Role {
   public:
-    StandardRole() {
+    RoundOneRole() {
       audacity = 0;
       linePressureWizards = 0.25;
       lineAudacityWizards = 2.0;
@@ -58,7 +52,7 @@ namespace AICup
     void update(const model::Wizard& self) override {
       Role::update(self);
 
-      const auto realLife = self.getLife() - EX::burnResidualDamage(self);
+      const auto realLife = self.getLife();
 
       audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
 

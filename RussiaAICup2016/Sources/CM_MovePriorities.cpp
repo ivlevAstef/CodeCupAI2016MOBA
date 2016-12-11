@@ -81,7 +81,7 @@ double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Wizard& 
   const double timeToWizardKill = double(wizard.getLife()) / EX::dps(self);
 
   if (timeToSelfKill + Game::model().getWizardActionCooldownTicks() < timeToWizardKill) {
-    return 0;
+    return 10;
   }
 
   return 300 * (timeToSelfKill / timeToWizardKill);
@@ -95,7 +95,7 @@ double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Minion& 
     return 500 * (1 - (timeToMinionKill / maxTimeToKill));
   }
 
-  return 0;
+  return 10;
 }
 
 double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Building& build) {
@@ -105,7 +105,7 @@ double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Building
     return 700;
   }
 
-  return 0;
+  return 10;
 }
 
 /// Это очень важно, поэтому завышено значение от нормы

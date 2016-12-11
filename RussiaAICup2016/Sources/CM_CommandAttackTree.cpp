@@ -21,9 +21,7 @@ bool CommandAttackTree::check(const Wizard& self) {
     return false;
   }
 
-
-  /// Если еще много времени до кд, то не стоит атаковать
-  if (self.minStaffOrMissileCooldown() > Algorithm::timeToTurnForAttack(tree, self) + 1) {
+  if (!Algorithm::canAttackMMOrMelee(self, tree)) {
     return false;
   }
 

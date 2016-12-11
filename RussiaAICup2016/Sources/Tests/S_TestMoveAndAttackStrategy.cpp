@@ -1,10 +1,12 @@
 #include "S_TestMoveAndAttackStrategy.h"
 #include "E_World.h"
 
+#include "R_RoundOne.h"
+
 using namespace AICup;
 
 TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder):
-  CommandStrategy(fabric, pathFinder) {
+  CommandStrategy(fabric, pathFinder, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
   currentMoveCommandIndex = 0;
 
   allMoveCommands.push_back(fabric.moveToPoint(800, 3200));
@@ -17,8 +19,9 @@ TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric
   allMoveCommands.push_back(fabric.moveToPoint(1600, 2400));
 }
 
-void TestMoveAndAttackStrategy::update(const Wizard& self, model::Move& move) {
+void TestMoveAndAttackStrategy::update(const model::Wizard& model, model::Move& move) {
   CommandStrategy::clear();
+  const auto& self = CommandStrategy::preUpdate(model, move);
 
   if (2.5 * 2.5 > self.getSpeedX()*self.getSpeedX() + self.getSpeedY()*self.getSpeedY()) {
     printf("Small Speed: %f %f\n", self.getSpeedX(), self.getSpeedY());

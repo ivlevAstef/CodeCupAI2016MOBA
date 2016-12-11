@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "E_Wizard.h"
+#include "model\Wizard.h"
 #include "model\Move.h"
 #include "S_StrategyType.h"
 #include "C_Singleton.h"
@@ -25,7 +25,7 @@ namespace AICup
   public:
     StrategyManager();
 
-    void update(const StrategyDTO& strategyDTO, const Wizard& self, model::Move& move);
+    void update(const StrategyDTO& strategyDTO, const model::Wizard& self, model::Move& move);
 
 #ifdef ENABLE_VISUALIZATOR
     void visualization(const model::Wizard& self, const Visualizator& visualizator) const;
@@ -34,6 +34,7 @@ namespace AICup
 
   private:
     CommandStrategyPtr strategy;
+
     CommandFabric fabric;
     Algorithm::PathFinder pathFinder;
 
