@@ -24,7 +24,7 @@ void TestDodgeStrategy::update(const model::Wizard& model, model::Move& move) {
     case 2:
     case 6:
     case 7:
-      moveCommand = fabric.moveToPoint(200, 800);
+      moveCommand = fabric.moveToPoint(200, 1600);
       break;
     case 3:
     case 8:
@@ -34,7 +34,7 @@ void TestDodgeStrategy::update(const model::Wizard& model, model::Move& move) {
     case 5:
     case 9:
     case 10:
-      moveCommand = fabric.moveToPoint(800, 4000-200);
+      moveCommand = fabric.moveToPoint(1400, 4000-200);
       break;
   }
 

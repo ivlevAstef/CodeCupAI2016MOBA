@@ -54,6 +54,7 @@ void SkillBuild::update(const model::Wizard& self, model::Move& move) {
   if (currentLevel < self.getLevel()) {
     const size_t branchIndex = currentLevel / 5;
     const size_t skillIndex = currentLevel % 5;
+
     const auto skill = build[branchIndex][skillIndex];
 
     move.setSkillToLearn(skill);

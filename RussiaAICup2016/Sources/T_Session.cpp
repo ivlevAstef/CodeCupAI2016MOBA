@@ -50,26 +50,27 @@ void Session::update(const model::Wizard& self, model::Move& move) {
 }
 
 void Session::tacticsSettingsUpdate(const model::Wizard& self, model::Move& move) {
-  //strategyDTO = {StrategyType::Standart, {model::_LANE_UNKNOWN_, 0, 0}};
-  //return;
+  strategyDTO = {StrategyType::Standart, {model::_LANE_UNKNOWN_, 0, 0}};
+  return;
 
-  if (self.isMaster()) {
-    /// тактический модуль создает 5 сообщений (или ничего), где последнее принадлежит мастеру, остальные на посылку
-    std::vector<Message> messages = Tactics::instance().update(self);
+  //TODO: сервак то не работает
+  //if (self.isMaster()) {
+  //  /// тактический модуль создает 5 сообщений (или ничего), где последнее принадлежит мастеру, остальные на посылку
+  //  std::vector<Message> messages = Tactics::instance().update(self);
 
-    if (!messages.empty()) {
-      assert(5 == messages.size());
+  //  if (!messages.empty()) {
+  //    assert(5 == messages.size());
 
-      strategyDTO = strategyDTOByMessage(messages[4]);
+  //    strategyDTO = strategyDTOByMessage(messages[4]);
 
-      messages.pop_back();
-      sendMessages(messages, move);
-    }
+  //    messages.pop_back();
+  //    sendMessages(messages, move);
+  //  }
 
-  } else if (!self.getMessages().empty()) {
-    const auto& modelMessage = self.getMessages().back();
-    strategyDTO = strategyDTOByMessage(Message::read(modelMessage));
-  }
+  //} else if (!self.getMessages().empty()) {
+  //  const auto& modelMessage = self.getMessages().back();
+  //  strategyDTO = strategyDTOByMessage(Message::read(modelMessage));
+  //}
 }
 
 

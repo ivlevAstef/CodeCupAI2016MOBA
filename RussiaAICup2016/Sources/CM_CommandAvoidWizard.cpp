@@ -4,6 +4,7 @@
 #include "CM_MovePriorities.h"
 #include "CM_TurnPriority.h"
 #include "A_Attack.h"
+#include "A_Move.h"
 #include "C_Math.h"
 #include "A_WinPredictor.h"
 
@@ -33,7 +34,6 @@ static Vector minimalPerpendicular(const Wizard& self, const Position& wizardPos
 }
 
 bool CommandAvoidWizard::check(const Wizard& self) {
-  return false;
   const auto mc = Game::model();
 
   const auto selfPos = EX::pos(self);
@@ -103,8 +103,8 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     finalCastRange = MAX(finalCastRange, castRange);
   }
 
-  double distance = MIN(finalDodgeRange, finalCastRange);
-  distance += self.maxSpeed() + EX::maxSpeed(wizard);
+  distance = MIN(finalDodgeRange, finalCastRange);
+  distance += Algorithm::maxSpeed(self, self.getAngle(), -delta).length() + Algorithm::maxSpeed(wizard, wizard.getAngle(), delta).length();
 
   if (delta.length() > distance) {
     return false;
