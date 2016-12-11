@@ -10,24 +10,21 @@ using namespace AICup;
 
 BaseStrategyComponents::BaseStrategyComponents(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder, RolePtr role, SkillBuildPtr skillBuild):
   CommandStrategy(fabric, pathFinder, role, skillBuild) {
+  currentLane = model::LANE_MIDDLE;
+  lastChangeLineTick = 0;
 }
 
-model::LaneType BaseStrategyComponents::checkAndChangeLane(const Wizard& self) {
-  static int lastChangeLineTick = 0;
-  static model::LaneType lane = model::LANE_MIDDLE;
+bool BaseStrategyComponents::changeLane(const Wizard& self) {
+  return Algorithm::checkChangeLine(pathFinder, self, currentLane);
+}
 
-  /// раз в 250 тиков пересматриваю линию,
-  /// 250 так как у нас бонусы появляются на кратных секундах, а значит взятие бонуса может привести к смене линии
-  if (World::model().getTickIndex() - lastChangeLineTick >= 250 ||
-    /// также проверяем вначале каждый тик, чтобы поудачней выбрать линию
-    (100 <= World::model().getTickIndex() && World::model().getTickIndex() <= 500)) {
-
-    if (Algorithm::checkChangeLine(pathFinder, self, lane)) {
-      lastChangeLineTick = World::model().getTickIndex();
-    }
+bool BaseStrategyComponents::changeLane(const Wizard& self, int period) {
+  if (World::model().getTickIndex() - lastChangeLineTick >= period) {
+    lastChangeLineTick = World::model().getTickIndex();
+    return Algorithm::checkChangeLine(pathFinder, self, currentLane);
   }
 
-  return lane;
+  return false;
 }
 
 void BaseStrategyComponents::addAroundEnemiesOrMoveMelee(const Wizard& self) {
@@ -71,12 +68,6 @@ void BaseStrategyComponents::addMoveTo(const Wizard& self, model::LaneType lane)
   if (moveToBonus->check(self)) {
     moveToBonus->execute(self, cache);
     moveToBonusPriority = cache.priority;
-
-    for (const auto& bonus : World::model().getBonuses()) {
-      if (self.getDistanceTo(bonus) < 350) {
-        moveToBonusPriority = 10000;
-      }
-    }
   }
 
 

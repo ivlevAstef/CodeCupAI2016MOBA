@@ -23,6 +23,12 @@ bool CommandCastHast::check(const Wizard& self) {
     return false;
   }
 
+
+  /// уже маны достаточно на прокаст двух, то может быть положим на своих
+  if (self.getMana() < 2 * Game::model().getShieldManacost()) {
+    return true;
+  }
+
   /// уже и так под хастой
   for (const auto& status : self.getStatuses()) {
     if (status.getType() == model::STATUS_HASTENED) {
@@ -55,6 +61,13 @@ void CommandCastHast::execute(const Wizard& self, Result& result) {
     if (!found) {
       result.unit = &wizard;
       break;
+    }
+  }
+
+  /// накладывать только на себя не имеет смысла, если уже есть этот статус
+  for (const auto& status : self.getStatuses()) {
+    if (status.getType() == model::STATUS_HASTENED) {
+      result.priority = 0;
     }
   }
 }

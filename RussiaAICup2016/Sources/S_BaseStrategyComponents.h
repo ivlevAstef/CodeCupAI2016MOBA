@@ -7,6 +7,7 @@
 #pragma once
 
 #include "S_CommandStrategy.h"
+#include "model\LaneType.h"
 
 namespace AICup
 {
@@ -15,7 +16,8 @@ namespace AICup
     BaseStrategyComponents(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder, RolePtr role, SkillBuildPtr skillBuild);
 
   protected:
-    model::LaneType checkAndChangeLane(const Wizard& self);
+    bool changeLane(const Wizard& self);
+    bool changeLane(const Wizard& self, int period);
 
     void addAroundEnemiesOrMoveMelee(const Wizard& self);
     void addAttackFollow(const Wizard& self);
@@ -24,5 +26,11 @@ namespace AICup
 
     void addAttacks(const Wizard& self);
     void addCasts(const Wizard& self);
+
+  protected:
+    model::LaneType currentLane;
+
+  private:
+    int lastChangeLineTick;
   };
 };

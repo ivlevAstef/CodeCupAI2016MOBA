@@ -50,23 +50,29 @@ namespace AICup
       importanceOfBonus = 1.0;
 
 
-      buildPriority = 8.0;
-      minionPriority = 1.0;
-      treePriority = 15.0;
+      buildPriority = 1.0;
+      minionPriority = 0.75;
+      treePriority = 5.0;
       wizardPriority = 1.5;
 
-      audacityBuild = 3.0;
+      audacityBuild = 5.0;
       audacityMinion = 1.0;
-      audacityWizard = 1.5;
-      attackSkillPriority = 1.5;
+      audacityWizard = 2.5;
+      attackSkillPriority = 3.5;
 
-      desireChangeLine = 0.91;
+      desireChangeLine = 0.95;
       changeLineForeFrontPriority = 0.25;
-      changeLinePathLengthPriority = 0.75;
-      changeLineWizardCountPriority = 1.5;
+      changeLinePathLengthPriority = 0.5;
+      changeLineWizardCountPriority = 2.5;
       changeLineWizardCountOnlyFriend = false;
       changeLineTowerBalancePriority = 1.0; // бежим туда где больше вражеских вышек, при прочих равных
       changeLineLaneStrengthPriority = 1.0;
+
+      attackMeleeWinThreshold = 0.8;
+
+      attackWizardMeleePriority = 0.2;
+      attackBuildMeleePriority = 0.5;
+      attackMinionMeleePriority = 0.75;
     }
 
     void update(const model::Wizard& self) override {
@@ -74,28 +80,22 @@ namespace AICup
 
       const auto realLife = self.getLife() - EX::burnResidualDamage(self);
 
-      audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
+      audacity = -4.0 * (1 - (float(realLife) / float(self.getMaxLife())));
 
-      linePressureWizards = 0.75 * float(realLife) / float(self.getMaxLife());
-      lineAudacityWizards = 0.5 + 3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
+      linePressureWizards = -1.0 + 0.75 * float(realLife) / float(self.getMaxLife());
+      lineAudacityWizards = 1.5 + 3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
 
   class SupportStanRole: public SupportRole {
   public:
-    SupportStanRole() {
-    }
-
-    void update(const model::Wizard& self) override {
+    SupportStanRole() : SupportRole() {
     }
   };
 
   class SupportHasteRole: public SupportRole {
   public:
-    SupportHasteRole() {
-    }
-
-    void update(const model::Wizard& self) override {
+    SupportHasteRole() : SupportRole() {
     }
   };
 }

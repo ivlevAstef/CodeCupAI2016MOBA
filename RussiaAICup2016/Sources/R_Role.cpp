@@ -38,5 +38,5 @@ Role::Role() {
 
 
 void Role::update(const model::Wizard& self) {
-  useStartedLinePriority = (World::model().getTickIndex() < 750);
+  useStartedLinePriority = (World::model().getTickIndex() < 500);
 }

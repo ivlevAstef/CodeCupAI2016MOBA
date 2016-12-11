@@ -130,7 +130,7 @@ double MovePriorities::follow(const Wizard&, const model::LivingUnit&) {
 }
 
 double MovePriorities::getExpirience(const Wizard& wizard, const model::LivingUnit&) {
-  return 350 * wizard.getRole().getImportanceOfXP();
+  return 350;
 }
 
 double MovePriorities::keepDistance(const Wizard&, const Position, const double, const double) {

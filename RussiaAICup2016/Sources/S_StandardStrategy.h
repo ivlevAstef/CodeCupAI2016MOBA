@@ -9,8 +9,6 @@
 #include "S_BaseStrategyComponents.h"
 #include "R_TacticsRole.h"
 
-#include <unordered_map>
-
 namespace AICup
 {
   class StandardStrategy: public BaseStrategyComponents {
@@ -20,9 +18,9 @@ namespace AICup
     void update(const model::Wizard& self, model::Move& move) override;
 
   private:
-    void initializeRoles();
+    void setupDefaultLane(const model::Wizard& self);
 
-    /// для командрой игры, чтобы быстро понимать кто на какой роли
-    std::unordered_map<long long, TacticsRole> roles;
+  private:
+    model::LaneType defaultLane;
   };
 };

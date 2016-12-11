@@ -50,8 +50,8 @@ void Session::update(const model::Wizard& self, model::Move& move) {
 }
 
 void Session::tacticsSettingsUpdate(const model::Wizard& self, model::Move& move) {
-  strategyDTO = {StrategyType::Rush5, {model::_LANE_UNKNOWN_, 0, 0}};
-  return;
+  //strategyDTO = {StrategyType::Standart, {model::_LANE_UNKNOWN_, 0, 0}};
+  //return;
 
   if (self.isMaster()) {
     /// тактический модуль создает 5 сообщений (или ничего), где последнее принадлежит мастеру, остальные на посылку

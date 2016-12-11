@@ -1,5 +1,7 @@
 #include "S_RoundOneStrategy.h"
 
+#include "E_World.h"
+
 #include "R_RoundOne.h"
 
 using namespace AICup;
@@ -12,7 +14,11 @@ void RoundOneStrategy::update(const model::Wizard& model, model::Move& move) {
   CommandStrategy::clear();
   const auto& self = CommandStrategy::preUpdate(model,move);
 
-  const auto lane = checkAndChangeLane(self);
+  if (100 <= World::model().getTickIndex() && World::model().getTickIndex() <= 500) {
+    changeLane(self);
+  } else {
+    changeLane(self, 250);
+  }
 
   ///////////////////////////////////
 
@@ -22,7 +28,7 @@ void RoundOneStrategy::update(const model::Wizard& model, model::Move& move) {
 
   ///////////////////////////////////
 
-  addMoveTo(self, lane);
+  addMoveTo(self, currentLane);
 
   const auto getExpirienceCommand = fabric.moveGetExpirience();
   if (getExpirienceCommand->check(self)) {

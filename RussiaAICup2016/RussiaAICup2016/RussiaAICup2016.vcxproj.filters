@@ -246,6 +246,9 @@
     <ClCompile Include="..\Sources\S_StandardStrategy.cpp">
       <Filter>Sources\Tactics\Final\Standard</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\R_StandardInfo.cpp">
+      <Filter>Sources\Tactics\Final\Standard</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -468,6 +471,9 @@
       <Filter>Sources\Tactics\RoundTwo</Filter>
     </ClInclude>
     <ClInclude Include="..\Sources\S_StandardStrategy.h">
+      <Filter>Sources\Tactics\Final\Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\R_StandardInfo.h">
       <Filter>Sources\Tactics\Final\Standard</Filter>
     </ClInclude>
   </ItemGroup>

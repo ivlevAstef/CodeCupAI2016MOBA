@@ -2,62 +2,38 @@
 
 #include "E_World.h"
 
-#include "R_Tanks.h"
-#include "R_Supports.h"
-#include "R_Attacks.h"
+#include "R_StandardInfo.h"
 
 using namespace AICup;
 
 StandardStrategy::StandardStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder) :
-  /// потом переопределяються
-  BaseStrategyComponents(fabric, pathFinder, std::make_shared<TankAttackRole>(), std::make_shared<TankAttackSkillBuild>()) {
-
-  initializeRoles();
+  BaseStrategyComponents(fabric, pathFinder, nullptr, nullptr) {
+  defaultLane = model::_LANE_UNKNOWN_;
 }
 
-RolePtr roleByRoleType(TacticsRole roleType) {
-  switch (roleType) {
-    case AICup::TacticsRole::TankStan:
-      return std::make_shared<TankRole>();
-    case AICup::TacticsRole::TankAttack:
-      return std::make_shared<TankRole>();
-    case AICup::TacticsRole::SupportStan:
-      return std::make_shared<SupportStanRole>();
-    case AICup::TacticsRole::AttackAOE:
-      return std::make_shared<AttackAOERole>();
-    case AICup::TacticsRole::SupportHaste:
-      return std::make_shared<SupportHasteRole>();
-    case AICup::TacticsRole::AttackStan:
-      return std::make_shared<AttackStanRole>();
-  }
-}
 
-SkillBuildPtr skillBuildByRoleType(TacticsRole roleType) {
-  switch (roleType) {
-    case AICup::TacticsRole::TankStan:
-      return std::make_shared<TankSupportSkillBuild>();
-    case AICup::TacticsRole::TankAttack:
-      return std::make_shared<TankAttackSkillBuild>();
-    case AICup::TacticsRole::SupportStan:
-      return std::make_shared<SupportStanSkillBuild>();
-    case AICup::TacticsRole::AttackAOE:
-      return std::make_shared<AttackAOESkillBuild>();
-    case AICup::TacticsRole::SupportHaste:
-      return std::make_shared<SupportHasteSkillBuild>();
-    case AICup::TacticsRole::AttackStan:
-      return std::make_shared<AttackStanSkillBuild>();
-  }
-}
 
 
 void StandardStrategy::update(const model::Wizard& model, model::Move& move) {
-  role = roleByRoleType(roles[model.getId()]);
-  skillBuild = skillBuildByRoleType(roles[model.getId()]);
+  if (nullptr == role) {
+    role = StandardInfo::role(model);
+  }
+  if (nullptr == skillBuild) {
+    skillBuild = StandardInfo::skillBuild(model);
+  }
+
+  if (model::_LANE_UNKNOWN_ == defaultLane) {
+    setupDefaultLane(model);
+  }
 
   CommandStrategy::clear();
   const auto& self = CommandStrategy::preUpdate(model, move);
 
-  const auto lane = checkAndChangeLane(self);
+  if (World::model().getTickIndex() >= 500) {
+    changeLane(self, 250);
+  } else {
+    currentLane = defaultLane;
+  }
 
   ///////////////////////////////////
 
@@ -67,7 +43,7 @@ void StandardStrategy::update(const model::Wizard& model, model::Move& move) {
 
   ///////////////////////////////////
 
-  addMoveTo(self, lane);
+  addMoveTo(self, currentLane);
 
   const auto getExpirienceCommand = fabric.moveGetExpirience();
   if (getExpirienceCommand->check(self)) {
@@ -82,28 +58,19 @@ void StandardStrategy::update(const model::Wizard& model, model::Move& move) {
   CommandStrategy::update(self, move);
 }
 
-
-void StandardStrategy::initializeRoles() {
-  const static TacticsRole allRoles[4] = {
-    TacticsRole::SupportStan,
-    TacticsRole::AttackAOE,
-    TacticsRole::SupportHaste,
-    TacticsRole::AttackStan
-  };
-
-  size_t roleIndex = 0;
-  for (const auto& wizard : World::model().getWizards()) {
-    if (wizard.isMaster()) {
-      //TODO: потом или random(), или какнибудь по ситуации учиться до пятого уровня определять что лучше
-      roles[wizard.getId()] = TacticsRole::TankStan;
-      continue;
-    }
-
-    roles[wizard.getId()] = allRoles[roleIndex++];
+void StandardStrategy::setupDefaultLane(const model::Wizard& self) {
+  switch (StandardInfo::tacticsRole(self)) {
+    case TacticsRole::TankStan:
+    case TacticsRole::TankAttack:
+      defaultLane = model::LANE_MIDDLE;
+      break;
+    case TacticsRole::SupportStan:
+    case TacticsRole::AttackAOE:
+      defaultLane = model::LANE_TOP;
+      break;
+    case TacticsRole::SupportHaste:
+    case TacticsRole::AttackStan:
+      defaultLane = model::LANE_BOTTOM;
+      break;
   }
 }
-
-/*
-RolePtr roleByRoleType(TacticsRole roleType);
-SkillBuildPtr skillBuildByRoleType(TacticsRole roleType);
-*/

@@ -18,5 +18,6 @@ namespace AICup
 
   private:
     std::vector<Message> useRush(const model::Wizard& self);
+    std::vector<Message> useStandard(const model::Wizard& self);
   };
 };

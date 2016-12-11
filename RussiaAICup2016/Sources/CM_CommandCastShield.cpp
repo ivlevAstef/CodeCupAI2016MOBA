@@ -23,7 +23,11 @@ bool CommandCastShield::check(const Wizard& self) {
     return false;
   }
 
-  /// уже и так под щитом
+  /// уже маны достаточно на прокаст двух, то может быть положим на своих
+  if (self.getMana() < 2 * Game::model().getShieldManacost()) {
+    return true;
+  }
+
   for (const auto& status : self.getStatuses()) {
     if (status.getType() == model::STATUS_SHIELDED) {
       return false;
@@ -54,7 +58,15 @@ void CommandCastShield::execute(const Wizard& self, Result& result) {
 
     if (!found) {
       result.unit = &wizard;
-      break;
+      return;
+    }
+  }
+
+
+  /// накладывать только на себя не имеет смысла, если уже есть этот статус
+  for (const auto& status : self.getStatuses()) {
+    if (status.getType() == model::STATUS_SHIELDED) {
+      result.priority = 0;
     }
   }
 }

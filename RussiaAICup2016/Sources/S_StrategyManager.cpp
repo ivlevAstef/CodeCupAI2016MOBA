@@ -17,6 +17,7 @@
 
 #include "S_RoundOneStrategy.h"
 #include "S_RoundTwoStrategy.h"
+#include "S_StandardStrategy.h"
 #include "S_Mid5RushStrategy.h"
 
 using namespace AICup;
@@ -67,7 +68,8 @@ void StrategyManager::update(const StrategyDTO& strategyDTO, const model::Wizard
 
       /// коммандные
       case StrategyType::Standart:
-        exit(1);
+        strategy = std::make_shared<StandardStrategy>(fabric, pathFinder);
+        break;
       case StrategyType::AntiRush:
         exit(1);
       case StrategyType::Rush5:

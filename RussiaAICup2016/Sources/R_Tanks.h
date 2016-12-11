@@ -46,27 +46,33 @@ namespace AICup
       linePressureWizards = 0.25;
       lineAudacityWizards = 2.0;
 
-      importanceOfXP = 1.5;
+      importanceOfXP = 2.5;
       importanceOfBonus = 1.0;
 
 
       buildPriority = 8.0;
       minionPriority = 1.0;
-      treePriority = 15.0;
+      treePriority = 7.0;
       wizardPriority = 1.5;
 
       audacityBuild = 3.0;
-      audacityMinion = 1.0;
-      audacityWizard = 1.5;
+      audacityMinion = 0.5;
+      audacityWizard = 0.75;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 0.91;
-      changeLineForeFrontPriority = 0.25;
-      changeLinePathLengthPriority = 0.75;
+      desireChangeLine = 0.98;
+      changeLineForeFrontPriority = 0.5;
+      changeLinePathLengthPriority = 0.5;
       changeLineWizardCountPriority = 1.5;
       changeLineWizardCountOnlyFriend = false;
-      changeLineTowerBalancePriority = 1.0; // бежим туда где больше вражеских вышек, при прочих равных
+      changeLineTowerBalancePriority = -0.5; // бежим туда где меньше своих вышек, при прочих равных
       changeLineLaneStrengthPriority = 1.0;
+
+      attackMeleeWinThreshold = 0.5;
+
+      attackWizardMeleePriority = 5.0;
+      attackBuildMeleePriority = 5.0;
+      attackMinionMeleePriority = 2.5;
     }
 
     void update(const model::Wizard& self) override {
@@ -74,28 +80,22 @@ namespace AICup
 
       const auto realLife = self.getLife() - EX::burnResidualDamage(self);
 
-      audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
+      audacity = -3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
 
-      linePressureWizards = 0.75 * float(realLife) / float(self.getMaxLife());
-      lineAudacityWizards = 0.5 + 3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
+      linePressureWizards = 1.25 * float(realLife) / float(self.getMaxLife());
+      lineAudacityWizards = 4.0 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
 
   class TankAttackRole: public TankRole {
   public:
-    TankAttackRole() {
-    }
-
-    void update(const model::Wizard& self) override {
+    TankAttackRole(): TankRole() {
     }
   };
 
   class TankSupportRole: public TankRole {
   public:
-    TankSupportRole() {
-    }
-
-    void update(const model::Wizard& self) override {
+    TankSupportRole() : TankRole() {
     }
   };
 }

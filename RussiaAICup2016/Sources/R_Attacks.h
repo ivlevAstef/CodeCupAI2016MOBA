@@ -46,27 +46,29 @@ namespace AICup
       linePressureWizards = 0.25;
       lineAudacityWizards = 2.0;
 
-      importanceOfXP = 1.5;
+      importanceOfXP = 2.5;
       importanceOfBonus = 1.0;
 
 
-      buildPriority = 8.0;
+      buildPriority = 5.0;
       minionPriority = 1.0;
-      treePriority = 15.0;
+      treePriority = 7.0;
       wizardPriority = 1.5;
 
       audacityBuild = 3.0;
       audacityMinion = 1.0;
-      audacityWizard = 1.5;
+      audacityWizard = 1.2;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 0.91;
-      changeLineForeFrontPriority = 0.25;
-      changeLinePathLengthPriority = 0.75;
-      changeLineWizardCountPriority = 1.5;
+      desireChangeLine = 0.9;
+      changeLineForeFrontPriority = 0.15;
+      changeLinePathLengthPriority = 1.5;
+      changeLineWizardCountPriority = -0.5; /// там где меньше врагов
       changeLineWizardCountOnlyFriend = false;
-      changeLineTowerBalancePriority = 1.0; // бежим туда где больше вражеских вышек, при прочих равных
-      changeLineLaneStrengthPriority = 1.0;
+      changeLineTowerBalancePriority = 2.0; // бежим туда где больше вражеских вышек, при прочих равных
+      changeLineLaneStrengthPriority = 2.0;
+
+      attackMeleeWinThreshold = 0.6;
     }
 
     void update(const model::Wizard& self) override {
@@ -74,7 +76,7 @@ namespace AICup
 
       const auto realLife = self.getLife() - EX::burnResidualDamage(self);
 
-      audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
+      audacity = -2.5 * (1 - (float(realLife) / float(self.getMaxLife())));
 
       linePressureWizards = 0.75 * float(realLife) / float(self.getMaxLife());
       lineAudacityWizards = 0.5 + 3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
@@ -83,19 +85,19 @@ namespace AICup
 
   class AttackStanRole: public AttackRole {
   public:
-    AttackStanRole() {
-    }
-
-    void update(const model::Wizard& self) override {
+    AttackStanRole() : AttackRole() {
+      attackWizardMeleePriority = 0.5;
+      attackBuildMeleePriority = 1.0;
+      attackMinionMeleePriority = 1.0;
     }
   };
 
   class AttackAOERole: public AttackRole {
   public:
-    AttackAOERole() {
-    }
-
-    void update(const model::Wizard& self) override {
+    AttackAOERole(): AttackRole() {
+      attackWizardMeleePriority = 5.0;
+      attackBuildMeleePriority = 2.0;
+      attackMinionMeleePriority = 3.0;
     }
   };
 }

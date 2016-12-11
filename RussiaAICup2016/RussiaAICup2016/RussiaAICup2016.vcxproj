@@ -338,6 +338,7 @@ powershell start-process local-runner.bat</Command>
     <ClCompile Include="..\Sources\E_WorldObjects.cpp" />
     <ClCompile Include="..\Sources\R_Role.cpp" />
     <ClCompile Include="..\Sources\R_SkillBuild.cpp" />
+    <ClCompile Include="..\Sources\R_StandardInfo.cpp" />
     <ClCompile Include="..\Sources\S_BaseStrategyComponents.cpp" />
     <ClCompile Include="..\Sources\S_Mid5RushStrategy.cpp" />
     <ClCompile Include="..\Sources\S_RoundOneStrategy.cpp" />
@@ -402,6 +403,7 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\R_RoundOne.h" />
     <ClInclude Include="..\Sources\R_RoundTwo.h" />
     <ClInclude Include="..\Sources\R_Rush.h" />
+    <ClInclude Include="..\Sources\R_StandardInfo.h" />
     <ClInclude Include="..\Sources\S_BaseStrategyComponents.h" />
     <ClInclude Include="..\Sources\S_Mid5RushStrategy.h" />
     <ClInclude Include="..\Sources\R_SkillBuild.h" />

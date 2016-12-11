@@ -133,6 +133,11 @@ void CommandMoveToBonus::execute(const Wizard& self, Result& result) {
 
   result.turnPriority = TurnPriority::moveToBonus;
   result.priority = MovePriorities::moveToBonus(self, bonusPos);
+
+
+  if ((EX::pos(self) - bonusPos).length() < 300) {
+    result.priority *= 10;
+  }
 }
 
 #ifdef ENABLE_VISUALIZATOR
