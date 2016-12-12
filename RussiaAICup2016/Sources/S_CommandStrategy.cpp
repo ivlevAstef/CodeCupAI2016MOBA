@@ -114,8 +114,11 @@ const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Resu
     return Vector(EX::maxSpeed(self), 0).rotated(self.getAngle());
   }
 
+  ///вначале находим самый приоритетный вектор
+  double maxSumPriority = 0;
+  Vector maxVector = Vector(0, 0);
   double maxPriority = 0;
-  Vector result = Vector(0, 0);
+
   for (const auto& moveIter : moveResults) {
     const auto direction = moveIter.moveDirection.normal();
 
@@ -124,13 +127,36 @@ const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Resu
       sumPriority += move.moveDirection.normal().dot(direction) * move.priority;
     }
 
-    if (sumPriority > maxPriority) {
-      sumPriority = maxPriority;
-      result = moveIter.moveDirection;
+    if (sumPriority > maxSumPriority) {
+      maxSumPriority = sumPriority;
+      maxVector = moveIter.moveDirection;
+      maxPriority = moveIter.priority;
     }
   }
 
-  return result;
+  if (0 == maxPriority) {
+    return maxVector;
+  }
+
+  double sumPriority = 0;
+  Vector result = Vector(0, 0);
+  //после складываем его, с существенными векторами, которые находяться в секторе +-60 градусов
+  for (const auto& moveIter : moveResults) {
+    const auto direction = moveIter.moveDirection;
+    const auto dot = direction.normal().dot(maxVector.normal());
+
+    /// если угол в пределах 30 градусов - cos(30) = 0.866
+    if (dot > 0.866) {
+      const auto priority = dot * moveIter.priority;
+
+      sumPriority += priority;
+      result += direction * priority;
+    }
+
+  }
+
+
+  return result / sumPriority;
 }
 
 bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const Wizard& self, Vector& direction) {
@@ -150,7 +176,7 @@ bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const 
   if (direction.length() < 1) {
     direction = finalMoveVector;
     for (const auto& tree : World::instance().trees()) {
-      if (Math::distanceToLine(EX::pos(tree), selfPos, selfPos + direction) < tree.getRadius() + self.getRadius()) {
+      if (Math::distanceToLine(EX::pos(tree), selfPos, selfPos + direction) < tree.getRadius() + self.getRadius() + 1) {
         addTreeForRemove(self, &tree);
       }
     }
@@ -197,9 +223,9 @@ void CommandStrategy::addTreeForRemove(const Wizard& self, const model::LivingUn
 void CommandStrategy::addAvoidProjectiles(std::vector<MoveCommand::Result>& moveResults, const Wizard& self, const Vector& moveDirection) {
 
   for (const auto& projectile : World::instance().bullets()) {
-    //if (projectile.faction == self.getFaction()) { // игнорируем свои снаряды, так как они наврятли летят в нас
-    //  continue;
-    //}
+    if (projectile.faction == self.getFaction()) { // игнорируем свои снаряды, так как они наврятли летят в нас
+      continue;
+    }
     const auto command = fabric.avoidProjectile(projectile, moveDirection);
 
     MoveCommand::Result moveCommandResult;

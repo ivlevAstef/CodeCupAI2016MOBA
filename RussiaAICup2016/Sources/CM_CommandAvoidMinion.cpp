@@ -34,7 +34,8 @@ bool CommandAvoidMinion::check(const Wizard& self) {
     }
   }
 
-  distance += 2 * self.maxSpeed();
+  distance += self.maxSpeed();
+
   if (delta.length() > distance) {
     return false;
   }

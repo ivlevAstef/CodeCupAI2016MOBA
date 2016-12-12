@@ -104,7 +104,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   }
 
   distance = MIN(finalDodgeRange, finalCastRange);
-  distance += Algorithm::maxSpeed(self, self.getAngle(), -delta).length() + Algorithm::maxSpeed(wizard, wizard.getAngle(), delta).length();
+  distance += self.maxSpeed();
 
   if (delta.length() > distance) {
     return false;

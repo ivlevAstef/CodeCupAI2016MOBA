@@ -33,7 +33,7 @@ double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& mini
     }
     return 450 + lifePriority;
   } else {
-    return 2*lifePriority + ((400 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
+    return 2*lifePriority + ((600 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
   }
 }
 
@@ -73,7 +73,7 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
 
 double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {
   /*сочетается с get expirience*/
-  return 650 * double(self.getLife())/double(self.getMaxLife());
+  return 350 * double(self.getLife())/double(self.getMaxLife());
 }
 
 double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Wizard& wizard) {
@@ -84,7 +84,7 @@ double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Wizard& 
     return 10;
   }
 
-  return 300 * (timeToSelfKill / timeToWizardKill);
+  return 200 * (timeToSelfKill / timeToWizardKill);
 }
 
 double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Minion& minion) {
@@ -92,7 +92,7 @@ double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Minion& 
   const double maxTimeToKill = Game::model().getWizardActionCooldownTicks() * 3;
 
   if (timeToMinionKill < maxTimeToKill) {
-    return 500 * (1 - (timeToMinionKill / maxTimeToKill));
+    return 100 * (1 - (timeToMinionKill / maxTimeToKill));
   }
 
   return 10;
@@ -102,7 +102,7 @@ double MovePriorities::moveMeleeAttack(const Wizard& self, const model::Building
   const double timeToTowerKill = EX::dps(self) / double(build.getLife());
 
   if (timeToTowerKill < build.getCooldownTicks()) {
-    return 700;
+    return 300;
   }
 
   return 10;
