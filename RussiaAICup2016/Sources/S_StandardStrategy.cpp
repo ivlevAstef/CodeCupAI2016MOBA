@@ -6,8 +6,8 @@
 
 using namespace AICup;
 
-StandardStrategy::StandardStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder) :
-  BaseStrategyComponents(fabric, pathFinder, nullptr, nullptr) {
+StandardStrategy::StandardStrategy(const CommandFabric& fabric) :
+  BaseStrategyComponents(fabric, nullptr, nullptr) {
   defaultLane = model::_LANE_UNKNOWN_;
 }
 
@@ -23,7 +23,7 @@ void StandardStrategy::update(const model::Wizard& model, model::Move& move) {
   }
 
   if (model::_LANE_UNKNOWN_ == defaultLane) {
-    setupDefaultLane(model);
+    defaultLane = calcDefaultLane(model);
   }
 
   CommandStrategy::clear();
@@ -58,19 +58,17 @@ void StandardStrategy::update(const model::Wizard& model, model::Move& move) {
   CommandStrategy::update(self, move);
 }
 
-void StandardStrategy::setupDefaultLane(const model::Wizard& self) {
+model::LaneType StandardStrategy::calcDefaultLane(const model::Wizard& self) {
   switch (StandardInfo::tacticsRole(self)) {
     case TacticsRole::TankStan:
     case TacticsRole::TankAttack:
-      defaultLane = model::LANE_MIDDLE;
-      break;
+      return model::LANE_MIDDLE;
     case TacticsRole::SupportStan:
     case TacticsRole::AttackAOE:
-      defaultLane = model::LANE_TOP;
-      break;
+      return model::LANE_TOP;
     case TacticsRole::SupportHaste:
     case TacticsRole::AttackStan:
-      defaultLane = model::LANE_BOTTOM;
-      break;
+      return model::LANE_BOTTOM;
   }
+  return model::LANE_MIDDLE;
 }

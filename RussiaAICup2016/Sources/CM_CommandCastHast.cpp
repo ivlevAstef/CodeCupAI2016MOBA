@@ -25,7 +25,7 @@ bool CommandCastHast::check(const Wizard& self) {
 
 
   /// уже маны достаточно на прокаст двух, то может быть положим на своих
-  if (self.getMana() < 2 * Game::model().getShieldManacost()) {
+  if (self.getMana() >= 2 * Game::model().getShieldManacost()) {
     return true;
   }
 

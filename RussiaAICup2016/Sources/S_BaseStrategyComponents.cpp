@@ -8,20 +8,20 @@
 
 using namespace AICup;
 
-BaseStrategyComponents::BaseStrategyComponents(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder, RolePtr role, SkillBuildPtr skillBuild):
-  CommandStrategy(fabric, pathFinder, role, skillBuild) {
+BaseStrategyComponents::BaseStrategyComponents(const CommandFabric& fabric, RolePtr role, SkillBuildPtr skillBuild):
+  CommandStrategy(fabric, role, skillBuild) {
   currentLane = model::LANE_MIDDLE;
   lastChangeLineTick = 0;
 }
 
 bool BaseStrategyComponents::changeLane(const Wizard& self) {
-  return Algorithm::checkChangeLine(pathFinder, self, currentLane);
+  return Algorithm::checkChangeLine(Algorithm::PathFinder::instance(), self, currentLane);
 }
 
 bool BaseStrategyComponents::changeLane(const Wizard& self, int period) {
   if (World::model().getTickIndex() - lastChangeLineTick >= period) {
     lastChangeLineTick = World::model().getTickIndex();
-    return Algorithm::checkChangeLine(pathFinder, self, currentLane);
+    return Algorithm::checkChangeLine(Algorithm::PathFinder::instance(), self, currentLane);
   }
 
   return false;

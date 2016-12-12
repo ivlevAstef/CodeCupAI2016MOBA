@@ -12,7 +12,7 @@ namespace AICup
 {
   class TestDodgeStrategy: public CommandStrategy {
   public:
-    TestDodgeStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
+    TestDodgeStrategy(const CommandFabric& fabric);
 
     void update(const model::Wizard& self, model::Move& move) override;
   };

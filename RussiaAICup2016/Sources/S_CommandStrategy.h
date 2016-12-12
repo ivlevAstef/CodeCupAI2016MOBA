@@ -25,7 +25,7 @@ namespace AICup
 {
   class CommandStrategy {
   public:
-    CommandStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder, RolePtr role, SkillBuildPtr skillBuild);
+    CommandStrategy(const CommandFabric& fabric, RolePtr role, SkillBuildPtr skillBuild);
 
     virtual void update(const model::Wizard& self, model::Move& move) = 0;
 
@@ -60,7 +60,6 @@ namespace AICup
 
   protected:
     const CommandFabric& fabric;
-    const Algorithm::PathFinder& pathFinder;
     std::shared_ptr<Algorithm::Path> path;
 
 

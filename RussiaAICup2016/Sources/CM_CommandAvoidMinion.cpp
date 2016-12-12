@@ -20,16 +20,18 @@ bool CommandAvoidMinion::check(const Wizard& self) {
   const auto unitPos = EX::pos(minion);
   const auto delta = selfPos - unitPos;
 
+  double projectileRadius = 0;
   if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
     distance = mc.getOrcWoodcutterAttackRange() + self.getRadius();
   } else {
-    distance = mc.getFetishBlowdartAttackRange() + self.getRadius() + mc.getDartRadius();
+    projectileRadius = mc.getDartRadius();
+    distance = mc.getFetishBlowdartAttackRange() + self.getRadius() + projectileRadius;
   }
 
   /// находим ближайшего к миньону юнита, так как бить он будет его, а значит дистанция минимальная = расстоянию до этого юнита
   for (const auto& unit : World::instance().around(minion, Game::reverseFaction(minion.getFaction()), distance)) {
-    double distanceToUnit = unit->getDistanceTo(minion);
-    if (unit->getLife() > 24 && distanceToUnit < distance) {
+    double distanceToUnit = unit->getDistanceTo(minion) + minion.getRadius() + projectileRadius;
+    if (unit->getLife() > 10 && distanceToUnit < distance) {
       distance = distanceToUnit;
     }
   }

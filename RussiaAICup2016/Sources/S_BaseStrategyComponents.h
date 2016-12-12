@@ -13,7 +13,7 @@ namespace AICup
 {
   class BaseStrategyComponents: public CommandStrategy {
   public:
-    BaseStrategyComponents(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder, RolePtr role, SkillBuildPtr skillBuild);
+    BaseStrategyComponents(const CommandFabric& fabric, RolePtr role, SkillBuildPtr skillBuild);
 
   protected:
     bool changeLane(const Wizard& self);

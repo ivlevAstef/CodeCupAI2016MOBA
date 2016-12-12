@@ -60,6 +60,8 @@ namespace AICup
     int cooldownSkill(const model::Wizard& obj, model::ActionType action);
     int cooldownMaxSkill(const model::Wizard& obj, model::ActionType action);
 
+    int cooldownByMana(const model::Wizard& obj, model::ActionType action);
+
 
     double burnResidualDamage(const model::Wizard& obj);
     bool isShield(const model::Wizard& obj);

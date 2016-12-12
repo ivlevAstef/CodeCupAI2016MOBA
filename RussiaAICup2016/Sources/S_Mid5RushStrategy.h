@@ -12,7 +12,7 @@ namespace AICup
 {
   class Mid5RushStrategy: public BaseStrategyComponents {
   public:
-    Mid5RushStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
+    Mid5RushStrategy(const CommandFabric& fabric);
 
     void update(const model::Wizard& self, model::Move& move) override;
   };

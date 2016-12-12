@@ -16,8 +16,7 @@
 #include "C_Logger.h"
 #include "E_Wizard.h"
 #include "T_Session.h"
-
-#include "A_Attack.h"
+#include "A_PathFinder.h"
 
 using namespace AICup;
 
@@ -30,11 +29,11 @@ MyStrategy::MyStrategy() {
 
 #ifdef ENABLE_VISUALIZATOR
 void visualization(const model::Wizard& self, const Visualizator& visualizator) {
-  /*AICup::World::instance().visualization(visualizator);
+  AICup::World::instance().visualization(visualizator);
   AICup::Points::instance().visualization(visualizator);
   AICup::HypotheticalEnemies::instance().visualization(visualizator);
   AICup::InfluenceMap::instance().visualization(visualizator);
-  AICup::StrategyManager::instance().visualization(self, visualizator);*/
+  AICup::StrategyManager::instance().visualization(self, visualizator);
 }
 #endif
 
@@ -44,6 +43,7 @@ void MyStrategy::move(const model::Wizard& self, const model::World& world, cons
   AICup::World::instance().update(world);
   AICup::HypotheticalEnemies::instance().update();
   AICup::InfluenceMap::instance().update(self);
+  AICup::Algorithm::PathFinder::instance().calculate(self);
 
   /// Запускаю обновление сессии - локальных данных, которые влияют на принятие решений что делать
   Session::instance().update(self, move);

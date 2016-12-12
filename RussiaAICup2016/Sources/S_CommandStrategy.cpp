@@ -12,8 +12,8 @@
 
 using namespace AICup;
 
-CommandStrategy::CommandStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& finder, RolePtr role, SkillBuildPtr skillBuild):
-  fabric(fabric), pathFinder(finder), role(role), skillBuild(skillBuild) {
+CommandStrategy::CommandStrategy(const CommandFabric& fabric, RolePtr role, SkillBuildPtr skillBuild):
+  fabric(fabric), role(role), skillBuild(skillBuild) {
 }
 
 void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
@@ -186,7 +186,7 @@ bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const 
 }
 
 const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Position& endPoint) {
-  pathFinder.calculatePath(endPoint, path);
+  Algorithm::PathFinder::instance().calculatePath(endPoint, path);
   assert(nullptr != path);
 
   const Position preEndPoint = path->calculateNearestCurvaturePoint(self.getVisionRange() / 2);

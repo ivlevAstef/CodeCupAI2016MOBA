@@ -5,18 +5,18 @@
 
 using namespace AICup;
 
-TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder):
-  CommandStrategy(fabric, pathFinder, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
+TestMoveAndAttackStrategy::TestMoveAndAttackStrategy(const CommandFabric& fabric):
+  CommandStrategy(fabric, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
   currentMoveCommandIndex = 0;
 
-  allMoveCommands.push_back(fabric.moveToPoint(800, 3200));
-  allMoveCommands.push_back(fabric.moveToPoint(200, 2400));
-  allMoveCommands.push_back(fabric.moveToPoint(1200, 1200));
-  allMoveCommands.push_back(fabric.moveToPoint(1600, 2400));
-  allMoveCommands.push_back(fabric.moveToPoint(1200, 3800));
-  allMoveCommands.push_back(fabric.moveToPoint(2800, 3800));
-  allMoveCommands.push_back(fabric.moveToPoint(2800, 2800));
-  allMoveCommands.push_back(fabric.moveToPoint(1600, 2400));
+  allMoveCommands.push_back(fabric.moveToPoint(800, 3200, 10));
+  allMoveCommands.push_back(fabric.moveToPoint(200, 2400, 10));
+  allMoveCommands.push_back(fabric.moveToPoint(1200, 1200, 10));
+  allMoveCommands.push_back(fabric.moveToPoint(1600, 2400, 10));
+  allMoveCommands.push_back(fabric.moveToPoint(1200, 3800, 10));
+  allMoveCommands.push_back(fabric.moveToPoint(2800, 3800, 10));
+  allMoveCommands.push_back(fabric.moveToPoint(2800, 2800, 10));
+  allMoveCommands.push_back(fabric.moveToPoint(1600, 2400, 10));
 }
 
 void TestMoveAndAttackStrategy::update(const model::Wizard& model, model::Move& move) {

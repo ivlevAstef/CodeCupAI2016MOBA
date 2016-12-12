@@ -36,7 +36,6 @@ namespace AICup
     CommandStrategyPtr strategy;
 
     CommandFabric fabric;
-    Algorithm::PathFinder pathFinder;
 
     StrategyDTO lastStrategyDTO;
   };

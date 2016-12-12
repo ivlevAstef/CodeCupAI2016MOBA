@@ -13,8 +13,8 @@
 
 using namespace AICup;
 
-CommandMoveToPoint::CommandMoveToPoint(const double x, const double y):
-  point(x,y) {
+CommandMoveToPoint::CommandMoveToPoint(const double x, const double y, const double priority):
+  point(x,y), priority(priority) {
 }
 
 bool CommandMoveToPoint::check(const Wizard& self) {
@@ -27,7 +27,7 @@ void CommandMoveToPoint::execute(const Wizard& self, Result& result) {
   result.turnDirection = Vector();
 
   result.turnPriority = TurnPriority::moveToPoint;
-  result.priority = MovePriorities::moveToPoint(self, point);
+  result.priority = priority;
 }
 
 

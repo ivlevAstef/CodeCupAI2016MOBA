@@ -5,8 +5,8 @@
 
 using namespace AICup;
 
-TestDodgeStrategy::TestDodgeStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder) :
-  CommandStrategy(fabric, pathFinder, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
+TestDodgeStrategy::TestDodgeStrategy(const CommandFabric& fabric) :
+  CommandStrategy(fabric, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
 }
 
 void TestDodgeStrategy::update(const model::Wizard& model, model::Move& move) {
@@ -18,23 +18,23 @@ void TestDodgeStrategy::update(const model::Wizard& model, model::Move& move) {
     moveCommands.push_back(moveCommand);
   }*/
 
-  auto moveCommand = fabric.moveToPoint(200, 800);
+  auto moveCommand = fabric.moveToPoint(200, 800, 10);
   switch ((int)self.getId()) {
     case 1:
     case 2:
     case 6:
     case 7:
-      moveCommand = fabric.moveToPoint(200, 1600);
+      moveCommand = fabric.moveToPoint(200, 1600, 10);
       break;
     case 3:
     case 8:
-      moveCommand = fabric.moveToPoint(1600, 2400);
+      moveCommand = fabric.moveToPoint(1600, 2400, 10);
       break;
     case 4:
     case 5:
     case 9:
     case 10:
-      moveCommand = fabric.moveToPoint(1400, 4000-200);
+      moveCommand = fabric.moveToPoint(1400, 4000-200, 10);
       break;
   }
 

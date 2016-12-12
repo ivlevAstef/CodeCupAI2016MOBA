@@ -5,8 +5,8 @@
 
 using namespace AICup;
 
-TestFollowStrategy::TestFollowStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder):
-  CommandStrategy(fabric, pathFinder, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
+TestFollowStrategy::TestFollowStrategy(const CommandFabric& fabric):
+  CommandStrategy(fabric, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
   for (const auto& wizard : World::instance().model().getWizards()) {
     if (!wizard.isMe()) {
       moveCommands.push_back(fabric.follow(wizard.getId(), 200, 235));

@@ -31,17 +31,18 @@
 #include "CM_CommandCastShield.h"
 
 #include "C_Extensions.h"
+
+#include "A_PathFinder.h"
 #include <cassert>
 
 using namespace AICup;
 
-CommandFabric::CommandFabric(Algorithm::PathFinder& finder):
-  finder(finder) {
+CommandFabric::CommandFabric() {
 
 }
 
-MoveCommandPtr CommandFabric::moveToPoint(const double x, const double y) const {
-  return std::make_shared<CommandMoveToPoint>(x, y);
+MoveCommandPtr CommandFabric::moveToPoint(const double x, const double y, const double priority) const {
+  return std::make_shared<CommandMoveToPoint>(x, y, priority);
 }
 
 MoveCommandPtr CommandFabric::moveToLine(const model::LaneType line) const {
@@ -50,7 +51,7 @@ MoveCommandPtr CommandFabric::moveToLine(const model::LaneType line) const {
 
 /// подойти чтобы взять руну
 MoveCommandPtr CommandFabric::moveToBonus() const {
-  return std::make_shared<CommandMoveToBonus>(finder);
+  return std::make_shared<CommandMoveToBonus>(Algorithm::PathFinder::instance());
 }
 
 MoveCommandPtr CommandFabric::follow(const long long unitId, const double minDistance, const double maxDistance) const {

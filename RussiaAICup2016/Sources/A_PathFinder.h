@@ -8,6 +8,7 @@
 #pragma once
 
 #include "E_Types.h"
+#include "C_Singleton.h"
 #include "C_Vector2D.h"
 #include "model\CircularUnit.h"
 #include <memory>
@@ -72,11 +73,10 @@ namespace AICup
 
 
 
-    class PathFinder {
+    class PathFinder: public Singleton<PathFinder> {
     public:
       PathFinder();
 
-      ///Возращает точку куда надо идти
       void calculate(const model::CircularUnit& unit);
 
       void calculatePath(const Position& to, std::shared_ptr<Path>& path) const;

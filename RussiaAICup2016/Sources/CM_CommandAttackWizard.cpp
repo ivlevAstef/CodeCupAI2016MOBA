@@ -56,6 +56,7 @@ void CommandAttackWizard::execute(const Wizard& self, Result& result) {
       bulletPos, bulletPos, self.getCastRange(), model::PROJECTILE_MAGIC_MISSILE, self.getFaction());
 
     result.priority = AttackPriorities::attackWizard(self, wizard, &bullet);
+    result.priority += (wizard.getId() % 5) * self.getRole().getWizardByIdPriority();
   }
 
   result.priority *= self.getRole().getWizardPriority();

@@ -4,8 +4,8 @@
 
 using namespace AICup;
 
-Mid5RushStrategy::Mid5RushStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder) :
-  BaseStrategyComponents(fabric, pathFinder, std::make_shared<RushRole>(), std::make_shared<RushSkillBuild>()) {
+Mid5RushStrategy::Mid5RushStrategy(const CommandFabric& fabric) :
+  BaseStrategyComponents(fabric, std::make_shared<RushRole>(), std::make_shared<RushSkillBuild>()) {
 }
 
 void Mid5RushStrategy::update(const model::Wizard& model, model::Move& move) {

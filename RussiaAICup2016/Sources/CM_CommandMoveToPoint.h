@@ -17,7 +17,7 @@ namespace AICup
 {
   class CommandMoveToPoint: public MoveCommand {
   public:
-    CommandMoveToPoint(const double x, const double y);
+    CommandMoveToPoint(const double x, const double y, const double priority);
 
     bool check(const Wizard& self) override;
 
@@ -29,5 +29,6 @@ namespace AICup
 
   private:
     const Position point;
+    const double priority;
   };
 }

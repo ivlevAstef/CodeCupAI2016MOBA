@@ -13,12 +13,12 @@ namespace AICup
 {
   class StandardStrategy: public BaseStrategyComponents {
   public:
-    StandardStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
+    StandardStrategy(const CommandFabric& fabric);
 
     void update(const model::Wizard& self, model::Move& move) override;
 
   private:
-    void setupDefaultLane(const model::Wizard& self);
+    model::LaneType calcDefaultLane(const model::Wizard& self);
 
   private:
     model::LaneType defaultLane;

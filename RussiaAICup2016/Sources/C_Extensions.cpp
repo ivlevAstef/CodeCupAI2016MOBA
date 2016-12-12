@@ -325,6 +325,28 @@ int EX::cooldownMaxSkill(const model::Wizard& obj, model::ActionType action) {
   return MAX(cd1, cd2);
 }
 
+int EX::cooldownByMana(const model::Wizard& obj, model::ActionType action) {
+  double manaRegen = Game::model().getWizardBaseManaRegeneration() + Game::model().getWizardManaRegenerationGrowthPerLevel() * obj.getLevel();
+  double manaCost = 0;
+  if (model::ACTION_MAGIC_MISSILE == action) {
+    manaCost = Game::model().getMagicMissileManacost();
+  } else if (model::ACTION_FROST_BOLT == action) {
+    manaCost = Game::model().getFrostBoltManacost();
+  } else if (model::ACTION_FIREBALL == action) {
+    manaCost = Game::model().getFireballManacost();
+  } else if (model::ACTION_HASTE == action) {
+    manaCost = Game::model().getHasteManacost();
+  } else if (model::ACTION_SHIELD == action) {
+    manaCost = Game::model().getShieldManacost();
+  }
+
+  if (manaCost <= obj.getMana()) {
+    return 0;
+  }
+
+  return (manaCost - obj.getMana()) / manaRegen;
+}
+
 double EX::burnResidualDamage(const model::Wizard& obj) {
   double result = 0;
 

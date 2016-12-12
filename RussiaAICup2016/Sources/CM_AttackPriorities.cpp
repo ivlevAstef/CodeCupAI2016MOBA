@@ -102,7 +102,6 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   const double distance = self.getDistanceTo(wizard);
   const double distancePriority = 500 * ((500 * 500) / (distance * distance));
 
-
   return MIN((lifePriority + statusPriority + distancePriority) * dodgePriority, 1500);
 }
 

@@ -12,7 +12,7 @@ namespace AICup
 {
   class RoundTwoStrategy: public BaseStrategyComponents {
   public:
-    RoundTwoStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder);
+    RoundTwoStrategy(const CommandFabric& fabric);
 
     void update(const model::Wizard& self, model::Move& move) override;
 

@@ -36,8 +36,6 @@ namespace AICup
     double moveToBonus(const Wizard& self, const Position& bonusPos);
 
     double moveToLine(const Wizard& self, const model::LaneType& lane);
-
-    double moveToPoint(const Wizard& self, const Position& point);
   };
 }
 

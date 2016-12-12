@@ -18,11 +18,11 @@ namespace AICup
 {
   class CommandFabric {
   public:
-    CommandFabric(Algorithm::PathFinder& finder);
+    CommandFabric();
 
 /// #pragma mark - перемещение
     /// переместиться в точку
-    MoveCommandPtr moveToPoint(const double x, const double y) const;
+    MoveCommandPtr moveToPoint(const double x, const double y, const double priority) const;
 
     /// переместиться на линию
     MoveCommandPtr moveToLine(const model::LaneType line) const;
@@ -62,8 +62,5 @@ namespace AICup
 /// #pragma mark - cast
     CastCommandPtr haste() const;
     CastCommandPtr shield() const;
-
-  private:
-    Algorithm::PathFinder& finder;
   };
 }

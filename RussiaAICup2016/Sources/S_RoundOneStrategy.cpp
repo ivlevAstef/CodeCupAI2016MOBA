@@ -6,8 +6,8 @@
 
 using namespace AICup;
 
-RoundOneStrategy::RoundOneStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder) :
-  BaseStrategyComponents(fabric, pathFinder, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
+RoundOneStrategy::RoundOneStrategy(const CommandFabric& fabric) :
+  BaseStrategyComponents(fabric, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
 }
 
 void RoundOneStrategy::update(const model::Wizard& model, model::Move& move) {

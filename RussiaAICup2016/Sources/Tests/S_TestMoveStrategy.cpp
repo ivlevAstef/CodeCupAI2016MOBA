@@ -5,16 +5,16 @@
 
 using namespace AICup;
 
-TestMoveStrategy::TestMoveStrategy(const CommandFabric& fabric, const Algorithm::PathFinder& pathFinder):
-  CommandStrategy(fabric, pathFinder, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
+TestMoveStrategy::TestMoveStrategy(const CommandFabric& fabric):
+  CommandStrategy(fabric, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
   currentMoveCommandIndex = 0;
 
-  allMoveCommands.push_back(fabric.moveToPoint(1200, 1200));
+  allMoveCommands.push_back(fabric.moveToPoint(1200, 1200, 10));
   allMoveCommands.push_back(fabric.moveToLine(model::LANE_BOTTOM));
-  allMoveCommands.push_back(fabric.moveToPoint(200, 3800));
+  allMoveCommands.push_back(fabric.moveToPoint(200, 3800, 10));
   allMoveCommands.push_back(fabric.moveToLine(model::LANE_TOP));
   allMoveCommands.push_back(fabric.moveToLine(model::LANE_MIDDLE));
-  allMoveCommands.push_back(fabric.moveToPoint(800, 3200));
+  allMoveCommands.push_back(fabric.moveToPoint(800, 3200, 10));
   allMoveCommands.push_back(fabric.moveToLine(model::LANE_BOTTOM));
 }
 
