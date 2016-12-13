@@ -110,6 +110,10 @@ namespace AICup
       return attackBuildMeleePriority;
     }
 
+    inline const float getFriendWizardConfidence() const {
+      return friendWizardConfidence;
+    }
+
   protected:
     float audacity; // дерзость. влияет на расположение на линии, каждая +1 увеличивает близость к врагу на 100, -1 увеличивает на 100
     /// коэцифиенты выбираються в зависимости от ситуации на линии - если шансы на победу маленькие то боязнь, иначе прессование
@@ -146,6 +150,8 @@ namespace AICup
     float attackWizardMeleePriority;
     float attackMinionMeleePriority;
     float attackBuildMeleePriority;
+
+    float friendWizardConfidence;
 
   private:
     /// если только начала игры, то приоритет всегда один

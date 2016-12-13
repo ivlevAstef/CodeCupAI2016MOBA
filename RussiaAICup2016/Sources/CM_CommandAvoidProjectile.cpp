@@ -16,15 +16,17 @@ bool CommandAvoidProjectile::check(const Wizard& self) {
   const auto mc = Game::model();
 
   auto lProjectile = projectile;
+  double fullRadius = projectile.radius;
   if (lProjectile.type == model::PROJECTILE_FIREBALL) {
-    lProjectile.radius += Game::model().getFireballExplosionMinDamageRange();
+    lProjectile.radius = Game::model().getFireballExplosionMaxDamageRange();
+    fullRadius = Game::model().getFireballExplosionMinDamageRange();
   }
 
 
   const auto selfPos = EX::pos(self);
 
   const auto distanceToLine = Math::distanceToSegment(selfPos, lProjectile.startPoint, lProjectile.startPoint + lProjectile.speed.normal() * projectile.range);
-  const auto distanceMoved = self.getRadius() + lProjectile.radius - distanceToLine;
+  const auto distanceMoved = self.getRadius() + fullRadius - distanceToLine;
 
   /// если снаряд не в нас, и я не могу в него войти то что беспокоиться
   if (distanceMoved < -self.maxSpeed()) {

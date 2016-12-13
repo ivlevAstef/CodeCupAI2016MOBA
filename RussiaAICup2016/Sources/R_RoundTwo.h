@@ -46,7 +46,7 @@ namespace AICup
       audacityWizard = 3.5;
       attackSkillPriority = 2.5;
 
-      desireChangeLine = 0.85;
+      desireChangeLine = 0.8;
       changeLineForeFrontPriority = 0.25;
       changeLinePathLengthPriority = 0.75;
       changeLineWizardCountPriority = 1.5;
@@ -54,10 +54,12 @@ namespace AICup
       changeLineTowerBalancePriority = 1.0; // бежим туда где больше вражеских вышек, при прочих равных
       changeLineLaneStrengthPriority = 1.0;
 
-      attackMeleeWinThreshold = 0.3;
+      attackMeleeWinThreshold = 0.7;
       attackWizardMeleePriority = 0.5;
       attackBuildMeleePriority = 1.0;
       attackMinionMeleePriority = 1.0;
+
+      friendWizardConfidence = 0.25;
     }
 
     void update(const model::Wizard& self) override {
@@ -67,7 +69,7 @@ namespace AICup
 
       audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
 
-      linePressureWizards = 0.75 * float(realLife) / float(self.getMaxLife());
+      linePressureWizards = 0.05 * float(realLife) / float(self.getMaxLife());
       lineAudacityWizards = 0.5 + 3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };

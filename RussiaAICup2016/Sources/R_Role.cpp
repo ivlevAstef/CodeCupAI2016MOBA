@@ -35,6 +35,8 @@ Role::Role() {
   attackWizardMeleePriority = 1;
   attackMinionMeleePriority = 1;
   attackBuildMeleePriority = 1;
+
+  friendWizardConfidence = 0.5;
 }
 
 

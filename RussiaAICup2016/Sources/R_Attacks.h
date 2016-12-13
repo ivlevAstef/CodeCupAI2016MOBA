@@ -69,6 +69,8 @@ namespace AICup
       changeLineLaneStrengthPriority = 2.0;
 
       attackMeleeWinThreshold = 0.6;
+
+      friendWizardConfidence = 1.0;
     }
 
     void update(const model::Wizard& self) override {

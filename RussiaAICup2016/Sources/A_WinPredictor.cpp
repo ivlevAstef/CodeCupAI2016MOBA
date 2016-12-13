@@ -19,7 +19,7 @@ double Algorithm::changeOfWinning(const Wizard& self, const double x, const doub
       if (self.getId() == wizard.getId()) {
         wizardSummaryDanger += EX::danger(wizard);
       } else if (self.getFaction() == wizard.getFaction()) {
-        wizardSummaryDanger += 0.75 * EX::danger(wizard); ///на сових пока не стоит сильно расчитывать
+        wizardSummaryDanger += self.getRole().getFriendWizardConfidence() * EX::danger(wizard);
       } else {
         wizardSummaryDanger -= EX::danger(wizard);
       }
