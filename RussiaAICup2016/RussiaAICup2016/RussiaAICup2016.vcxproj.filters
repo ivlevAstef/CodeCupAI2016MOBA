@@ -482,9 +482,6 @@
     <ClInclude Include="..\Sources\R_StandardInfo.h">
       <Filter>Sources\Tactics\Final\Standard</Filter>
     </ClInclude>
-    <ClInclude Include="..\Sources\R_AntiRush.h">
-      <Filter>Sources\Tactics\Final\AntiRush</Filter>
-    </ClInclude>
     <ClInclude Include="..\Sources\S_AntiRushStrategy.h">
       <Filter>Sources\Tactics\Final\AntiRush</Filter>
     </ClInclude>

@@ -114,7 +114,5 @@ void StrategyManager::visualization(const model::Wizard& self, const Visualizato
   if (nullptr != strategy.get()) {
     strategy->visualization(self, visualizator);
   }
-
-  pathFinder.visualization(visualizator);
 }
 #endif // ENABLE_VISUALIZATOR

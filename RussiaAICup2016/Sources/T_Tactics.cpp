@@ -74,5 +74,6 @@ std::vector<Message> Tactics::finalResult(TacticsType tacticsType, const std::ve
   if (tacticsType == lastType) {
     return{ };
   }
+  lastType = tacticsType;
   return data;
 }

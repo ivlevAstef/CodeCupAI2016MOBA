@@ -40,7 +40,7 @@ namespace AICup
       audacityWizard = 3.6;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 0.91;
+      desireChangeLine = 0.88;
       changeLineForeFrontPriority = 0.25;
       changeLinePathLengthPriority = 0.75;
       changeLineWizardCountPriority = 1.5;

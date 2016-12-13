@@ -17,22 +17,12 @@ void AntiRushStrategy::update(const model::Wizard& model, model::Move& move) {
     skillBuild = StandardInfo::skillBuild(model);
   }
 
-  bool boolHasCenter = false;
-  for (const auto& wizard : World::model().getWizards()) {
-    if (wizard.getFaction() == model.getFaction()) {
-      boolHasCenter |= (4 == World::instance().aroundAuraWizards(model).size());
-    }
-  }
-
-  if (boolHasCenter) {
-    role = std::make_shared<AntiRushRole>();
-  } else {
+  if (nullptr == role) {
     role = StandardInfo::role(model);
   }
 
   CommandStrategy::clear();
   const auto& self = CommandStrategy::preUpdate(model, move);
-
 
   ///јтака на мид, из 2 точек (с мида 3, и с нижней "руны" двое)
   addAroundEnemiesOrMoveMelee(self);
@@ -43,19 +33,18 @@ void AntiRushStrategy::update(const model::Wizard& model, model::Move& move) {
 
   addAttackFollow(self);
 
-  /*if (model::LANE_BOTTOM == World::instance().positionToLine(model.getX(), model.getY())) {
-    addMoveToBottom(self);
-  } else {*/
+  if (model::LANE_BOTTOM == World::instance().positionToLine(model.getX(), model.getY())) {
+    const auto pos = Points::point(Points::BONUS_BOTTOM) + Vector(-500, 500);
+    addMoveToPoint(self, pos);
+  } else {
     addMoveTo(self, model::LANE_MIDDLE);
-  //}
-
-
+  }
 
   CommandStrategy::update(self, move);
 }
 
 
-void AntiRushStrategy::addMoveToBottom(const Wizard& self) {
+void AntiRushStrategy::addMoveToPoint(const Wizard& self, Position pos) {
   MoveCommand::Result cache;
 
   /// эмул€ци€ машины состо€ний... крива€ до невозможности
@@ -69,11 +58,9 @@ void AntiRushStrategy::addMoveToBottom(const Wizard& self) {
 
 
   double moveToPointPriority = -1000;
-  const auto pos = Points::point(Points::BONUS_BOTTOM) + Vector(-500, -500);
   const auto moveToPoint = fabric.moveToPoint(pos.x, pos.y, 2000);
   if (moveToPoint->check(self)) {
     moveToPoint->execute(self, cache);
-    moveToPointPriority = cache.priority;
   }
 
   if (moveToPointPriority < 0 && moveToBonusPriority < 0) {

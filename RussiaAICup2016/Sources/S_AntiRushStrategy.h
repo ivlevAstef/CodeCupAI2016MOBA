@@ -17,6 +17,6 @@ namespace AICup
     void update(const model::Wizard& self, model::Move& move) override;
 
   private:
-    void addMoveToBottom(const Wizard& self);
+    void addMoveToPoint(const Wizard& self, Position pos);
   };
 };

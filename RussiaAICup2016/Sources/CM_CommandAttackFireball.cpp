@@ -12,19 +12,36 @@ CommandAttackFireball::CommandAttackFireball() {
 }
 
 double calcPriority(const model::LivingUnit& unit) {
+  const double minRange = Game::model().getFireballExplosionMaxDamageRange();
+  const double maxRange = Game::model().getFireballExplosionMinDamageRange();
+
   double priority = 0;
 
-  for (const auto& enemy : World::instance().around(unit, unit.getFaction(), Game::model().getFireballExplosionMinDamageRange()+25)) {
+  for (const auto& enemy : World::instance().around(unit, unit.getFaction(), maxRange+100)) {
+    double distance = enemy->getDistanceTo(unit);
+    distance -= unit.getRadius(); /// так как до края юнита а не до центра
+
+    bool isDynamic = EX::isWizard(*enemy) || EX::isMinion(*enemy);
+
+    /// если объекты движимы, то считаем, что всеже мы их не задеваем на более близкой дистанции
+    if (distance > (isDynamic ? (minRange*0.3 + maxRange*0.7) : maxRange)) {
+      continue;
+    }
+
+    double priorityMult = (distance - minRange) / (maxRange - minRange);
+    priorityMult = 1 - MAX(0, priorityMult);
+
     if (EX::isWizard(*enemy)) {
-      priority += 25;
+      priority += priorityMult * 28;
     } else if (EX::isMinion(*enemy)) {
-      priority += enemy->getLife() / 10;
+      priority += priorityMult * (enemy->getLife() / 10);
     } else if (EX::isBuilding(*enemy)) {
       if (!Algorithm::isImmortal(EX::asBuilding(*enemy))) {
-        priority += 20;
+        priority += priorityMult * 20;
       }
     }
   }
+
   return priority;
 }
 
@@ -48,7 +65,7 @@ bool CommandAttackFireball::check(const Wizard& self) {
 
   double maxPriority = 0;
   /// находим кого поджечь
-  for (const auto& enemy : World::instance().aroundEnemies(self, self.getCastRange() + 50)) {
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getCastRange() + 35+50/*чтобы можно было задевать и не по центру врагов*/)) {
     const auto& unit = *enemy;
 
     const auto unitPos = EX::pos(unit);
@@ -72,7 +89,7 @@ bool CommandAttackFireball::check(const Wizard& self) {
   }
 
   /// если уж совсем некого бить, то не бьем
-  if (maxPriority < 20) {
+  if (maxPriority < 25 / (self.getMana()/Game::model().getFireballManacost())) {
     return false;
   }
 

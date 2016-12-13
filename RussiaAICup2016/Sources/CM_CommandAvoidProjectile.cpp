@@ -14,16 +14,17 @@ CommandAvoidProjectile::CommandAvoidProjectile(const Bullet& projectile, const V
 
 bool CommandAvoidProjectile::check(const Wizard& self) {
   const auto mc = Game::model();
-  double projectileRadius = projectile.radius; /// специальный радиус, чтобы убегать от взрыва дабы снизить урон
-  if (projectile.type == model::PROJECTILE_FIREBALL) {
-    projectileRadius += Game::model().getFireballExplosionMinDamageRange();
+
+  auto lProjectile = projectile;
+  if (lProjectile.type == model::PROJECTILE_FIREBALL) {
+    lProjectile.radius += Game::model().getFireballExplosionMinDamageRange();
   }
 
 
   const auto selfPos = EX::pos(self);
 
-  const auto distanceToLine = Math::distanceToSegment(selfPos, projectile.startPoint, projectile.startPoint + projectile.speed.normal() * projectile.range);
-  const auto distanceMoved = self.getRadius() + projectileRadius - distanceToLine;
+  const auto distanceToLine = Math::distanceToSegment(selfPos, lProjectile.startPoint, lProjectile.startPoint + lProjectile.speed.normal() * projectile.range);
+  const auto distanceMoved = self.getRadius() + lProjectile.radius - distanceToLine;
 
   /// если снаряд не в нас, и я не могу в него войти то что беспокоиться
   if (distanceMoved < -self.maxSpeed()) {
@@ -31,7 +32,7 @@ bool CommandAvoidProjectile::check(const Wizard& self) {
   }
 
   int turnSign = 0;
-  const auto dodgeVector = Algorithm::dodge(self, moveDirection, projectile, turnSign);
+  const auto dodgeVector = Algorithm::dodge(self, moveDirection, lProjectile, turnSign);
   /// невозможно отклониться
   if (dodgeVector.length() < 1.0e-5) {
     return false;

@@ -101,7 +101,7 @@ const Vector CommandStrategy::turn(const std::vector<MoveCommand::Result>& moveR
     }
 
     if (sumPriority > maxPriority) {
-      sumPriority = maxPriority;
+      maxPriority = sumPriority;
       result = direction;
     }
   }
@@ -145,8 +145,8 @@ const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Resu
     const auto direction = moveIter.moveDirection;
     const auto dot = direction.normal().dot(maxVector.normal());
 
-    /// если угол в пределах 30 градусов - cos(30) = 0.866
-    if (dot > 0.866) {
+    /// если угол в пределах 60 градусов - cos(60) = 0.5
+    if (dot > 0.5) {
       const auto priority = dot * moveIter.priority;
 
       sumPriority += priority;
