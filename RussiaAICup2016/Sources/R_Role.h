@@ -94,6 +94,10 @@ namespace AICup
       return !useStartedLinePriority ? changeLineLaneStrengthPriority : 0.0f;
     }
 
+    inline const float getChangeLineExpiriencePriority() const {
+      return !useStartedLinePriority ? changeLineExpiriencePriority : 0.0f;
+    }
+
     inline const float getAttackMeleeWinThreshold() const {
       return attackMeleeWinThreshold;
     }
@@ -145,6 +149,7 @@ namespace AICup
     bool  changeLineWizardCountOnlyFriend; /// учитывать только своих магов, или своих - противника
     float changeLineTowerBalancePriority; /// насколько сильно влияет количество вышек на линии (свои - вражеские)
     float changeLineLaneStrengthPriority; /// насколько сильно влияет дизбаланс сил
+    float changeLineExpiriencePriority; /// насколько сильно влияет потенциальный опыт который на текущей линии
 
     float attackMeleeWinThreshold;
     float attackWizardMeleePriority;

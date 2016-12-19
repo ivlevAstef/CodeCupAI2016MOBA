@@ -13,6 +13,7 @@
 #include "CM_MovePriorities.h"
 #include "CM_TurnPriority.h"
 #include "C_Extensions.h"
+#include "A_ChangeLine.h"
 
 using namespace AICup;
 
@@ -97,7 +98,7 @@ bool CommandMoveToBonus::check(const Wizard& self) {
   }
 
   /// если опыт на линии + тот опыт который может еще прийти, больше того что дают за бонус, то он не нужен
-  if (potensialExpirience(self) + minMoveTicks * 0.1  > Game::model().getBonusScoreAmount()) {
+  if (Algorithm::potensialExpirience(self) + minMoveTicks * 0.1  > Game::model().getBonusScoreAmount()) {
     return false;
   }
 
@@ -114,17 +115,6 @@ bool CommandMoveToBonus::check(const Wizard& self) {
   bonusPos = selfPos + delta.normal() * (delta.length() - minDistance);
 
   return true;
-}
-
-double CommandMoveToBonus::potensialExpirience(const Wizard& self) {
-  double result = 0;
-  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 100)) {
-    if (enemy->getLife() < 150) {
-      result += enemy->getMaxLife() * 0.25f;
-    }
-  }
-
-  return result;
 }
 
 void CommandMoveToBonus::execute(const Wizard& self, Result& result) {

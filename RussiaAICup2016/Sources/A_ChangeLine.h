@@ -18,6 +18,8 @@ namespace AICup
     double calculateLinePriority(const Algorithm::PathFinder& finder, const Wizard& self, const model::LaneType lane);
     double calculateLineEnemyPriority(const Algorithm::PathFinder& finder, const Wizard& self, const model::LaneType lane);
     bool checkChangeLine(const Algorithm::PathFinder& finder, const Wizard& self, model::LaneType& lane);
+
+    double potensialExpirience(const Wizard& self);
   };
 
 };

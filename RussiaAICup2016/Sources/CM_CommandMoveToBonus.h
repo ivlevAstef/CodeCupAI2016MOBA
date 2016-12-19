@@ -23,10 +23,6 @@ namespace AICup
     void visualization(const model::Wizard& self, const Visualizator& visualizator) const override;
 #endif // ENABLE_VISUALIZATOR
 
-
-  private:
-    double potensialExpirience(const Wizard& self);
-
   private:
     Algorithm::PathFinder& pathFinder;
 

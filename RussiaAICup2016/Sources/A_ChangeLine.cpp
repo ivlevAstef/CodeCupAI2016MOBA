@@ -4,6 +4,7 @@
 #include "E_Game.h"
 #include "C_Math.h"
 #include "E_Points.h"
+#include "C_Extensions.h"
 
 using namespace AICup;
 
@@ -51,13 +52,20 @@ double Algorithm::calculateLinePriority(const Algorithm::PathFinder& finder, con
   /// пачка крипов около 1500, башня около 4000
   const double laneStrength = InfluenceMap::instance().getLineStrength(lane);
 
+  /// текущая линия может быть более приоритетной, если на ней есть тот кого в ближайшее время можно убить и получить опыт
+  double expirience = 0;
+  if (World::instance().positionToLine(self.getX(), self.getY()) == lane) {
+    expirience = potensialExpirience(self);
+  }
+
 
   /// Множители из роли
   const auto lengthRole = self.getRole().getChangeLineForeFrontPriority();
   const auto distanceRole = self.getRole().getChangeLinePathLengthPriority();
   const auto wizardRole = self.getRole().getChangeLineWizardCountPriority();
   const auto towerRole = self.getRole().getChangeLineTowerBalancePriority();
-  const auto laneStrengthRoley = self.getRole().getChangeLineLaneStrengthPriority();
+  const auto laneStrengthRole = self.getRole().getChangeLineLaneStrengthPriority();
+  const auto expirienceRole = self.getRole().getChangeLineExpiriencePriority();
 
   /// все значения от 0 до 1000
   double lengthPriority = (baseReverseLength * baseReverseLength) / (14.4 * 3600);
@@ -65,12 +73,15 @@ double Algorithm::calculateLinePriority(const Algorithm::PathFinder& finder, con
   double wizardPriority = wizardRole > 0 ? (500 - 100 * wizardCount) : (500 + 100 * wizardCount);
   double towerPriority = towerRole > 0 ? (500 - 250 * towerBalance) : (500 + 250 * towerBalance);
   double laneStrengthPriority = 500 - (MAX(-1000, MIN(laneStrength, 1000)) / 2);
+  double expiriencePriority = MIN(1000, expirience / 500);
 
   return priority * (lengthPriority * lengthRole
     + distancePriority * distanceRole
     + wizardPriority * abs(wizardRole)
     + towerPriority * abs(towerRole)
-    + laneStrengthPriority * laneStrengthRoley) / (lengthRole + distanceRole + abs(wizardRole) + abs(towerRole) + laneStrengthRoley);
+    + laneStrengthPriority * laneStrengthRole
+    + expiriencePriority * expirienceRole)
+    / (lengthRole + distanceRole + abs(wizardRole) + abs(towerRole) + laneStrengthRole + expirienceRole);
 }
 
 bool equal(double a, double b) {
@@ -102,4 +113,27 @@ bool Algorithm::checkChangeLine(const Algorithm::PathFinder& finder, const Wizar
   }
 
   return true;
+}
+
+double Algorithm::potensialExpirience(const Wizard& self) {
+  double result = 0;
+  for (const auto& enemy : World::instance().aroundEnemies(self, self.getVisionRange() + 150)) {
+    double lifeMult = 1.0 - (double(enemy->getLife()) / double(enemy->getMaxLife()));
+    lifeMult *= lifeMult; // квадратичная зависимость
+
+    if (EX::isBuilding(*enemy)) {
+      result += enemy->getMaxLife() * 0.5f * lifeMult;
+    } if (EX::isMinion(*enemy)) {
+      result += enemy->getMaxLife() * 0.25f * lifeMult;
+    } else if (EX::isWizard(*enemy)) {
+      double distance = enemy->getDistanceTo(self);
+      double distanceMult = (1.0 - distance / self.getCastRange());
+      distanceMult = MAX(distanceMult, 0);
+      distanceMult *= distanceMult; // квадратичная зависимость
+
+      result += enemy->getMaxLife() * lifeMult * distanceMult;
+    }
+  }
+
+  return result;
 }

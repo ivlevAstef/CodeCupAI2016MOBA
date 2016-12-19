@@ -67,6 +67,7 @@ namespace AICup
       changeLineWizardCountOnlyFriend = false;
       changeLineTowerBalancePriority = -0.5; // бежим туда где меньше своих вышек, при прочих равных
       changeLineLaneStrengthPriority = 1.0;
+      changeLineExpiriencePriority = 0.5;
 
       attackMeleeWinThreshold = 0.5;
 
