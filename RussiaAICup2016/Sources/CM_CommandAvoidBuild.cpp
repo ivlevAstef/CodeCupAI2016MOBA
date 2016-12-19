@@ -17,7 +17,7 @@ bool CommandAvoidBuild::check(const Wizard& self) {
   const auto delta = selfPos - buildPos;
 
   distance = build.getAttackRange() - build.getRemainingActionCooldownTicks() * self.maxBackwardSpeed();
-  distance += self.maxSpeed();
+  distance += 5 * self.maxSpeed();
 
   return delta.length() < distance;
 }

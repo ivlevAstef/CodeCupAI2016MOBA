@@ -41,7 +41,7 @@ bool CommandRepulsionForDodgeFireBall::check(const Wizard& self) {
 void CommandRepulsionForDodgeFireBall::execute(const Wizard& self, Result& result) {
   const auto selfPos = EX::pos(self);
 
-  const double length = Game::model().getFireballExplosionMinDamageRange() + self.getRadius();
+  const double length = Game::model().getFireballExplosionMinDamageRange() + 2 * self.getRadius();
 
   /// находим всех магов, к которым мы близко стоим и складываем направления чтобы двигаться от них
   Vector dodgeVector;
@@ -51,7 +51,7 @@ void CommandRepulsionForDodgeFireBall::execute(const Wizard& self, Result& resul
       && wizard.getDistanceTo(self) < length) {
       Vector delta = selfPos - EX::pos(wizard);
       dodgeVector += delta.normal() * (length - delta.length());
-      priority += delta.length();
+      priority += 2 * (length - delta.length());
     }
   }
 

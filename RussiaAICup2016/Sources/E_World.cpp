@@ -245,7 +245,7 @@ void World::updateSupposedWizards() {
     }
   }
 
-  const auto enemyRessurection = Points::point(Points::RENEGADES_BASE);
+  const auto enemyRessurection = Points::point(Points::RENEGADES_BASE) + Vector(800, 800);
   const double dt = model().getTickIndex() - lastUpdateTick;
 
   /// после чего остались маги, о которых была утеряна информация, но на прошлом тике они были
