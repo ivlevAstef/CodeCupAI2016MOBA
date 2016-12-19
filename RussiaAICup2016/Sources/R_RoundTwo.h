@@ -15,9 +15,9 @@ namespace AICup
   class RoundTwoSkillBuild: public SkillBuild {
   public:
     RoundTwoSkillBuild() : SkillBuild({
-      SkillBranches::meleeDamageFireBolt,
       SkillBranches::moveHast,
       SkillBranches::magicalDamageFrostBolt,
+      SkillBranches::meleeDamageFireBolt,
       SkillBranches::armorShield,
       SkillBranches::rangeMagicMissile,
 
@@ -41,18 +41,18 @@ namespace AICup
       treePriority = 7.0;
       wizardPriority = 1.5;
 
-      audacityBuild = 7.0;
+      audacityBuild = 1.0;
       audacityMinion = 2.0;
       audacityWizard = 3.5;
       attackSkillPriority = 2.5;
 
-      desireChangeLine = 0.8;
-      changeLineForeFrontPriority = 0.25;
-      changeLinePathLengthPriority = 0.75;
-      changeLineWizardCountPriority = 1.5;
+      desireChangeLine = 0.9;
+      changeLineForeFrontPriority = 0.0;
+      changeLinePathLengthPriority = 1.0;
+      changeLineWizardCountPriority = -3.0;
       changeLineWizardCountOnlyFriend = false;
-      changeLineTowerBalancePriority = 1.0; // бежим туда где больше вражеских вышек, при прочих равных
-      changeLineLaneStrengthPriority = 1.0;
+      changeLineTowerBalancePriority = -0.5; // бежим туда где больше вражеских вышек, при прочих равных
+      changeLineLaneStrengthPriority = 0.0;
 
       attackMeleeWinThreshold = 0.7;
       attackWizardMeleePriority = 0.5;

@@ -12,9 +12,9 @@ using namespace AICup;
 std::vector<Message> Tactics::update(const model::Wizard& self, const std::unordered_map<long long, int>& idMessage) {
   std::vector<Message> result;
 
-  if (useAntiRush(self, result)) {
+  /*if (useAntiRush(self, result)) {
     return finalResult(TacticsType::AntiRush, result);
-  }
+  }*/
 
   if (useStandard(self, result)) {
     return finalResult(TacticsType::Standart, result);

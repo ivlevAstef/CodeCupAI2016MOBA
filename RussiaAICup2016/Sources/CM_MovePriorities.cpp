@@ -12,10 +12,10 @@ double MovePriorities::avoidBuild(const Wizard& self, const model::Building& bui
 
   if (model::BUILDING_FACTION_BASE == build.getType()) {
     const int lifePriority = 4 * life;
-    return 1000 + 50 * lifePriority;
+    return 3000 + 50 * lifePriority;
   }
 
-  return 2000 + 30 * life;
+  return 4000 + 30 * life;
 }
 
 double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& minion) {
@@ -114,13 +114,13 @@ double MovePriorities::avoidProjectile(const Wizard& self, const Bullet& project
   double distance = (EX::pos(self) - projectile.pos).length();
   switch (projectile.type) {
     case model::PROJECTILE_DART:
-      return 3000 - distance;
+      return 1000 - distance;
     case model::PROJECTILE_MAGIC_MISSILE:
-      return 8000 - distance;
+      return 3000 - distance;
     case model::PROJECTILE_FIREBALL:
-      return 10000 - distance;
+      return 5000 - distance;
     case model::PROJECTILE_FROST_BOLT:
-      return 15000 - distance;
+      return 10000 - distance;
   }
   return 0;
 }

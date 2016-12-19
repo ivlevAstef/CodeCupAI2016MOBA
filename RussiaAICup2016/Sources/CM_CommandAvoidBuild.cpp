@@ -33,6 +33,7 @@ void CommandAvoidBuild::execute(const Wizard& self, Result& result) {
 
   result.turnPriority = TurnPriority::avoidBuild;
   result.priority = MovePriorities::avoidBuild(self, build) * self.getRole().getAudacityBuild();
+  result.force = true;
 }
 
 #ifdef ENABLE_VISUALIZATOR

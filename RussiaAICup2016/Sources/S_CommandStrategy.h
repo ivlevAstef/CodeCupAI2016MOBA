@@ -50,6 +50,7 @@ namespace AICup
 
     /// просчитывает движение, на указанном векторе moveResults
     const Vector calcMoveVector(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self);
+    const Vector calcMoveOldVector(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self);
 
     /// просчитывает столкновения, и добавляет деревья для уничтожения
     const Vector calculateCollisions(const Wizard& self, const Position& endPoint);

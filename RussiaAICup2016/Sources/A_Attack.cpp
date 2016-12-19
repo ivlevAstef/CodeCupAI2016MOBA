@@ -62,18 +62,26 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
 
   const size_t maxIteration = (size_t)ceil(castRange / bulletSpeed.length());
 
+  /// текущая максимальная скорость, нужна для приблизительных расчетом сколько тиков нужно чтобы дойти до объекта
+  const auto currentMaxSpeed = Algorithm::maxSpeed(prey, prey.getAngle(), preyEndVec).length();
   /// находим максимальную дистанцию на которую можно сместиться при таком векторе, и не упереться
   auto preyEndPos = preyBeginPos + preyEndVec * (EX::maxSpeed(prey) * maxIteration);
   for (const auto& obstacle : obstacles) {
-    /// пока не будет учитывать движимые объекты, ибо сложно
-    if (EX::isMinion(*obstacle) || EX::isWizard(*obstacle)) {
-      continue;
-    }
     /// проверка на уперся в препятствие
     const auto obstaclePos = EX::pos(*obstacle);
     const auto intersectPoint = Math::point_distanceToSegment(EX::pos(*obstacle), preyBeginPos, preyEndPos);
     const auto distance = (obstaclePos - intersectPoint).length();
-    const auto radius = obstacle->getRadius() + prey.getRadius();
+    auto radius = obstacle->getRadius() + prey.getRadius();
+
+    /// для сокращения расчетов, сложные форму по движимым объектам внутри
+    if (distance > radius) {
+      continue;
+    }
+
+    // движимый объект это такойже объект, но у него уменьшается радиус от расстояния, в зависимости от его скорости
+    int ticks = (preyBeginPos - intersectPoint).length() / currentMaxSpeed;
+    radius -= obstacle->getRadius() - double(ticks) * EX::maxSpeed(*obstacle); // если объект не движемый то у него скорость нулевая
+
     if (distance < radius) {
       double translate = sqrt(radius*radius - distance * distance);
       preyEndPos = intersectPoint - preyEndVec * translate;

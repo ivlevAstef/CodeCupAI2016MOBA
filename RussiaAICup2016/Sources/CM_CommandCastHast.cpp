@@ -25,7 +25,7 @@ bool CommandCastHast::check(const Wizard& self) {
 
 
   /// уже маны достаточно на прокаст двух, то может быть положим на своих
-  if (self.getMana() >= 2 * Game::model().getShieldManacost()) {
+  if (self.getMana() >= 2 * Game::model().getHasteManacost()) {
     return true;
   }
 
@@ -51,7 +51,7 @@ void CommandCastHast::execute(const Wizard& self, Result& result) {
     }
 
     bool found = false;
-    for (const auto& status : self.getStatuses()) {
+    for (const auto& status : wizard.getStatuses()) {
       if (status.getType() == model::STATUS_HASTENED) {
         found = true;
         continue;
@@ -60,7 +60,7 @@ void CommandCastHast::execute(const Wizard& self, Result& result) {
 
     if (!found) {
       result.unit = &wizard;
-      break;
+      return;
     }
   }
 

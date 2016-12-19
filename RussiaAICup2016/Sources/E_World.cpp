@@ -369,7 +369,7 @@ const int World::towerCount(model::LaneType lane, model::Faction faction) const 
 
 const int World::wizardCount(model::LaneType line, model::Faction faction) const {
   int result = 0;
-  for (const auto& wizard : model().getWizards()) {
+  for (const auto& wizard : wizards()) {
     if (faction == wizard.getFaction() && line == positionToLine(wizard.getX(), wizard.getY())) {
       result++;
     }

@@ -114,6 +114,27 @@ const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Resu
     return Vector(EX::maxSpeed(self), 0).rotated(self.getAngle());
   }
 
+  ///вначале находим самый приоритетный вектор из force, дабы уклониться от снаряда
+  Vector maxVector = Vector(0, 0);
+  double maxPriority = 0;
+
+  for (const auto& moveIter : moveResults) {
+    if (moveIter.force && moveIter.priority > maxPriority) {
+      maxPriority = moveIter.priority;
+      maxVector = moveIter.moveDirection;
+    }
+  }
+
+  /// если нашли то берем за основу его
+  if (maxPriority > 0) {
+    return maxVector;
+  }
+
+  /// если не нашли, то просто берем суммарный наиболее подходящий вектор как в старом варианте
+  return calcMoveOldVector(moveResults, self);
+}
+
+const Vector CommandStrategy::calcMoveOldVector(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self) {
   ///вначале находим самый приоритетный вектор
   double maxSumPriority = 0;
   Vector maxVector = Vector(0, 0);
@@ -145,8 +166,8 @@ const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Resu
     const auto direction = moveIter.moveDirection;
     const auto dot = direction.normal().dot(maxVector.normal());
 
-    /// если угол в пределах 60 градусов - cos(60) = 0.5
-    if (dot > 0.5) {
+    /// если угол в пределах 30 градусов - cos(30) = 0.866
+    if (dot > 0.866) {
       const auto priority = dot * moveIter.priority;
 
       sumPriority += priority;

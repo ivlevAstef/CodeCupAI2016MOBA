@@ -22,10 +22,10 @@ bool CommandAvoidProjectile::check(const Wizard& self) {
     fullRadius = Game::model().getFireballExplosionMinDamageRange();
   }
 
-
   const auto selfPos = EX::pos(self);
+  const auto projectileEndPos = lProjectile.startPoint + lProjectile.speed.normal() * projectile.range;
 
-  const auto distanceToLine = Math::distanceToSegment(selfPos, lProjectile.startPoint, lProjectile.startPoint + lProjectile.speed.normal() * projectile.range);
+  const auto distanceToLine = Math::distanceToSegment(selfPos, lProjectile.startPoint, projectileEndPos);
   const auto distanceMoved = self.getRadius() + fullRadius - distanceToLine;
 
   /// если снаряд не в нас, и я не могу в него войти то что беспокоиться
@@ -52,6 +52,7 @@ void CommandAvoidProjectile::execute(const Wizard& self, Result& result) {
 
   result.turnPriority = TurnPriority::avoidProjectile;
   result.priority = MovePriorities::avoidProjectile(self, projectile);
+  result.force = true;
 }
 
 #ifdef ENABLE_VISUALIZATOR

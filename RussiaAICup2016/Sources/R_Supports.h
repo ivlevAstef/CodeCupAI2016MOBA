@@ -55,7 +55,7 @@ namespace AICup
       treePriority = 5.0;
       wizardPriority = 1.5;
 
-      audacityBuild = 5.0;
+      audacityBuild = 1.0;
       audacityMinion = 1.0;
       audacityWizard = 2.5;
       attackSkillPriority = 3.5;

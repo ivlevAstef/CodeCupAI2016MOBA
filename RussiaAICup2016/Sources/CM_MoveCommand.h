@@ -22,6 +22,10 @@ namespace AICup
       double priority; /// просто тут его удобно хранить, чем создавать потом обертку, но при этом оно не инициализуется!
       double turnPriority;
 
+      bool force;
+
+      Result();
+
       void set(const Position& position, const Wizard& self);
     };
 

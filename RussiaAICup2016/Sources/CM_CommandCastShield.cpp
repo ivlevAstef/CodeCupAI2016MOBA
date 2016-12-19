@@ -49,7 +49,7 @@ void CommandCastShield::execute(const Wizard& self, Result& result) {
     }
 
     bool found = false;
-    for (const auto& status : self.getStatuses()) {
+    for (const auto& status : wizard.getStatuses()) {
       if (status.getType() == model::STATUS_SHIELDED) {
         found = true;
         continue;

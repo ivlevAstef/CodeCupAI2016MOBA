@@ -5,6 +5,12 @@
 
 using namespace AICup;
 
+MoveCommand::Result::Result() {
+  double priority = 0;
+  double turnPriority = 0;
+
+  bool force = false;
+}
 
 void MoveCommand::Result::set(const Position& pos, const Wizard& self) {
   /// короче далее магия - ставим точку так, чтобы она не выходила за пределы карты, но при этом сохранив вектор движения

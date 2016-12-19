@@ -10,6 +10,13 @@ RoundTwoStrategy::RoundTwoStrategy(const CommandFabric& fabric) :
   BaseStrategyComponents(fabric, std::make_shared<RoundTwoRole>(), std::make_shared<RoundTwoSkillBuild>()) {
 }
 
+static model::LaneType laneWithIndex(model::LaneType lane, int index) {
+  if (lane == model::LANE_BOTTOM) {
+    return model::LaneType((int(lane) + model::_LANE_COUNT_ - index) % model::_LANE_COUNT_);
+  }
+  return model::LaneType((int(lane) + index) % model::_LANE_COUNT_);
+}
+
 void RoundTwoStrategy::update(const model::Wizard& model, model::Move& move) {
   CommandStrategy::clear();
   const auto& self = CommandStrategy::preUpdate(model, move);

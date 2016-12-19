@@ -15,7 +15,7 @@ double Algorithm::changeOfWinning(const Wizard& self, const double x, const doub
 
   double wizardSummaryDanger = 0;
   for (const auto& wizard : World::instance().wizards()) {
-    if ((EX::pos(wizard) - pos).length() < self.getVisionRange() + 250 || self.getId() == wizard.getId()) {
+    if ((EX::pos(wizard) - pos).length() < self.getVisionRange() + 150 || self.getId() == wizard.getId()) {
       if (self.getId() == wizard.getId()) {
         wizardSummaryDanger += EX::danger(wizard);
       } else if (self.getFaction() == wizard.getFaction()) {
@@ -27,7 +27,7 @@ double Algorithm::changeOfWinning(const Wizard& self, const double x, const doub
   }
 
   /// определяем перевес сил, так как маги мало на него влияют то, он по факту сообщит чьих крипов больше, с учетом вышек
-  float strength = InfluenceMap::instance().getStrength(pos, self.getVisionRange()+250) / 5;
+  float strength = InfluenceMap::instance().getStrength(pos, 500) / 5;
 
   double priority = wizardSummaryDanger + double(strength);
 
