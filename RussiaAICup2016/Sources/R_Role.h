@@ -70,6 +70,10 @@ namespace AICup
       return audacityWizard;
     }
 
+    inline const float& getRepulsionDodgeFireballPriority() const {
+      return repulsionDodgeFireballPriority;
+    }
+
     // смена линии
     inline const float getDesireChangeLine() const {
       return !useStartedLinePriority ? desireChangeLine : 0.95f;
@@ -139,6 +143,8 @@ namespace AICup
     float audacityBuild;
     float audacityMinion;
     float audacityWizard;
+
+    float repulsionDodgeFireballPriority; /// насколько приоритетно расходиться от своих если рядом fire маг
 
 
     /// смена линии

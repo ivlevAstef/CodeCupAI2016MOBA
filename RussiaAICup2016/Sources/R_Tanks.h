@@ -76,6 +76,8 @@ namespace AICup
       attackMinionMeleePriority = 2.5;
 
       friendWizardConfidence = 1.0;
+
+      repulsionDodgeFireballPriority = 1.0;
     }
 
     void update(const model::Wizard& self) override {

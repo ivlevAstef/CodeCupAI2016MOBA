@@ -44,6 +44,7 @@ void StandardStrategy::update(const model::Wizard& model, model::Move& move) {
   ///////////////////////////////////
 
   addMoveTo(self, currentLane);
+  repulsionDodgeFireball(self);
 
   const auto getExpirienceCommand = fabric.moveGetExpirience();
   if (getExpirienceCommand->check(self)) {

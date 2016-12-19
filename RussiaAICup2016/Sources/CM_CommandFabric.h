@@ -53,6 +53,8 @@ namespace AICup
 
 /// #pragma mark - защита
 
+    MoveCommandPtr repulsionForDodgeFireBall() const;
+
     /// держаться на безопасном расстоянии от юнита
     MoveCommandPtr avoidEnemy(const model::LivingUnit& unit) const;
 

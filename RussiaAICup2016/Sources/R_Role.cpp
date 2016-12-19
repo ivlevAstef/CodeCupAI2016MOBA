@@ -23,6 +23,8 @@ Role::Role() {
   audacityMinion = 1;
   audacityWizard = 1;
 
+  repulsionDodgeFireballPriority = 0;
+
   desireChangeLine = 1;
   changeLineForeFrontPriority = 1;
   changeLinePathLengthPriority = 1;

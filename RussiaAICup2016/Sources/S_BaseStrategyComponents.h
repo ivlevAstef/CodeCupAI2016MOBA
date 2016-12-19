@@ -27,10 +27,19 @@ namespace AICup
     void addAttacks(const Wizard& self);
     void addCasts(const Wizard& self);
 
+    void repulsionDodgeFireball(const Wizard& self);
+
   protected:
     model::LaneType currentLane;
 
   private:
     int lastChangeLineTick;
+
+    enum class LastOperation {
+      LANE,
+      BONUS
+    };
+    LastOperation lastOperation;
+
   };
 };

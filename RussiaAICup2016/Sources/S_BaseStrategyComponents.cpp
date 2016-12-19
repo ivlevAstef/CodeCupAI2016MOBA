@@ -12,6 +12,7 @@ BaseStrategyComponents::BaseStrategyComponents(const CommandFabric& fabric, Role
   CommandStrategy(fabric, role, skillBuild) {
   currentLane = model::LANE_MIDDLE;
   lastChangeLineTick = 0;
+  lastOperation = LastOperation::LANE;
 }
 
 bool BaseStrategyComponents::changeLane(const Wizard& self) {
@@ -82,11 +83,17 @@ void BaseStrategyComponents::addMoveTo(const Wizard& self, model::LaneType lane)
     return;
   }
 
+  /// чтобы если уж пошли за бонусом то пошли
+  if (lastOperation == LastOperation::BONUS) {
+    moveToBonusPriority += 900;
+  }
 
   if (moveToLinePriority >= moveToBonusPriority) {
     moveCommands.push_back(moveToLine);
+    lastOperation = LastOperation::LANE;
   } else {
     moveCommands.push_back(moveToBonus);
+    lastOperation = LastOperation::BONUS;
   }
 }
 
@@ -118,5 +125,12 @@ void BaseStrategyComponents::addCasts(const Wizard& self) {
   const auto castShieldCommand = fabric.shield();
   if (nullptr != castShieldCommand && castShieldCommand->check(self)) {
     castCommands.push_back(castShieldCommand);
+  }
+}
+
+void BaseStrategyComponents::repulsionDodgeFireball(const Wizard& self) {
+  const auto command = fabric.repulsionForDodgeFireBall();
+  if (nullptr != command && command->check(self)) {
+    moveCommands.push_back(command);
   }
 }

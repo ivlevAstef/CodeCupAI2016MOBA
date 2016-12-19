@@ -72,6 +72,8 @@ namespace AICup
       attackMeleeWinThreshold = 0.6;
 
       friendWizardConfidence = 1.0;
+
+      repulsionDodgeFireballPriority = 4.0;
     }
 
     void update(const model::Wizard& self) override {

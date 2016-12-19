@@ -26,6 +26,7 @@
 #include "CM_CommandAvoidBuild.h"
 #include "CM_CommandAvoidMinion.h"
 #include "CM_CommandAvoidProjectile.h"
+#include "CM_CommandRepulsionForDodgeFireBall.h"
 
 #include "CM_CommandCastHast.h"
 #include "CM_CommandCastShield.h"
@@ -93,6 +94,10 @@ AttackCommandPtr CommandFabric::attackUseFireball() const {
 
 AttackCommandPtr CommandFabric::pool(const long long neutralUnitId) const {
   return std::make_shared<CommandPool>(neutralUnitId);
+}
+
+MoveCommandPtr CommandFabric::repulsionForDodgeFireBall() const {
+  return std::make_shared<CommandRepulsionForDodgeFireBall>();
 }
 
 MoveCommandPtr CommandFabric::avoidEnemy(const model::LivingUnit& unit) const {

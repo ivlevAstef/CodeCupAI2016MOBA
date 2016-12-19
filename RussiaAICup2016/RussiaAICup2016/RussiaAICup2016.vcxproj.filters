@@ -255,6 +255,9 @@
     <ClCompile Include="..\Sources\S_AntiRushStrategy.cpp">
       <Filter>Sources\Tactics\Final\AntiRush</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sources\CM_CommandRepulsionForDodgeFireBall.cpp">
+      <Filter>Sources\Command\Commands\defend</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Sources\MyStrategy.h">
@@ -484,6 +487,9 @@
     </ClInclude>
     <ClInclude Include="..\Sources\S_AntiRushStrategy.h">
       <Filter>Sources\Tactics\Final\AntiRush</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sources\CM_CommandRepulsionForDodgeFireBall.h">
+      <Filter>Sources\Command\Commands\defend</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
