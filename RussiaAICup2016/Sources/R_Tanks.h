@@ -87,7 +87,7 @@ namespace AICup
 
       audacity = -3.0 * (1 - (float(realLife) / float(self.getMaxLife())));
 
-      linePressureWizards = 1.25 * float(realLife) / float(self.getMaxLife());
+      linePressureWizards = 0.5 * float(realLife) / float(self.getMaxLife());
       lineAudacityWizards = 4.0 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };

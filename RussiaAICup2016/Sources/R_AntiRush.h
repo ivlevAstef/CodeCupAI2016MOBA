@@ -40,7 +40,6 @@ namespace AICup
       attackBuildMeleePriority = 0.1;
       attackMinionMeleePriority = 0.5;
 
-      wizardByIdPriority = 200;
     }
 
     void update(const model::Wizard& self) override {

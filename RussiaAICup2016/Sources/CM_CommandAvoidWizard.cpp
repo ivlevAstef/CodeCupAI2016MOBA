@@ -46,8 +46,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     return false;
   }
 
-  const auto center = wizardPos + delta * 0.8;
-  changeOfWin = Algorithm::changeOfWinning(self, center.x, center.y);
+  changeOfWin = Algorithm::changeOfWinning(self, wizardPos.x, wizardPos.y);
 
   const double useSpeed = self.maxBackwardSpeed();
 
@@ -129,18 +128,17 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   const auto delta = selfPos - wizardPos;
 
 
+  /// если шансы на победу маленькие, то стоит повернуться спиной к магу, ну или точнее тупо бежать к точке, ибо мы находимся ближе
   const auto pos = wizardPos + delta.normal() * distance;
   result.set(pos, self);
 
-  /// если шансы на победу маленькие, то стоит повернуться спиной к магу, ну или точнее тупо бежать к точке, ибо мы находимся ближе
-
   if (changeOfWin > 0.8) { ///если шансы на победу высоки, то можно идти по наглому в лоб
     result.turnDirection = -result.turnDirection;
-  } else if (changeOfWin > -0.2) {
+  } else if (changeOfWin > -0.1) { /// если шансы на победу приблизительно равны, то пытаемся по возможности встать боком
     result.turnDirection = minimalPerpendicular(self, wizardPos);
   }
 
-  double changeOfWinPriority = (changeOfWin > 0) ? (1 - changeOfWin * 0.75) : (1 - changeOfWin);
+  double changeOfWinPriority = (changeOfWin > 0) ? (1 - changeOfWin * 0.5) : (1 - changeOfWin);
 
   result.turnPriority = TurnPriority::avoidWizard + (10 - wizard.getId());
   result.priority = MovePriorities::avoidWizard(self, wizard) * changeOfWinPriority * self.getRole().getAudacityWizard();

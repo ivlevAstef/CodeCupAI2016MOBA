@@ -51,10 +51,6 @@ namespace AICup
       return wizardPriority;
     }
 
-    inline const float& getWizardByIdPriority() const {
-      return wizardByIdPriority;
-    }
-
     inline const float& getAttackSkillPriority() const {
       return attackSkillPriority;
     }
@@ -136,7 +132,6 @@ namespace AICup
     float minionPriority;
     float treePriority;
     float wizardPriority;
-    float wizardByIdPriority;
     float attackSkillPriority;
 
     /// насколько приоритетно избегание объектов

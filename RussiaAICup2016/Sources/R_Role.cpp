@@ -16,7 +16,6 @@ Role::Role() {
   minionPriority = 1;
   treePriority = 1;
   wizardPriority = 1;
-  wizardByIdPriority = 0;
   attackSkillPriority = 1;
 
   audacityBuild = 1;

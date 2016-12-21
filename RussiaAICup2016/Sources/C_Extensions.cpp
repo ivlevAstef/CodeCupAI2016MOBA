@@ -385,10 +385,10 @@ double EX::danger(const model::Wizard& obj) {
   double speedDanger = (maxSpeed(obj) * maxSpeed(obj)) / 5.333; /// 3 вначале - 6.75 на максиуме
   double armorDanger = armor(obj) * 1.5; /// 0 вначале - 6 вконце
   double shieldDanger = isShield(obj) ? 6 : 0; /// 0-6
-  double empowerdDanger = isEmpower(obj) ? 6 : 0; ///0-6
+  double empowerdDanger = isEmpower(obj) ? 8 : 0; ///0-8
   double frostDanger = availableSkill(obj, model::ACTION_FROST_BOLT) ? 15 : 0; ///0-15
   double frostCd = double(cooldownMaxSkill(obj, model::ACTION_FROST_BOLT)) / double(Game::model().getFrostBoltCooldownTicks());
-  double fireDanger = availableSkill(obj, model::ACTION_FIREBALL) ? 8 : 0; ///0-8
+  double fireDanger = availableSkill(obj, model::ACTION_FIREBALL) ? 6 : 0; ///0-6
   double fireCd = double(cooldownMaxSkill(obj, model::ACTION_FIREBALL)) / double(Game::model().getFireballCooldownTicks());
 
   frostDanger *= MAX(0.5, 1.0 - frostCd);
@@ -402,7 +402,7 @@ double EX::danger(const model::Wizard& obj) {
 
   /// min 20
   /// max 100
-  ///      10-35      4-10,66       3-6          3-6.75          0-6           0-6             0-6            0-15          0-8          -24-0
+  ///      10-35      4-10,66       3-6          3-6.75          0-6           0-6             0-8            0-15          0-6          -24-0
   return lifeDanger + mmDanger + staffDanger + speedDanger + armorDanger + shieldDanger + empowerdDanger + frostDanger + fireDanger + frozenAntiDanger;
 }
 

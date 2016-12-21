@@ -28,8 +28,7 @@ bool CommandMoveMeleeAttack::check(const Wizard& self) {
   }
 
 
-  const auto center = unitPos - delta.normal() * (Game::model().getStaffRange() + unit.getRadius());
-  changeOfWin = Algorithm::changeOfWinning(self, center.x, center.y);
+  changeOfWin = Algorithm::changeOfWinning(self, unitPos.x, unitPos.y);
   if (changeOfWin < self.getRole().getAttackMeleeWinThreshold()) {
     return false;
   }

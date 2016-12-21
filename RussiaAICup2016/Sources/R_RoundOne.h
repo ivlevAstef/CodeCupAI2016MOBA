@@ -40,14 +40,15 @@ namespace AICup
       audacityWizard = 3.6;
       attackSkillPriority = 1.5;
 
-      desireChangeLine = 0.88;
+      desireChangeLine = 0.9;
       changeLineForeFrontPriority = 0.25;
       changeLinePathLengthPriority = 0.75;
-      changeLineWizardCountPriority = 1.0;
+      changeLineWizardCountPriority = 0.5;
       changeLineWizardCountOnlyFriend = false;
       changeLineTowerBalancePriority = 1.0; // бежим туда где больше вражеских вышек, при прочих равных
-      changeLineLaneStrengthPriority = 1.0;
-      changeLineExpiriencePriority = 0.35;
+      changeLineLaneStrengthPriority = 0.7;
+      changeLineExpiriencePriority = 0.8;
+
 
       attackMeleeWinThreshold = 0.2;
       attackWizardMeleePriority = 0.5;

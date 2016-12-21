@@ -16,28 +16,41 @@ bool CommandAvoidProjectile::check(const Wizard& self) {
   const auto mc = Game::model();
 
   auto lProjectile = projectile;
-  double fullRadius = projectile.radius;
   if (lProjectile.type == model::PROJECTILE_FIREBALL) {
-    lProjectile.radius = Game::model().getFireballExplosionMaxDamageRange();
-    fullRadius = Game::model().getFireballExplosionMinDamageRange();
+    lProjectile.radius = Game::model().getFireballExplosionMinDamageRange();
   }
 
   const auto selfPos = EX::pos(self);
   const auto projectileEndPos = lProjectile.startPoint + lProjectile.speed.normal() * projectile.range;
 
   const auto distanceToLine = Math::distanceToSegment(selfPos, lProjectile.startPoint, projectileEndPos);
-  const auto distanceMoved = self.getRadius() + fullRadius - distanceToLine;
 
   /// если снаряд не в нас, и я не могу в него войти то что беспокоиться
-  if (distanceMoved < -self.maxSpeed()) {
+  if (self.getRadius() + lProjectile.radius + self.maxSpeed() < distanceToLine) {
     return false;
   }
 
   int turnSign = 0;
-  const auto dodgeVector = Algorithm::dodge(self, moveDirection, lProjectile, turnSign);
-  /// невозможно отклониться
+  auto dodgeVector = Algorithm::dodge(self, moveDirection, lProjectile, turnSign);
+  /// невозможно уклониться
   if (dodgeVector.length() < 1.0e-5) {
     return false;
+   /* if (lProjectile.type != model::PROJECTILE_FIREBALL) {
+      return false;
+    }
+
+    /// если тип fireball, то попробует получить хотябы на 6 урона меньше (уклониться от половины радиуса)
+    lProjectile.radius = lProjectile.radius / 2;
+    /// если мы не попадаем в полу радиус, значит уклоняться смысла нету - сильно урон не снизим
+    if (self.getRadius() + lProjectile.radius < distanceToLine) {
+      return false;
+    }
+
+    dodgeVector = Algorithm::dodge(self, moveDirection, lProjectile, turnSign);
+    if (dodgeVector.length() < 1.0e-5) {
+      return false;
+    }*/
+
   }
 
   turnDirection = dodgeVector.normal() * turnSign;

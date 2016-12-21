@@ -47,12 +47,12 @@ namespace AICup
       attackSkillPriority = 2.5;
 
       desireChangeLine = 0.9;
-      changeLineForeFrontPriority = 0.0;
+      changeLineForeFrontPriority = 0.5;
       changeLinePathLengthPriority = 1.0;
-      changeLineWizardCountPriority = -3.0;
+      changeLineWizardCountPriority = 0.0;
       changeLineWizardCountOnlyFriend = false;
-      changeLineTowerBalancePriority = -0.5; // бежим туда где больше вражеских вышек, при прочих равных
-      changeLineLaneStrengthPriority = 0.0;
+      changeLineTowerBalancePriority = 0.5;
+      changeLineLaneStrengthPriority = 0.4;
       changeLineExpiriencePriority = 1.5;
 
       attackMeleeWinThreshold = 0.7;

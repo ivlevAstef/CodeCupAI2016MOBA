@@ -1,5 +1,6 @@
 #include "CM_AttackPriorities.h"
 #include "E_Game.h"
+#include "E_World.h"
 #include "C_Extensions.h"
 #include "C_Math.h"
 #include "A_Attack.h"
@@ -55,7 +56,7 @@ double AttackPriorities::attackTree(const Wizard& self, const model::Tree& tree)
 
 double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& wizard, const Bullet* bullet) {
   if (Algorithm::isMelee(self, wizard)) {
-    return 1000;
+    return 1500;
   }
 
   /// если хп (с запасом если немного востановится) меньше атаки, то надо добивать
@@ -71,6 +72,31 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   double dodgePriority = 1;
   if (nullptr != bullet && Algorithm::canDodge(wizard, Vector(1, 0).rotate(wizard.getAngle()), *bullet)) {
     dodgePriority = 0.25;
+  }
+
+
+  double supportedPriority = 0;
+  /// если маги вокруге могут теоретически атаковать, то повышаем приоритет
+  for (const auto& aroundWizard : World::model().getWizards()) {
+    if (self.getFaction() == aroundWizard.getFaction() && self.getId() != aroundWizard.getId()
+      && aroundWizard.getDistanceTo(wizard) < EX::radiusForGuaranteedDodge(wizard, 0)) {
+      supportedPriority += 250;
+    }
+  }
+
+  /// если миньоны вокруге могут теоретически атаковать, то повышаем приоритет
+  for (const auto& around : World::instance().aroundEnemies(wizard, 400)) {
+    if (EX::isMinion(*around)) {
+      const auto& minion = EX::asMinion(*around);
+      double distance = minion.getDistanceTo(wizard);
+      if (model::MINION_ORC_WOODCUTTER == minion.getType()
+        && distance < Game::model().getOrcWoodcutterAttackRange() + wizard.getRadius()) {
+        supportedPriority += 100;
+      } else if (model::MINION_FETISH_BLOWDART == minion.getType()
+        && distance < Game::model().getFetishBlowdartAttackRange()) {
+        supportedPriority += 50;
+      }
+    }
   }
 
 
@@ -102,14 +128,14 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   const double distance = self.getDistanceTo(wizard);
   const double distancePriority = 500 * ((500 * 500) / (distance * distance));
 
-  return MIN((lifePriority + statusPriority + distancePriority) * dodgePriority, 1500);
+  return MIN((lifePriority + statusPriority + distancePriority + supportedPriority) * dodgePriority, 2200);
 }
 
 double AttackPriorities::attackFrostbolt(const Wizard& self) {
-  return 2000;
+  return 3000;
 }
 double AttackPriorities::attackFireball(const Wizard& self) {
-  return 1500;
+  return 2500;
 }
 
 double AttackPriorities::pool(const Wizard&, const model::Minion&) {

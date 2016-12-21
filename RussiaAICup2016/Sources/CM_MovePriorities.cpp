@@ -33,7 +33,7 @@ double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& mini
     }
     return 450 + lifePriority;
   } else {
-    return 2*lifePriority + ((600 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
+    return lifePriority + ((400 * minion.getRemainingActionCooldownTicks()) / minion.getCooldownTicks());
   }
 }
 
@@ -60,11 +60,11 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
 
   int skillPriority = 0;
   if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
-    skillPriority = 3 * (Game::model().getFireballCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL));
+    skillPriority = 10 * (Game::model().getFireballCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL));
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
-    skillPriority = 5 * (Game::model().getFrostBoltCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT));
+    skillPriority = 7 * (Game::model().getFrostBoltCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT));
   }
 
 
