@@ -25,8 +25,8 @@ bool CommandFollowAttack::check(const Wizard& self) {
 
   // если у мага мало хп и шанс на победу есть, то стоит преследовать
   return (wizard.getLife() + 1 < self.damage(model::ACTION_MAGIC_MISSILE) && changeOfWin > 0)
-  /// если шанс на победу при нападении высокий, то тоже преследуем
-    || changeOfWin > 0.5;
+  /// если шанс на победу при нападении средний, то тоже преследуем
+    || changeOfWin > 0.2;
 }
 
 

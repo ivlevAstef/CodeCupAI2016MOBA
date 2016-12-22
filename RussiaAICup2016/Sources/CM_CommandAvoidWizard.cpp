@@ -114,11 +114,6 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     return false;
   }
 
-  /// если на пути дерево, то тоже бояться не стоит
-  if (Algorithm::checkIntersectedTree(selfPos, wizardPos, Game::model().getMagicMissileRadius())) {
-    return false;
-  }
-
   return true;
 }
 
@@ -132,13 +127,13 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
   const auto pos = wizardPos + delta.normal() * distance;
   result.set(pos, self);
 
-  if (changeOfWin > 0.8) { ///если шансы на победу высоки, то можно идти по наглому в лоб
+  if (changeOfWin > 0.5) { ///если шансы на победу высоки, то можно идти по наглому в лоб
     result.turnDirection = -result.turnDirection;
   } else if (changeOfWin > -0.1) { /// если шансы на победу приблизительно равны, то пытаемся по возможности встать боком
     result.turnDirection = minimalPerpendicular(self, wizardPos);
   }
 
-  double changeOfWinPriority = (changeOfWin > 0) ? (1 - changeOfWin * 0.5) : (1 - changeOfWin);
+  double changeOfWinPriority = (changeOfWin > 0) ? (1 - changeOfWin * 0.75) : (1 - changeOfWin);
 
   result.turnPriority = TurnPriority::avoidWizard + (10 - wizard.getId());
   result.priority = MovePriorities::avoidWizard(self, wizard) * changeOfWinPriority * self.getRole().getAudacityWizard();

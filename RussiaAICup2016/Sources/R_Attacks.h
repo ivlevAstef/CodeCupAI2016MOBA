@@ -56,7 +56,7 @@ namespace AICup
       wizardPriority = 1.5;
 
       audacityBuild = 1.0;
-      audacityMinion = 1.0;
+      audacityMinion = 0.8;
       audacityWizard = 1.2;
       attackSkillPriority = 1.5;
 
@@ -66,7 +66,7 @@ namespace AICup
       changeLineWizardCountPriority = -0.5; /// там где меньше врагов
       changeLineWizardCountOnlyFriend = false;
       changeLineTowerBalancePriority = 2.0; // бежим туда где больше вражеских вышек, при прочих равных
-      changeLineLaneStrengthPriority = 2.0;
+      changeLineLaneStrengthPriority = 0.9;
       changeLineExpiriencePriority = 0.8;
 
       attackMeleeWinThreshold = 0.6;

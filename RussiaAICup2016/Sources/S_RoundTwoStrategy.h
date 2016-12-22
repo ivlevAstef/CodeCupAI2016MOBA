@@ -15,9 +15,5 @@ namespace AICup
     RoundTwoStrategy(const CommandFabric& fabric);
 
     void update(const model::Wizard& self, model::Move& move) override;
-
-  private:
-    /// cмена скилл билда в зависимости от ситуации на линии
-    void dynamicChangeSkillBuild(const model::Wizard& self);
   };
 };

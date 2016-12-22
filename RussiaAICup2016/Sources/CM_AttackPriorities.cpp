@@ -71,7 +71,7 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   /// если маг может уклонится от снаряда, то снижаем приоритет
   double dodgePriority = 1;
   if (nullptr != bullet && Algorithm::canDodge(wizard, Vector(1, 0).rotate(wizard.getAngle()), *bullet)) {
-    dodgePriority = 0.25;
+    dodgePriority = 0.1;
   }
 
 

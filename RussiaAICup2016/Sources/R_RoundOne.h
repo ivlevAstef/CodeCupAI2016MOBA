@@ -42,7 +42,7 @@ namespace AICup
 
       desireChangeLine = 0.9;
       changeLineForeFrontPriority = 0.25;
-      changeLinePathLengthPriority = 0.75;
+      changeLinePathLengthPriority = 1.5;
       changeLineWizardCountPriority = 0.5;
       changeLineWizardCountOnlyFriend = false;
       changeLineTowerBalancePriority = 1.0; // бежим туда где больше вражеских вышек, при прочих равных
@@ -55,7 +55,7 @@ namespace AICup
       attackBuildMeleePriority = 1.0;
       attackMinionMeleePriority = 1.0;
 
-      friendWizardConfidence = 0.5;
+      friendWizardConfidence = 0.8;
     }
 
     void update(const model::Wizard& self) override {

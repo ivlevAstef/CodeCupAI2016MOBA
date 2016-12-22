@@ -28,8 +28,8 @@ double MovePriorities::avoidMinion(const Wizard& self, const model::Minion& mini
   const double lifePriority = (300 * minion.getLife()) / minion.getMaxLife();
 
   if (model::MINION_ORC_WOODCUTTER == minion.getType()) {
-    if (distance < mc.getOrcWoodcutterAttackRange() + self.getRadius() + 50/*небольшой запас*/) {
-      return 900 + lifePriority;
+    if (distance < Game::model().getStaffRange() + minion.getRadius()) {
+      return 900 + 3 * lifePriority;
     }
     return 450 + lifePriority;
   } else {

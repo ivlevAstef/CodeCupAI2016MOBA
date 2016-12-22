@@ -182,22 +182,22 @@ const std::vector<Position>& InfluenceMap::getLinePoints(const model::LaneType l
   /// ћассивы точек, по которым идут крипы
   /// не симметричен, ибо на своей базе уйти в угол можно, а вот на базе врага... очень не желательно
   static const std::vector<Position> topLinePoints = {
-    Points::point(Points::RENEGADES_BASE_TOP_MELEE),
-    Points::point(Points::RENEGADES_TOP_CENTER),
+    Points::point(Points::ACADEMY_BASE),
     Points::point(Points::ACADEMY_TOP_CENTER),
-    Points::point(Points::ACADEMY_BASE)
+    Points::point(Points::RENEGADES_TOP_CENTER),
+    Points::point(Points::RENEGADES_BASE_TOP_MELEE)
   };
 
   static const std::vector<Position> middleLinePoints = {
-    Points::point(Points::RENEGADES_BASE_MIDDLE_MELEE),
-    Points::point(Points::ACADEMY_BASE)
+    Points::point(Points::ACADEMY_BASE),
+    Points::point(Points::RENEGADES_BASE_MIDDLE_MELEE)
   };
 
   static const std::vector<Position> bottomLinePoints = {
-    Points::point(Points::RENEGADES_BASE_BOTTOM_MELEE),
-    Points::point(Points::RENEGADES_BOTTOM_CENTER),
+    Points::point(Points::ACADEMY_BASE),
     Points::point(Points::ACADEMY_BOTTOM_CENTER),
-    Points::point(Points::ACADEMY_BASE)
+    Points::point(Points::RENEGADES_BOTTOM_CENTER),
+    Points::point(Points::RENEGADES_BASE_BOTTOM_MELEE)
   };
 
 
@@ -235,7 +235,7 @@ Position InfluenceMap::calculateForeFront(const model::Wizard& self, const model
       int sign = SIGN(p2.x - p1.x);
       for (int x = p1.x; x != p2.x+sign; x += sign) {
         int y = p1.y + ((x - p1.x) * delta.y) / delta.x;
-        if (isFriendZone(x, y)) {
+        if (isEnemyZone(x, y)) {
           return pointToForeFront(self, x, y, linePoints);
         }
       }
@@ -243,7 +243,7 @@ Position InfluenceMap::calculateForeFront(const model::Wizard& self, const model
       int sign = SIGN(p2.y - p1.y);
       for (int y = p1.y; y != p2.y+sign; y += sign) {
         int x = p1.x + ((y - p1.y) * delta.x) / delta.y;
-        if (isFriendZone(x, y)) {
+        if (isEnemyZone(x, y)) {
           return pointToForeFront(self, x, y, linePoints);
         }
       }
@@ -257,19 +257,27 @@ Position InfluenceMap::calculateForeFront(const model::Wizard& self, const model
 
 
 float InfluenceMap::zonePriority(const int x, const int y) const {
-  int ignoreX = x;
-  int ignoreY = y;
-  return zonePriorityAndPoint(ignoreX, ignoreY);
-}
-
-float InfluenceMap::zonePriorityAndPoint(int& x, int& y) const {
-  const int xB = x;
-  const int yB = y;
-
   float maxPriority = 0;
   for (int nx = -3; nx <= 3; nx++) {
     for (int ny = -3; ny <= 3; ny++) {
-      float priority = friends[xB + nx][yB + ny] - enemies[xB + nx][yB + ny];
+      float priority = friends[x + nx][y + ny] - enemies[x + nx][y + ny];
+      if (priority > maxPriority) {
+        maxPriority = priority;
+      }
+    }
+  }
+
+  return maxPriority;
+}
+
+float InfluenceMap::zoneEnemyPriorityAndPoint(int& x, int& y) const {
+  const int xB = x;
+  const int yB = y;
+
+  float maxPriority = -0.001;
+  for (int nx = -3; nx <= 3; nx++) {
+    for (int ny = -3; ny <= 3; ny++) {
+      float priority = enemies[xB + nx][yB + ny] - friends[xB + nx][yB + ny];
       if (priority > maxPriority) {
         x = xB + nx;
         y = yB + ny;
@@ -282,14 +290,15 @@ float InfluenceMap::zonePriorityAndPoint(int& x, int& y) const {
 }
 
 
-bool InfluenceMap::isFriendZone(int& x, int& y) const {
-  int friendX = x;
-  int friendY = y;
-  if (zonePriorityAndPoint(friendX, friendY) > 0.3) {
-    x = friendX;
-    y = friendY;
+bool InfluenceMap::isEnemyZone(int& x, int& y) const {
+  int enemyX = x;
+  int enemyY = y;
+  if (zoneEnemyPriorityAndPoint(enemyX, enemyY) > 0) {
+    x = enemyX;
+    y = enemyY;
     return true;
   }
+
   return false;
 }
 
@@ -349,9 +358,7 @@ float buildDps(const model::Building& build) {
 }
 
 double buildRadius(const model::Building& build) {
-  double ticks = 1 - ((double)build.getRemainingActionCooldownTicks() / (double)build.getCooldownTicks());
-  ticks = MAX(0.5, ticks); /// чтобы совсем в ноль радиус не уходил не уходила
-  return MAX(build.getRadius(), build.getAttackRange() * ticks);
+  return build.getAttackRange();
 }
 
 float buildDanger(const model::Building& build) {
@@ -365,8 +372,10 @@ double baseRadius(const model::Building& build) {
 }
 
 float baseDanger(const model::Building& build) {
+  double ticks = 1 - ((double)build.getRemainingActionCooldownTicks() / (double)build.getCooldownTicks());
+  ticks = sqrt(ticks);
   /// так как база имеет больший радиус, то еЄ опасность повышаетс€ сильно завышенной
-  return 0.005f * float(MIN(300, build.getLife())) * buildDps(build);
+  return 0.005f * float(MIN(300, build.getLife())) * buildDps(build) * ticks;
 }
 
 float wizardDps(const model::Wizard& wizard) {
@@ -474,8 +483,8 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
   /*if (Visualizator::ABS == visualizator.getStyle()) {
     for (int x = 0; x < InfluenceMapConstants::memorySize; x++) {
       for (int y = 0; y < InfluenceMapConstants::memorySize; y++) {
-        const double fWeight = 100 + (friends[x][y] * 5);
-        const double eWeight = 100 + (enemies[x][y] * 5);
+        const double fWeight = 100 + (friends[x][y] * 100);
+        const double eWeight = 100 + (enemies[x][y] * 100);
         int32_t colorRed = MAX(100, MIN((int)(eWeight), 255));
         int32_t colorGreen = MAX(100, MIN((int)(fWeight), 255));
         visualizator.fillRect(x*3, y*3, (x+1)*3, (y+1)*3, (colorRed << 16) | (colorGreen << 8) | (100));
@@ -485,14 +494,14 @@ void InfluenceMap::visualization(const Visualizator& visualizator) const {
 
 
   /*if (Visualizator::PRE == visualizator.getStyle()) {
-    const auto size = 40;// InfluenceMapConstants::memorySize;
+    const auto size = InfluenceMapConstants::memorySize;
     for (int x = 0; x < size; x++) {
       for (int y = 0; y < size; y++) {
         const auto p1 = InfluenceMapConstants::toReal(Vector2D<int>(x, y));
         const auto p2 = InfluenceMapConstants::toReal(Vector2D<int>(x, y), 1, 1);
 
-        const double fWeight = 100 + (friends[x][y] * 5);
-        const double eWeight = 100 + (enemies[x][y] * 5);
+        const double fWeight = 100 + (friends[x][y] * 100);
+        const double eWeight = 100 + (enemies[x][y] * 100);
         int32_t colorRed = MAX(100, MIN((int)(eWeight), 255));
         int32_t colorGreen = MAX(100, MIN((int)(fWeight), 255));
         visualizator.fillRect(p1.x, p1.y, p2.x, p2.y, (colorRed << 16) | (colorGreen << 8) | (100));

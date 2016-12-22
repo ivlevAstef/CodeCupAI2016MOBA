@@ -67,9 +67,9 @@ namespace AICup
 
     const std::vector<Position>& getLinePoints(const model::LaneType lane) const;
     Position calculateForeFront(const model::Wizard& self, const model::LaneType lane) const;
-    bool isFriendZone(int& x, int& y) const;
+    bool isEnemyZone(int& x, int& y) const;
     float zonePriority(const int x, const int y) const;
-    float zonePriorityAndPoint(int& x, int& y) const;
+    float zoneEnemyPriorityAndPoint(int& x, int& y) const;
     Position pointToForeFront(const model::Wizard& self, const int x, const int y, const std::vector<Position>& line) const;
 
   private:

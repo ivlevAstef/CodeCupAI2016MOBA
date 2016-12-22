@@ -19,7 +19,7 @@ double Algorithm::changeOfWinning(const Wizard& self, const double x, const doub
       wizardSummaryDanger += EX::danger(wizard);
     } else if (self.getFaction() == wizard.getFaction()) {
       /// если союзник, то он должен находиться в окрестностях вокруг врага
-      if ((EX::pos(wizard) - pos).length() < (EX::pos(self) - pos).length() + 25) {
+      if ((EX::pos(wizard) - pos).length() < (EX::pos(self) - pos).length() + 50) {
         wizardSummaryDanger += self.getRole().getFriendWizardConfidence() * EX::danger(wizard);
       }
     } else {
@@ -32,7 +32,7 @@ double Algorithm::changeOfWinning(const Wizard& self, const double x, const doub
 
   /// определяем перевес сил, так как маги мало на него влияют то, он по факту сообщит чьих крипов больше, с учетом вышек
   auto center = EX::pos(self) + (pos - EX::pos(self)) * 0.5;
-  float strength = InfluenceMap::instance().getStrength(center, 300) / 2.5;
+  float strength = InfluenceMap::instance().getStrength(center, 300) / 6;
 
   double priority = wizardSummaryDanger + double(strength);
 
