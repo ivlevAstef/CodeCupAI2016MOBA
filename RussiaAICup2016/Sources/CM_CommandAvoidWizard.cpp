@@ -42,7 +42,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   const auto delta = selfPos - wizardPos;
 
   //// для сокращения расчетов
-  if (delta.length() > 600 + 35 + 100 + 60) {//максимальный радиус атаки + радиус мага + максимальный радиус снаряда(fireball) + время на поворот
+  if (delta.length() > 600 + 35 + 100 + 90) {//максимальный радиус атаки + радиус мага + максимальный радиус снаряда(fireball) + время на поворот
     return false;
   }
 
@@ -72,7 +72,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
 
   if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
     magics.push_back(MagicInfo{
-      EX::radiusForGuaranteedDodgeFrostBolt(self, 0) + 2 * self.maxSpeed()/*лучше перестраховаться*/,
+      EX::radiusForGuaranteedDodgeFrostBolt(self, 0) + self.maxSpeed()/*лучше перестраховаться*/,
       EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT) * useSpeed,
       EX::cooldownByMana(wizard, model::ACTION_FROST_BOLT) * useSpeed,
       Game::model().getFrostBoltRadius() + self.maxSpeed()/*лучше перестраховаться*/
@@ -108,7 +108,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   }
 
   distance = MIN(finalDodgeRange, finalCastRange);
-  distance += self.maxSpeed();
+  distance += 3 * self.maxSpeed();
 
   if (delta.length() > distance) {
     return false;
@@ -129,11 +129,11 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
 
   if (changeOfWin > 0.5) { ///если шансы на победу высоки, то можно идти по наглому в лоб
     result.turnDirection = -result.turnDirection;
-  } else if (changeOfWin > -0.1) { /// если шансы на победу приблизительно равны, то пытаемся по возможности встать боком
+  } else if (changeOfWin > 0.05) { /// если шансы на победу приблизительно равны, то пытаемся по возможности встать боком
     result.turnDirection = minimalPerpendicular(self, wizardPos);
   }
 
-  double changeOfWinPriority = (changeOfWin > 0) ? (1 - changeOfWin * 0.75) : (1 - changeOfWin);
+  double changeOfWinPriority = (changeOfWin > 0) ? (1 - changeOfWin * 0.45) : (1 - changeOfWin);
 
   result.turnPriority = TurnPriority::avoidWizard + (10 - wizard.getId());
   result.priority = MovePriorities::avoidWizard(self, wizard) * changeOfWinPriority * self.getRole().getAudacityWizard();

@@ -162,7 +162,8 @@ Vector Algorithm::dodge(const model::Wizard& prey, const Vector desiredDir, cons
 
   /// проверяем возможность уклониться при всех возможных конечных углах, начиная с текущего
   /// проверяем каждые 6 градусов
-  for (double angleDt = 0; angleDt < AICUP_PI; angleDt += AICUP_PI / 30.0) {
+  const double dtStep = EX::turnSpeed(prey) * 0.5;
+  for (double angleDt = 0; angleDt < AICUP_PI + dtStep; angleDt += dtStep) {
     const auto leftAngle = centerAngle + angleDt;
     const auto rightAngle = centerAngle - angleDt;
     const auto endVectorLeft = Vector(1, 0).rotate(leftAngle);

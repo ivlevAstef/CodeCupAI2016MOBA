@@ -73,6 +73,7 @@ double EX::turnSpeed(const model::Wizard& obj) {
   for (const auto& status : obj.getStatuses()) {
     if (model::STATUS_HASTENED == status.getType()) {
       maxTurnSpeed *= (1.0 + Game::model().getHastenedRotationBonusFactor());
+      break;
     }
   }
 
@@ -413,7 +414,7 @@ double EX::radiusForGuaranteedDodge(const model::Wizard& self, double coef) {
   ///такая скорость, ибо наврятли условия будут идеальные
   const auto speed = maxSpeed(self) * coef +  maxStrafeSpeed(self) * (1 - coef);
 
-  return Game::model().getMagicMissileSpeed() * (1.0 + (radius / speed));
+  return Game::model().getMagicMissileSpeed() * (1.0 + ceil(radius / speed));
 }
 
 double EX::radiusForGuaranteedDodgeFrostBolt(const model::Wizard& self, double coef) {
@@ -421,7 +422,7 @@ double EX::radiusForGuaranteedDodgeFrostBolt(const model::Wizard& self, double c
   ///такая скорость, ибо наврятли условия будут идеальные
   const auto speed = maxSpeed(self) * coef + maxStrafeSpeed(self) * (1 - coef);
 
-  return Game::model().getFrostBoltSpeed() * (1.0 + (radius / speed));
+  return Game::model().getFrostBoltSpeed() * (1.0 + ceil(radius / speed));
 }
 
 double EX::radiusForGuaranteedDodgeFireBall(const model::Wizard& self, double coef) {
@@ -429,7 +430,7 @@ double EX::radiusForGuaranteedDodgeFireBall(const model::Wizard& self, double co
   ///такая скорость, ибо наврятли условия будут идеальные
   const auto speed = maxSpeed(self) * coef + maxStrafeSpeed(self) * (1 - coef);
 
-  return Game::model().getFireballSpeed() * (1.0 + (radius / speed));
+  return Game::model().getFireballSpeed() * (1.0 + ceil(radius / speed));
 }
 
 int EX::minTimeForMagic(const model::Wizard& obj) {

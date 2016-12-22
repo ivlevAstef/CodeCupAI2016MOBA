@@ -54,21 +54,21 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
     if (model::STATUS_EMPOWERED == status.getType()) {
       statusPriority += 400;
     } else if (model::STATUS_FROZEN == status.getType()) {
-      statusPriority -= status.getRemainingDurationTicks() * 100;
+      statusPriority -= status.getRemainingDurationTicks() * 50;
     }
   }
 
   int skillPriority = 0;
   if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
-    skillPriority = 10 * (Game::model().getFireballCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL));
+    skillPriority = 15 * (Game::model().getFireballCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL));
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
-    skillPriority = 7 * (Game::model().getFrostBoltCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT));
+    skillPriority = 10 * (Game::model().getFrostBoltCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT));
   }
 
 
-  return 500 + statusPriority + skillPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 25;
+  return 500 + statusPriority + skillPriority + lifePriority - timeForMagic * 5 - timeToTurnAttack * 10;
 }
 
 double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {
