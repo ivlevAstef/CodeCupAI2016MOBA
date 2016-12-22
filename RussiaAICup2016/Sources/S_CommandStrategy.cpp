@@ -131,7 +131,11 @@ const Vector CommandStrategy::calcMoveVector(const std::vector<MoveCommand::Resu
   }
 
   /// если не нашли, то просто берем суммарный наиболее подходящий вектор как в старом варианте
-  return calcMoveOldVector(moveResults, self);
+  Vector preFinalVector = calcMoveOldVector(moveResults, self);
+
+  /// но в отличии от force вектора, у этого вектора лучше сделать мин длину, дабы искать путь заранее
+  return preFinalVector * (MAX(240, preFinalVector.length()) / preFinalVector.length());
+
 }
 
 const Vector CommandStrategy::calcMoveOldVector(const std::vector<MoveCommand::Result>& moveResults, const Wizard& self) {
@@ -166,8 +170,8 @@ const Vector CommandStrategy::calcMoveOldVector(const std::vector<MoveCommand::R
     const auto direction = moveIter.moveDirection;
     const auto dot = direction.normal().dot(maxVector.normal());
 
-    /// если угол в пределах 30 градусов - cos(30) = 0.866
-    if (dot > 0.866) {
+    /// если угол в пределах 45 градусов - cos(45) = 0.5
+    if (dot > 0.5) {
       const auto priority = dot * moveIter.priority;
 
       sumPriority += priority;
@@ -207,7 +211,15 @@ bool CommandStrategy::move(std::vector<MoveCommand::Result>& moveResults, const 
 }
 
 const Vector CommandStrategy::calculateCollisions(const Wizard& self, const Position& endPoint) {
-  Algorithm::PathFinder::instance().calculatePath(endPoint, path);
+  auto mEndPoint = endPoint;
+  /// если точка выходит за пределы карты то мы её искуственно удлиняем, дабы она точно пересеклась с деревьями по краю
+  if (endPoint.x < self.getRadius() || endPoint.x > World::size() - self.getRadius()
+    || endPoint.y < self.getRadius() || endPoint.y > World::size() - self.getRadius()) {
+    const auto& delta = endPoint - EX::pos(self);
+    mEndPoint += delta.normal() * 100;
+  }
+
+  Algorithm::PathFinder::instance().calculatePath(mEndPoint, path);
   assert(nullptr != path);
 
   const Position preEndPoint = path->calculateNearestCurvaturePoint(self.getVisionRange() / 2);
