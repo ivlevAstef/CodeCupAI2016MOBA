@@ -63,7 +63,8 @@ void CommandAvoidProjectile::execute(const Wizard& self, Result& result) {
   result.set(position, self);
   result.turnDirection = turnDirection;
 
-  result.turnPriority = TurnPriority::avoidProjectile;
+  double distance = (EX::pos(self) - projectile.pos).length();
+  result.turnPriority = TurnPriority::avoidProjectile - (distance / projectile.speed.length());
   result.priority = MovePriorities::avoidProjectile(self, projectile);
   result.force = true;
 }

@@ -152,17 +152,17 @@ void World::initTrees() {
     }
   }
 
-  for (int i = 150; i <= size() - 150; i += 100) {
-    invisibleAreaTrees.push_back(Tree(i, -50, 50/*радиус*/));
-    invisibleAreaTrees.push_back(Tree(i, size() + 50, 50/*радиус*/));
-    invisibleAreaTrees.push_back(Tree(-50, i, 50/*радиус*/));
-    invisibleAreaTrees.push_back(Tree(size() + 50, i, 50/*радиус*/));
+  for (int i = 75; i <= size() - 75; i += 50) {
+    invisibleAreaTrees.push_back(Tree(i, -25, 25/*радиус*/));
+    invisibleAreaTrees.push_back(Tree(i, size() + 25, 25/*радиус*/));
+    invisibleAreaTrees.push_back(Tree(-25, i, 25/*радиус*/));
+    invisibleAreaTrees.push_back(Tree(size() + 25, i, 25/*радиус*/));
   }
-  /// + 4 дерева по углам, сделал так чтобы на углах плавнее был проход
-  invisibleAreaTrees.push_back(Tree(50, 50, 50/*радиус*/));
-  invisibleAreaTrees.push_back(Tree(size() - 50, 50, 50/*радиус*/));
-  invisibleAreaTrees.push_back(Tree(size() - 50, size() - 50, 50/*радиус*/));
-  invisibleAreaTrees.push_back(Tree(50, size() - 50, 50/*радиус*/));
+  /// + 4 дерева по углам, сделал так чтобы на углах плавнее был проход sqrt(25^2 + 50^2) - 25
+  invisibleAreaTrees.push_back(Tree(0, 0, 30.902/*радиус*/));
+  invisibleAreaTrees.push_back(Tree(size(), 0, 30.902/*радиус*/));
+  invisibleAreaTrees.push_back(Tree(size(), size(), 30.902/*радиус*/));
+  invisibleAreaTrees.push_back(Tree(0, size(), 30.902/*радиус*/));
 
 }
 

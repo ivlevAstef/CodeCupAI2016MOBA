@@ -1,12 +1,12 @@
 #include "S_TestDodgeStrategy.h"
 #include "E_World.h"
 
-#include "R_RoundOne.h"
+#include "R_RoundTwo.h"
 
 using namespace AICup;
 
 TestDodgeStrategy::TestDodgeStrategy(const CommandFabric& fabric) :
-  CommandStrategy(fabric, std::make_shared<RoundOneRole>(), std::make_shared<RoundOneSkillBuild>()) {
+  CommandStrategy(fabric, std::make_shared<RoundTwoRole>(), std::make_shared<RoundTwoSkillBuild>()) {
 }
 
 void TestDodgeStrategy::update(const model::Wizard& model, model::Move& move) {
@@ -24,7 +24,7 @@ void TestDodgeStrategy::update(const model::Wizard& model, model::Move& move) {
     case 2:
     case 6:
     case 7:
-      moveCommand = fabric.moveToPoint(200, 1600, 10);
+      moveCommand = fabric.moveToPoint(200, 2600, 10);
       break;
     case 3:
     case 8:

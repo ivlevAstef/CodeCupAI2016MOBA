@@ -16,10 +16,9 @@ CommandAvoidWizard::CommandAvoidWizard(const model::Wizard& wizard): wizard(wiza
 }
 
 struct MagicInfo {
-  double dodgeRange;
-  double distanceCooldown;
-  double manaDistanceCooldown;
-  double projectileRadius;
+  Bullet bullet;
+  int cooldown;
+  int manaCooldown;
 };
 
 static Vector minimalPerpendicular(const Wizard& self, const Position& wizardPos) {
@@ -48,73 +47,80 @@ bool CommandAvoidWizard::check(const Wizard& self) {
 
   changeOfWin = Algorithm::changeOfWinning(self, wizardPos.x, wizardPos.y);
 
-  const double useSpeed = self.maxBackwardSpeed();
+  const auto maxSpeed = Algorithm::maxSpeed(self, self.getAngle(), delta);
+
+  const int time = (int)ceil(Algorithm::timeToTurnForAttack(self, wizard));
+  const int frozen = EX::frozenTime(wizard);
+  const int maxSafeTime = MAX(time, frozen);
+
+  /// вначале проверяем, что нужно или нет уклонятся от удара посоха
+  if (EX::availableSkill(wizard, model::ACTION_STAFF)) {
+    int cooldown = MAX(maxSafeTime, EX::cooldownMaxSkill(wizard, model::ACTION_STAFF));
+
+
+    distance = Game::model().getStaffRange() + self.getRadius() - (double(cooldown) - 1) * maxSpeed.length();
+    if (delta.length() < distance) {
+      return true;
+    }
+  }
+
+  /// если не нужно, то дальше уже считаем для снарядов
 
   std::vector<MagicInfo> magics;
 
+  double useSpeedForMoveSelf = maxSpeed.length();
+  /// всегда считаем что пуля будет запущена со следующей позиции врага
+  const auto wizardSpeed = Algorithm::maxSpeed(wizard, wizard.getAngle(), delta);
+  auto bBeginPos = wizardPos + delta.normal() * wizardSpeed.length();
+  /// всегда считаем что снаряд уже вылетел, и находиться на один тик ближе к нам и с учетом что маг к нам подошел на тик
   if (EX::availableSkill(wizard, model::ACTION_MAGIC_MISSILE)) { ///magic missile
+    useSpeedForMoveSelf *= 0.5;
+    const auto bPos = bBeginPos + delta.normal() * Game::model().getMagicMissileSpeed();
     magics.push_back(MagicInfo{
-      EX::radiusForGuaranteedDodge(self, 0),
-      EX::cooldownMaxSkill(wizard, model::ACTION_MAGIC_MISSILE) * useSpeed,
-      EX::cooldownByMana(wizard, model:: ACTION_MAGIC_MISSILE) * useSpeed,
-      Game::model().getMagicMissileRadius()
+      Bullet(0, delta.normal() * Game::model().getMagicMissileSpeed(), Game::model().getMagicMissileRadius(),
+      bBeginPos, bPos, wizard.getCastRange(), model::PROJECTILE_MAGIC_MISSILE, wizard.getFaction()),
+      EX::cooldownMaxSkill(wizard, model::ACTION_MAGIC_MISSILE),
+      EX::cooldownByMana(wizard, model:: ACTION_MAGIC_MISSILE)
     });
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
+    useSpeedForMoveSelf *= 0.5;
+    const auto bPos = bBeginPos + delta.normal() * Game::model().getFireballSpeed();
     magics.push_back(MagicInfo{
-      EX::radiusForGuaranteedDodgeFireBall(self, 0),
-      EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL) * useSpeed,
-      EX::cooldownByMana(wizard, model::ACTION_FIREBALL) * useSpeed,
-      Game::model().getFireballExplosionMinDamageRange()
+      Bullet(0, delta.normal() * Game::model().getFireballSpeed(), Game::model().getFireballExplosionMinDamageRange(),
+      bBeginPos, bPos, wizard.getCastRange(), model::PROJECTILE_FIREBALL, wizard.getFaction()),
+      EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL),
+      EX::cooldownByMana(wizard, model::ACTION_FIREBALL)
     });
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
+    useSpeedForMoveSelf *= 0.15;
+    const auto bPos = bBeginPos + delta.normal() * Game::model().getFrostBoltSpeed();
     magics.push_back(MagicInfo{
-      EX::radiusForGuaranteedDodgeFrostBolt(self, 0) + self.maxSpeed()/*лучше перестраховаться*/,
-      EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT) * useSpeed,
-      EX::cooldownByMana(wizard, model::ACTION_FROST_BOLT) * useSpeed,
-      Game::model().getFrostBoltRadius() + self.maxSpeed()/*лучше перестраховаться*/
+      Bullet(0, delta.normal() * Game::model().getFrostBoltSpeed(), Game::model().getFrostBoltRadius(),
+      bBeginPos, bPos, wizard.getCastRange(), model::PROJECTILE_FROST_BOLT, wizard.getFaction()),
+      EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT),
+      EX::cooldownByMana(wizard, model::ACTION_FROST_BOLT)
     });
   }
 
-  if (EX::availableSkill(wizard, model::ACTION_STAFF)) {
-    magics.push_back(MagicInfo{
-      Game::model().getStaffRange() + self.getRadius(),
-      EX::cooldownMaxSkill(wizard, model::ACTION_STAFF) * useSpeed,
-      0,
-      0
-    });
+  for (auto& magic : magics) {
+    const int maxCooldown = MAX(maxSafeTime, MAX(magic.cooldown, magic.manaCooldown));
+
+    double tr = (useSpeedForMoveSelf * double(maxCooldown)) - self.maxSpeed() - 12 * wizardSpeed.length();
+
+    magic.bullet.pos -= delta.normal() * tr;
+    magic.bullet.startPoint -= delta.normal() * tr;
+
+    if (!Algorithm::canDodge(self, selfPos, delta, magic.bullet)) {
+      distance = delta.length() + self.getRadius(); /// уходим назад
+      return true;
+    }
   }
 
-  const double distanceTime = Algorithm::timeToTurnForAttack(self, wizard) * useSpeed;
-  const double distanceFrozen = EX::frozenTime(wizard) * useSpeed;
-  const double maxFromDistanceTimeFrozen = MAX(distanceTime, distanceFrozen);
-
-  const double maxCastRange = wizard.getCastRange() + self.getRadius();
-
-
-  double finalDodgeRange = 0;
-  double finalCastRange = 0;
-  for (const auto& magic : magics) {
-    const double maxCooldownManaDistance = MAX(magic.distanceCooldown, magic.manaDistanceCooldown);
-    const double stockDistance = MAX(maxCooldownManaDistance, maxFromDistanceTimeFrozen);
-    const double dodgeRange = magic.dodgeRange - stockDistance;
-    const double castRange = maxCastRange - stockDistance + magic.projectileRadius;
-
-    finalDodgeRange = MAX(finalDodgeRange, dodgeRange);
-    finalCastRange = MAX(finalCastRange, castRange);
-  }
-
-  distance = MIN(finalDodgeRange, finalCastRange);
-  distance += 3 * self.maxSpeed();
-
-  if (delta.length() > distance) {
-    return false;
-  }
-
-  return true;
+  return false;
 }
 
 void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
@@ -133,10 +139,8 @@ void CommandAvoidWizard::execute(const Wizard& self, Result& result) {
     result.turnDirection = minimalPerpendicular(self, wizardPos);
   }
 
-  double changeOfWinPriority = (changeOfWin > 0) ? (1 - changeOfWin * 0.45) : (1 - changeOfWin);
-
   result.turnPriority = TurnPriority::avoidWizard + (10 - wizard.getId());
-  result.priority = MovePriorities::avoidWizard(self, wizard) * changeOfWinPriority * self.getRole().getAudacityWizard();
+  result.priority = MovePriorities::avoidWizard(self, wizard) * self.getRole().getAudacityWizard();
 }
 
 #ifdef ENABLE_VISUALIZATOR

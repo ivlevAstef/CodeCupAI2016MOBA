@@ -18,7 +18,7 @@ bool CommandAttackWizard::check(const Wizard& self) {
   const auto delta = wizardPos - selfPos;
 
   /// маг далеко
-  if (delta.length() > self.getCastRange() + wizard.getRadius()) {
+  if (delta.length() > self.getCastRange() + wizard.getRadius() + self.maxSpeed()) {
     return false;
   }
 
@@ -48,12 +48,11 @@ void CommandAttackWizard::execute(const Wizard& self, Result& result) {
     const auto wizardPos = EX::pos(wizard);
     const auto delta = wizardPos - selfPos;
 
-    /// подвинуть мага на один тик вперед сложно, но зато можно пулю слегка отодвинуть назад, и убедиться что она попадет
-    const auto bulletPos = selfPos - delta.normal() * EX::maxSpeed(wizard);
+    const auto bulletPos = selfPos;
     Bullet bullet = Bullet(0,
       delta.normal() * Game::model().getMagicMissileSpeed(),
       Game::model().getMagicMissileRadius(),
-      bulletPos, bulletPos, self.getCastRange(), model::PROJECTILE_MAGIC_MISSILE, self.getFaction());
+      selfPos, bulletPos, self.getCastRange(), model::PROJECTILE_MAGIC_MISSILE, self.getFaction());
 
     result.priority = AttackPriorities::attackWizard(self, wizard, &bullet);
   }

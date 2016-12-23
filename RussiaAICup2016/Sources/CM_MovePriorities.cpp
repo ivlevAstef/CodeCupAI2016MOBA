@@ -60,15 +60,15 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
 
   int skillPriority = 0;
   if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
-    skillPriority = 15 * (Game::model().getFireballCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL));
+    skillPriority += 8 * (Game::model().getFireballCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FIREBALL));
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
-    skillPriority = 10 * (Game::model().getFrostBoltCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT));
+    skillPriority += 15 * (Game::model().getFrostBoltCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT));
   }
 
 
-  return 500 + statusPriority + skillPriority + lifePriority - timeForMagic * 5 - timeToTurnAttack * 10;
+  return 500 + statusPriority + skillPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 10;
 }
 
 double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {

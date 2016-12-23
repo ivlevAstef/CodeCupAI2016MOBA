@@ -28,9 +28,9 @@ double AttackPriorities::attackMinion(const Wizard& self, const model::Minion& m
     const double distance = self.getDistanceTo(minion);
     const double nDistance = MAX(distance, range);
 
-    return 200 + lifePriority + 400 * ((range * range) / (nDistance * nDistance));
+    return lifePriority + 400 * ((range * range) / (nDistance * nDistance));
   } else if (model::MINION_FETISH_BLOWDART == minion.getType()) {
-    return 300 + lifePriority;
+    return 410 + lifePriority;
   }
   assert(false && "Incorrect minion type...");
   return 0;
@@ -71,7 +71,7 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   /// если маг может уклонится от снаряда, то снижаем приоритет
   double dodgePriority = 1;
   if (nullptr != bullet && Algorithm::canDodge(wizard, Vector(1, 0).rotate(wizard.getAngle()), *bullet)) {
-    dodgePriority = 0.1;
+    dodgePriority = 0.01;
   }
 
 

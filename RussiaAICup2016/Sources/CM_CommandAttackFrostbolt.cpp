@@ -56,7 +56,7 @@ bool CommandAttackFrostbolt::check(const Wizard& self) {
       }
 
       /// подвинуть мага на один тик вперед сложно, но зато можно пулю слегка отодвинуть назад, и убедиться что она попадет
-      const auto bulletPos = selfPos - delta.normal() * EX::maxSpeed(wizard);
+      const auto bulletPos = selfPos - delta.normal() * (EX::maxSpeed(wizard) + self.maxSpeed());
       Bullet bullet = Bullet(0,
         delta.normal() * Game::model().getFrostBoltSpeed(),
         Game::model().getFrostBoltRadius(),

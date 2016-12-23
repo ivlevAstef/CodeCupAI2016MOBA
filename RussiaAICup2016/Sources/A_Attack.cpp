@@ -57,34 +57,45 @@ double Algorithm::timeToTurn(const model::Wizard& wizard, const double angle) {
 }
 
 
-bool canEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius, const Vector preyEndVec, const double preyEndAngle, const Obstacles& obstacles) {
-  const auto preyBeginPos = EX::pos(prey);
-
-  const size_t maxIteration = (size_t)ceil(castRange / bulletSpeed.length());
+bool canEscape(const Bullet& bullet, const model::Wizard& prey, const Position& preyBeginPos, const Vector preyEndVec, const double preyEndAngle, const Obstacles& obstacles) {
+  const double subRange = (bullet.pos - bullet.startPoint).length();
+  const size_t maxIteration = (size_t)ceil((bullet.range - subRange) / bullet.speed.length());
 
   /// текущая максимальная скорость, нужна для приблизительных расчетом сколько тиков нужно чтобы дойти до объекта
   const auto currentMaxSpeed = Algorithm::maxSpeed(prey, prey.getAngle(), preyEndVec).length();
+  const auto maxSpeed = EX::maxSpeed(prey);
   /// находим максимальную дистанцию на которую можно сместиться при таком векторе, и не упереться
-  auto preyEndPos = preyBeginPos + preyEndVec * (EX::maxSpeed(prey) * maxIteration);
+  auto preyEndPos = preyBeginPos + preyEndVec * (EX::maxSpeed(prey) * double(maxIteration + 1));
   for (const auto& obstacle : obstacles) {
     /// проверка на уперся в препятствие
     const auto obstaclePos = EX::pos(*obstacle);
-    const auto intersectPoint = Math::point_distanceToSegment(EX::pos(*obstacle), preyBeginPos, preyEndPos);
+    const auto intersectPoint = Math::point_distanceToSegment(obstaclePos, preyBeginPos, preyEndPos);
     const auto distance = (obstaclePos - intersectPoint).length();
     auto radius = obstacle->getRadius() + prey.getRadius();
 
-    /// для сокращения расчетов, сложные форму по движимым объектам внутри
+    /// для сокращения расчетов, сложных формул по движимым объектам внутри
     if (distance > radius) {
       continue;
     }
 
     // движимый объект это такойже объект, но у него уменьшается радиус от расстояния, в зависимости от его скорости
-    int ticks = (preyBeginPos - intersectPoint).length() / currentMaxSpeed;
-    radius -= obstacle->getRadius() - double(ticks) * EX::maxSpeed(*obstacle); // если объект не движемый то у него скорость нулевая
+    int ticks = (preyBeginPos - intersectPoint).length() / maxSpeed;
+    if (EX::isWizard(*obstacle)) {
+      /// маги по факту достаточно статичны, если рядом враги.
+      radius -= double(ticks) * EX::maxSpeed(*obstacle) * 0.1;
+    } else if (EX::isMinion(*obstacle)) {
+      /// миньоны идут только вперед
+      double speedMult = abs(preyEndVec.perpendicular().dot(Vector(1, 0).rotated(obstacle->getAngle())));
+      radius -= double(ticks) * EX::maxSpeed(*obstacle) * speedMult * 0.5;
+    }
+
 
     if (distance < radius) {
       double translate = sqrt(radius*radius - distance * distance);
-      preyEndPos = intersectPoint - preyEndVec * translate;
+      const auto& prePos = intersectPoint - preyEndVec * translate;
+      if ((prePos - preyBeginPos).length() < (preyEndPos - preyBeginPos).length()) {
+        preyEndPos = prePos;
+      }
     }
   }
 
@@ -93,20 +104,20 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
   auto preyPos = preyBeginPos;
   auto preyAngle = prey.getAngle();
 
-  Position lastBulletPos = attackingPos;
-  Position bulletPos = attackingPos;
+  Position lastBulletPos = bullet.pos;
+  Position bulletPos = bullet.pos;
 
   for (size_t iter = 0; iter <= maxIteration; iter++) {
     ///////////////////
     lastBulletPos = bulletPos;
-    bulletPos += bulletSpeed;
+    bulletPos += bullet.speed;
 
-    if ((bulletPos - attackingPos).length() > castRange) {
-      bulletPos = attackingPos + bulletSpeed.normal() * castRange;
+    if ((bulletPos - bullet.startPoint).length() > bullet.range) {
+      bulletPos = bullet.startPoint + bullet.speed.normal() * bullet.range;
     }
 
-    if (Math::distanceToSegment(preyPos, bulletPos, lastBulletPos) < bulletRadius + prey.getRadius()) {
-      return false;
+    if (bulletPos == lastBulletPos) {
+      break;
     }
 
     ////////////////////
@@ -122,70 +133,45 @@ bool canEscape(const Position attackingPos, const double castRange, const model:
       angleDiff = preyTurnSpeed * SIGN(angleDiff);
     }
     preyAngle += angleDiff;
+
+    if (Math::distanceToSegment(preyPos, bulletPos, lastBulletPos) < bullet.radius + prey.getRadius()) {
+      return false;
+    }
   }
 
   return true;
 }
 
-bool Algorithm::canSideForwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius) {
-  auto endAngleVec = bulletSpeed.perpendicular().normal();
-  /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикуляров
-  if (endAngleVec.dot(Vector(1, 0).rotate(prey.getAngle())) < 0) {
-    endAngleVec *= -1;
-  }
-
-  const double preyEndAngle = endAngleVec.angle();
-  const auto obstacles = World::instance().obstacles(prey, prey.getRadius() + bulletRadius);
-  return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, endAngleVec, preyEndAngle, obstacles);
-}
-bool Algorithm::canSideBackwardEscape(const Position attackingPos, const double castRange, const model::Wizard& prey, const Vector bulletSpeed, const double bulletRadius) {
-  auto endAngleVec = bulletSpeed.perpendicular().normal();
-  /// если угол больше 90 градусов - выбран не оптимальный из двух возможных перпендикуляров
-  if (endAngleVec.dot(Vector(1, 0).rotate(prey.getAngle())) < 0) {
-    endAngleVec *= -1;
-  }
-
-  const double preyEndAngle = endAngleVec.angle();
-  const auto obstacles = World::instance().obstacles(prey, prey.getRadius() + bulletRadius);
-  return canEscape(attackingPos, castRange, prey, bulletSpeed, bulletRadius, -endAngleVec, preyEndAngle, obstacles);
-}
-
-bool Algorithm::canDodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet) {
-  int turnSign = 0;
-  return dodge(prey, desiredDir, bullet, turnSign).length() > 0.1;
-}
-
-Vector Algorithm::dodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet, int& turnSign) {
+Vector _dodge(const model::Wizard& prey, const Position& preyBeginPos, const Vector desiredDir, const Bullet bullet, int& turnSign) {
   const double centerAngle = desiredDir.angle();
 
-  const auto obstacles = World::instance().obstacles(prey, prey.getRadius() + bullet.radius + 100);
+  const auto obstacles = World::instance().obstacles(prey, prey.getRadius() + bullet.radius + 200);
 
   /// проверяем возможность уклониться при всех возможных конечных углах, начиная с текущего
-  /// проверяем каждые 6 градусов
   const double dtStep = EX::turnSpeed(prey) * 0.5;
-  for (double angleDt = 0; angleDt < AICUP_PI + dtStep; angleDt += dtStep) {
+  for (double angleDt = 0; angleDt < 3.1416 + dtStep; angleDt += dtStep) {
     const auto leftAngle = centerAngle + angleDt;
     const auto rightAngle = centerAngle - angleDt;
     const auto endVectorLeft = Vector(1, 0).rotate(leftAngle);
     const auto endVectorRight = Vector(1, 0).rotate(rightAngle);
 
     /// если идти вперед
-    if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, endVectorLeft, leftAngle, obstacles)) {
+    if (canEscape(bullet, prey, preyBeginPos, endVectorLeft, leftAngle, obstacles)) {
       turnSign = 1;
       return endVectorLeft;
     }
 
-    if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, endVectorRight, rightAngle, obstacles)) {
+    if (canEscape(bullet, prey, preyBeginPos, endVectorRight, rightAngle, obstacles)) {
       turnSign = 1;
       return endVectorRight;
     }
 
     /// если идти назад
-    if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, -endVectorLeft, leftAngle, obstacles)) {
+    if (canEscape(bullet, prey, preyBeginPos, -endVectorLeft, leftAngle, obstacles)) {
       turnSign = -1;
       return -endVectorLeft;
     }
-    if (canEscape(bullet.startPoint, bullet.range, prey, bullet.speed, bullet.radius, -endVectorRight, rightAngle, obstacles)) {
+    if (canEscape(bullet, prey, preyBeginPos, -endVectorRight, rightAngle, obstacles)) {
       turnSign = -1;
       return -endVectorRight;
     }
@@ -193,6 +179,23 @@ Vector Algorithm::dodge(const model::Wizard& prey, const Vector desiredDir, cons
 
   return Vector();
 }
+
+bool Algorithm::canDodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet) {
+  int turnSign = 0;
+  const auto preyBeginPos = EX::pos(prey);
+  return _dodge(prey, preyBeginPos, desiredDir, bullet, turnSign).length() > 0.1;
+}
+
+bool Algorithm::canDodge(const model::Wizard& prey, const Position& preyBeginPos, const Vector desiredDir, const Bullet bullet) {
+  int turnSign = 0;
+  return _dodge(prey, preyBeginPos, desiredDir, bullet, turnSign).length() > 0.1;
+}
+
+Vector Algorithm::dodge(const model::Wizard& prey, const Vector desiredDir, const Bullet bullet, int& turnSign) {
+  const auto preyBeginPos = EX::pos(prey);
+  return _dodge(prey, preyBeginPos, desiredDir, bullet, turnSign);
+}
+
 
 bool Algorithm::canAttackMMOrMelee(const model::Wizard& self, const model::LivingUnit& unit) {
   const double timeToAttack = timeToTurnForAttack(unit, self);
