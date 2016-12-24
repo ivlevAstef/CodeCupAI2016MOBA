@@ -58,11 +58,11 @@ namespace AICup
       desireChangeLine = 0.9;
       changeLineForeFrontPriority = 0.5;
       changeLinePathLengthPriority = 1.25;
-      changeLineWizardCountPriority = -2.0;
+      changeLineWizardCountPriority = -0.5;
       changeLineWizardCountOnlyFriend = false;
       changeLineTowerBalancePriority = 0.5;
       changeLineLaneStrengthPriority = 0.4;
-      changeLineExpiriencePriority = 2.5;
+      changeLineExpiriencePriority = 1.5;
 
       attackMeleeWinThreshold = 0.5;
       attackWizardMeleePriority = 0.5;

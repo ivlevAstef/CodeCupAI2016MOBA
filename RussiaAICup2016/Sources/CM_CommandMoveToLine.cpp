@@ -29,7 +29,7 @@ bool CommandMoveToLine::check(const Wizard& self) {
   const double factor = (1 + changeOfWinning) * 0.5 * self.getRole().getLinePressureWizards()
                       - (1 - changeOfWinning) * 0.5 * self.getRole().getLineAudacityWizard();
 
-  const auto wizardOffset = -100 * changeOfWinning * factor;
+  const auto wizardOffset = -100 * factor;
 
   const auto foreFront = InfluenceMap::instance().getForeFront(line, float(offset + wizardOffset));
   const auto foreFrontDirection = InfluenceMap::instance().getForeDirection(line, foreFront);

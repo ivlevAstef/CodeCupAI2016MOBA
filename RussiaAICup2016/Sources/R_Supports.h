@@ -62,7 +62,7 @@ namespace AICup
 
       desireChangeLine = 0.95;
       changeLineForeFrontPriority = 0.25;
-      changeLinePathLengthPriority = 0.5;
+      changeLinePathLengthPriority = 0.6;
       changeLineWizardCountPriority = 1.5;
       changeLineWizardCountOnlyFriend = false;
       changeLineTowerBalancePriority = 0.5; // бежим туда где больше вражеских вышек, при прочих равных
