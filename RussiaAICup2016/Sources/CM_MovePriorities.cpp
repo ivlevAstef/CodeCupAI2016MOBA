@@ -41,11 +41,11 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
   const double timeToTurnAttack = Algorithm::timeToTurnForAttack(self, wizard);
   const double timeForMagic = EX::minTimeForMagic(wizard);
 
-  /// если мага можно быстро добить, то его не стоит бояться
   int lifePriority = (600 * wizard.getLife()) / wizard.getMaxLife();
 
+  /// если мага можно быстро добить, то его не стоит бояться
   if (wizard.getLife() + 2/*так как есть регенерация*/ < 2 * EX::magicMissleAttack(self)) {
-    lifePriority -= 200 * EX::magicMissleAttack(self);
+    lifePriority -= 25 * EX::magicMissleAttack(self);
   }
 
 
@@ -55,6 +55,8 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
       statusPriority += 400;
     } else if (model::STATUS_FROZEN == status.getType()) {
       statusPriority -= status.getRemainingDurationTicks() * 50;
+    } else if (model::STATUS_HASTENED == status.getType()) {
+      statusPriority += 100;
     }
   }
 
@@ -67,8 +69,7 @@ double MovePriorities::avoidWizard(const Wizard& self, const model::Wizard& wiza
     skillPriority += 15 * (Game::model().getFrostBoltCooldownTicks() - EX::cooldownMaxSkill(wizard, model::ACTION_FROST_BOLT));
   }
 
-
-  return 500 + statusPriority + skillPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 10;
+  return 500 + statusPriority + skillPriority + lifePriority - timeForMagic * 10 - timeToTurnAttack * 15;
 }
 
 double MovePriorities::attackFollow(const Wizard& self, const model::Wizard& wizard) {

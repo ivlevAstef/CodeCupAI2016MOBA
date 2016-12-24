@@ -88,11 +88,11 @@ void InfluenceMap::updateLinePosition(const model::Wizard& self) {
 Position InfluenceMap::getForeFront(const model::LaneType lane, const float offset) const {
   switch (lane) {
     case model::LANE_TOP:
-      return Algorithm::offsetPointByPath(topForeFront, offset, getLinePoints(lane));
+      return Algorithm::offsetPointByPath(topForeFront, -offset, getLinePoints(lane));
     case model::LANE_MIDDLE:
-      return Algorithm::offsetPointByPath(middleForeFront, offset, getLinePoints(lane));
+      return Algorithm::offsetPointByPath(middleForeFront, -offset, getLinePoints(lane));
     case model::LANE_BOTTOM:
-      return Algorithm::offsetPointByPath(bottomForeFront, offset, getLinePoints(lane));
+      return Algorithm::offsetPointByPath(bottomForeFront, -offset, getLinePoints(lane));
     default:
       break;
   }

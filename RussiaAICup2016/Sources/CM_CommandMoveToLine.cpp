@@ -24,9 +24,11 @@ CommandMoveToLine::CommandMoveToLine(model::LaneType line): line(line) {
 bool CommandMoveToLine::check(const Wizard& self) {
   const auto offset = -100 * self.getRole().getAudacity();
 
-  const auto preForeFront = InfluenceMap::instance().getForeFront(line, float(offset));
+  const auto preForeFront = InfluenceMap::instance().getForeFront(line, 0);
   const double changeOfWinning = Algorithm::changeOfWinning(self, preForeFront.x, preForeFront.y);
-  const double factor = (changeOfWinning > 0) ? self.getRole().getLinePressureWizards() : self.getRole().getLineAudacityWizard();
+  const double factor = (1 + changeOfWinning) * 0.5 * self.getRole().getLinePressureWizards()
+                      - (1 - changeOfWinning) * 0.5 * self.getRole().getLineAudacityWizard();
+
   const auto wizardOffset = -100 * changeOfWinning * factor;
 
   const auto foreFront = InfluenceMap::instance().getForeFront(line, float(offset + wizardOffset));

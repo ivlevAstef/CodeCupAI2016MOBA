@@ -74,7 +74,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   auto bBeginPos = wizardPos + delta.normal() * wizardSpeed.length();
   /// всегда считаем что снаряд уже вылетел, и находиться на один тик ближе к нам и с учетом что маг к нам подошел на тик
   if (EX::availableSkill(wizard, model::ACTION_MAGIC_MISSILE)) { ///magic missile
-    useSpeedForMoveSelf *= 0.5;
+    useSpeedForMoveSelf *= 1;
     const auto bPos = bBeginPos + delta.normal() * Game::model().getMagicMissileSpeed();
     magics.push_back(MagicInfo{
       Bullet(0, delta.normal() * Game::model().getMagicMissileSpeed(), Game::model().getMagicMissileRadius(),
@@ -85,7 +85,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
-    useSpeedForMoveSelf *= 0.5;
+    useSpeedForMoveSelf *= 0.8;
     const auto bPos = bBeginPos + delta.normal() * Game::model().getFireballSpeed();
     magics.push_back(MagicInfo{
       Bullet(0, delta.normal() * Game::model().getFireballSpeed(), Game::model().getFireballExplosionMinDamageRange(),
@@ -96,7 +96,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FROST_BOLT)) {
-    useSpeedForMoveSelf *= 0.15;
+    useSpeedForMoveSelf *= 0.5;
     const auto bPos = bBeginPos + delta.normal() * Game::model().getFrostBoltSpeed();
     magics.push_back(MagicInfo{
       Bullet(0, delta.normal() * Game::model().getFrostBoltSpeed(), Game::model().getFrostBoltRadius(),
@@ -106,15 +106,19 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     });
   }
 
+  double audicity = (1 - changeOfWin) * (1 - changeOfWin) * 4; /// 16, 4, 0
+  useSpeedForMoveSelf *= (1 + changeOfWin) * 0.5; // 0, 0.5, 1
   for (auto& magic : magics) {
     const int maxCooldown = MAX(maxSafeTime, MAX(magic.cooldown, magic.manaCooldown));
 
-    double tr = (useSpeedForMoveSelf * double(maxCooldown)) - self.maxSpeed() - 12 * wizardSpeed.length();
+    double bTr = audicity * wizardSpeed.length();
+    double sTr = (useSpeedForMoveSelf * double(maxCooldown)) - self.maxSpeed();
 
-    magic.bullet.pos -= delta.normal() * tr;
-    magic.bullet.startPoint -= delta.normal() * tr;
+    magic.bullet.pos += delta.normal() * bTr;
+    magic.bullet.startPoint += delta.normal() * bTr;
 
-    if (!Algorithm::canDodge(self, selfPos, delta, magic.bullet)) {
+
+    if (!Algorithm::canDodge(self, selfPos, delta + delta.normal() * sTr, magic.bullet)) {
       distance = delta.length() + self.getRadius(); /// уходим назад
       return true;
     }
