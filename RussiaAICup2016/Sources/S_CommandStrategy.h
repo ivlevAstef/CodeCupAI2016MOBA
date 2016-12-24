@@ -40,7 +40,7 @@ namespace AICup
     Wizard preUpdate(const model::Wizard& self, model::Move& move);
 
   private:
-    const Vector turn(const std::vector<MoveCommand::Result>& moveResults, bool& force);
+    const Vector turn(const std::vector<MoveCommand::Result>& moveResults);
     bool move(std::vector<MoveCommand::Result>& moveResults, const Wizard& self, Vector& direction);
 
     const model::LivingUnit* attack(const Wizard& self, model::ActionType& action);

@@ -4,6 +4,8 @@
 #include "R_StandardInfo.h"
 #include "E_World.h"
 #include "E_Points.h"
+#include "E_InfluenceMap.h"
+#include "C_Math.h"
 
 using namespace AICup;
 
@@ -18,7 +20,7 @@ void AntiRushStrategy::update(const model::Wizard& model, model::Move& move) {
   }
 
   if (nullptr == role) {
-    role = StandardInfo::role(model);
+    role = std::make_shared<AntiRushRole>(*StandardInfo::role(model).get());
   }
 
   CommandStrategy::clear();
@@ -33,8 +35,13 @@ void AntiRushStrategy::update(const model::Wizard& model, model::Move& move) {
 
   addAttackFollow(self);
 
-  if (model::LANE_BOTTOM == World::instance().positionToLine(model.getX(), model.getY())) {
-    const auto pos = Points::point(Points::BONUS_BOTTOM) + Vector(-500, 500);
+  const auto tacticRole = StandardInfo::tacticsRole(self);
+
+  if (tacticRole == TacticsRole::SupportHaste || tacticRole == TacticsRole::AttackStan) {
+    auto distance = Math::distanceToLine(EX::pos(model), Points::point(Points::ACADEMY_BASE), Points::point(Points::RENEGADES_BASE));
+    distance = INTERVAL(100, distance - 25, 750);
+
+    const auto pos = InfluenceMap::instance().getForeFront(model::LANE_MIDDLE, -distance);
     addMoveToPoint(self, pos);
   } else {
     addMoveTo(self, model::LANE_MIDDLE);
@@ -58,9 +65,10 @@ void AntiRushStrategy::addMoveToPoint(const Wizard& self, Position pos) {
 
 
   double moveToPointPriority = -1000;
-  const auto moveToPoint = fabric.moveToPoint(pos.x, pos.y, 2000);
+  const auto moveToPoint = fabric.moveToPoint(pos.x, pos.y, 200);
   if (moveToPoint->check(self)) {
     moveToPoint->execute(self, cache);
+    moveToPointPriority = cache.priority;
   }
 
   if (moveToPointPriority < 0 && moveToBonusPriority < 0) {

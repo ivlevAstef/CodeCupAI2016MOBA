@@ -1,7 +1,7 @@
 //
-//File: R_AntiRush.h
+//File: R_Rush.h
 //Author: Ivlev Alexander. Stef
-//Created: 12/12/2016
+//Created: 11/12/2016
 //
 
 #pragma once
@@ -12,34 +12,48 @@
 
 namespace AICup
 {
-  /// TODO: подогнать цифры
+
   class AntiRushRole: public Role {
   public:
-    AntiRushRole() {
-      audacity = 0;
-      linePressureWizards = 2.25;
-      lineAudacityWizards = 2.0;
+    AntiRushRole(const Role& parent) {
 
-      importanceOfXP = 0.5;
-      importanceOfBonus = 0.25;
+      audacity = parent.getAudacity();
+      linePressureWizards = parent.getLinePressureWizards();
+      lineAudacityWizards = parent.getAudacityWizard();
+
+      importanceOfXP = parent.getImportanceOfXP();
+      importanceOfBonus = parent.getImportanceOfBonus();
 
 
-      buildPriority = 0.1;
-      minionPriority = 0.25;
-      treePriority = 3.0;
-      wizardPriority = 5.0;
+      buildPriority = parent.getBuildPriority();
+      minionPriority = parent.getMinionPriority();
+      treePriority = parent.getTreePriority();
+      wizardPriority = parent.getWizardPriority();
 
-      audacityBuild = 5.0;
-      audacityMinion = 0.1;
-      audacityWizard = 0.0;
-      attackSkillPriority = 3.5;
+      audacityBuild = parent.getAudacityBuild() * 2;
+      audacityMinion = parent.getAudacityMinion() * 1.2;
+      audacityWizard = parent.getAudacityWizard();
+      attackSkillPriority = parent.getAttackSkillPriority();
 
-      attackMeleeWinThreshold = 0.0;
+      desireChangeLine = parent.getDesireChangeLine();
 
-      attackWizardMeleePriority = 1.0;
-      attackBuildMeleePriority = 0.1;
-      attackMinionMeleePriority = 0.5;
+      changeLineForeFrontPriority = parent.getChangeLineForeFrontPriority();
+      changeLinePathLengthPriority = parent.getChangeLinePathLengthPriority();
+      changeLineWizardCountPriority = parent.getChangeLineWizardCountPriority();
+      changeLineWizardCountOnlyFriend = false;
+      changeLineTowerBalancePriority = parent.getChangeLineTowerBalancePriority(); // бежим туда где больше вражеских вышек, при прочих равных
+      changeLineLaneStrengthPriority = parent.getChangeLineLaneStrengthPriority();
+      changeLineExpiriencePriority = parent.getChangeLineExpiriencePriority();
 
+      attackMeleeWinThreshold = 0.4;
+
+      attackWizardMeleePriority = 10;
+      attackMinionMeleePriority = 1;
+      attackBuildMeleePriority = 0.5;
+
+      friendWizardConfidence = 1.2;
+
+      repulsionDodgeFireballPriority = parent.getRepulsionDodgeFireballPriority();
     }
 
     void update(const model::Wizard& self) override {
@@ -47,10 +61,11 @@ namespace AICup
 
       const auto realLife = self.getLife() - EX::burnResidualDamage(self);
 
-      audacity = -2.0 * (1 - (float(realLife) / float(self.getMaxLife())));
+      audacity = -3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
 
-      linePressureWizards = 2.25 * float(realLife) / float(self.getMaxLife());
-      lineAudacityWizards = 4.0 * (1 - (float(realLife) / float(self.getMaxLife())));
+      linePressureWizards = -0.25 + 0.75 * float(realLife) / float(self.getMaxLife());
+      lineAudacityWizards = 0.5 + 3.5 * (1 - (float(realLife) / float(self.getMaxLife())));
     }
   };
+
 }

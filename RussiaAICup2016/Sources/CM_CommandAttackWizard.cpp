@@ -31,6 +31,12 @@ bool CommandAttackWizard::check(const Wizard& self) {
     return false;
   }
 
+  double changeOfWin = Algorithm::symmetrialChangeOfWinning(self, wizard, self.getRole().getFriendWizardConfidence(), 1);
+  /// если шансов на победу нету, то лучше уйти подальше, нежели бить мага
+  if (changeOfWin < -0.6) {
+    return false;
+  }
+
   return true;
 }
 

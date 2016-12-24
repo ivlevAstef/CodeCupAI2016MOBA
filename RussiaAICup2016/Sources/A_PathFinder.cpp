@@ -167,7 +167,7 @@ void PathFinder::calculateCost(const Vector2D<int> ignoreCenter, const int ignor
   for (const auto& obstacle : obstacles) {
     float life = 1;
     if (EX::isTree(*obstacle)) {
-      life = float(obstacle->getLife() * obstacle->getLife()) / 40.0f; /// дерево
+      life = float(obstacle->getLife() * obstacle->getLife()) / 25.0f; /// дерево
     } else if (EX::isNeutral(*obstacle)) {
       life = 100.0f; /// нейтрал очень дорогое удовольствие
     } else {
@@ -180,7 +180,7 @@ void PathFinder::calculateCost(const Vector2D<int> ignoreCenter, const int ignor
     Math::fillGrid(reinterpret_cast<float*>(costs), oPos.x, oPos.y, PathConstants::step, fullRadius, life);
   }
 
-
+  /// код хороший, но приводит к зацикливанию иногда и хождению назад вперед
   const float* enemiesMap = InfluenceMap::instance().getEnemiesMap();
   for (size_t x = 2; x < PathConstants::memorySize-2; x++) {
     for (size_t y = 2; y < PathConstants::memorySize-2; y++) {
@@ -192,11 +192,12 @@ void PathFinder::calculateCost(const Vector2D<int> ignoreCenter, const int ignor
       const size_t mapX = size_t((x * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const size_t mapY = size_t((y * double(PathConstants::step)) / double(InfluenceMapConstants::step));
       const float value = enemiesMap[mapX * InfluenceMapConstants::memorySize + mapY];
-      costs[x][y] += value * 2/*магическая константа, о том насколько не стоит проходить по точкам врага*/;
+
+      costs[x][y] += value * 5;
       /// и еще немного ячеек вокруге захватим, дабы точно не пройти рядом с врагами
       for (int nx = -2; nx <= 2; nx++) {
         for (int ny = -2; ny <= 2; ny++) {
-          costs[x + nx][y + ny] += value;
+          costs[x + nx][y + ny] += value * 2;
         }
       }
     }
@@ -360,19 +361,19 @@ void PathFinder::visualization(const Visualizator& visualizator) const {
   }*/
 
 
-  /*if (Visualizator::PRE == visualizator.getStyle()) {
-    const auto size = 80; // PathConstants::memorySize
-    for (int x = 0; x < size; x++) {
-      for (int y = 0; y < size; y++) {
-        const auto p1 = PathConstants::toReal({x,y}, 0, 0);
-        const auto p2 = PathConstants::toReal({x,y}, 1, 1);
+  //if (Visualizator::PRE == visualizator.getStyle()) {
+  //  const auto size = PathConstants::memorySize; // PathConstants::memorySize
+  //  for (int x = 0; x < size; x++) {
+  //    for (int y = 0; y < size; y++) {
+  //      const auto p1 = PathConstants::toReal({x,y}, 0, 0);
+  //      const auto p2 = PathConstants::toReal({x,y}, 1, 1);
 
-        const double weight = weights[x][y] / 50;
-        int color = 255 - MIN(255, (int)(weight * 255));
-        visualizator.fillRect(p1.x, p1.y, p2.x, p2.y, color << 8);
-      }
-    }
-  }*/
+  //      const double weight = costs[x][y] / 50;
+  //      int color = 255 - MIN(255, (int)(weight * 255));
+  //      visualizator.fillRect(p1.x, p1.y, p2.x, p2.y, color << 8);
+  //    }
+  //  }
+  //}
 
   /*if (Visualizator::PRE == visualizator.getStyle()) {
     const auto size = PathConstants::memorySize;

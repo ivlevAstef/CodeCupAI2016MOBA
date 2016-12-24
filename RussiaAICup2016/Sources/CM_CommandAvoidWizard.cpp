@@ -45,7 +45,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     return false;
   }
 
-  changeOfWin = Algorithm::changeOfWinning(self, wizardPos.x, wizardPos.y);
+  changeOfWin = Algorithm::symmetrialChangeOfWinning(self, wizard, self.getRole().getFriendWizardConfidence(), 1);
 
   const auto maxSpeed = Algorithm::maxSpeed(self, self.getAngle(), delta);
 
@@ -85,7 +85,7 @@ bool CommandAvoidWizard::check(const Wizard& self) {
   }
 
   if (EX::availableSkill(wizard, model::ACTION_FIREBALL)) {
-    useSpeedForMoveSelf *= 0.8;
+    useSpeedForMoveSelf *= 1.5;
     const auto bPos = bBeginPos + delta.normal() * Game::model().getFireballSpeed();
     magics.push_back(MagicInfo{
       Bullet(0, delta.normal() * Game::model().getFireballSpeed(), Game::model().getFireballExplosionMinDamageRange(),
@@ -106,8 +106,8 @@ bool CommandAvoidWizard::check(const Wizard& self) {
     });
   }
 
-  double audicity = (1 - changeOfWin) * (1 - changeOfWin) * 4; /// 16, 4, 0
-  useSpeedForMoveSelf *= (1 + changeOfWin) * 0.5; // 0, 0.5, 1
+  double audicity = (1 - changeOfWin) * (1 - changeOfWin) * 4 - 4; /// 12, 0, -4
+  useSpeedForMoveSelf *= sqrt(1 + changeOfWin) / sqrt(2); // 0, 0.7, 1
   for (auto& magic : magics) {
     const int maxCooldown = MAX(maxSafeTime, MAX(magic.cooldown, magic.manaCooldown));
 

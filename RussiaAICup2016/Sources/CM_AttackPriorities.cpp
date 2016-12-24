@@ -59,29 +59,29 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
     return 1500;
   }
 
-  /// если хп (с запасом если немного востановится) меньше атаки, то надо добивать
-  if (wizard.getLife() + 1 < self.damage(model::ACTION_MAGIC_MISSILE)) {
-    return 2500;
-  }
-
   const auto selfPos = EX::pos(self);
   const auto wizardPos = EX::pos(wizard);
   const auto delta = wizardPos - selfPos;
 
-  /// если маг может уклонится от снаряда, то снижаем приоритет
-  double dodgePriority = 1;
-  if (nullptr != bullet && Algorithm::canDodge(wizard, Vector(1, 0).rotate(wizard.getAngle()), *bullet)) {
-    dodgePriority = 0.01;
-  }
-
 
   double supportedPriority = 0;
+
+  double countFriendWizards = 0;
   /// если маги вокруге могут теоретически атаковать, то повышаем приоритет
   for (const auto& aroundWizard : World::model().getWizards()) {
-    if (self.getFaction() == aroundWizard.getFaction() && self.getId() != aroundWizard.getId()
+    if (self.getFaction() == aroundWizard.getFaction()
       && aroundWizard.getDistanceTo(wizard) < EX::radiusForGuaranteedDodge(wizard, 0)) {
-      supportedPriority += 250;
+      if (self.getId() != aroundWizard.getId()) {
+        supportedPriority += 220;
+      }
+
+      countFriendWizards += 1;
     }
+  }
+
+  /// если хп (с запасом если немного востановится) меньше атаки, то надо добивать
+  if (wizard.getLife() + 1 < countFriendWizards * self.damage(model::ACTION_MAGIC_MISSILE)) {
+    return 2500;
   }
 
   /// если миньоны вокруге могут теоретически атаковать, то повышаем приоритет
@@ -100,7 +100,7 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
   }
 
 
-  const double lifePriority = 100.0 + 400.0 * (1.0 - MIN(100.0, double(wizard.getLife()))/100.0);
+  const double lifePriority = 100.0 + 600.0 * (1.0 - MIN(100.0, double(wizard.getLife()))/100.0);
 
   double statusPriority = 0;
   for (const auto& status : wizard.getStatuses()) {
@@ -127,6 +127,12 @@ double AttackPriorities::attackWizard(const Wizard& self, const model::Wizard& w
 
   const double distance = self.getDistanceTo(wizard);
   const double distancePriority = 500 * ((500 * 500) / (distance * distance));
+
+  /// если маг может уклонится от снаряда, то снижаем приоритет
+  double dodgePriority = 1;
+  if (nullptr != bullet && Algorithm::canDodge(wizard, Vector(1, 0).rotate(wizard.getAngle()), *bullet)) {
+    dodgePriority = 0.01;
+  }
 
   return MIN((lifePriority + statusPriority + distancePriority + supportedPriority) * dodgePriority, 2200);
 }

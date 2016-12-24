@@ -57,7 +57,7 @@ namespace AICup
 
       audacityBuild = 1.0;
       audacityMinion = 1.0;
-      audacityWizard = 2.5;
+      audacityWizard = 1.5;
       attackSkillPriority = 3.5;
 
       desireChangeLine = 0.95;
@@ -69,7 +69,7 @@ namespace AICup
       changeLineLaneStrengthPriority = 1.0;
       changeLineExpiriencePriority = 0.2;
 
-      attackMeleeWinThreshold = 0.8;
+      attackMeleeWinThreshold = 0.5;
 
       attackWizardMeleePriority = 0.2;
       attackBuildMeleePriority = 0.5;

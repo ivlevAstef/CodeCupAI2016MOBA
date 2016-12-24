@@ -491,6 +491,9 @@
     <ClInclude Include="..\Sources\CM_CommandRepulsionForDodgeFireBall.h">
       <Filter>Sources\Command\Commands\defend</Filter>
     </ClInclude>
+    <ClInclude Include="..\Sources\R_AntiRush.h">
+      <Filter>Sources\Tactics\Final\AntiRush</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\local-runner\read.me" />

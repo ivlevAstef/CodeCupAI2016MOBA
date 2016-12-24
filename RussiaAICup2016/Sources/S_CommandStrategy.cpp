@@ -23,7 +23,7 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
   {
     Vector direction;
     if (move(moveResults, self, direction)) {
-      Vector turnDirection = turn(moveResults, forceTurn);
+      Vector turnDirection = turn(moveResults);
 
       /// если мы в окружении, значит все плохо... или алгоритм глюканул
       assert(direction.length() > 0.1);
@@ -35,9 +35,6 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
       Algorithm::execMove(self, turnDirection, direction, finalMove);
     }
   }
-
-  /// сохраняем поворот, чтобы если что потом восстановить (если в нас летит снаряд)
-  const auto turn = finalMove.getTurn();
 
   if (!attackCommands.empty()) {
     model::ActionType action;
@@ -53,10 +50,6 @@ void CommandStrategy::update(const Wizard& self, model::Move& finalMove) {
     if (nullptr != unit) {
       Algorithm::execCast(self, action, *unit, finalMove);
     }
-  }
-
-  if (forceTurn) {
-    finalMove.setTurn(turn);
   }
 }
 
@@ -90,26 +83,10 @@ std::vector<MoveCommand::Result> CommandStrategy::moveCommandsToMoveResult(const
   return moveResults;
 }
 
-const Vector CommandStrategy::turn(const std::vector<MoveCommand::Result>& moveResults, bool& force) {
+const Vector CommandStrategy::turn(const std::vector<MoveCommand::Result>& moveResults) {
   assert(!moveResults.empty());
-
-  Vector maxVector = Vector(0, 0);
-  double maxPriority = 100;
-
-  for (const auto& moveIter : moveResults) {
-    if (moveIter.force && moveIter.turnPriority > maxPriority) {
-      maxPriority = moveIter.priority;
-      maxVector = moveIter.turnDirection;
-    }
-  }
-
-  if (maxPriority > 100) {
-    force = true;
-    return maxVector;
-  }
-
   /// выбираем самый предпочтительный вид поворота
-  maxPriority = 0;
+  double maxPriority = 0;
   Vector result = Vector(0, 0);
   for (const auto& moveIter : moveResults) {
     const auto direction = moveIter.turnDirection;
@@ -341,14 +318,11 @@ const model::LivingUnit* CommandStrategy::cast(const Wizard& self, model::Action
 
 #ifdef ENABLE_VISUALIZATOR
 void CommandStrategy::visualization(const model::Wizard& self, const Visualizator& visualizator) const {
-  /*for (const auto& command : moveCommands) {
-    command->visualization(self, visualizator);
-  }*/
-
+  path->visualization(visualizator);
   if (Visualizator::PRE == visualizator.getStyle()) {
-    /*for (const auto& move : moveCommandsToMoveResult(self)) {
-      visualizator.line(self.getX(), self.getY(), self.getX() + move.moveDirection.x, self.getY() + move.moveDirection.y, 0xff0000);
-    }*/
+    for (const auto& command : moveCommands) {
+      command->visualization(self, visualizator);
+    }
   }
 
   for (const auto& command : attackCommands) {

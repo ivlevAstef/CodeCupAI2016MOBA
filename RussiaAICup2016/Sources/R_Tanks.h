@@ -69,7 +69,7 @@ namespace AICup
       changeLineLaneStrengthPriority = 1.0;
       changeLineExpiriencePriority = 0.5;
 
-      attackMeleeWinThreshold = 0.5;
+      attackMeleeWinThreshold = 0.35;
 
       attackWizardMeleePriority = 5.0;
       attackBuildMeleePriority = 5.0;

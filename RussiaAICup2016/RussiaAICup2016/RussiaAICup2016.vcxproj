@@ -402,6 +402,7 @@ powershell start-process local-runner.bat</Command>
     <ClInclude Include="..\Sources\E_Bullet.h" />
     <ClInclude Include="..\Sources\E_InfluenceMap.h" />
     <ClInclude Include="..\Sources\E_HypotheticalEnemies.h" />
+    <ClInclude Include="..\Sources\R_AntiRush.h" />
     <ClInclude Include="..\Sources\R_Attacks.h" />
     <ClInclude Include="..\Sources\R_RoundOne.h" />
     <ClInclude Include="..\Sources\R_RoundTwo.h" />

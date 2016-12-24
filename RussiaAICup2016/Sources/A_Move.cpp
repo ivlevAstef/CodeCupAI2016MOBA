@@ -177,7 +177,6 @@ Vector findGroupPartsAndReturnTangets(const Position& from, const double radius,
   }
   findGroupPartsAndReturnTangets_for_END:;
 
-  assert(2 == resultIndex || 0 == resultIndex);
   if (2 != resultIndex) {
     /// нет возможности выйти из группы - окружен.
     return Vector();

@@ -21,12 +21,12 @@ bool CommandFollowAttack::check(const Wizard& self) {
     return false;
   }
 
-  const auto changeOfWin = Algorithm::changeOfWinning(self, wizardPos.x, wizardPos.y);
+  const auto changeOfWin = Algorithm::symmetrialChangeOfWinning(self, wizard, self.getRole().getFriendWizardConfidence(), 1);
 
   // если у мага мало хп и шанс на победу есть, то стоит преследовать
   return (wizard.getLife() + 1 < self.damage(model::ACTION_MAGIC_MISSILE) && changeOfWin > 0)
   /// если шанс на победу при нападении средний, то тоже преследуем
-    || changeOfWin > 0.2;
+    || changeOfWin > 0.5;
 }
 
 

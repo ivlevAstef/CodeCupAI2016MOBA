@@ -415,7 +415,7 @@ void InfluenceMap::includeFriends() {
 
   /// своим магам доверять, себе дороже
   for (const auto& wizard : World::instance().wizards()) {
-    if (Game::friendFaction() == wizard.getFaction()) {
+    if (Game::friendFaction() == wizard.getFaction() && wizard.getX() > 0) {
       includeFriend(wizard, wizardRadius(wizard), wizardDanger(wizard));
 
     }
@@ -433,13 +433,13 @@ void InfluenceMap::includeEnemies() {
     if (Game::enemyFaction() == minion.getFaction()) {
       includeEnemy(minion, minionRadius(minion), minionDanger(minion));
 
-    } else if (model::FACTION_NEUTRAL == minion.getFaction()) {
+    }/* else if (model::FACTION_NEUTRAL == minion.getFaction()) {
       includeEnemy(minion, minionRadius(minion), 0.01 * minionDanger(minion));
-    }
+    }*/
   }
 
   for (const auto& wizard : World::instance().wizards()) {
-    if (Game::enemyFaction() == wizard.getFaction()) {
+    if (Game::enemyFaction() == wizard.getFaction() && wizard.getX() < World::size()) {
       includeEnemy(wizard, wizardRadius(wizard), wizardDanger(wizard));
 
     }

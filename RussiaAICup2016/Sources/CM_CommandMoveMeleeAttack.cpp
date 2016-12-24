@@ -28,7 +28,7 @@ bool CommandMoveMeleeAttack::check(const Wizard& self) {
   }
 
 
-  changeOfWin = Algorithm::changeOfWinning(self, unitPos.x, unitPos.y);
+  changeOfWin = Algorithm::changeOfWinning(self, self.getRole().getFriendWizardConfidence(), 1, unitPos.x, unitPos.y);
   if (changeOfWin < self.getRole().getAttackMeleeWinThreshold()) {
     return false;
   }
